@@ -32,6 +32,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @since 2026-01-30
  */
 @SpringBootApplication
+@SuppressWarnings("checkstyle:HideUtilityClassConstructor")
 public class NavillaBackendApplication {
 
   /**

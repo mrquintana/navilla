@@ -208,6 +208,9 @@
             </plugin>
 
             <!-- JaCoCo for Code Coverage -->
+            <!-- TODO: Re-enable when JaCoCo supports Java 25 -->
+            <!-- Current version 0.8.12 has instrumentation issues with Java 25 -->
+            <!--
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
@@ -227,6 +230,7 @@
                     </execution>
                 </executions>
             </plugin>
+            -->
         </plugins>
     </build>
 
