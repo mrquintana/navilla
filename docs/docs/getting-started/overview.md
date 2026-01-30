@@ -1,0 +1,46 @@
+---
+sidebar_position: 1
+title: Overview
+---
+
+# Navilla Overview
+
+**Navilla** is a privacy-preserving sexual health platform that helps users understand their potential STI exposure through an anonymized connection network.
+
+## Core Principle
+
+> "Numbers, not names."
+
+Users can see statistics about their exposure risk (degrees of separation, potential exposures) without ever learning the identities of who may have exposed them.
+
+## Key Features
+
+- **Private Testing History**: Track your own STI testing history securely
+- **Anonymous Connections**: Connect with past partners without revealing identities
+- **Exposure Statistics**: See aggregate exposure data without identifying anyone
+- **Timely Alerts**: Receive anonymous notifications when potential exposure occurs
+
+## Privacy Architecture
+
+| Feature | Implementation |
+|---------|----------------|
+| **Zero names revealed** | Hashed IDs, encrypted PII |
+| **Statistics only** | Users see numbers, not identities |
+| **Mutual consent** | Connections require both parties to confirm |
+| **Minimum threshold** | 3+ connections required before specific alerts |
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| Frontend | React + Vite + TypeScript |
+| Backend | Java + Spring Boot |
+| Database | PostgreSQL (Supabase) |
+| Auth | Supabase Auth |
+| Docs | Docusaurus |
+
+## Quick Links
+
+- [Setup Guide](./setup) - Get your development environment running
+- [Architecture Overview](../architecture/overview) - Understand the system design
+- [API Reference](../api/overview) - Explore the API endpoints
