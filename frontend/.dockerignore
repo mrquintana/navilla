@@ -1,0 +1,46 @@
+# Docker ignore file for frontend
+
+# Dependencies
+node_modules/
+
+# Build outputs (we build inside container)
+dist/
+build/
+
+# IDE files
+.idea/
+.vscode/
+
+# Git
+.git/
+.gitignore
+
+# Environment files
+.env
+.env.*
+*.env
+
+# Documentation
+docs/
+*.md
+!README.md
+
+# Test files
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+__tests__/
+coverage/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Temporary files
+*.tmp
+*.bak

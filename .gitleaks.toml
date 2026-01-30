@@ -1,0 +1,59 @@
+# Gitleaks Configuration
+# https://github.com/gitleaks/gitleaks
+
+title = "Navilla Gitleaks Configuration"
+
+[extend]
+# Use the default gitleaks rules as a base
+useDefault = true
+
+# Allowlist for known safe patterns
+[allowlist]
+
+# Allow test/example credentials in test files
+paths = [
+    '''.*test.*''',
+    '''.*spec.*''',
+    '''.*\.example''',
+    '''.*\.sample''',
+    '''docs/.*''',
+]
+
+# Allow specific known safe strings
+regexes = [
+    # Example Supabase URL patterns in docs
+    '''https://test\.supabase\.co''',
+    '''https://example\.supabase\.co''',
+    # Test JWT tokens (base64 patterns that start with test)
+    '''eyJ0ZXN0.*''',
+]
+
+# Custom rules
+[[rules]]
+id = "supabase-service-key"
+description = "Supabase Service Role Key"
+regex = '''eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+'''
+tags = ["key", "supabase"]
+keywords = ["service_role", "supabase"]
+
+[[rules]]
+id = "database-password"
+description = "Database Password"
+regex = '''DATABASE_PASSWORD\s*=\s*[^\s]+'''
+tags = ["password", "database"]
+
+# Entropy-based detection for high-entropy strings
+[[rules]]
+id = "high-entropy-base64"
+description = "High entropy base64 string"
+regex = '''[A-Za-z0-9+/]{40,}={0,2}'''
+tags = ["entropy"]
+entropy = 4.5
+secretGroup = 0
+
+# Allowlist specific commits or files that are safe
+[allowlist.commits]
+# Add SHA hashes of commits that are known safe if needed
+
+[allowlist.stopwords]
+# Common words that might trigger false positives

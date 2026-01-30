@@ -1,0 +1,87 @@
+{
+  "common": {
+    "appName": "Navilla",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "retry": "Retry",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "submit": "Submit",
+    "close": "Close"
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "signOut": "Sign Out",
+    "signUp": "Sign Up",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "forgotPassword": "Forgot Password?",
+    "resetPassword": "Reset Password",
+    "verifyEmail": "Verify your email",
+    "checkEmail": "Check your email for a verification link"
+  },
+  "nav": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "connections": "Connections",
+    "health": "Health Status",
+    "settings": "Settings",
+    "profile": "Profile"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome back",
+    "exposureStatus": "Exposure Status",
+    "noExposure": "No known exposure",
+    "potentialExposure": "Potential exposure detected",
+    "connectionCount": "Connections",
+    "lastUpdated": "Last updated"
+  },
+  "connections": {
+    "title": "Connections",
+    "addConnection": "Add Connection",
+    "pendingRequests": "Pending Requests",
+    "noConnections": "No connections yet",
+    "connectionDate": "Connected on",
+    "removeConnection": "Remove Connection",
+    "confirmRemove": "Are you sure you want to remove this connection?"
+  },
+  "health": {
+    "title": "Health Status",
+    "reportStatus": "Report Health Status",
+    "currentStatus": "Current Status",
+    "healthy": "Healthy",
+    "reportedCondition": "Reported Condition",
+    "reportDate": "Report Date",
+    "updateStatus": "Update Status",
+    "statusUpdated": "Health status updated successfully"
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "notifications": "Notifications",
+    "privacy": "Privacy",
+    "account": "Account",
+    "deleteAccount": "Delete Account",
+    "confirmDeleteAccount": "Are you sure? This action cannot be undone."
+  },
+  "errors": {
+    "required": "This field is required",
+    "invalidEmail": "Please enter a valid email address",
+    "passwordMismatch": "Passwords do not match",
+    "passwordTooShort": "Password must be at least 8 characters",
+    "networkError": "Network error. Please check your connection.",
+    "unauthorized": "You are not authorized to perform this action",
+    "notFound": "Resource not found",
+    "serverError": "Server error. Please try again later."
+  },
+  "privacy": {
+    "tagline": "Numbers, not names",
+    "description": "Your privacy is our priority. We never share personal information - only anonymized statistics."
+  }
+}

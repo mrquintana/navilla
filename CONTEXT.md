@@ -71,10 +71,17 @@
 - [x] React + Vite + TypeScript project scaffolded
 - [x] TailwindCSS configured
 - [x] Startup scripts created (prod/dev/troubleshoot)
-- [ ] Supabase project setup (requires manual browser login)
+- [x] Supabase project setup (migrations run)
+- [x] Security configuration (JWT, CORS, encryption)
+- [x] GitHub Actions CI/CD workflows
+- [x] Docker configuration (multi-stage builds)
+- [x] Security scanning (Gitleaks, OWASP, CodeQL)
+- [x] i18n infrastructure (frontend: react-i18next, backend: MessageSource)
+- [x] README.md and CONTRIBUTING.md created
 
 ### Phase 2: Core Features
-- [ ] User registration/login
+- [x] User Entity & API (backend) - GitHub Issue #4
+- [ ] User registration/login (frontend)
 - [ ] Connection request system
 - [ ] Health status reporting
 - [ ] Basic exposure calculation
@@ -199,11 +206,65 @@ navilla/
    - Supabase client
    - TanStack Query
    - React Router
+7. Set up Supabase project & ran migrations
+8. Created GitHub issues for milestone tracking
 
 **Startup Scripts Created:**
 - `scripts/start-production.sh` - G1GC, optimized heap, container-aware
 - `scripts/start-development.sh` - Debug port 5005, verbose logging
 - `scripts/start-troubleshooting.sh` - GC logging, heap dumps, JMX, Flight Recorder
+
+### Session 2 - 2026-01-30 (continued)
+**Accomplished:**
+1. Implemented security configuration:
+   - `SecurityConfig.java` - JWT auth with Supabase, CORS, CSP headers
+   - `EncryptionService.java` - AES-256-GCM encryption, SHA-256 hashing
+   - `HealthController.java` - Public & authenticated health endpoints
+2. Created comprehensive unit tests (29 tests passing):
+   - `EncryptionServiceTest.java` - 25 tests for encryption/hashing
+   - `HealthControllerTest.java` - 3 integration tests
+3. Set up GitHub Actions CI/CD:
+   - `ci.yml` - Backend tests, frontend build, DB migration validation
+   - `security.yml` - Gitleaks, OWASP dependency check, CodeQL, Trivy
+   - `docker-publish.yml` - Multi-arch images to GitHub Container Registry
+4. Created Docker configuration:
+   - `backend/Dockerfile` - Multi-stage build, non-root user, health check
+   - `frontend/Dockerfile` - Nginx with SPA routing, security headers
+   - `.dockerignore` files for optimized builds
+5. Added security tooling:
+   - `.gitleaks.toml` - Secret scanning configuration
+   - `.dependency-check-suppression.xml` - OWASP false positive handling
+
+**Note:** Spring Boot 4 moved test packages:
+- `@WebMvcTest` → `org.springframework.boot.webmvc.test.autoconfigure`
+- `@AutoConfigureMockMvc` → same new package
+
+### Session 3 - 2026-01-30 (continued)
+**Accomplished:**
+1. Added i18n infrastructure:
+   - Frontend: react-i18next with en_US and es_MX locales
+   - Backend: Spring MessageSource with messages.properties files
+   - es_MX files contain English placeholders for future translation
+2. Created root documentation:
+   - `README.md` - Project overview, quick start, tech stack
+   - `CONTRIBUTING.md` - Contribution guidelines, code style, PR process
+3. Implemented User Entity & API (GitHub Issue #4):
+   - `User.java` - JPA entity with encrypted fields
+   - `UserRepository.java` - Spring Data JPA repository
+   - `UserService.java` - Business logic with encryption handling
+   - `UserController.java` - REST endpoints (/api/users/me)
+   - `UpdateProfileRequest.java`, `UserResponse.java` - DTOs
+   - `ApiError.java` - Standard error response format
+   - `ResourceNotFoundException.java` - Custom exception
+   - `GlobalExceptionHandler.java` - i18n error handling
+   - `MessageConfig.java` - i18n configuration
+
+**New Packages Created:**
+- `app.navilla.entity` - JPA entities
+- `app.navilla.repository` - Spring Data repositories
+- `app.navilla.service` - Business logic services
+- `app.navilla.dto` - Data transfer objects
+- `app.navilla.exception` - Exception classes and handlers
 
 ---
 
@@ -244,11 +305,16 @@ npm run dev  # Opens at http://localhost:5173
 
 ## Next Steps
 
-1. **Set up Supabase project** - Go to supabase.com, create project, run migrations
-2. **Configure environment files** - Copy .env.example to .env in backend and frontend
-3. **Implement Security Config** - JWT validation with Supabase
-4. **Create first API endpoint** - Health check / user endpoint
-5. **Implement authentication flow** - Frontend Supabase integration
+1. ~~**Set up Supabase project**~~ ✅ Done
+2. ~~**Configure environment files**~~ ✅ Done
+3. ~~**Implement Security Config**~~ ✅ Done (JWT, CORS, encryption)
+4. ~~**Create first API endpoint**~~ ✅ Done (health check)
+5. ~~**Implement User Entity & API**~~ ✅ Done (GitHub Issue #4)
+6. ~~**Add i18n infrastructure**~~ ✅ Done (en_US, es_MX with placeholders)
+7. ~~**Create README & CONTRIBUTING**~~ ✅ Done
+8. **Implement authentication flow** - Frontend Supabase integration
+9. **Implement Connection entity & API** - Next backend milestone
+10. **Push CI/CD workflows to GitHub** - Requires commit & push
 
 ---
 
