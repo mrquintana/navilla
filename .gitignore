@@ -11,10 +11,11 @@ out/
 .docusaurus/
 .cache-loader/
 
-# Java/Gradle
+# Java/Gradle/Maven
 .gradle/
 **/build/
 !src/**/build/
+**/target/
 *.class
 *.jar
 *.war
