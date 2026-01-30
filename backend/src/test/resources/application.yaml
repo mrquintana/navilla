@@ -1,0 +1,54 @@
+# Navilla Backend Test Configuration
+
+spring:
+  application:
+    name: navilla-backend-test
+
+  # H2 In-Memory Database for Tests
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  # JPA Configuration for Tests
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  # Disable OAuth2 resource server for tests (will be mocked)
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://test.supabase.co/auth/v1
+
+# Logging Configuration for Tests
+logging:
+  level:
+    root: WARN
+    app.navilla: DEBUG
+    org.springframework.security: DEBUG
+
+# Application-specific Test Configuration
+navilla:
+  supabase:
+    url: https://test.supabase.co
+    anon-key: test-anon-key
+    service-key: test-service-key
+
+  encryption:
+    pepper: test-pepper-for-unit-tests
+
+  privacy:
+    minimum-connections: 3
+    max-exposure-degree: 3
+
+  notification:
+    batch-day: SUNDAY
+    batch-hour: 18
+    random-delay-hours: 6

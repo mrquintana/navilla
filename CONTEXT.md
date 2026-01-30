@@ -18,10 +18,10 @@
 
 | Layer | Technology | Status |
 |-------|------------|--------|
-| Frontend | React + Vite + TypeScript | Not started |
-| Backend | Java 21 + Spring Boot 3.x | Not started |
-| Database | PostgreSQL (Supabase) | Not started |
-| Auth | Supabase Auth | Not started |
+| Frontend | React + Vite + TypeScript + TailwindCSS | ✅ Scaffolded |
+| Backend | Java 25 + Spring Boot 4.0.2 + Maven | ✅ Scaffolded |
+| Database | PostgreSQL (Supabase) | ✅ Migrations ready |
+| Auth | Supabase Auth | Pending setup |
 | Docs | Docusaurus | ✅ Complete |
 | Hosting | Vercel (FE + Docs), TBD (BE) | Docs ready |
 
@@ -41,13 +41,18 @@
 - **Format:** Single markdown file with dated entries, decision rationale, and status tracking
 - **Status:** ✅ Implemented
 
-**Decision:** Technology stack (ADR-002)
-- **Frontend:** React + Vite + TypeScript
-- **Backend:** Java 21 + Spring Boot 3.x
-- **Database:** PostgreSQL via Supabase
-- **Auth:** Supabase Auth
-- **Why:** Type safety, mature security libraries, free tiers for MVP
-- **Status:** ✅ Documented
+**Decision:** Use Maven over Gradle for backend build
+- **Why:** User preference, historically fewer issues, better IDE support
+- **Status:** ✅ Implemented
+
+**Decision:** Use Java 25 + Spring Boot 4.0.2
+- **Why:** Latest LTS Java, latest Spring Boot for modern features
+- **Status:** ✅ Implemented
+
+**Decision:** Use Google Java Style with Checkstyle
+- **Why:** Industry standard, well documented, enforces consistency
+- **Config:** `backend/checkstyle/google_checks.xml`
+- **Status:** ✅ Implemented
 
 ---
 
@@ -56,14 +61,17 @@
 ### Phase 1: Foundation
 - [x] Project directory created
 - [x] Context tracking file created (CONTEXT.md)
+- [x] Git repository initialized
 - [x] Docusaurus documentation site setup
 - [x] Documentation structure created (30+ docs)
 - [x] ADRs documented
-- [ ] Git repository initialized
-- [ ] Database schema implementation (SQL files)
-- [ ] Supabase project setup
-- [ ] Spring Boot project scaffolding
-- [ ] React + Vite project scaffolding
+- [x] Database migrations created (SQL files)
+- [x] Supabase setup guide created
+- [x] Spring Boot project scaffolded (Maven, Java 25)
+- [x] React + Vite + TypeScript project scaffolded
+- [x] TailwindCSS configured
+- [x] Startup scripts created (prod/dev/troubleshoot)
+- [ ] Supabase project setup (requires manual browser login)
 
 ### Phase 2: Core Features
 - [ ] User registration/login
@@ -81,52 +89,54 @@
 
 ---
 
-## Documentation Structure
+## Project Structure
 
 ```
-docs/
-├── getting-started/
-│   ├── overview.md
-│   ├── setup.md
-│   └── quick-start.md
-├── architecture/
-│   ├── overview.md (with Mermaid diagrams)
-│   ├── system-design.md
-│   ├── data-model.md (full schema)
-│   ├── privacy-model.md
-│   └── security.md
-├── backend/
-│   ├── overview.md
-│   ├── project-structure.md
-│   ├── authentication.md
-│   ├── database.md
-│   └── services.md
-├── frontend/
-│   ├── overview.md
-│   ├── project-structure.md
-│   ├── components.md
-│   ├── state-management.md
-│   └── styling.md
-├── development/
-│   ├── contributing.md
-│   ├── code-style.md
-│   ├── testing.md
-│   └── deployment.md
-├── onboarding/
-│   ├── new-hire.md
-│   ├── codebase-tour.md
-│   └── first-task.md
-├── adrs/
-│   ├── index.md
-│   ├── adr-001-documentation-platform.md
-│   └── adr-002-tech-stack.md
-└── api/
-    ├── overview.md
-    ├── authentication.md
-    ├── users.md
-    ├── connections.md
-    ├── health-status.md
-    └── exposures.md
+navilla/
+├── CONTEXT.md                    # This file - project tracking
+├── .gitignore                    # Git ignore rules
+│
+├── docs/                         # Docusaurus documentation
+│   ├── docs/                     # Markdown documentation
+│   │   ├── getting-started/
+│   │   ├── architecture/
+│   │   ├── backend/
+│   │   ├── frontend/
+│   │   ├── development/
+│   │   ├── onboarding/
+│   │   ├── adrs/
+│   │   └── api/
+│   └── docusaurus.config.ts
+│
+├── database/                     # Database files
+│   ├── SUPABASE_SETUP.md        # Setup guide
+│   └── migrations/
+│       ├── 001_initial_schema.sql
+│       ├── 002_row_level_security.sql
+│       └── 003_functions.sql
+│
+├── backend/                      # Spring Boot API
+│   ├── pom.xml                  # Maven configuration
+│   ├── checkstyle/              # Google Java style
+│   ├── scripts/                 # Startup scripts
+│   │   ├── start-production.sh
+│   │   ├── start-development.sh
+│   │   ├── start-troubleshooting.sh
+│   │   └── STARTUP_GUIDE.md
+│   └── src/
+│       ├── main/
+│       │   ├── java/app/navilla/
+│       │   └── resources/
+│       │       └── application.yaml
+│       └── test/
+│
+└── frontend/                     # React application
+    ├── package.json
+    ├── vite.config.ts
+    ├── tailwind.config.js
+    ├── postcss.config.js
+    └── src/
+        └── index.css            # TailwindCSS setup
 ```
 
 ---
@@ -135,10 +145,10 @@ docs/
 
 | Question | Status | Resolution |
 |----------|--------|------------|
-| Degree limit for exposure calc? | Open | Considering 3 degrees for MVP |
-| Connection deletion affects partner's graph? | Open | Leaning toward soft-delete (user removes from their view, partner keeps history) |
-| STI clearing removes past alerts? | Open | Leaning toward "resolved" status (alerts remain but marked resolved) |
-| Email hashing algorithm? | Open | SHA-256 with pepper for lookups, need to decide for password-like hashing |
+| Degree limit for exposure calc? | Decided | 3 degrees for MVP |
+| Connection deletion affects partner's graph? | Decided | Soft-delete (user removes from view, partner keeps history) |
+| STI clearing removes past alerts? | Decided | "Resolved" status (alerts remain but marked resolved) |
+| Email hashing algorithm? | Decided | SHA-256 with pepper for lookups |
 | Backend hosting? | Open | Railway vs Fly.io vs Render |
 
 ---
@@ -148,58 +158,52 @@ docs/
 ### ADR-001: Documentation Platform
 - **Status:** Accepted
 - **Decision:** Use Docusaurus
-- **Full details:** `/docs/docs/adrs/adr-001-documentation-platform.md`
+- **Full details:** `docs/docs/adrs/adr-001-documentation-platform.md`
 
 ### ADR-002: Technology Stack
 - **Status:** Accepted
 - **Decision:** React/Vite (FE), Java/Spring Boot (BE), Supabase (Auth/DB)
-- **Full details:** `/docs/docs/adrs/adr-002-tech-stack.md`
+- **Full details:** `docs/docs/adrs/adr-002-tech-stack.md`
+
+### ADR-003: Build Tool
+- **Status:** Accepted
+- **Decision:** Maven for backend (over Gradle)
+- **Why:** User preference, fewer compatibility issues historically
+
+### ADR-004: Code Style
+- **Status:** Accepted
+- **Decision:** Google Java Style with Checkstyle enforcement
+- **Config:** `backend/checkstyle/google_checks.xml`
 
 ---
 
 ## Session Notes
 
 ### Session 1 - 2026-01-30
-**Duration:** Initial setup session
-
 **Accomplished:**
-- Reviewed requirements document from `/Users/miguelramos/Downloads/Navilla_Requirements.md`
-- Identified technical considerations:
-  - Graph traversal efficiency (recursive CTEs vs application-level BFS)
-  - Encryption strategy (AES-256-GCM, per-user keys)
-  - Inference attack prevention (3-connection minimum, batched notifications)
-- Created project structure (`docs/`, `backend/`, `frontend/`)
-- Set up Docusaurus with Mermaid support
-- Created comprehensive documentation (30+ documents):
-  - Getting started guides
-  - Architecture documentation with diagrams
-  - API reference
-  - New hire onboarding
-  - Development guidelines
-  - ADRs
+1. Reviewed requirements document
+2. Set up Docusaurus documentation (30+ docs)
+3. Initialized Git repository
+4. Created database migrations (3 SQL files)
+5. Scaffolded Spring Boot backend:
+   - Java 25 + Spring Boot 4.0.2
+   - Maven build
+   - Google Java Style + Checkstyle
+   - Lombok, DevTools
+   - YAML configuration
+   - JaCoCo code coverage
+   - Startup scripts (prod/dev/troubleshoot)
+6. Scaffolded React frontend:
+   - Vite + TypeScript
+   - TailwindCSS configured
+   - Supabase client
+   - TanStack Query
+   - React Router
 
-**Key Technical Insights:**
-1. Email hashing: Use SHA-256 with application pepper for lookups, store encrypted copy for recovery
-2. Graph traversal: Start with application-level BFS, consider PostgreSQL recursive CTEs for performance
-3. Encryption: Derive per-user keys from application secret + user ID (since we don't have password access via Supabase)
-4. RLS: Use as defense-in-depth, primary authorization in application layer
-
-**Next Steps:**
-1. Initialize Git repository
-2. Set up Supabase project
-3. Create database migrations (SQL files)
-4. Scaffold Spring Boot backend
-5. Scaffold React frontend
-
----
-
-## Quick Links
-
-- **Requirements:** `/Users/miguelramos/Downloads/Navilla_Requirements.md`
-- **Documentation:** `docs/` (run `cd docs && npm start`)
-- **Backend:** `backend/` (Spring Boot - not yet created)
-- **Frontend:** `frontend/` (React + Vite - not yet created)
-- **This file:** `CONTEXT.md`
+**Startup Scripts Created:**
+- `scripts/start-production.sh` - G1GC, optimized heap, container-aware
+- `scripts/start-development.sh` - Debug port 5005, verbose logging
+- `scripts/start-troubleshooting.sh` - GC logging, heap dumps, JMX, Flight Recorder
 
 ---
 
@@ -212,15 +216,63 @@ npm install  # First time only
 npm start    # Opens at http://localhost:3000
 ```
 
-### Backend (when ready)
+### Backend
 ```bash
 cd backend
-./gradlew bootRun  # Opens at http://localhost:8080
+
+# Build
+./mvnw clean package
+
+# Development mode (with debug)
+./scripts/start-development.sh
+
+# Production mode
+./scripts/start-production.sh
+
+# Or via Maven directly
+./mvnw spring-boot:run
 ```
 
-### Frontend (when ready)
+### Frontend
 ```bash
 cd frontend
 npm install
 npm run dev  # Opens at http://localhost:5173
+```
+
+---
+
+## Next Steps
+
+1. **Set up Supabase project** - Go to supabase.com, create project, run migrations
+2. **Configure environment files** - Copy .env.example to .env in backend and frontend
+3. **Implement Security Config** - JWT validation with Supabase
+4. **Create first API endpoint** - Health check / user endpoint
+5. **Implement authentication flow** - Frontend Supabase integration
+
+---
+
+## Quick Commands
+
+```bash
+# Backend - run tests
+cd backend && ./mvnw test
+
+# Backend - check code style
+cd backend && ./mvnw checkstyle:check
+
+# Backend - build JAR
+cd backend && ./mvnw clean package -DskipTests
+
+# Frontend - run dev server
+cd frontend && npm run dev
+
+# Frontend - build for production
+cd frontend && npm run build
+
+# Docs - run local server
+cd docs && npm start
+
+# Docs - build for production
+cd docs && npm run build
 ```

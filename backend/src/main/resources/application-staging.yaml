@@ -1,0 +1,44 @@
+# Navilla Backend - Staging Configuration
+# Profile: staging
+# Usage: java -jar app.jar --spring.profiles.active=staging
+
+spring:
+  # Database - Supabase staging project
+  datasource:
+    url: ${DATABASE_URL}
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+
+  # JPA - validate schema, no auto-generation
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+
+# Logging - balanced for staging
+logging:
+  level:
+    root: INFO
+    app.navilla: DEBUG
+    org.springframework.web: INFO
+    org.springframework.security: INFO
+    org.hibernate.SQL: INFO
+
+# Management endpoints - limited exposure
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: when-authorized
+
+# Application settings
+navilla:
+  # Production-like batch intervals
+  notification:
+    batch-day: SUNDAY
+    batch-hour: 18
+    random-delay-hours: 6
