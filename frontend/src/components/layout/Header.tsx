@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../hooks/useAuth';
+import { LanguageSwitcher } from '../LanguageSwitcher';
 
 export function Header() {
   const { t } = useTranslation();
@@ -13,13 +14,14 @@ export function Header() {
           {t('common.appName')}
         </Link>
 
-        <nav className="flex items-center gap-6">
+        <nav className="flex items-center gap-4">
+          <LanguageSwitcher />
           {session ? (
             <>
               <Link to="/dashboard" className="text-foreground-secondary hover:text-primary">
                 {t('nav.dashboard')}
               </Link>
-              <span className="text-muted text-sm">{session.user.email}</span>
+              <span className="text-muted text-sm hidden sm:inline">{session.user.email}</span>
               <button onClick={() => signOut()} className="btn btn-secondary">
                 {t('auth.signOut')}
               </button>
