@@ -33,9 +33,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 /**
  * User entity representing a Navilla user account.
@@ -119,10 +117,10 @@ public class User {
 
   /**
    * Controls who can find this user's profile.
+   * Stored as VARCHAR in database, mapped to PostgreSQL enum.
    */
   @Enumerated(EnumType.STRING)
-  @JdbcType(PostgreSQLEnumJdbcType.class)
-  @Column(name = "profile_visibility", nullable = false)
+  @Column(name = "profile_visibility", nullable = false, length = 20)
   @Builder.Default
   private ProfileVisibility profileVisibility = ProfileVisibility.PRIVATE;
 
