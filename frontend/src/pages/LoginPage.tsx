@@ -76,6 +76,12 @@ export function LoginPage() {
         <button type="submit" className="btn btn-primary w-full" disabled={isSubmitting}>
           {isSubmitting ? t('common.loading') : t('auth.signIn')}
         </button>
+
+        <p className="text-center mt-4">
+          <Link to="/forgot-password" className="text-sm text-primary">
+            {t('auth.forgotPassword')}
+          </Link>
+        </p>
       </form>
 
       <div className="divider" />
