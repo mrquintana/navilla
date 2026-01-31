@@ -64,10 +64,18 @@ gh issue view <number>
 gh issue create --title "Title" --body "Description"
 ```
 
+## Testing Environment
+
+- **No local testing** - All testing is done on AWS environment
+- **Do not run locally** - Use deployed AWS infrastructure for end-to-end testing
+- Push changes and test on the AWS environment
+
 ## Project Context
 - Main tracking file: `/CONTEXT.md`
 - Documentation site: `/docs` (Docusaurus)
 - Backend: Java 25 + Spring Boot 4.0.2
 - Frontend: React 19 + Vite + TypeScript + TailwindCSS
 - Auth: Supabase Auth
+- Email: SendGrid (SMTP via Supabase)
+- Hosting: AWS
 - i18n: react-i18next (en_US, es_MX)
