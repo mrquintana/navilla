@@ -23,7 +23,9 @@
     "forgotPassword": "Forgot Password?",
     "resetPassword": "Reset Password",
     "verifyEmail": "Verify your email",
-    "checkEmail": "Check your email for a verification link"
+    "checkEmail": "Check your email for a verification link",
+    "noAccount": "Don't have an account?",
+    "haveAccount": "Already have an account?"
   },
   "nav": {
     "home": "Home",

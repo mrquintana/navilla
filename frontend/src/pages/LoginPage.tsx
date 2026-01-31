@@ -35,18 +35,18 @@ export function LoginPage() {
   };
 
   return (
-    <div className="card">
-      <h1 className="text-2xl font-semibold mb-6">{t('auth.signIn')}</h1>
+    <div className="card card-elevated" style={{ maxWidth: '400px', margin: '0 auto' }}>
+      <h1 className="text-2xl mb-6">{t('auth.signIn')}</h1>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit}>
         {error && (
-          <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+          <div className="alert alert-error">
             {error}
           </div>
         )}
 
-        <div>
-          <label htmlFor="email" className="block text-sm font-medium text-foreground mb-1">
+        <div className="mb-4">
+          <label htmlFor="email" className="label">
             {t('auth.email')}
           </label>
           <input
@@ -59,8 +59,8 @@ export function LoginPage() {
           />
         </div>
 
-        <div>
-          <label htmlFor="password" className="block text-sm font-medium text-foreground mb-1">
+        <div className="mb-6">
+          <label htmlFor="password" className="label">
             {t('auth.password')}
           </label>
           <input
@@ -78,9 +78,11 @@ export function LoginPage() {
         </button>
       </form>
 
-      <p className="mt-4 text-center text-sm text-muted">
-        {t('auth.signUp')}?{' '}
-        <Link to="/signup" className="text-accent hover:underline">
+      <div className="divider" />
+
+      <p className="text-center text-sm text-muted">
+        {t('auth.noAccount')}{' '}
+        <Link to="/signup" className="text-primary font-medium">
           {t('auth.signUp')}
         </Link>
       </p>
