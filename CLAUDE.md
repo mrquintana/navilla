@@ -1,5 +1,9 @@
 # Claude Code Project Instructions
 
+## Commit Preferences
+
+- **No Co-Authored-By signature** - Do not add "Co-Authored-By: Claude" lines to commits
+
 ## Post-Implementation Checklist
 
 After completing any significant work, **always update the following**:
