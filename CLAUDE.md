@@ -23,20 +23,30 @@ After completing any significant work, **always update the following**:
   - New hooks/contexts → `docs/docs/frontend/state-management.md`
   - Project structure changes → `docs/docs/frontend/project-structure.md`
 
-### 3. GitHub Issues (When applicable)
-- Close completed issues with `gh issue close <number>`
+### 3. GitHub Issues (Required for milestones)
+- **All milestones must be tracked as GitHub issues**
+- Close completed issues with `gh issue close <number> --comment "details"`
 - Add comments on progress with `gh issue comment <number> -b "message"`
-- Create new issues for discovered work with `gh issue create`
-- Check open issues: `gh issue list`
+- Create new issues for discovered work/next milestones with `gh issue create`
+- Check open issues before starting work: `gh issue list`
+- Use labels: `backend`, `frontend`, `phase-2`, `enhancement`
 
 ### 4. Locale Files (For UI text changes)
 - Update both locale files when adding UI text:
   - `frontend/src/locales/en_US.json`
   - `frontend/src/locales/es_MX.json` (Spanish translations or English placeholders)
 
-### 5. Tests (For code changes)
+### 5. Tests (Required for code changes)
+- **All new code must have unit and integration tests**
 - Run backend tests: `cd backend && ./mvnw test`
 - Run frontend build: `cd frontend && npm run build`
+- Backend test locations:
+  - Unit tests: `backend/src/test/java/app/navilla/service/`
+  - Integration tests: `backend/src/test/java/app/navilla/controller/`
+
+### 6. Postman Collection (For API changes)
+- Update Postman collection when adding/modifying API endpoints
+- Location: `docs/static/postman/navilla-api.postman_collection.json`
 
 ## Quick Reference
 
