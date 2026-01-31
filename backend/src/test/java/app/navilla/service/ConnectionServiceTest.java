@@ -1,0 +1,361 @@
+/*
+ * Copyright 2026 Navilla
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package app.navilla.service;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+import app.navilla.dto.ConnectionResponse;
+import app.navilla.dto.ConnectionStatsResponse;
+import app.navilla.dto.CreateConnectionRequest;
+import app.navilla.entity.Connection;
+import app.navilla.entity.ConnectionStatus;
+import app.navilla.exception.ResourceNotFoundException;
+import app.navilla.repository.ConnectionRepository;
+import app.navilla.repository.UserRepository;
+import app.navilla.security.EncryptionService;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.oauth2.jwt.Jwt;
+
+/**
+ * Unit tests for {@link ConnectionService}.
+ *
+ * @author Navilla Team
+ * @since 2026-01-31
+ */
+@ExtendWith(MockitoExtension.class)
+class ConnectionServiceTest {
+
+  @Mock
+  private ConnectionRepository connectionRepository;
+
+  @Mock
+  private UserRepository userRepository;
+
+  @Mock
+  private EncryptionService encryptionService;
+
+  @Mock
+  private Jwt jwt;
+
+  @InjectMocks
+  private ConnectionService connectionService;
+
+  private static final String REQUESTER_EMAIL = "requester@example.com";
+  private static final String RECIPIENT_EMAIL = "recipient@example.com";
+  private static final String REQUESTER_HASH = "requester_hash_123";
+  private static final String RECIPIENT_HASH = "recipient_hash_456";
+  private static final UUID CONNECTION_ID = UUID.randomUUID();
+
+  @BeforeEach
+  void setUp() {
+    lenient().when(jwt.getClaimAsString("email")).thenReturn(REQUESTER_EMAIL);
+    lenient().when(encryptionService.hashEmail(REQUESTER_EMAIL)).thenReturn(REQUESTER_HASH);
+    lenient().when(encryptionService.hashEmail(RECIPIENT_EMAIL)).thenReturn(RECIPIENT_HASH);
+  }
+
+  @Nested
+  @DisplayName("createConnection")
+  class CreateConnectionTests {
+
+    @Test
+    @DisplayName("should create connection request successfully")
+    void shouldCreateConnectionSuccessfully() {
+      when(userRepository.existsByEmailHash(RECIPIENT_HASH)).thenReturn(true);
+      when(connectionRepository.existsBetweenUsers(REQUESTER_HASH, RECIPIENT_HASH))
+          .thenReturn(false);
+      when(connectionRepository.save(any(Connection.class))).thenAnswer(invocation -> {
+        Connection conn = invocation.getArgument(0);
+        conn.setId(CONNECTION_ID);
+        conn.setRequestedAt(OffsetDateTime.now());
+        return conn;
+      });
+
+      CreateConnectionRequest request = new CreateConnectionRequest(RECIPIENT_EMAIL);
+      ConnectionResponse response = connectionService.createConnection(jwt, request);
+
+      assertThat(response.id()).isEqualTo(CONNECTION_ID);
+      assertThat(response.status()).isEqualTo(ConnectionStatus.PENDING);
+      assertThat(response.isRequester()).isTrue();
+
+      ArgumentCaptor<Connection> captor = ArgumentCaptor.forClass(Connection.class);
+      verify(connectionRepository).save(captor.capture());
+      assertThat(captor.getValue().getRequesterHash()).isEqualTo(REQUESTER_HASH);
+      assertThat(captor.getValue().getRecipientHash()).isEqualTo(RECIPIENT_HASH);
+    }
+
+    @Test
+    @DisplayName("should throw exception when connecting to self")
+    void shouldThrowExceptionWhenConnectingToSelf() {
+      when(encryptionService.hashEmail(REQUESTER_EMAIL)).thenReturn(REQUESTER_HASH);
+      CreateConnectionRequest request = new CreateConnectionRequest(REQUESTER_EMAIL);
+
+      assertThatThrownBy(() -> connectionService.createConnection(jwt, request))
+          .isInstanceOf(IllegalArgumentException.class)
+          .hasMessage("connection.error.selfConnection");
+
+      verify(connectionRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("should throw exception when recipient not found")
+    void shouldThrowExceptionWhenRecipientNotFound() {
+      when(userRepository.existsByEmailHash(RECIPIENT_HASH)).thenReturn(false);
+      CreateConnectionRequest request = new CreateConnectionRequest(RECIPIENT_EMAIL);
+
+      assertThatThrownBy(() -> connectionService.createConnection(jwt, request))
+          .isInstanceOf(ResourceNotFoundException.class)
+          .hasMessage("connection.error.recipientNotFound");
+
+      verify(connectionRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("should throw exception when connection already exists")
+    void shouldThrowExceptionWhenConnectionExists() {
+      when(userRepository.existsByEmailHash(RECIPIENT_HASH)).thenReturn(true);
+      when(connectionRepository.existsBetweenUsers(REQUESTER_HASH, RECIPIENT_HASH))
+          .thenReturn(true);
+      CreateConnectionRequest request = new CreateConnectionRequest(RECIPIENT_EMAIL);
+
+      assertThatThrownBy(() -> connectionService.createConnection(jwt, request))
+          .isInstanceOf(IllegalStateException.class)
+          .hasMessage("connection.error.alreadyExists");
+
+      verify(connectionRepository, never()).save(any());
+    }
+  }
+
+  @Nested
+  @DisplayName("acceptConnection")
+  class AcceptConnectionTests {
+
+    @Test
+    @DisplayName("should accept pending connection successfully")
+    void shouldAcceptConnectionSuccessfully() {
+      when(jwt.getClaimAsString("email")).thenReturn(RECIPIENT_EMAIL);
+      when(encryptionService.hashEmail(RECIPIENT_EMAIL)).thenReturn(RECIPIENT_HASH);
+
+      Connection connection = Connection.builder()
+          .id(CONNECTION_ID)
+          .requesterHash(REQUESTER_HASH)
+          .recipientHash(RECIPIENT_HASH)
+          .status(ConnectionStatus.PENDING)
+          .requestedAt(OffsetDateTime.now())
+          .build();
+
+      when(connectionRepository.findById(CONNECTION_ID)).thenReturn(Optional.of(connection));
+      when(connectionRepository.save(any(Connection.class))).thenAnswer(i -> i.getArgument(0));
+
+      ConnectionResponse response = connectionService.acceptConnection(jwt, CONNECTION_ID);
+
+      assertThat(response.status()).isEqualTo(ConnectionStatus.CONFIRMED);
+      assertThat(response.confirmedAt()).isNotNull();
+    }
+
+    @Test
+    @DisplayName("should throw exception when connection not found")
+    void shouldThrowExceptionWhenConnectionNotFound() {
+      when(connectionRepository.findById(CONNECTION_ID)).thenReturn(Optional.empty());
+
+      assertThatThrownBy(() -> connectionService.acceptConnection(jwt, CONNECTION_ID))
+          .isInstanceOf(ResourceNotFoundException.class)
+          .hasMessage("connection.error.notFound");
+    }
+
+    @Test
+    @DisplayName("should throw exception when user is not recipient")
+    void shouldThrowExceptionWhenNotRecipient() {
+      Connection connection = Connection.builder()
+          .id(CONNECTION_ID)
+          .requesterHash(REQUESTER_HASH)
+          .recipientHash("other_user_hash")
+          .status(ConnectionStatus.PENDING)
+          .build();
+
+      when(connectionRepository.findById(CONNECTION_ID)).thenReturn(Optional.of(connection));
+
+      assertThatThrownBy(() -> connectionService.acceptConnection(jwt, CONNECTION_ID))
+          .isInstanceOf(IllegalStateException.class)
+          .hasMessage("connection.error.notRecipient");
+    }
+
+    @Test
+    @DisplayName("should throw exception when connection not pending")
+    void shouldThrowExceptionWhenNotPending() {
+      when(jwt.getClaimAsString("email")).thenReturn(RECIPIENT_EMAIL);
+      when(encryptionService.hashEmail(RECIPIENT_EMAIL)).thenReturn(RECIPIENT_HASH);
+
+      Connection connection = Connection.builder()
+          .id(CONNECTION_ID)
+          .requesterHash(REQUESTER_HASH)
+          .recipientHash(RECIPIENT_HASH)
+          .status(ConnectionStatus.CONFIRMED)
+          .build();
+
+      when(connectionRepository.findById(CONNECTION_ID)).thenReturn(Optional.of(connection));
+
+      assertThatThrownBy(() -> connectionService.acceptConnection(jwt, CONNECTION_ID))
+          .isInstanceOf(IllegalStateException.class)
+          .hasMessage("connection.error.notPending");
+    }
+  }
+
+  @Nested
+  @DisplayName("denyConnection")
+  class DenyConnectionTests {
+
+    @Test
+    @DisplayName("should deny pending connection successfully")
+    void shouldDenyConnectionSuccessfully() {
+      when(jwt.getClaimAsString("email")).thenReturn(RECIPIENT_EMAIL);
+      when(encryptionService.hashEmail(RECIPIENT_EMAIL)).thenReturn(RECIPIENT_HASH);
+
+      Connection connection = Connection.builder()
+          .id(CONNECTION_ID)
+          .requesterHash(REQUESTER_HASH)
+          .recipientHash(RECIPIENT_HASH)
+          .status(ConnectionStatus.PENDING)
+          .requestedAt(OffsetDateTime.now())
+          .build();
+
+      when(connectionRepository.findById(CONNECTION_ID)).thenReturn(Optional.of(connection));
+      when(connectionRepository.save(any(Connection.class))).thenAnswer(i -> i.getArgument(0));
+
+      ConnectionResponse response = connectionService.denyConnection(jwt, CONNECTION_ID);
+
+      assertThat(response.status()).isEqualTo(ConnectionStatus.DENIED);
+    }
+  }
+
+  @Nested
+  @DisplayName("cancelConnection")
+  class CancelConnectionTests {
+
+    @Test
+    @DisplayName("should cancel pending connection successfully")
+    void shouldCancelConnectionSuccessfully() {
+      Connection connection = Connection.builder()
+          .id(CONNECTION_ID)
+          .requesterHash(REQUESTER_HASH)
+          .recipientHash(RECIPIENT_HASH)
+          .status(ConnectionStatus.PENDING)
+          .build();
+
+      when(connectionRepository.findById(CONNECTION_ID)).thenReturn(Optional.of(connection));
+
+      connectionService.cancelConnection(jwt, CONNECTION_ID);
+
+      verify(connectionRepository).delete(connection);
+    }
+
+    @Test
+    @DisplayName("should throw exception when user is not requester")
+    void shouldThrowExceptionWhenNotRequester() {
+      Connection connection = Connection.builder()
+          .id(CONNECTION_ID)
+          .requesterHash("other_user_hash")
+          .recipientHash(RECIPIENT_HASH)
+          .status(ConnectionStatus.PENDING)
+          .build();
+
+      when(connectionRepository.findById(CONNECTION_ID)).thenReturn(Optional.of(connection));
+
+      assertThatThrownBy(() -> connectionService.cancelConnection(jwt, CONNECTION_ID))
+          .isInstanceOf(IllegalStateException.class)
+          .hasMessage("connection.error.notRequester");
+
+      verify(connectionRepository, never()).delete(any());
+    }
+  }
+
+  @Nested
+  @DisplayName("getConnections")
+  class GetConnectionsTests {
+
+    @Test
+    @DisplayName("should return all connections for user")
+    void shouldReturnAllConnectionsForUser() {
+      Connection conn1 = Connection.builder()
+          .id(UUID.randomUUID())
+          .requesterHash(REQUESTER_HASH)
+          .recipientHash("other1")
+          .status(ConnectionStatus.CONFIRMED)
+          .requestedAt(OffsetDateTime.now())
+          .build();
+
+      Connection conn2 = Connection.builder()
+          .id(UUID.randomUUID())
+          .requesterHash("other2")
+          .recipientHash(REQUESTER_HASH)
+          .status(ConnectionStatus.PENDING)
+          .requestedAt(OffsetDateTime.now())
+          .build();
+
+      when(connectionRepository.findAllByUserHash(REQUESTER_HASH))
+          .thenReturn(List.of(conn1, conn2));
+
+      List<ConnectionResponse> connections = connectionService.getConnections(jwt);
+
+      assertThat(connections).hasSize(2);
+      assertThat(connections.get(0).isRequester()).isTrue();
+      assertThat(connections.get(1).isRequester()).isFalse();
+    }
+  }
+
+  @Nested
+  @DisplayName("getStats")
+  class GetStatsTests {
+
+    @Test
+    @DisplayName("should return correct connection statistics")
+    void shouldReturnCorrectStats() {
+      when(connectionRepository.countConfirmedByUserHash(REQUESTER_HASH)).thenReturn(5L);
+      when(connectionRepository.countByRecipientHashAndStatus(
+          REQUESTER_HASH, ConnectionStatus.PENDING)).thenReturn(3L);
+      when(connectionRepository.findByRequesterHashAndStatus(
+          REQUESTER_HASH, ConnectionStatus.PENDING)).thenReturn(List.of(
+          Connection.builder().build(),
+          Connection.builder().build()
+      ));
+
+      ConnectionStatsResponse stats = connectionService.getStats(jwt);
+
+      assertThat(stats.confirmedCount()).isEqualTo(5);
+      assertThat(stats.pendingIncomingCount()).isEqualTo(3);
+      assertThat(stats.pendingSentCount()).isEqualTo(2);
+    }
+  }
+}

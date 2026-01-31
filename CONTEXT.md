@@ -82,7 +82,7 @@
 ### Phase 2: Core Features
 - [x] User Entity & API (backend) - GitHub Issue #4
 - [x] User registration/login (frontend) - Auth system implemented
-- [ ] Connection request system
+- [x] Connection request system - Full API with tests and docs
 - [ ] Health status reporting
 - [ ] Basic exposure calculation
 
@@ -329,6 +329,44 @@ navilla/
 - Styling: Uses existing `.btn`, `.btn-primary`, `.card`, `.input` classes
 - Query keys: `['user', 'me']` with 5-min stale time
 
+### Session 5 - 2026-01-31 (continued)
+**Accomplished:**
+1. Updated frontend UI theme from green to blue (Docusaurus-style)
+2. Fixed i18n - added missing translation keys for auth prompts
+3. Implemented Connection entity & API (backend):
+   - `ConnectionStatus.java` - Enum (PENDING, CONFIRMED, DENIED, EXPIRED)
+   - `Connection.java` - JPA entity with privacy-preserving hashed user IDs
+   - `ConnectionRepository.java` - Spring Data JPA with custom queries
+   - `ConnectionService.java` - Business logic for connection management
+   - `ConnectionController.java` - REST endpoints for connections
+   - DTOs: `ConnectionResponse`, `CreateConnectionRequest`, `ConnectionStatsResponse`
+   - Updated `GlobalExceptionHandler.java` - Added IllegalArgumentException/IllegalStateException handlers
+   - Added i18n messages for connection errors
+
+4. Created comprehensive tests:
+   - `ConnectionServiceTest.java` - 15 unit tests with Mockito
+   - `ConnectionControllerTest.java` - 12 integration tests
+
+5. Created Postman collection:
+   - `docs/static/postman/navilla-api.postman_collection.json`
+   - Includes all Health, Users, and Connections endpoints
+
+6. Updated documentation:
+   - `docs/docs/api/connections.md` - Full API reference
+
+**Connection API Endpoints:**
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/connections` | Create connection request |
+| GET | `/api/connections` | Get all connections |
+| GET | `/api/connections/confirmed` | Get confirmed only |
+| GET | `/api/connections/pending/incoming` | Pending incoming |
+| GET | `/api/connections/pending/sent` | Pending sent |
+| GET | `/api/connections/stats` | Connection statistics |
+| POST | `/api/connections/{id}/accept` | Accept request |
+| POST | `/api/connections/{id}/deny` | Deny request |
+| DELETE | `/api/connections/{id}` | Cancel request |
+
 ---
 
 ## Running the Project
@@ -376,9 +414,11 @@ npm run dev  # Opens at http://localhost:5173
 6. ~~**Add i18n infrastructure**~~ ✅ Done (en_US, es_MX with placeholders)
 7. ~~**Create README & CONTRIBUTING**~~ ✅ Done
 8. ~~**Implement authentication flow**~~ ✅ Done - Frontend Supabase integration
-9. **Implement Connection entity & API** - Next backend milestone
-10. **Push CI/CD workflows to GitHub** - Requires commit & push
-11. **Add frontend tests** - Unit tests for auth components
+9. ~~**Implement Connection entity & API**~~ ✅ Done - Full CRUD with tests
+10. **Implement Health Status entity & API** - Next backend milestone
+11. **Push CI/CD workflows to GitHub** - Requires commit & push
+12. **Add frontend tests** - Unit tests for auth components
+13. **Frontend Connections UI** - UI to manage connections
 
 ---
 

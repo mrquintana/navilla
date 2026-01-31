@@ -63,6 +63,44 @@ public class GlobalExceptionHandler {
   }
 
   /**
+   * Handles illegal argument exceptions (bad request).
+   */
+  @ExceptionHandler(IllegalArgumentException.class)
+  public ResponseEntity<ApiError> handleIllegalArgument(
+      IllegalArgumentException ex,
+      HttpServletRequest request,
+      Locale locale) {
+
+    String message = messageSource.getMessage(ex.getMessage(), null, ex.getMessage(), locale);
+    ApiError error = ApiError.of(
+        HttpStatus.BAD_REQUEST.value(),
+        HttpStatus.BAD_REQUEST.getReasonPhrase(),
+        message,
+        request.getRequestURI()
+    );
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+  }
+
+  /**
+   * Handles illegal state exceptions (conflict).
+   */
+  @ExceptionHandler(IllegalStateException.class)
+  public ResponseEntity<ApiError> handleIllegalState(
+      IllegalStateException ex,
+      HttpServletRequest request,
+      Locale locale) {
+
+    String message = messageSource.getMessage(ex.getMessage(), null, ex.getMessage(), locale);
+    ApiError error = ApiError.of(
+        HttpStatus.CONFLICT.value(),
+        HttpStatus.CONFLICT.getReasonPhrase(),
+        message,
+        request.getRequestURI()
+    );
+    return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+  }
+
+  /**
    * Handles validation errors.
    */
   @ExceptionHandler(MethodArgumentNotValidException.class)

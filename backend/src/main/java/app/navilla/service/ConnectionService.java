@@ -1,0 +1,303 @@
+/*
+ * Copyright 2026 Navilla
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package app.navilla.service;
+
+import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.UUID;
+
+import app.navilla.dto.ConnectionResponse;
+import app.navilla.dto.ConnectionStatsResponse;
+import app.navilla.dto.CreateConnectionRequest;
+import app.navilla.entity.Connection;
+import app.navilla.entity.ConnectionStatus;
+import app.navilla.exception.ResourceNotFoundException;
+import app.navilla.repository.ConnectionRepository;
+import app.navilla.repository.UserRepository;
+import app.navilla.security.EncryptionService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * Service for connection-related operations.
+ *
+ * <p>Handles creating, accepting, denying, and managing connections
+ * between users. All user identifiers are hashed for privacy.
+ *
+ * @author Navilla Team
+ * @since 2026-01-31
+ */
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class ConnectionService {
+
+  private final ConnectionRepository connectionRepository;
+  private final UserRepository userRepository;
+  private final EncryptionService encryptionService;
+
+  /**
+   * Creates a new connection request.
+   *
+   * @param jwt the JWT token of the requesting user
+   * @param request the connection request with recipient email
+   * @return the created connection
+   * @throws IllegalArgumentException if trying to connect with self
+   * @throws IllegalStateException if connection already exists
+   * @throws ResourceNotFoundException if recipient not found
+   */
+  @Transactional
+  public ConnectionResponse createConnection(Jwt jwt, CreateConnectionRequest request) {
+    String requesterEmail = jwt.getClaimAsString("email");
+    String requesterHash = encryptionService.hashEmail(requesterEmail);
+    String recipientHash = encryptionService.hashEmail(request.recipientEmail());
+
+    // Validate not connecting to self
+    if (requesterHash.equals(recipientHash)) {
+      throw new IllegalArgumentException("connection.error.selfConnection");
+    }
+
+    // Validate recipient exists
+    if (!userRepository.existsByEmailHash(recipientHash)) {
+      throw new ResourceNotFoundException("connection.error.recipientNotFound");
+    }
+
+    // Check if connection already exists
+    if (connectionRepository.existsBetweenUsers(requesterHash, recipientHash)) {
+      throw new IllegalStateException("connection.error.alreadyExists");
+    }
+
+    Connection connection = Connection.builder()
+        .requesterHash(requesterHash)
+        .recipientHash(recipientHash)
+        .status(ConnectionStatus.PENDING)
+        .build();
+
+    Connection saved = connectionRepository.save(connection);
+    log.info("Connection request created: {} -> {}",
+        requesterHash.substring(0, 8), recipientHash.substring(0, 8));
+
+    return toConnectionResponse(saved, requesterHash);
+  }
+
+  /**
+   * Gets all connections for the current user.
+   *
+   * @param jwt the JWT token of the user
+   * @return list of connections
+   */
+  @Transactional(readOnly = true)
+  public List<ConnectionResponse> getConnections(Jwt jwt) {
+    String email = jwt.getClaimAsString("email");
+    String userHash = encryptionService.hashEmail(email);
+
+    return connectionRepository.findAllByUserHash(userHash).stream()
+        .map(c -> toConnectionResponse(c, userHash))
+        .toList();
+  }
+
+  /**
+   * Gets confirmed connections for the current user.
+   *
+   * @param jwt the JWT token of the user
+   * @return list of confirmed connections
+   */
+  @Transactional(readOnly = true)
+  public List<ConnectionResponse> getConfirmedConnections(Jwt jwt) {
+    String email = jwt.getClaimAsString("email");
+    String userHash = encryptionService.hashEmail(email);
+
+    return connectionRepository.findConfirmedByUserHash(userHash).stream()
+        .map(c -> toConnectionResponse(c, userHash))
+        .toList();
+  }
+
+  /**
+   * Gets pending incoming connection requests for the current user.
+   *
+   * @param jwt the JWT token of the user
+   * @return list of pending incoming requests
+   */
+  @Transactional(readOnly = true)
+  public List<ConnectionResponse> getPendingIncoming(Jwt jwt) {
+    String email = jwt.getClaimAsString("email");
+    String userHash = encryptionService.hashEmail(email);
+
+    return connectionRepository.findByRecipientHashAndStatus(userHash, ConnectionStatus.PENDING)
+        .stream()
+        .map(c -> toConnectionResponse(c, userHash))
+        .toList();
+  }
+
+  /**
+   * Gets pending sent connection requests for the current user.
+   *
+   * @param jwt the JWT token of the user
+   * @return list of pending sent requests
+   */
+  @Transactional(readOnly = true)
+  public List<ConnectionResponse> getPendingSent(Jwt jwt) {
+    String email = jwt.getClaimAsString("email");
+    String userHash = encryptionService.hashEmail(email);
+
+    return connectionRepository.findByRequesterHashAndStatus(userHash, ConnectionStatus.PENDING)
+        .stream()
+        .map(c -> toConnectionResponse(c, userHash))
+        .toList();
+  }
+
+  /**
+   * Accepts a pending connection request.
+   *
+   * @param jwt the JWT token of the recipient
+   * @param connectionId the connection to accept
+   * @return the updated connection
+   * @throws ResourceNotFoundException if connection not found
+   * @throws IllegalStateException if connection is not pending or user is not recipient
+   */
+  @Transactional
+  public ConnectionResponse acceptConnection(Jwt jwt, UUID connectionId) {
+    String email = jwt.getClaimAsString("email");
+    String userHash = encryptionService.hashEmail(email);
+
+    Connection connection = connectionRepository.findById(connectionId)
+        .orElseThrow(() -> new ResourceNotFoundException("connection.error.notFound"));
+
+    // Validate user is the recipient
+    if (!connection.getRecipientHash().equals(userHash)) {
+      throw new IllegalStateException("connection.error.notRecipient");
+    }
+
+    // Validate connection is pending
+    if (connection.getStatus() != ConnectionStatus.PENDING) {
+      throw new IllegalStateException("connection.error.notPending");
+    }
+
+    connection.setStatus(ConnectionStatus.CONFIRMED);
+    connection.setRespondedAt(OffsetDateTime.now());
+    connection.setConfirmedAt(OffsetDateTime.now());
+
+    Connection saved = connectionRepository.save(connection);
+    log.info("Connection accepted: {}", connectionId);
+
+    return toConnectionResponse(saved, userHash);
+  }
+
+  /**
+   * Denies a pending connection request.
+   *
+   * @param jwt the JWT token of the recipient
+   * @param connectionId the connection to deny
+   * @return the updated connection
+   * @throws ResourceNotFoundException if connection not found
+   * @throws IllegalStateException if connection is not pending or user is not recipient
+   */
+  @Transactional
+  public ConnectionResponse denyConnection(Jwt jwt, UUID connectionId) {
+    String email = jwt.getClaimAsString("email");
+    String userHash = encryptionService.hashEmail(email);
+
+    Connection connection = connectionRepository.findById(connectionId)
+        .orElseThrow(() -> new ResourceNotFoundException("connection.error.notFound"));
+
+    // Validate user is the recipient
+    if (!connection.getRecipientHash().equals(userHash)) {
+      throw new IllegalStateException("connection.error.notRecipient");
+    }
+
+    // Validate connection is pending
+    if (connection.getStatus() != ConnectionStatus.PENDING) {
+      throw new IllegalStateException("connection.error.notPending");
+    }
+
+    connection.setStatus(ConnectionStatus.DENIED);
+    connection.setRespondedAt(OffsetDateTime.now());
+
+    Connection saved = connectionRepository.save(connection);
+    log.info("Connection denied: {}", connectionId);
+
+    return toConnectionResponse(saved, userHash);
+  }
+
+  /**
+   * Cancels a pending connection request (requester only).
+   *
+   * @param jwt the JWT token of the requester
+   * @param connectionId the connection to cancel
+   * @throws ResourceNotFoundException if connection not found
+   * @throws IllegalStateException if connection is not pending or user is not requester
+   */
+  @Transactional
+  public void cancelConnection(Jwt jwt, UUID connectionId) {
+    String email = jwt.getClaimAsString("email");
+    String userHash = encryptionService.hashEmail(email);
+
+    Connection connection = connectionRepository.findById(connectionId)
+        .orElseThrow(() -> new ResourceNotFoundException("connection.error.notFound"));
+
+    // Validate user is the requester
+    if (!connection.getRequesterHash().equals(userHash)) {
+      throw new IllegalStateException("connection.error.notRequester");
+    }
+
+    // Validate connection is pending
+    if (connection.getStatus() != ConnectionStatus.PENDING) {
+      throw new IllegalStateException("connection.error.notPending");
+    }
+
+    connectionRepository.delete(connection);
+    log.info("Connection cancelled: {}", connectionId);
+  }
+
+  /**
+   * Gets connection statistics for the current user.
+   *
+   * @param jwt the JWT token of the user
+   * @return connection statistics
+   */
+  @Transactional(readOnly = true)
+  public ConnectionStatsResponse getStats(Jwt jwt) {
+    String email = jwt.getClaimAsString("email");
+    String userHash = encryptionService.hashEmail(email);
+
+    long confirmedCount = connectionRepository.countConfirmedByUserHash(userHash);
+    long pendingIncomingCount = connectionRepository.countByRecipientHashAndStatus(
+        userHash, ConnectionStatus.PENDING);
+    long pendingSentCount = connectionRepository.findByRequesterHashAndStatus(
+        userHash, ConnectionStatus.PENDING).size();
+
+    return new ConnectionStatsResponse(confirmedCount, pendingIncomingCount, pendingSentCount);
+  }
+
+  /**
+   * Converts a Connection entity to a ConnectionResponse DTO.
+   */
+  private ConnectionResponse toConnectionResponse(Connection connection, String currentUserHash) {
+    boolean isRequester = connection.getRequesterHash().equals(currentUserHash);
+
+    return new ConnectionResponse(
+        connection.getId(),
+        connection.getStatus(),
+        isRequester,
+        connection.getRequestedAt(),
+        connection.getConfirmedAt()
+    );
+  }
+}
