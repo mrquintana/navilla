@@ -184,6 +184,7 @@ navilla/
 | STI clearing removes past alerts? | Decided | "Resolved" status (alerts remain but marked resolved) |
 | Email hashing algorithm? | Decided | SHA-256 with pepper for lookups |
 | Backend hosting? | Open | Railway vs Fly.io vs Render |
+| Email provider? | Decided | SendGrid (SMTP for Supabase Auth) |
 
 ---
 
