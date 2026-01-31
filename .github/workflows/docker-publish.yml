@@ -153,9 +153,17 @@ jobs:
             # Login to GHCR and deploy
             echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             cd /opt/navilla
-            docker-compose pull
-            docker-compose up -d
+            echo "Current images:"
+            docker images | grep navilla || true
+            echo "Pulling latest..."
+            docker-compose pull --quiet
+            echo "Stopping old containers..."
+            docker-compose down
+            echo "Starting with fresh containers..."
+            docker-compose up -d --force-recreate
             docker image prune -f
+            echo "New images:"
+            docker images | grep navilla || true
             echo "Deployed at $(date)"
 
       - name: Health check
