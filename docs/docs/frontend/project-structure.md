@@ -5,38 +5,56 @@ title: Project Structure
 
 # Frontend Project Structure
 
-:::note Work in Progress
-This documentation will be updated as the frontend is implemented.
-:::
-
 ## Directory Layout
 
 ```
 frontend/
 ├── src/
-│   ├── main.tsx
-│   ├── App.tsx
-│   ├── components/
-│   │   ├── ui/           # Base UI components
-│   │   ├── layout/       # Layout components
-│   │   └── features/     # Feature-specific components
-│   ├── pages/
-│   │   ├── Dashboard.tsx
-│   │   ├── Connections.tsx
-│   │   ├── Health.tsx
-│   │   ├── Alerts.tsx
-│   │   └── Settings.tsx
-│   ├── hooks/
-│   │   ├── useAuth.ts
-│   │   ├── useConnections.ts
-│   │   └── useExposures.ts
+│   ├── main.tsx              # App entry point (renders App)
+│   ├── App.tsx               # Root component with providers
+│   ├── router.tsx            # React Router v7 configuration
+│   ├── queryClient.ts        # TanStack Query client setup
+│   ├── i18n.ts               # i18n configuration (react-i18next)
+│   ├── index.css             # TailwindCSS global styles
+│   │
 │   ├── lib/
-│   │   ├── supabase.ts
-│   │   └── api.ts
-│   ├── types/
-│   │   └── index.ts
-│   └── styles/
-│       └── globals.css
+│   │   └── supabase.ts       # Supabase client initialization
+│   │
+│   ├── contexts/
+│   │   └── AuthContext.tsx   # Auth state management
+│   │
+│   ├── hooks/
+│   │   ├── useAuth.ts        # Auth hook (re-export)
+│   │   ├── useUser.ts        # User profile query (/api/users/me)
+│   │   ├── useConnections.ts # (planned)
+│   │   └── useExposures.ts   # (planned)
+│   │
+│   ├── components/
+│   │   ├── auth/
+│   │   │   └── ProtectedRoute.tsx  # Route guard
+│   │   ├── layout/
+│   │   │   ├── Header.tsx          # Nav with auth state
+│   │   │   ├── Layout.tsx          # Main layout wrapper
+│   │   │   └── AuthLayout.tsx      # Centered auth pages
+│   │   ├── ui/               # (planned) Base UI components
+│   │   └── features/         # (planned) Feature components
+│   │
+│   ├── pages/
+│   │   ├── HomePage.tsx      # Landing page
+│   │   ├── LoginPage.tsx     # Login form
+│   │   ├── SignUpPage.tsx    # Registration form
+│   │   ├── DashboardPage.tsx # Protected dashboard
+│   │   ├── Connections.tsx   # (planned)
+│   │   ├── Health.tsx        # (planned)
+│   │   └── Settings.tsx      # (planned)
+│   │
+│   ├── locales/
+│   │   ├── en_US.json        # English translations
+│   │   └── es_MX.json        # Spanish translations
+│   │
+│   └── types/
+│       └── index.ts          # (planned) TypeScript types
+│
 ├── public/
 ├── index.html
 ├── vite.config.ts
@@ -44,3 +62,22 @@ frontend/
 ├── tsconfig.json
 └── package.json
 ```
+
+## Key Files
+
+### App.tsx
+The root component that sets up all providers:
+- `QueryClientProvider` - TanStack Query for server state
+- `AuthProvider` - Supabase auth context
+- `RouterProvider` - React Router v7
+
+### router.tsx
+Configures all application routes:
+- Public routes: `/`, `/login`, `/signup`
+- Protected routes: `/dashboard` (requires authentication)
+
+### AuthContext.tsx
+Manages authentication state:
+- Listens to Supabase auth state changes
+- Provides `signIn`, `signUp`, `signOut` functions
+- Exposes `session`, `user`, and `isLoading` state

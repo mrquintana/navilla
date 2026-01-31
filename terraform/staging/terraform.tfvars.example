@@ -17,8 +17,11 @@ domain_name = ""  # e.g., "staging.navilla.app"
 ghcr_username = "your-github-username"
 
 # Supabase configuration
-supabase_url      = "https://your-project.supabase.co"
-supabase_anon_key = "your-supabase-anon-key"
+supabase_url         = "https://your-project.supabase.co"
+supabase_project_ref = "your-project-ref"  # The subdomain part of your Supabase URL
+supabase_pooler_host = "aws-0-us-west-2.pooler.supabase.com"  # From Supabase Dashboard → Settings → Database → Connection pooler
+supabase_anon_key    = "your-supabase-anon-key"
+supabase_db_password = "your-supabase-db-password"  # From Supabase Dashboard → Settings → Database
 
 # Encryption pepper (generate a random string)
 encryption_pepper = "your-random-pepper-string"

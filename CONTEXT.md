@@ -21,7 +21,7 @@
 | Frontend | React + Vite + TypeScript + TailwindCSS | ✅ Scaffolded |
 | Backend | Java 25 + Spring Boot 4.0.2 + Maven | ✅ Scaffolded |
 | Database | PostgreSQL (Supabase) | ✅ Migrations ready |
-| Auth | Supabase Auth | Pending setup |
+| Auth | Supabase Auth | ✅ Frontend integrated |
 | Docs | Docusaurus | ✅ Complete |
 | Hosting | Vercel (FE + Docs), TBD (BE) | Docs ready |
 
@@ -81,7 +81,7 @@
 
 ### Phase 2: Core Features
 - [x] User Entity & API (backend) - GitHub Issue #4
-- [ ] User registration/login (frontend)
+- [x] User registration/login (frontend) - Auth system implemented
 - [ ] Connection request system
 - [ ] Health status reporting
 - [ ] Basic exposure calculation
@@ -143,7 +143,34 @@ navilla/
     ├── tailwind.config.js
     ├── postcss.config.js
     └── src/
-        └── index.css            # TailwindCSS setup
+        ├── main.tsx             # App entry point
+        ├── App.tsx              # Root component with providers
+        ├── router.tsx           # React Router configuration
+        ├── queryClient.ts       # TanStack Query client
+        ├── i18n.ts              # i18n configuration
+        ├── index.css            # TailwindCSS setup
+        ├── lib/
+        │   └── supabase.ts      # Supabase client
+        ├── contexts/
+        │   └── AuthContext.tsx  # Auth state management
+        ├── hooks/
+        │   ├── useAuth.ts       # Auth hook
+        │   └── useUser.ts       # User profile query
+        ├── components/
+        │   ├── auth/
+        │   │   └── ProtectedRoute.tsx
+        │   └── layout/
+        │       ├── Header.tsx
+        │       ├── Layout.tsx
+        │       └── AuthLayout.tsx
+        ├── pages/
+        │   ├── HomePage.tsx
+        │   ├── LoginPage.tsx
+        │   ├── SignUpPage.tsx
+        │   └── DashboardPage.tsx
+        └── locales/
+            ├── en_US.json
+            └── es_MX.json
 ```
 
 ---
@@ -266,6 +293,42 @@ navilla/
 - `app.navilla.dto` - Data transfer objects
 - `app.navilla.exception` - Exception classes and handlers
 
+### Session 4 - 2026-01-31
+**Accomplished:**
+1. Implemented complete frontend authentication system:
+   - `src/lib/supabase.ts` - Supabase client initialization
+   - `src/queryClient.ts` - TanStack Query client (5-min stale time)
+   - `src/contexts/AuthContext.tsx` - Session management, signIn/signUp/signOut
+   - `src/hooks/useAuth.ts` - Re-export of auth hook
+   - `src/hooks/useUser.ts` - TanStack Query hook for /api/users/me
+   - `src/components/auth/ProtectedRoute.tsx` - Route guard component
+   - `src/components/layout/Header.tsx` - Nav with auth state
+   - `src/components/layout/Layout.tsx` - Main layout wrapper
+   - `src/components/layout/AuthLayout.tsx` - Centered auth pages layout
+   - `src/pages/HomePage.tsx` - Landing page
+   - `src/pages/LoginPage.tsx` - Email/password login form
+   - `src/pages/SignUpPage.tsx` - Registration with email confirmation
+   - `src/pages/DashboardPage.tsx` - Protected dashboard
+   - `src/router.tsx` - React Router v7 configuration
+   - Updated `src/App.tsx` - Added providers (QueryClient, Auth, Router)
+
+2. Created CLAUDE.md for project instructions and post-implementation checklist
+
+**Routes Configured:**
+| Path | Component | Protected |
+|------|-----------|-----------|
+| `/` | HomePage | No |
+| `/login` | LoginPage | No (redirects if logged in) |
+| `/signup` | SignUpPage | No (redirects if logged in) |
+| `/dashboard` | DashboardPage | Yes |
+
+**Key Patterns Used:**
+- Auth token: `session?.access_token` passed to API calls
+- Protected routes: Check `isLoading` first, then `session`
+- i18n: All UI text uses `t('key')` from useTranslation
+- Styling: Uses existing `.btn`, `.btn-primary`, `.card`, `.input` classes
+- Query keys: `['user', 'me']` with 5-min stale time
+
 ---
 
 ## Running the Project
@@ -312,9 +375,10 @@ npm run dev  # Opens at http://localhost:5173
 5. ~~**Implement User Entity & API**~~ ✅ Done (GitHub Issue #4)
 6. ~~**Add i18n infrastructure**~~ ✅ Done (en_US, es_MX with placeholders)
 7. ~~**Create README & CONTRIBUTING**~~ ✅ Done
-8. **Implement authentication flow** - Frontend Supabase integration
+8. ~~**Implement authentication flow**~~ ✅ Done - Frontend Supabase integration
 9. **Implement Connection entity & API** - Next backend milestone
 10. **Push CI/CD workflows to GitHub** - Requires commit & push
+11. **Add frontend tests** - Unit tests for auth components
 
 ---
 

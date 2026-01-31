@@ -43,6 +43,7 @@ services:
       - "8080:8080"
     environment:
       - SPRING_PROFILES_ACTIVE=staging
+      - DATABASE_URL=jdbc:postgresql://${supabase_pooler_host}:5432/postgres?user=postgres.${supabase_project_ref}&password=${supabase_db_password}
       - SUPABASE_URL=${supabase_url}
       - SUPABASE_ANON_KEY=${supabase_anon_key}
       - ENCRYPTION_PEPPER=$${ENCRYPTION_PEPPER}

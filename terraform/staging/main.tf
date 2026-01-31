@@ -104,10 +104,13 @@ resource "aws_instance" "navilla_staging" {
   }
 
   user_data = base64encode(templatefile("${path.module}/user-data.sh", {
-    domain_name      = var.domain_name
-    ghcr_username    = var.ghcr_username
-    supabase_url     = var.supabase_url
-    supabase_anon_key = var.supabase_anon_key
+    domain_name          = var.domain_name
+    ghcr_username        = var.ghcr_username
+    supabase_url         = var.supabase_url
+    supabase_anon_key    = var.supabase_anon_key
+    supabase_project_ref = var.supabase_project_ref
+    supabase_pooler_host = var.supabase_pooler_host
+    supabase_db_password = var.supabase_db_password
   }))
 
   tags = {

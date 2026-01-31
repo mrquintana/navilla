@@ -37,8 +37,24 @@ variable "supabase_url" {
   type        = string
 }
 
+variable "supabase_project_ref" {
+  description = "Supabase project reference ID (e.g., 'abcdefghijkl' from abcdefghijkl.supabase.co)"
+  type        = string
+}
+
+variable "supabase_pooler_host" {
+  description = "Supabase connection pooler hostname (e.g., 'aws-0-us-west-2.pooler.supabase.com')"
+  type        = string
+}
+
 variable "supabase_anon_key" {
   description = "Supabase anonymous key"
+  type        = string
+  sensitive   = true
+}
+
+variable "supabase_db_password" {
+  description = "Supabase PostgreSQL database password"
   type        = string
   sensitive   = true
 }
