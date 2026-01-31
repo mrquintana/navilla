@@ -21,6 +21,8 @@ import java.util.UUID;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -31,7 +33,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 /**
  * User entity representing a Navilla user account.
@@ -40,7 +44,8 @@ import org.hibernate.annotations.UpdateTimestamp;
  * <ul>
  *   <li>Email is stored both hashed (for lookups) and encrypted (for recovery)</li>
  *   <li>Display name and date of birth are encrypted</li>
- *   <li>No plaintext PII is stored in the database</li>
+ *   <li>Supabase ID links to authentication provider</li>
+ *   <li>Privacy settings control profile visibility</li>
  * </ul>
  *
  * <p>Encryption and decryption of sensitive fields should be handled by the
@@ -59,16 +64,24 @@ import org.hibernate.annotations.UpdateTimestamp;
 public class User {
 
   /**
-   * Unique identifier for the user.
+   * Unique identifier for the user (internal database ID).
    */
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
   private UUID id;
 
   /**
-   * SHA-256 hash of the user's email (with pepper) for database lookups.
+   * Supabase Auth user UUID for API authentication lookups.
    *
-   * <p>This allows finding users by email without storing plaintext.
+   * <p>This is the primary key used to find users from JWT tokens.
+   */
+  @Column(name = "supabase_id", unique = true)
+  private UUID supabaseId;
+
+  /**
+   * SHA-256 hash of the user's email (with pepper) for connection lookups.
+   *
+   * <p>Used when another user wants to connect via email address.
    */
   @Column(name = "email_hash", length = 64, unique = true, nullable = false)
   private String emailHash;
@@ -101,6 +114,45 @@ public class User {
   @Column(nullable = false)
   @Builder.Default
   private Boolean verified = false;
+
+  // ==================== Privacy Settings ====================
+
+  /**
+   * Controls who can find this user's profile.
+   */
+  @Enumerated(EnumType.STRING)
+  @JdbcType(PostgreSQLEnumJdbcType.class)
+  @Column(name = "profile_visibility", nullable = false)
+  @Builder.Default
+  private ProfileVisibility profileVisibility = ProfileVisibility.PRIVATE;
+
+  /**
+   * Whether the display name is shown in search results (for public profiles).
+   */
+  @Column(name = "display_name_public", nullable = false)
+  @Builder.Default
+  private Boolean displayNamePublic = false;
+
+  /**
+   * Whether the user can be found by email search (requires PUBLIC visibility).
+   */
+  @Column(name = "searchable_by_email", nullable = false)
+  @Builder.Default
+  private Boolean searchableByEmail = false;
+
+  /**
+   * Optional public username (only meaningful for public profiles).
+   */
+  @Column(name = "username", length = 30, unique = true)
+  private String username;
+
+  /**
+   * SHA-256 hash of username for privacy-preserving lookups.
+   */
+  @Column(name = "username_hash", length = 64, unique = true)
+  private String usernameHash;
+
+  // ==================== Timestamps ====================
 
   /**
    * Timestamp when the user account was created.

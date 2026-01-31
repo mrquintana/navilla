@@ -35,7 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
  * REST controller for user profile operations.
  *
  * <p>All endpoints require authentication via Supabase JWT.
- * The user ID is extracted from the JWT token.
+ * Implements lazy sync: users are automatically created on first API access.
  *
  * @author Navilla Team
  * @since 2026-01-30
@@ -50,13 +50,15 @@ public class UserController {
   /**
    * Gets the current authenticated user's profile.
    *
-   * @param jwt the JWT token containing the user ID
+   * <p>If the user doesn't exist in our database, they are automatically
+   * created using information from their JWT token (lazy sync).
+   *
+   * @param jwt the JWT token containing user information
    * @return the user's profile
    */
   @GetMapping("/me")
   public ResponseEntity<UserResponse> getCurrentUser(@AuthenticationPrincipal Jwt jwt) {
-    String userId = jwt.getSubject();
-    UserResponse user = userService.getCurrentUser(userId);
+    UserResponse user = userService.getOrCreateCurrentUser(jwt);
     return ResponseEntity.ok(user);
   }
 
@@ -72,8 +74,7 @@ public class UserController {
       @AuthenticationPrincipal Jwt jwt,
       @Valid @RequestBody UpdateProfileRequest request) {
 
-    String userId = jwt.getSubject();
-    UserResponse user = userService.updateProfile(userId, request);
+    UserResponse user = userService.updateProfile(jwt, request);
     return ResponseEntity.ok(user);
   }
 
@@ -88,8 +89,7 @@ public class UserController {
    */
   @DeleteMapping("/me")
   public ResponseEntity<Void> deleteAccount(@AuthenticationPrincipal Jwt jwt) {
-    String userId = jwt.getSubject();
-    userService.deleteUser(userId);
+    userService.deleteUser(jwt);
     return ResponseEntity.noContent().build();
   }
 }

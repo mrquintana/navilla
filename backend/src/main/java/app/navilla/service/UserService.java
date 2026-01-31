@@ -20,12 +20,14 @@ import java.util.UUID;
 
 import app.navilla.dto.UpdateProfileRequest;
 import app.navilla.dto.UserResponse;
+import app.navilla.entity.ProfileVisibility;
 import app.navilla.entity.User;
 import app.navilla.exception.ResourceNotFoundException;
 import app.navilla.repository.UserRepository;
 import app.navilla.security.EncryptionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +36,9 @@ import org.springframework.transaction.annotation.Transactional;
  *
  * <p>Handles user profile retrieval, updates, and account management.
  * All sensitive data is encrypted/decrypted through this service.
+ *
+ * <p>Implements lazy sync: if a user exists in Supabase Auth but not in
+ * our database, they are automatically created on first API access.
  *
  * @author Navilla Team
  * @since 2026-01-30
@@ -47,21 +52,38 @@ public class UserService {
   private final EncryptionService encryptionService;
 
   /**
-   * Gets the current user's profile by their Supabase user ID.
+   * Gets or creates the current user's profile from JWT token.
    *
-   * <p>The user ID is extracted from the JWT token and hashed to find
-   * the user in the database.
+   * <p>Implements lazy sync: if the user doesn't exist in our database,
+   * they are automatically created using information from the JWT.
    *
-   * @param userId the Supabase user ID from JWT
+   * @param jwt the JWT token from Supabase Auth
    * @return the user's profile with decrypted data
+   */
+  @Transactional
+  public UserResponse getOrCreateCurrentUser(Jwt jwt) {
+    UUID supabaseId = UUID.fromString(jwt.getSubject());
+    String email = jwt.getClaimAsString("email");
+
+    return userRepository.findBySupabaseId(supabaseId)
+        .map(this::toUserResponse)
+        .orElseGet(() -> createUserFromJwt(supabaseId, email));
+  }
+
+  /**
+   * Gets the current user's profile by their Supabase ID.
+   *
+   * <p>Unlike {@link #getOrCreateCurrentUser(Jwt)}, this method does not
+   * create the user if they don't exist.
+   *
+   * @param supabaseId the Supabase Auth user UUID
+   * @return the user's profile
    * @throws ResourceNotFoundException if user not found
    */
   @Transactional(readOnly = true)
-  public UserResponse getCurrentUser(String userId) {
-    String userHash = encryptionService.hashUserId(userId);
-    User user = userRepository.findByEmailHash(userHash)
+  public UserResponse getUserBySupabaseId(UUID supabaseId) {
+    User user = userRepository.findBySupabaseId(supabaseId)
         .orElseThrow(() -> new ResourceNotFoundException("user.error.notFound"));
-
     return toUserResponse(user);
   }
 
@@ -76,22 +98,36 @@ public class UserService {
   public UserResponse getUserById(UUID id) {
     User user = userRepository.findById(id)
         .orElseThrow(() -> new ResourceNotFoundException("user.error.notFound"));
-
     return toUserResponse(user);
   }
 
   /**
-   * Updates the current user's profile.
+   * Finds a user by their email hash (for connection requests).
    *
-   * @param userId the Supabase user ID from JWT
+   * @param email the plaintext email to look up
+   * @return the user if found
+   * @throws ResourceNotFoundException if user not found
+   */
+  @Transactional(readOnly = true)
+  public UserResponse getUserByEmail(String email) {
+    String emailHash = encryptionService.hashEmail(email);
+    User user = userRepository.findByEmailHash(emailHash)
+        .orElseThrow(() -> new ResourceNotFoundException("user.error.notFound"));
+    return toUserResponse(user);
+  }
+
+  /**
+   * Updates the current authenticated user's profile.
+   *
+   * @param jwt the JWT token from Supabase Auth
    * @param request the profile update request
    * @return the updated user profile
    * @throws ResourceNotFoundException if user not found
    */
   @Transactional
-  public UserResponse updateProfile(String userId, UpdateProfileRequest request) {
-    String userHash = encryptionService.hashUserId(userId);
-    User user = userRepository.findByEmailHash(userHash)
+  public UserResponse updateProfile(Jwt jwt, UpdateProfileRequest request) {
+    UUID supabaseId = UUID.fromString(jwt.getSubject());
+    User user = userRepository.findBySupabaseId(supabaseId)
         .orElseThrow(() -> new ResourceNotFoundException("user.error.notFound"));
 
     if (request.displayName() != null) {
@@ -104,38 +140,7 @@ public class UserService {
     }
 
     User savedUser = userRepository.save(user);
-    log.info("Updated profile for user hash: {}", userHash.substring(0, 8) + "...");
-
-    return toUserResponse(savedUser);
-  }
-
-  /**
-   * Creates a new user account (called during Supabase auth sync).
-   *
-   * @param userId the Supabase user ID
-   * @param email the user's email address
-   * @return the created user's profile
-   */
-  @Transactional
-  public UserResponse createUser(String userId, String email) {
-    String emailHash = encryptionService.hashEmail(email);
-
-    if (userRepository.existsByEmailHash(emailHash)) {
-      log.warn("Attempted to create duplicate user for email hash: {}...",
-          emailHash.substring(0, 8));
-      // Return existing user instead of throwing
-      User existingUser = userRepository.findByEmailHash(emailHash).orElseThrow();
-      return toUserResponse(existingUser);
-    }
-
-    User user = User.builder()
-        .emailHash(emailHash)
-        .emailEncrypted(encryptionService.encryptToBytes(email))
-        .verified(false)
-        .build();
-
-    User savedUser = userRepository.save(user);
-    log.info("Created new user with hash: {}...", emailHash.substring(0, 8));
+    log.info("Updated profile for supabase_id: {}", supabaseId);
 
     return toUserResponse(savedUser);
   }
@@ -143,17 +148,52 @@ public class UserService {
   /**
    * Deletes a user account.
    *
-   * @param userId the Supabase user ID from JWT
+   * @param jwt the JWT token from Supabase Auth
    * @throws ResourceNotFoundException if user not found
    */
   @Transactional
-  public void deleteUser(String userId) {
-    String userHash = encryptionService.hashUserId(userId);
-    User user = userRepository.findByEmailHash(userHash)
+  public void deleteUser(Jwt jwt) {
+    UUID supabaseId = UUID.fromString(jwt.getSubject());
+    User user = userRepository.findBySupabaseId(supabaseId)
         .orElseThrow(() -> new ResourceNotFoundException("user.error.notFound"));
 
     userRepository.delete(user);
-    log.info("Deleted user with hash: {}...", userHash.substring(0, 8));
+    log.info("Deleted user with supabase_id: {}", supabaseId);
+  }
+
+  /**
+   * Creates a new user from JWT claims (lazy sync).
+   */
+  private UserResponse createUserFromJwt(UUID supabaseId, String email) {
+    if (email == null || email.isBlank()) {
+      throw new IllegalStateException("JWT does not contain email claim");
+    }
+
+    String emailHash = encryptionService.hashEmail(email);
+
+    // Check if user exists by email (edge case: same email, different Supabase ID)
+    if (userRepository.existsByEmailHash(emailHash)) {
+      log.warn("User exists by email but not by Supabase ID. Linking accounts.");
+      User existingUser = userRepository.findByEmailHash(emailHash).orElseThrow();
+      existingUser.setSupabaseId(supabaseId);
+      return toUserResponse(userRepository.save(existingUser));
+    }
+
+    User user = User.builder()
+        .supabaseId(supabaseId)
+        .emailHash(emailHash)
+        .emailEncrypted(encryptionService.encryptToBytes(email))
+        .verified(false)
+        .profileVisibility(ProfileVisibility.PRIVATE)
+        .displayNamePublic(false)
+        .searchableByEmail(false)
+        .build();
+
+    User savedUser = userRepository.save(user);
+    log.info("Created new user via lazy sync. supabase_id: {}, email_hash: {}...",
+        supabaseId, emailHash.substring(0, 8));
+
+    return toUserResponse(savedUser);
   }
 
   /**

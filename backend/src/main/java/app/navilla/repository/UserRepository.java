@@ -53,4 +53,39 @@ public interface UserRepository extends JpaRepository<User, UUID> {
    * @return true if a user exists with this email hash
    */
   boolean existsByEmailHash(String emailHash);
+
+  /**
+   * Finds a user by their Supabase Auth UUID.
+   *
+   * <p>This is the primary lookup method for authenticated API requests.
+   * The Supabase ID is extracted from the JWT token.
+   *
+   * @param supabaseId the Supabase Auth user UUID
+   * @return the user if found
+   */
+  Optional<User> findBySupabaseId(UUID supabaseId);
+
+  /**
+   * Checks if a user exists with the given Supabase ID.
+   *
+   * @param supabaseId the Supabase Auth user UUID
+   * @return true if a user exists with this Supabase ID
+   */
+  boolean existsBySupabaseId(UUID supabaseId);
+
+  /**
+   * Finds a user by their username (case-insensitive).
+   *
+   * @param username the username to search for
+   * @return the user if found
+   */
+  Optional<User> findByUsernameIgnoreCase(String username);
+
+  /**
+   * Checks if a username is already taken (case-insensitive).
+   *
+   * @param username the username to check
+   * @return true if the username is taken
+   */
+  boolean existsByUsernameIgnoreCase(String username);
 }
