@@ -17,8 +17,6 @@ env:
 permissions:
   contents: read
   packages: write
-  attestations: write
-  id-token: write
 
 jobs:
   # Build and publish backend image
@@ -81,13 +79,6 @@ jobs:
             VCS_REF=${{ github.sha }}
             VERSION=${{ steps.meta.outputs.version }}
 
-      - name: Generate artifact attestation
-        uses: actions/attest-build-provenance@v2
-        with:
-          subject-name: ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}
-          subject-digest: ${{ steps.push.outputs.digest }}
-          push-to-registry: true
-
   # Build and publish frontend image
   frontend:
     name: Frontend Image
@@ -142,13 +133,6 @@ jobs:
             VITE_SUPABASE_URL=${{ vars.VITE_SUPABASE_URL }}
             VITE_SUPABASE_ANON_KEY=${{ secrets.VITE_SUPABASE_ANON_KEY }}
             VITE_API_URL=${{ vars.VITE_API_URL }}
-
-      - name: Generate artifact attestation
-        uses: actions/attest-build-provenance@v2
-        with:
-          subject-name: ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}
-          subject-digest: ${{ steps.push.outputs.digest }}
-          push-to-registry: true
 
   # Deploy to staging EC2
   deploy-staging:
