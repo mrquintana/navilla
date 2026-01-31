@@ -154,8 +154,8 @@ jobs:
             echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             cd /opt/navilla
 
-            # Fix docker-compose.yml image names
-            cat > docker-compose.yml << 'EOF'
+            # Fix docker-compose.yml image names (use sudo for permission)
+            sudo tee docker-compose.yml > /dev/null << 'EOF'
             services:
               backend:
                 image: ghcr.io/mrquintana/navilla/backend:latest
@@ -183,12 +183,12 @@ jobs:
             EOF
 
             echo "Pulling latest images..."
-            docker-compose pull
+            sudo docker-compose pull
             echo "Stopping old containers..."
-            docker-compose down
+            sudo docker-compose down
             echo "Starting fresh containers..."
-            docker-compose up -d --force-recreate
-            docker image prune -f
+            sudo docker-compose up -d --force-recreate
+            sudo docker image prune -f
             echo "Deployed at $(date)"
 
       - name: Health check
