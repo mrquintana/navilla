@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { Link, Navigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
 
 export function SignUpPage() {
   const { t } = useTranslation();
   const { session, signUp } = useAuth();
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -33,13 +34,17 @@ export function SignUpPage() {
 
     setIsSubmitting(true);
 
-    const { error } = await signUp(email, password);
+    const { error, needsEmailConfirmation } = await signUp(email, password);
 
     if (error) {
       setError(error.message);
       setIsSubmitting(false);
-    } else {
+    } else if (needsEmailConfirmation) {
+      // Email confirmation is required
       setShowConfirmation(true);
+    } else {
+      // User was auto-confirmed, redirect to dashboard
+      navigate('/dashboard', { replace: true });
     }
   };
 

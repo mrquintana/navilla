@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /* Navilla Design System - Inspired by Docusaurus/Infima */
-@theme {
+:root {
   /* Primary blue palette (Docusaurus style) */
   --color-primary: #2563eb;
   --color-primary-dark: #1d4ed8;
@@ -37,7 +37,8 @@ html {
 }
 
 body {
-  @apply bg-background text-foreground;
+  background-color: var(--color-background);
+  color: var(--color-foreground);
   margin: 0;
 }
 
@@ -66,20 +67,21 @@ a:hover {
   text-decoration: underline;
 }
 
-/* Button styles - Docusaurus-inspired */
+/* Button styles - Infima/Docusaurus style */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.625rem 1.25rem;
+  padding: 0.75rem 1.5rem;
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.5;
-  border-radius: 0.375rem;
-  border: 2px solid transparent;
+  border-radius: 50px;
+  border: none;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
   text-decoration: none;
+  white-space: nowrap;
 }
 
 .btn:hover {
@@ -89,34 +91,33 @@ a:hover {
 .btn-primary {
   background-color: var(--color-primary);
   color: #ffffff;
-  border-color: var(--color-primary);
 }
 
 .btn-primary:hover {
   background-color: var(--color-primary-dark);
-  border-color: var(--color-primary-dark);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
 }
 
 .btn-primary:disabled {
   background-color: var(--color-muted);
-  border-color: var(--color-muted);
   cursor: not-allowed;
+  box-shadow: none;
 }
 
 .btn-secondary {
   background-color: transparent;
   color: var(--color-primary);
-  border-color: var(--color-primary);
+  border: 2px solid var(--color-primary);
 }
 
 .btn-secondary:hover {
-  background-color: var(--color-primary);
-  color: #ffffff;
+  background-color: rgba(37, 99, 235, 0.1);
+  color: var(--color-primary-dark);
 }
 
 .btn-lg {
-  padding: 0.875rem 2rem;
-  font-size: 1.125rem;
+  padding: 1rem 2.5rem;
+  font-size: 1.25rem;
 }
 
 /* Card styles */
@@ -190,30 +191,35 @@ a:hover {
   color: #1e40af;
 }
 
-/* Hero section */
+/* Hero section - Infima style */
 .hero {
-  padding: 4rem 1rem;
+  padding: 6rem 1rem;
   text-align: center;
-  background: linear-gradient(180deg, var(--color-background) 0%, var(--color-background-secondary) 100%);
+  background: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);
+  position: relative;
 }
 
 .hero-title {
-  font-size: 3rem;
-  font-weight: 700;
-  margin-bottom: 1rem;
+  font-size: 3.5rem;
+  font-weight: 800;
+  margin-bottom: 1.5rem;
+  color: var(--color-foreground);
+  letter-spacing: -0.025em;
 }
 
 .hero-subtitle {
-  font-size: 1.5rem;
-  color: var(--color-foreground-secondary);
-  margin-bottom: 0.5rem;
+  font-size: 1.75rem;
+  font-weight: 500;
+  color: var(--color-primary);
+  margin-bottom: 1rem;
 }
 
 .hero-description {
-  font-size: 1.125rem;
-  color: var(--color-muted);
-  max-width: 600px;
-  margin: 0 auto 2rem;
+  font-size: 1.25rem;
+  color: var(--color-foreground-secondary);
+  max-width: 640px;
+  margin: 0 auto 2.5rem;
+  line-height: 1.7;
 }
 
 /* Feature grid */
@@ -248,14 +254,22 @@ a:hover {
   margin-bottom: 0;
 }
 
-/* Navbar */
+/* Navbar - Infima style */
 .navbar {
   background-color: var(--color-background);
-  border-bottom: 1px solid var(--color-border-light);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   height: 60px;
   position: sticky;
   top: 0;
   z-index: 100;
+}
+
+.navbar a {
+  font-weight: 500;
+}
+
+.navbar a:hover {
+  text-decoration: none;
 }
 
 /* Footer */

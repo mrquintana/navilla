@@ -209,6 +209,18 @@ navilla/
 - **Decision:** Google Java Style with Checkstyle enforcement
 - **Config:** `backend/checkstyle/google_checks.xml`
 
+### ADR-005: Design System
+- **Status:** Accepted
+- **Decision:** Blue primary color (#2563eb) with Infima-inspired styling
+- **Why:** Matches Docusaurus docs, conveys trust for health app
+- **Full details:** `docs/docs/adrs/adr-005-design-system.md`
+
+### ADR-006: Email Confirmation
+- **Status:** Accepted
+- **Decision:** Dynamic detection of email confirmation requirement
+- **Why:** Works with any Supabase config, no code changes needed
+- **Full details:** `docs/docs/adrs/adr-006-auth-email-confirmation.md`
+
 ---
 
 ## Session Notes
@@ -366,6 +378,21 @@ navilla/
 | POST | `/api/connections/{id}/accept` | Accept request |
 | POST | `/api/connections/{id}/deny` | Deny request |
 | DELETE | `/api/connections/{id}` | Cancel request |
+
+### Session 5 (continued) - Theme and Auth Fixes
+**Accomplished:**
+1. Fixed CSS theme - changed from `@theme` to `:root` for CSS custom properties
+2. Updated Docusaurus docs to use same blue theme (#2563eb)
+3. Improved Infima-like styling:
+   - Pill-shaped buttons (border-radius: 50px)
+   - More prominent hero section
+   - Better navbar styling
+4. Fixed signup flow to detect if email confirmation is required
+5. Created ADRs:
+   - ADR-005: Design System
+   - ADR-006: Email Confirmation Handling
+6. Closed GitHub issue #6 (Connection API)
+7. Created new GitHub issues: #10, #11, #12 for next milestones
 
 ---
 

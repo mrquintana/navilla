@@ -7,7 +7,7 @@ interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: AuthError | null }>;
-  signUp: (email: string, password: string) => Promise<{ error: AuthError | null }>;
+  signUp: (email: string, password: string) => Promise<{ error: AuthError | null; needsEmailConfirmation: boolean }>;
   signOut: () => Promise<void>;
 }
 
@@ -38,8 +38,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signUp = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signUp({ email, password });
-    return { error };
+    const { data, error } = await supabase.auth.signUp({ email, password });
+    // If user is auto-confirmed (no email verification required), session will exist
+    const needsEmailConfirmation = !error && !data.session;
+    return { error, needsEmailConfirmation };
   };
 
   const signOut = async () => {
