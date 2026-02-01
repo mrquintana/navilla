@@ -11,7 +11,8 @@
     "back": "Atrás",
     "next": "Siguiente",
     "submit": "Enviar",
-    "close": "Cerrar"
+    "close": "Cerrar",
+    "select": "Seleccionar..."
   },
   "auth": {
     "signIn": "Iniciar Sesión",
@@ -20,6 +21,7 @@
     "email": "Correo Electrónico",
     "password": "Contraseña",
     "confirmPassword": "Confirmar Contraseña",
+    "passwordHint": "Al menos 8 caracteres",
     "forgotPassword": "¿Olvidaste tu Contraseña?",
     "forgotPasswordDescription": "Ingresa tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña.",
     "resetPassword": "Restablecer Contraseña",
@@ -36,7 +38,21 @@
     "verifyEmail": "Verifica tu correo",
     "checkEmail": "Revisa tu correo para obtener el enlace de verificación",
     "noAccount": "¿No tienes una cuenta?",
-    "haveAccount": "¿Ya tienes una cuenta?"
+    "haveAccount": "¿Ya tienes una cuenta?",
+    "step1of2": "Paso 1 de 2 - Cuenta",
+    "step2of2": "Paso 2 de 2 - Sobre Ti",
+    "username": "Nombre de Usuario",
+    "usernameHint": "Solo letras, números y guiones bajos",
+    "fullName": "Nombre Completo",
+    "dateOfBirth": "Fecha de Nacimiento",
+    "mustBe18": "Debes tener 18 años o más",
+    "sex": "Sexo",
+    "sexMale": "Masculino",
+    "sexFemale": "Femenino",
+    "sexOther": "Otro",
+    "country": "País",
+    "location": "Ciudad / Región",
+    "locationPlaceholder": "ej. Ciudad de México, CDMX"
   },
   "nav": {
     "home": "Inicio",
@@ -94,7 +110,13 @@
     "networkError": "Error de red. Por favor verifica tu conexión.",
     "unauthorized": "No tienes autorización para realizar esta acción",
     "notFound": "Recurso no encontrado",
-    "serverError": "Error del servidor. Por favor intenta más tarde."
+    "serverError": "Error del servidor. Por favor intenta más tarde.",
+    "usernameRequired": "El nombre de usuario es obligatorio",
+    "usernameTooShort": "El nombre de usuario debe tener al menos 3 caracteres",
+    "usernameInvalid": "El nombre de usuario solo puede contener letras, números y guiones bajos",
+    "dobRequired": "La fecha de nacimiento es obligatoria",
+    "sexRequired": "Por favor selecciona tu sexo",
+    "mustBe18": "Debes tener 18 años o más para usar Navilla"
   },
   "privacy": {
     "tagline": "Números, no nombres",

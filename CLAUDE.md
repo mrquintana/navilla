@@ -67,11 +67,17 @@ gh issue view <number>
 gh issue create --title "Title" --body "Description"
 ```
 
-## Testing Environment
+## Testing Requirements
 
-- **No local testing** - All testing is done on AWS environment
-- **Do not run locally** - Use deployed AWS infrastructure for end-to-end testing
-- Push changes and test on the AWS environment
+### Before Every Commit (Required)
+- **Run local tests before committing** - Never commit without verifying tests pass
+- Frontend: `cd frontend && npm run build && npm run lint`
+- Backend: `cd backend && ./mvnw test`
+- Fix any errors before committing
+
+### E2E Testing
+- E2E tests run on AWS environment after deployment
+- Run with: `cd frontend && npm run test:e2e`
 
 ## Project Context
 - Main tracking file: `/CONTEXT.md`

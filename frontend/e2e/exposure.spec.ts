@@ -1,6 +1,5 @@
 import { test, expect } from '@playwright/test';
 import { login } from './helpers/auth';
-import { exposureScenarios } from './fixtures/test-users';
 
 test.describe('Exposure System', () => {
   test.describe('Dashboard Exposure Status', () => {
@@ -44,7 +43,7 @@ test.describe('Exposure System', () => {
       await page.goto('/health');
     });
 
-    test.skip('3rd degree exposure shows low alert', async ({ page }) => {
+    test.skip('3rd degree exposure shows low alert', async () => {
       // Skip until health status UI is implemented
       // When user4 reports, user1 should see 3rd degree exposure
       // (user1 -> user2 -> user3 -> user4)
@@ -52,7 +51,7 @@ test.describe('Exposure System', () => {
       // Note: Based on CONTEXT.md, 3 degrees is the limit for MVP
     });
 
-    test.skip('beyond 3 degrees shows no exposure', async ({ page }) => {
+    test.skip('beyond 3 degrees shows no exposure', async () => {
       // Skip until health status UI is implemented
       // Users more than 3 degrees away should not see exposure alerts
     });
@@ -78,7 +77,7 @@ test.describe('Exposure System', () => {
       await expect(page.locator('text=@')).not.toBeVisible();
     });
 
-    test.skip('cannot identify who reported', async ({ page }) => {
+    test.skip('cannot identify who reported', async () => {
       // Skip until health status UI is implemented
       // Users should not be able to determine WHO in their network reported
     });
@@ -116,23 +115,23 @@ test.describe('Health Status', () => {
       await expect(reportButton).toBeVisible();
     });
 
-    test.skip('can clear a health condition (mark as resolved)', async ({ page }) => {
+    test.skip('can clear a health condition (mark as resolved)', async () => {
       // Skip until health status UI is implemented
       // Per CONTEXT.md: "Resolved" status - alerts remain but marked resolved
     });
 
-    test.skip('cannot see own exposure from own report', async ({ page }) => {
+    test.skip('cannot see own exposure from own report', async () => {
       // Skip until health status UI is implemented
       // Reporting your own condition should not show YOU as exposed
     });
   });
 
   test.describe('Historical Data', () => {
-    test.skip('shows history of health reports', async ({ page }) => {
+    test.skip('shows history of health reports', async () => {
       // Skip until health status UI is implemented
     });
 
-    test.skip('resolved conditions remain visible but marked', async ({ page }) => {
+    test.skip('resolved conditions remain visible but marked', async () => {
       // Skip until health status UI is implemented
       // Per CONTEXT.md: alerts remain but marked resolved
     });

@@ -2,12 +2,21 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from '
 import type { Session, User, AuthError } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 
+export interface UserMetadata {
+  username: string;
+  full_name?: string;
+  date_of_birth: string;
+  sex: 'male' | 'female' | 'other';
+  country?: string;
+  location?: string;
+}
+
 interface AuthContextType {
   session: Session | null;
   user: User | null;
   isLoading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: AuthError | null }>;
-  signUp: (email: string, password: string) => Promise<{ error: AuthError | null; needsEmailConfirmation: boolean }>;
+  signUp: (email: string, password: string, metadata: UserMetadata) => Promise<{ error: AuthError | null; needsEmailConfirmation: boolean }>;
   signOut: () => Promise<void>;
 }
 
@@ -37,8 +46,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { error };
   };
 
-  const signUp = async (email: string, password: string) => {
-    const { data, error } = await supabase.auth.signUp({ email, password });
+  const signUp = async (email: string, password: string, metadata: UserMetadata) => {
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: metadata,
+      },
+    });
     // If user is auto-confirmed (no email verification required), session will exist
     const needsEmailConfirmation = !error && !data.session;
     return { error, needsEmailConfirmation };
@@ -64,6 +79,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {

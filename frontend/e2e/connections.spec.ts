@@ -1,6 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { login, logout } from './helpers/auth';
-import { testUsers } from './fixtures/test-users';
+import { login } from './helpers/auth';
 
 test.describe('Connections', () => {
   test.describe('View Connections', () => {
@@ -76,16 +75,16 @@ test.describe('Connections', () => {
       await expect(page.getByText(/confirmed|confirmad/i)).toBeVisible();
     });
 
-    test.skip('shows pending sent requests', async ({ page }) => {
+    test.skip('shows pending sent requests', async () => {
       // Skip until connections UI is implemented
       // User with pending sent requests
     });
 
-    test.skip('can cancel a pending sent request', async ({ page }) => {
+    test.skip('can cancel a pending sent request', async () => {
       // Skip until connections UI is implemented
     });
 
-    test.skip('can remove a confirmed connection', async ({ page }) => {
+    test.skip('can remove a confirmed connection', async () => {
       // Skip until connections UI is implemented
       // Note: This should be a soft delete
     });
