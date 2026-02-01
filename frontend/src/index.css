@@ -42,6 +42,29 @@ body {
   margin: 0;
 }
 
+/* Background patterns */
+.bg-pattern {
+  background-color: #f8fafc;
+  background-image:
+    radial-gradient(at 40% 20%, rgba(37, 99, 235, 0.08) 0px, transparent 50%),
+    radial-gradient(at 80% 0%, rgba(59, 130, 246, 0.06) 0px, transparent 50%),
+    radial-gradient(at 0% 50%, rgba(37, 99, 235, 0.04) 0px, transparent 50%),
+    radial-gradient(at 80% 50%, rgba(96, 165, 250, 0.05) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, rgba(37, 99, 235, 0.06) 0px, transparent 50%);
+}
+
+.bg-gradient-subtle {
+  background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 50%, #f1f5f9 100%);
+}
+
+.bg-mesh {
+  background-color: #f8fafc;
+  background-image:
+    linear-gradient(rgba(37, 99, 235, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(37, 99, 235, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
 h1, h2, h3, h4, h5, h6 {
   font-weight: 700;
   line-height: 1.25;
@@ -195,8 +218,24 @@ a:hover {
 .hero {
   padding: 6rem 1rem;
   text-align: center;
-  background: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);
   position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(37, 99, 235, 0.15), transparent),
+    linear-gradient(180deg, #f8fafc 0%, #e8f0fe 50%, #f1f5f9 100%);
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image:
+    radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 80% 20%, rgba(96, 165, 250, 0.1) 0%, transparent 40%);
+  pointer-events: none;
 }
 
 .hero-title {

@@ -40,20 +40,23 @@
   },
   "nav": {
     "home": "Home",
-    "dashboard": "Dashboard",
+    "dashboard": "Your Network",
     "connections": "Connections",
     "health": "Health Status",
     "settings": "Settings",
-    "profile": "Profile"
+    "profile": "Your Profile"
   },
   "dashboard": {
-    "title": "Dashboard",
-    "welcome": "Welcome back",
-    "exposureStatus": "Exposure Status",
-    "noExposure": "No known exposure",
-    "potentialExposure": "Potential exposure detected",
-    "connectionCount": "Connections",
-    "lastUpdated": "Last updated"
+    "title": "Your Network",
+    "welcome": "Hey",
+    "subtitle": "Here's what's happening in your network",
+    "exposureStatus": "Your Status",
+    "noExposure": "You're all clear",
+    "potentialExposure": "Heads up - potential exposure",
+    "connectionCount": "Your Connections",
+    "connectionDescription": "people in your trusted network",
+    "lastUpdated": "Last updated",
+    "yourProfile": "About You"
   },
   "connections": {
     "title": "Connections",

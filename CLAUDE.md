@@ -3,6 +3,9 @@
 ## Commit Preferences
 
 - **No Co-Authored-By signature** - Do not add "Co-Authored-By: Claude" lines to commits
+- **Commit frequently** - After completing 3-5 related changes or every 15-20 minutes of work, commit and push
+- **Don't accumulate changes** - Large uncommitted changesets are risky. Commit early and often
+- **Push after commit** - Always push to remote after committing to keep AWS environment up-to-date
 
 ## Post-Implementation Checklist
 

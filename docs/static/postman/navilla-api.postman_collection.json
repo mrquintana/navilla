@@ -1,19 +1,33 @@
 {
   "info": {
     "name": "Navilla API",
-    "description": "API collection for Navilla - Privacy-preserving sexual health platform",
+    "description": "API collection for Navilla - Privacy-preserving sexual health platform.\n\n## Setup\n\n1. Set `baseUrl` variable to your API URL (e.g., `http://localhost:8080` or `https://api.navilla.app`)\n2. Get a JWT token from Supabase Auth and set it as `accessToken`\n3. Run the collection to test all endpoints\n\n## Authentication\n\nAll endpoints except public health check require a valid Supabase JWT token in the Authorization header.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
     {
       "key": "baseUrl",
       "value": "http://localhost:8080",
-      "type": "string"
+      "type": "string",
+      "description": "Base URL for the API"
     },
     {
       "key": "accessToken",
       "value": "",
-      "type": "string"
+      "type": "string",
+      "description": "Supabase JWT access token"
+    },
+    {
+      "key": "connectionId",
+      "value": "",
+      "type": "string",
+      "description": "Connection ID for accept/deny/cancel operations"
+    },
+    {
+      "key": "testEmail",
+      "value": "testuser@example.com",
+      "type": "string",
+      "description": "Email for connection request testing"
     }
   ],
   "auth": {
@@ -29,10 +43,37 @@
   "item": [
     {
       "name": "Health",
+      "description": "Health check endpoints for monitoring API status",
       "item": [
         {
           "name": "Public Health Check",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has status field', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('status');",
+                  "    pm.expect(json.status).to.equal('UP');",
+                  "});",
+                  "",
+                  "pm.test('Response time is less than 500ms', function() {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(500);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "GET",
             "header": [],
             "url": {
@@ -40,11 +81,37 @@
               "host": ["{{baseUrl}}"],
               "path": ["api", "health"]
             },
-            "description": "Public health check endpoint - no authentication required"
+            "description": "Public health check endpoint - no authentication required. Returns API status."
           }
         },
         {
           "name": "Authenticated Health Check",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has status and authenticated fields', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('status');",
+                  "    pm.expect(json).to.have.property('authenticated');",
+                  "    pm.expect(json.authenticated).to.equal(true);",
+                  "});",
+                  "",
+                  "pm.test('Response has user ID', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('userId');",
+                  "    pm.expect(json.userId).to.be.a('string');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
@@ -53,16 +120,47 @@
               "host": ["{{baseUrl}}"],
               "path": ["api", "auth", "health"]
             },
-            "description": "Authenticated health check - requires valid JWT token"
+            "description": "Authenticated health check - requires valid JWT token. Verifies authentication is working."
           }
         }
       ]
     },
     {
       "name": "Users",
+      "description": "User profile management endpoints",
       "item": [
         {
           "name": "Get Current User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has required user fields', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('id');",
+                  "    pm.expect(json).to.have.property('email');",
+                  "    pm.expect(json).to.have.property('created_at');",
+                  "});",
+                  "",
+                  "pm.test('Email is a valid format', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.email).to.match(/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/);",
+                  "});",
+                  "",
+                  "pm.test('ID is a valid UUID', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.id).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
@@ -71,11 +169,30 @@
               "host": ["{{baseUrl}}"],
               "path": ["api", "users", "me"]
             },
-            "description": "Get the current authenticated user's profile. Creates the user if they don't exist (lazy sync)."
+            "description": "Get the current authenticated user's profile. Creates the user if they don't exist (lazy sync from Supabase Auth)."
           }
         },
         {
           "name": "Update Profile",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Display name was updated', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('display_name');",
+                  "    pm.expect(json.display_name).to.equal('Test User');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "PUT",
             "header": [
@@ -86,18 +203,31 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"displayName\": \"My Display Name\"\n}"
+              "raw": "{\n  \"displayName\": \"Test User\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/users/me",
               "host": ["{{baseUrl}}"],
               "path": ["api", "users", "me"]
             },
-            "description": "Update the current user's profile"
+            "description": "Update the current user's profile. Only displayName can be updated."
           }
         },
         {
           "name": "Delete Account",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 204', function() {",
+                  "    pm.response.to.have.status(204);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "DELETE",
             "header": [],
@@ -106,16 +236,48 @@
               "host": ["{{baseUrl}}"],
               "path": ["api", "users", "me"]
             },
-            "description": "Delete the current user's account"
+            "description": "Delete the current user's account. WARNING: This is irreversible."
           }
         }
       ]
     },
     {
       "name": "Connections",
+      "description": "Connection management endpoints for creating and managing connections between users",
       "item": [
         {
           "name": "Create Connection Request",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function() {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Connection has required fields', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('id');",
+                  "    pm.expect(json).to.have.property('status');",
+                  "    pm.expect(json).to.have.property('created_at');",
+                  "});",
+                  "",
+                  "pm.test('Status is PENDING', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.status).to.equal('PENDING');",
+                  "});",
+                  "",
+                  "// Save connection ID for later tests",
+                  "if (pm.response.code === 201) {",
+                  "    const json = pm.response.json();",
+                  "    pm.collectionVariables.set('connectionId', json.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -126,18 +288,45 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"recipientEmail\": \"recipient@example.com\"\n}"
+              "raw": "{\n  \"recipientEmail\": \"{{testEmail}}\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/connections",
               "host": ["{{baseUrl}}"],
               "path": ["api", "connections"]
             },
-            "description": "Create a new connection request to another user by their email"
+            "description": "Create a new connection request to another user by their email. The request starts in PENDING status."
           }
         },
         {
           "name": "Get All Connections",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is an array', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('Each connection has required fields', function() {",
+                  "    const json = pm.response.json();",
+                  "    json.forEach(function(conn) {",
+                  "        pm.expect(conn).to.have.property('id');",
+                  "        pm.expect(conn).to.have.property('status');",
+                  "        pm.expect(conn).to.have.property('created_at');",
+                  "    });",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
@@ -146,11 +335,36 @@
               "host": ["{{baseUrl}}"],
               "path": ["api", "connections"]
             },
-            "description": "Get all connections for the current user (all statuses)"
+            "description": "Get all connections for the current user (all statuses: PENDING, CONFIRMED, DENIED, EXPIRED)"
           }
         },
         {
           "name": "Get Confirmed Connections",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is an array', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('All connections are CONFIRMED', function() {",
+                  "    const json = pm.response.json();",
+                  "    json.forEach(function(conn) {",
+                  "        pm.expect(conn.status).to.equal('CONFIRMED');",
+                  "    });",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
@@ -164,6 +378,31 @@
         },
         {
           "name": "Get Pending Incoming Requests",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is an array', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('All connections are PENDING', function() {",
+                  "    const json = pm.response.json();",
+                  "    json.forEach(function(conn) {",
+                  "        pm.expect(conn.status).to.equal('PENDING');",
+                  "    });",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
@@ -172,11 +411,36 @@
               "host": ["{{baseUrl}}"],
               "path": ["api", "connections", "pending", "incoming"]
             },
-            "description": "Get pending connection requests received by the current user"
+            "description": "Get pending connection requests received by the current user (requests they can accept or deny)"
           }
         },
         {
           "name": "Get Pending Sent Requests",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is an array', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('All connections are PENDING', function() {",
+                  "    const json = pm.response.json();",
+                  "    json.forEach(function(conn) {",
+                  "        pm.expect(conn.status).to.equal('PENDING');",
+                  "    });",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
@@ -185,11 +449,38 @@
               "host": ["{{baseUrl}}"],
               "path": ["api", "connections", "pending", "sent"]
             },
-            "description": "Get pending connection requests sent by the current user"
+            "description": "Get pending connection requests sent by the current user (requests they can cancel)"
           }
         },
         {
           "name": "Get Connection Statistics",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has all stat fields', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('confirmedCount');",
+                  "    pm.expect(json).to.have.property('pendingIncomingCount');",
+                  "    pm.expect(json).to.have.property('pendingSentCount');",
+                  "});",
+                  "",
+                  "pm.test('All counts are non-negative numbers', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.confirmedCount).to.be.at.least(0);",
+                  "    pm.expect(json.pendingIncomingCount).to.be.at.least(0);",
+                  "    pm.expect(json.pendingSentCount).to.be.at.least(0);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
@@ -198,67 +489,196 @@
               "host": ["{{baseUrl}}"],
               "path": ["api", "connections", "stats"]
             },
-            "description": "Get connection statistics (confirmed count, pending incoming, pending sent)"
+            "description": "Get connection statistics including confirmed count, pending incoming, and pending sent counts"
           }
         },
         {
           "name": "Accept Connection Request",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Connection status is CONFIRMED', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.status).to.equal('CONFIRMED');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/connections/:connectionId/accept",
+              "raw": "{{baseUrl}}/api/connections/{{connectionId}}/accept",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "connections", ":connectionId", "accept"],
-              "variable": [
-                {
-                  "key": "connectionId",
-                  "value": "",
-                  "description": "UUID of the connection to accept"
-                }
-              ]
+              "path": ["api", "connections", "{{connectionId}}", "accept"]
             },
-            "description": "Accept a pending connection request (recipient only)"
+            "description": "Accept a pending connection request. Only the recipient can accept. Changes status to CONFIRMED."
           }
         },
         {
           "name": "Deny Connection Request",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Connection status is DENIED', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.status).to.equal('DENIED');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/connections/:connectionId/deny",
+              "raw": "{{baseUrl}}/api/connections/{{connectionId}}/deny",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "connections", ":connectionId", "deny"],
-              "variable": [
-                {
-                  "key": "connectionId",
-                  "value": "",
-                  "description": "UUID of the connection to deny"
-                }
-              ]
+              "path": ["api", "connections", "{{connectionId}}", "deny"]
             },
-            "description": "Deny a pending connection request (recipient only)"
+            "description": "Deny a pending connection request. Only the recipient can deny. Changes status to DENIED."
           }
         },
         {
           "name": "Cancel Connection Request",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 204', function() {",
+                  "    pm.response.to.have.status(204);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/connections/:connectionId",
+              "raw": "{{baseUrl}}/api/connections/{{connectionId}}",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "connections", ":connectionId"],
-              "variable": [
-                {
-                  "key": "connectionId",
-                  "value": "",
-                  "description": "UUID of the connection to cancel"
-                }
-              ]
+              "path": ["api", "connections", "{{connectionId}}"]
             },
-            "description": "Cancel a pending connection request (requester only)"
+            "description": "Cancel a pending connection request. Only the requester can cancel. Removes the connection."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Error Cases",
+      "description": "Test error handling for various scenarios",
+      "item": [
+        {
+          "name": "Unauthorized - No Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 401', function() {",
+                  "    pm.response.to.have.status(401);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "me"]
+            },
+            "description": "Test that protected endpoints return 401 without a token"
+          }
+        },
+        {
+          "name": "Not Found - Invalid Connection ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 404', function() {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "pm.test('Error response has message', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('message');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/connections/00000000-0000-0000-0000-000000000000/accept",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "connections", "00000000-0000-0000-0000-000000000000", "accept"]
+            },
+            "description": "Test that invalid connection ID returns 404"
+          }
+        },
+        {
+          "name": "Bad Request - Invalid Email Format",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 400', function() {",
+                  "    pm.response.to.have.status(400);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"recipientEmail\": \"not-an-email\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/connections",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "connections"]
+            },
+            "description": "Test that invalid email format returns 400"
           }
         }
       ]

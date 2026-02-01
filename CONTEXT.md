@@ -142,15 +142,19 @@ navilla/
     ├── vite.config.ts
     ├── tailwind.config.js
     ├── postcss.config.js
+    ├── playwright.config.ts     # E2E test config
+    ├── e2e/                     # E2E tests
+    │   └── auth.spec.ts
     └── src/
         ├── main.tsx             # App entry point
         ├── App.tsx              # Root component with providers
         ├── router.tsx           # React Router configuration
         ├── queryClient.ts       # TanStack Query client
         ├── i18n.ts              # i18n configuration
-        ├── index.css            # TailwindCSS setup
+        ├── index.css            # TailwindCSS + design system
         ├── lib/
-        │   └── supabase.ts      # Supabase client
+        │   ├── supabase.ts      # Supabase client
+        │   └── api.ts           # Backend API client
         ├── contexts/
         │   └── AuthContext.tsx  # Auth state management
         ├── hooks/
@@ -167,6 +171,8 @@ navilla/
         │   ├── HomePage.tsx
         │   ├── LoginPage.tsx
         │   ├── SignUpPage.tsx
+        │   ├── ForgotPasswordPage.tsx
+        │   ├── ResetPasswordPage.tsx
         │   └── DashboardPage.tsx
         └── locales/
             ├── en_US.json
@@ -395,6 +401,86 @@ navilla/
 6. Closed GitHub issue #6 (Connection API)
 7. Created new GitHub issues: #10, #11, #12 for next milestones
 
+### Session 6 - 2026-02-01
+**Accomplished:**
+1. Fixed API URL configuration bug causing "Profile An error occurred":
+   - Created centralized API client (`frontend/src/lib/api.ts`)
+   - Uses `VITE_API_URL` environment variable properly
+   - Includes `ApiError` class for proper error handling
+   - Updated `useUser` hook to use the new API client
+
+2. Set up Playwright E2E testing framework:
+   - Installed Playwright and Chromium browser
+   - Created `playwright.config.ts` with CI support
+   - Added npm scripts: `test:e2e`, `test:e2e:ui`, `test:e2e:report`
+   - Added Playwright artifacts to `.gitignore`
+
+3. Created E2E tests for auth flows (`frontend/e2e/auth.spec.ts`):
+   - Login page rendering and form validation
+   - Signup page rendering and password validation
+   - Forgot password flow
+   - Protected routes redirect to login
+   - Navigation between pages
+
+4. Updated CI workflow with E2E job:
+   - Runs Playwright tests on every PR
+   - Uses preview server for built assets
+   - Uploads test reports and screenshots as artifacts
+
+5. Added UI background styling improvements:
+   - Added `.bg-pattern` with radial gradients
+   - Added `.bg-gradient-subtle` and `.bg-mesh` options
+   - Enhanced hero section with glow effects
+   - Applied pattern background to AuthLayout
+
+6. Created GitHub issues:
+   - #15: E2E Automated Testing with Playwright
+   - #16: UI Background Styling Improvements
+   - #17: Fix API URL configuration causing 'Profile error'
+
+**Files Added:**
+- `frontend/src/lib/api.ts` - Centralized API client
+- `frontend/playwright.config.ts` - Playwright configuration
+- `frontend/e2e/auth.spec.ts` - E2E test suite
+
+**Files Modified:**
+- `frontend/src/hooks/useUser.ts` - Uses new API client
+- `frontend/src/index.css` - Background patterns and hero styling
+- `frontend/src/components/layout/AuthLayout.tsx` - Applied bg-pattern
+- `frontend/package.json` - Added E2E test scripts
+- `frontend/.gitignore` - Added Playwright artifacts
+- `.github/workflows/ci.yml` - Added E2E test job
+
+**Pending:**
+- Create 10 test users in AWS Supabase
+- Seed connection relationships for test scenarios
+
+### Session 6 (continued)
+**Additional Accomplishments:**
+
+7. Created comprehensive E2E test structure:
+   - `frontend/e2e/fixtures/test-users.ts` - 10 test users with network graph
+   - `frontend/e2e/helpers/auth.ts` - Authentication helpers
+   - `frontend/e2e/connections.spec.ts` - Connection tests (some skipped pending UI)
+   - `frontend/e2e/exposure.spec.ts` - Exposure tests (some skipped pending health UI)
+   - `frontend/e2e/README.md` - E2E testing documentation
+
+8. Updated Postman collection with comprehensive tests:
+   - Added test scripts to all endpoints
+   - Added Error Cases folder for error handling tests
+   - Tests verify response status, body structure, data types
+   - Location: `docs/static/postman/navilla-api.postman_collection.json`
+
+9. Updated documentation:
+   - `docs/docs/development/testing.md` - Added E2E testing section
+   - `docs/docs/api/authentication.md` - Added forgot password and reset password
+   - `docs/docs/frontend/state-management.md` - Added API client documentation
+   - Fixed Maven commands (was incorrectly showing Gradle)
+
+10. Created GitHub issues:
+    - #18: Update Postman collection with comprehensive tests
+    - #19: Create user guide documentation with screenshots (open for later)
+
 ---
 
 ## Running the Project
@@ -443,10 +529,13 @@ npm run dev  # Opens at http://localhost:5173
 7. ~~**Create README & CONTRIBUTING**~~ ✅ Done
 8. ~~**Implement authentication flow**~~ ✅ Done - Frontend Supabase integration
 9. ~~**Implement Connection entity & API**~~ ✅ Done - Full CRUD with tests
-10. **Implement Health Status entity & API** - Next backend milestone
-11. **Push CI/CD workflows to GitHub** - Requires commit & push
-12. **Add frontend tests** - Unit tests for auth components
-13. **Frontend Connections UI** - UI to manage connections
+10. ~~**Set up E2E testing**~~ ✅ Done - Playwright with CI integration
+11. ~~**Fix API URL configuration**~~ ✅ Done - Centralized API client
+12. ~~**Add UI background styling**~~ ✅ Done - Pattern backgrounds
+13. **Implement Health Status entity & API** - GitHub Issue #10
+14. **Comprehensive E2E test suite** - 10 test users, all edge cases (GitHub Issue #15)
+15. **Frontend Connections UI** - GitHub Issue #11
+16. **Frontend Unit Tests** - GitHub Issue #12
 
 ---
 
@@ -467,6 +556,15 @@ cd frontend && npm run dev
 
 # Frontend - build for production
 cd frontend && npm run build
+
+# Frontend - run E2E tests
+cd frontend && npm run test:e2e
+
+# Frontend - run E2E tests with UI
+cd frontend && npm run test:e2e:ui
+
+# Frontend - view E2E test report
+cd frontend && npm run test:e2e:report
 
 # Docs - run local server
 cd docs && npm start

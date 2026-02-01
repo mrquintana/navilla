@@ -107,17 +107,77 @@ if (!session) return <Navigate to="/login" />;
 </QueryClientProvider>
 ```
 
-## API Calls with Auth
+## API Client
 
-All API calls include the JWT token:
+All API calls use the centralized API client that handles authentication and error handling:
 
 ```typescript
-async function fetchUser(accessToken: string) {
-  const response = await fetch('/api/users/me', {
+// src/lib/api.ts
+const API_URL = import.meta.env.VITE_API_URL || '';
+
+export async function apiRequest<T>(
+  endpoint: string,
+  accessToken: string,
+  options: RequestOptions = {}
+): Promise<T> {
+  const response = await fetch(`${API_URL}${endpoint}`, {
+    ...options,
     headers: {
+      'Content-Type': 'application/json',
       Authorization: `Bearer ${accessToken}`,
+      ...options.headers,
     },
   });
+
+  if (!response.ok) {
+    throw new ApiError(message, response.status);
+  }
+
   return response.json();
 }
+
+// Pre-built API methods
+export const api = {
+  users: {
+    me: (token: string) => apiRequest<UserProfile>('/api/users/me', token),
+    update: (token: string, data: UpdateProfileData) =>
+      apiRequest<UserProfile>('/api/users/me', token, {
+        method: 'PUT',
+        body: data,
+      }),
+  },
+  connections: {
+    list: (token: string) => apiRequest<Connection[]>('/api/connections', token),
+    // ... other methods
+  },
+};
+```
+
+### Using the API Client
+
+```typescript
+// In hooks
+import { api } from '../lib/api';
+
+export function useUser() {
+  const { session } = useAuth();
+
+  return useQuery({
+    queryKey: ['user', 'me'],
+    queryFn: () => api.users.me(session!.access_token),
+    enabled: !!session?.access_token,
+  });
+}
+```
+
+### Environment Configuration
+
+Set `VITE_API_URL` in your `.env` file:
+
+```bash
+# Development
+VITE_API_URL=http://localhost:8080
+
+# Production
+VITE_API_URL=https://api.navilla.app
 ```
