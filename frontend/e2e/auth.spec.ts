@@ -75,18 +75,21 @@ test.describe('Authentication', () => {
 
       // Should show error for password mismatch
       await expect(page.locator('.alert-error')).toBeVisible();
-      await expect(page.locator('.alert-error')).toContainText(/mismatch|coinciden/i);
+      await expect(page.locator('.alert-error')).toContainText(/do not match|no coinciden/i);
     });
 
     test('validates password minimum length', async ({ page }) => {
       await page.getByLabel(/^email/i).fill('test@example.com');
-      await page.getByLabel(/^password/i).fill('short');
+      const passwordInput = page.getByLabel(/^password/i);
+      await passwordInput.fill('short');
       await page.getByLabel(/confirm/i).fill('short');
       await page.getByRole('button', { name: /sign up|registr/i }).click();
 
-      // Should show error for short password
-      await expect(page.locator('.alert-error')).toBeVisible();
-      await expect(page.locator('.alert-error')).toContainText(/8|short|caracteres/i);
+      // HTML5 minlength validation prevents submission
+      // Verify we're still on signup page (form didn't submit)
+      await expect(page).toHaveURL(/\/signup/);
+      // Verify the password field has minLength attribute
+      await expect(passwordInput).toHaveAttribute('minlength', '8');
     });
   });
 
