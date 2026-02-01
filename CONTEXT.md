@@ -154,7 +154,8 @@ navilla/
         ├── index.css            # TailwindCSS + design system
         ├── lib/
         │   ├── supabase.ts      # Supabase client
-        │   └── api.ts           # Backend API client
+        │   ├── api.ts           # Backend API client
+        │   └── geolocation.ts   # IP geolocation and country list
         ├── contexts/
         │   └── AuthContext.tsx  # Auth state management
         ├── hooks/
@@ -480,6 +481,46 @@ navilla/
 10. Created GitHub issues:
     - #18: Update Postman collection with comprehensive tests
     - #19: Create user guide documentation with screenshots (open for later)
+
+### Session 7 - 2026-02-01 (continued)
+**Accomplished:**
+1. Enhanced signup form with user profile fields:
+   - Multi-step form (Step 1: Account, Step 2: About You)
+   - Added fields: username (required), full name (optional), DOB (required), sex (required), country (auto-detect), location (optional)
+   - IP-based country detection via ip-api.com (`frontend/src/lib/geolocation.ts`)
+   - Age validation (18+ required)
+   - Username validation (letters, numbers, underscores only)
+
+2. Added UserMetadata interface to AuthContext:
+   - Extended signUp to pass metadata to Supabase
+
+3. Fixed site title from "frontend" to "Navilla":
+   - Updated `frontend/index.html`
+
+4. Added Spanish translations for new signup fields:
+   - Updated `frontend/src/locales/es_MX.json`
+
+5. Fixed TypeScript and lint errors:
+   - Fixed ApiError class parameter properties in `api.ts`
+   - Removed unused imports in E2E test files
+   - Added eslint-disable comment for AuthContext export
+
+6. Updated CLAUDE.md with local testing requirements:
+   - Added rule: run `npm run build && npm run lint` before committing
+
+**Files Added:**
+- `frontend/src/lib/geolocation.ts` - IP geolocation and country list
+
+**Files Modified:**
+- `frontend/index.html` - Fixed title
+- `frontend/src/pages/SignUpPage.tsx` - Multi-step signup form
+- `frontend/src/contexts/AuthContext.tsx` - UserMetadata interface
+- `frontend/src/locales/en_US.json` - New auth translation keys
+- `frontend/src/locales/es_MX.json` - Spanish translations
+- `frontend/src/lib/api.ts` - Fixed TypeScript error
+- `frontend/e2e/connections.spec.ts` - Fixed lint errors
+- `frontend/e2e/exposure.spec.ts` - Fixed lint errors
+- `CLAUDE.md` - Added local testing requirement
 
 ---
 
