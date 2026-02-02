@@ -125,6 +125,7 @@ public class SecurityConfig {
     configuration.setAllowedOrigins(Arrays.asList(
         "http://localhost:5173",  // Vite dev server
         "http://localhost:3000",  // Alternative dev port
+        "http://54.159.90.88",    // AWS staging
         "https://navilla.app",    // Production
         "https://www.navilla.app" // Production with www
     ));
