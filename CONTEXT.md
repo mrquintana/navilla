@@ -522,6 +522,54 @@ navilla/
 - `frontend/e2e/exposure.spec.ts` - Fixed lint errors
 - `CLAUDE.md` - Added local testing requirement
 
+### Session 8 - 2026-02-02
+**Problem:** Backend on AWS returning 502 Bad Gateway - database connection failing
+
+**Root Cause:**
+- Supabase database only has IPv6 address
+- EC2 instance only had IPv4 connectivity
+- Docker containers couldn't resolve IPv6 hostnames
+
+**Accomplished:**
+1. Diagnosed database connectivity issue:
+   - Backend container couldn't connect to Supabase PostgreSQL
+   - Supabase `db.xxx.supabase.co` resolves to IPv6 only
+   - EC2 default VPC had no IPv6 support
+
+2. Enabled IPv6 on AWS infrastructure via Terraform:
+   - Added IPv6 CIDR block to default VPC
+   - Created new subnet (172.31.128.0/24) with IPv6
+   - Added IPv6 route to internet gateway
+   - Recreated EC2 instance in IPv6-enabled subnet
+
+3. Fixed Docker IPv6 connectivity:
+   - Used `network_mode: host` for backend container
+   - Allows container to use host's IPv6 address
+   - Backend now connects directly to Supabase via IPv6
+
+4. Updated deployment configuration:
+   - Updated docker-compose.yml with proper environment variables
+   - Created docker-compose.prod.yml for production deployments
+   - Added DATABASE_URL, DATABASE_USERNAME, DATABASE_PASSWORD to terraform
+   - Added GitHub secrets for database credentials
+
+5. Created GitHub issue #20 for scheduled EC2 start/stop (cost saving)
+
+**Key Learnings:**
+- IPv6 on AWS EC2 is FREE
+- Supabase free tier databases are IPv6-only
+- Docker containers need `network_mode: host` for IPv6
+
+**Files Added:**
+- `docker-compose.prod.yml` - Production docker-compose override
+
+**Files Modified:**
+- `docker-compose.yml` - Updated environment variables
+- `terraform/staging/main.tf` - Added IPv6 VPC, subnet, routes
+- `terraform/staging/variables.tf` - Added database variables
+- `terraform/staging/user-data.sh` - Updated with host networking and env vars
+- `terraform/staging/terraform.tfvars.example` - Added database examples
+
 ---
 
 ## Running the Project
