@@ -49,37 +49,49 @@ data "aws_vpc" "default" {
   default = true
 }
 
-# Get default subnet
-data "aws_subnets" "default" {
-  filter {
-    name   = "vpc-id"
-    values = [data.aws_vpc.default.id]
-  }
-
-  filter {
-    name   = "availability-zone"
-    values = ["${var.aws_region}a"]
-  }
-}
-
 # Enable IPv6 on default VPC
 resource "aws_vpc_ipv6_cidr_block_association" "default" {
-  vpc_id = data.aws_vpc.default.id
+  vpc_id                           = data.aws_vpc.default.id
+  assign_generated_ipv6_cidr_block = true
 }
 
-# Enable IPv6 on subnet
+# Create new subnet with IPv6 (using unused CIDR range)
 resource "aws_subnet" "ipv6_enabled" {
-  count = length(data.aws_subnets.default.ids) > 0 ? 1 : 0
-
   vpc_id                          = data.aws_vpc.default.id
-  cidr_block                      = cidrsubnet(data.aws_vpc.default.cidr_block, 4, 1)
-  ipv6_cidr_block                 = cidrsubnet(aws_vpc_ipv6_cidr_block_association.default.ipv6_cidr_block, 8, 1)
+  cidr_block                      = "172.31.128.0/24"
+  ipv6_cidr_block                 = cidrsubnet(aws_vpc_ipv6_cidr_block_association.default.ipv6_cidr_block, 8, 128)
   assign_ipv6_address_on_creation = true
   availability_zone               = "${var.aws_region}a"
+  map_public_ip_on_launch         = true
 
   tags = {
     Name = "navilla-staging-ipv6"
   }
+}
+
+# Get default internet gateway
+data "aws_internet_gateway" "default" {
+  filter {
+    name   = "attachment.vpc-id"
+    values = [data.aws_vpc.default.id]
+  }
+}
+
+# Get default route table
+data "aws_route_table" "default" {
+  vpc_id = data.aws_vpc.default.id
+
+  filter {
+    name   = "association.main"
+    values = ["true"]
+  }
+}
+
+# Add IPv6 route to internet gateway
+resource "aws_route" "ipv6_default" {
+  route_table_id              = data.aws_route_table.default.id
+  destination_ipv6_cidr_block = "::/0"
+  gateway_id                  = data.aws_internet_gateway.default.id
 }
 
 # Security group for the EC2 instance
@@ -144,7 +156,7 @@ resource "aws_instance" "navilla_staging" {
 
   key_name               = var.key_name
   vpc_security_group_ids = [aws_security_group.navilla_staging.id]
-  subnet_id              = length(aws_subnet.ipv6_enabled) > 0 ? aws_subnet.ipv6_enabled[0].id : null
+  subnet_id              = aws_subnet.ipv6_enabled.id
 
   # Enable IPv6
   ipv6_address_count = 1

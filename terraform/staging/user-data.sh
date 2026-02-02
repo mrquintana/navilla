@@ -49,8 +49,7 @@ services:
     image: ghcr.io/${ghcr_username}/navilla/backend:latest
     container_name: navilla-backend
     restart: unless-stopped
-    ports:
-      - "8080:8080"
+    network_mode: host
     environment:
       - SPRING_PROFILES_ACTIVE=staging
       - SUPABASE_URL=$${SUPABASE_URL}
