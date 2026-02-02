@@ -32,21 +32,36 @@ dnf install -y certbot python3-certbot-nginx
 mkdir -p /opt/navilla
 cd /opt/navilla
 
+# Create .env file
+cat > /opt/navilla/.env << 'ENV_EOF'
+SUPABASE_URL=${supabase_url}
+SUPABASE_ANON_KEY=${supabase_anon_key}
+DATABASE_URL=${database_url}
+DATABASE_USERNAME=${database_username}
+DATABASE_PASSWORD=${database_password}
+ENCRYPTION_PEPPER=${encryption_pepper}
+ENV_EOF
+
 # Create docker-compose.yml
 cat > /opt/navilla/docker-compose.yml << 'COMPOSE_EOF'
 services:
   backend:
-    image: ghcr.io/${ghcr_username}/navilla-backend:latest
+    image: ghcr.io/${ghcr_username}/navilla/backend:latest
     container_name: navilla-backend
     restart: unless-stopped
     ports:
       - "8080:8080"
     environment:
       - SPRING_PROFILES_ACTIVE=staging
-      - DATABASE_URL=jdbc:postgresql://${supabase_pooler_host}:5432/postgres?user=postgres.${supabase_project_ref}&password=${supabase_db_password}
-      - SUPABASE_URL=${supabase_url}
-      - SUPABASE_ANON_KEY=${supabase_anon_key}
+      - SUPABASE_URL=$${SUPABASE_URL}
+      - SUPABASE_ANON_KEY=$${SUPABASE_ANON_KEY}
+      - DATABASE_URL=$${DATABASE_URL}
+      - DATABASE_USERNAME=$${DATABASE_USERNAME}
+      - DATABASE_PASSWORD=$${DATABASE_PASSWORD}
       - ENCRYPTION_PEPPER=$${ENCRYPTION_PEPPER}
+      - JAVA_OPTS=-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -XX:InitialRAMPercentage=50.0 -XX:+UseG1GC -XX:+UseStringDeduplication -Djava.security.egd=file:/dev/./urandom -Dspring.profiles.active=staging
+    env_file:
+      - .env
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
       interval: 30s
@@ -55,15 +70,15 @@ services:
       start_period: 60s
 
   frontend:
-    image: ghcr.io/${ghcr_username}/navilla-frontend:latest
+    image: ghcr.io/${ghcr_username}/navilla/frontend:latest
     container_name: navilla-frontend
     restart: unless-stopped
     ports:
       - "3000:80"
     environment:
-      - VITE_SUPABASE_URL=${supabase_url}
-      - VITE_SUPABASE_ANON_KEY=${supabase_anon_key}
-      - VITE_API_URL=http://localhost:8080
+      - VITE_SUPABASE_URL=$${SUPABASE_URL}
+      - VITE_SUPABASE_ANON_KEY=$${SUPABASE_ANON_KEY}
+      - VITE_API_URL=http://54.159.90.88
     depends_on:
       - backend
 COMPOSE_EOF

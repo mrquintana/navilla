@@ -44,6 +44,44 @@ data "aws_ami" "amazon_linux" {
   }
 }
 
+# Get default VPC
+data "aws_vpc" "default" {
+  default = true
+}
+
+# Get default subnet
+data "aws_subnets" "default" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.default.id]
+  }
+
+  filter {
+    name   = "availability-zone"
+    values = ["${var.aws_region}a"]
+  }
+}
+
+# Enable IPv6 on default VPC
+resource "aws_vpc_ipv6_cidr_block_association" "default" {
+  vpc_id = data.aws_vpc.default.id
+}
+
+# Enable IPv6 on subnet
+resource "aws_subnet" "ipv6_enabled" {
+  count = length(data.aws_subnets.default.ids) > 0 ? 1 : 0
+
+  vpc_id                          = data.aws_vpc.default.id
+  cidr_block                      = cidrsubnet(data.aws_vpc.default.cidr_block, 4, 1)
+  ipv6_cidr_block                 = cidrsubnet(aws_vpc_ipv6_cidr_block_association.default.ipv6_cidr_block, 8, 1)
+  assign_ipv6_address_on_creation = true
+  availability_zone               = "${var.aws_region}a"
+
+  tags = {
+    Name = "navilla-staging-ipv6"
+  }
+}
+
 # Security group for the EC2 instance
 resource "aws_security_group" "navilla_staging" {
   name        = "navilla-staging-sg"
@@ -76,12 +114,22 @@ resource "aws_security_group" "navilla_staging" {
     description = "HTTPS"
   }
 
-  # Allow all outbound
+  # Allow all outbound IPv4
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
+    description = "Allow all outbound IPv4"
+  }
+
+  # Allow all outbound IPv6
+  egress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    ipv6_cidr_blocks = ["::/0"]
+    description      = "Allow all outbound IPv6"
   }
 
   tags = {
@@ -96,6 +144,10 @@ resource "aws_instance" "navilla_staging" {
 
   key_name               = var.key_name
   vpc_security_group_ids = [aws_security_group.navilla_staging.id]
+  subnet_id              = length(aws_subnet.ipv6_enabled) > 0 ? aws_subnet.ipv6_enabled[0].id : null
+
+  # Enable IPv6
+  ipv6_address_count = 1
 
   root_block_device {
     volume_size = 20
@@ -111,6 +163,10 @@ resource "aws_instance" "navilla_staging" {
     supabase_project_ref = var.supabase_project_ref
     supabase_pooler_host = var.supabase_pooler_host
     supabase_db_password = var.supabase_db_password
+    database_url         = var.database_url
+    database_username    = var.database_username
+    database_password    = var.database_password
+    encryption_pepper    = var.encryption_pepper
   }))
 
   tags = {
