@@ -82,3 +82,9 @@ variable "database_password" {
   type        = string
   sensitive   = true
 }
+
+variable "api_url" {
+  description = "Backend API URL (will use EIP address)"
+  type        = string
+  default     = "http://54.159.90.88"
+}

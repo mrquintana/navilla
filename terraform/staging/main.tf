@@ -167,6 +167,7 @@ resource "aws_instance" "navilla_staging" {
     database_username    = var.database_username
     database_password    = var.database_password
     encryption_pepper    = var.encryption_pepper
+    api_url              = var.api_url
   }))
 
   tags = {

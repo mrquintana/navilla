@@ -78,7 +78,7 @@ services:
     environment:
       - VITE_SUPABASE_URL=$${SUPABASE_URL}
       - VITE_SUPABASE_ANON_KEY=$${SUPABASE_ANON_KEY}
-      - VITE_API_URL=http://54.159.90.88
+      - VITE_API_URL=${api_url}
     depends_on:
       - backend
 COMPOSE_EOF
