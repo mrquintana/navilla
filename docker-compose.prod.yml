@@ -7,6 +7,8 @@ services:
     # Use pre-built image from GitHub Container Registry instead of building
     image: ghcr.io/mrquintana/navilla/backend:latest
     build: null  # Disable build
+    # Use host network for IPv6 connectivity to Supabase database
+    network_mode: host
     environment:
       - SPRING_PROFILES_ACTIVE=staging
       - JAVA_OPTS=-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -XX:InitialRAMPercentage=50.0 -XX:+UseG1GC -XX:+UseStringDeduplication -Djava.security.egd=file:/dev/./urandom -Dspring.profiles.active=staging
