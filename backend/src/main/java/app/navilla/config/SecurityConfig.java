@@ -51,9 +51,6 @@ public class SecurityConfig {
   @Value("${navilla.supabase.url}")
   private String supabaseUrl;
 
-  @Value("${spring.security.oauth2.resourceserver.jwt.jwk-set-uri:}")
-  private String jwkSetUri;
-
   /**
    * Configures the security filter chain.
    *
@@ -100,16 +97,15 @@ public class SecurityConfig {
   /**
    * Creates the JWT decoder for validating Supabase tokens.
    *
-   * <p>Uses the Supabase JWKS endpoint to fetch public keys for token validation.
+   * <p>Supabase uses ES256 (ECDSA with P-256) for JWT signing.
+   * The JWKS endpoint provides the public keys for verification.
    *
    * @return configured JwtDecoder
    */
   @Bean
   public JwtDecoder jwtDecoder() {
-    String effectiveJwkUri = jwkSetUri.isEmpty()
-        ? supabaseUrl + "/auth/v1/.well-known/jwks.json"
-        : jwkSetUri;
-    return NimbusJwtDecoder.withJwkSetUri(effectiveJwkUri).build();
+    String jwksUri = supabaseUrl + "/auth/v1/.well-known/jwks.json";
+    return NimbusJwtDecoder.withJwkSetUri(jwksUri).build();
   }
 
   /**
