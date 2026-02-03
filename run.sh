@@ -55,6 +55,18 @@ case "${1:-dev}" in
         echo "Press Ctrl+C to stop all services"
         echo ""
 
+        # Load backend .env file if it exists
+        if [ -f "backend/.env" ]; then
+            print_status "Loading backend/.env file..."
+            export $(grep -v '^#' backend/.env | xargs)
+        fi
+
+        # Load frontend .env file if it exists
+        if [ -f "frontend/.env" ]; then
+            print_status "Loading frontend/.env file..."
+            export $(grep -v '^#' frontend/.env | xargs)
+        fi
+
         # Start both services, kill both on Ctrl+C
         trap 'kill 0' INT
         (cd backend && ./mvnw spring-boot:run -Dspring-boot.run.profiles=development 2>&1 | sed 's/^/[backend] /') &

@@ -25,7 +25,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -71,7 +74,7 @@ public class SecurityConfig {
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     return http
         .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-        .csrf(csrf -> csrf.disable())
+        .csrf(AbstractHttpConfigurer::disable)
         .sessionManagement(session ->
             session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> auth
@@ -87,7 +90,7 @@ public class SecurityConfig {
         .headers(headers -> headers
             .contentSecurityPolicy(csp ->
                 csp.policyDirectives("default-src 'self'"))
-            .frameOptions(frame -> frame.deny())
+            .frameOptions(HeadersConfigurer.FrameOptionsConfig::deny)
             .contentTypeOptions(content -> {})
             .httpStrictTransportSecurity(hsts ->
                 hsts.includeSubDomains(true).maxAgeInSeconds(31536000)))
@@ -105,7 +108,9 @@ public class SecurityConfig {
   @Bean
   public JwtDecoder jwtDecoder() {
     String jwksUri = supabaseUrl + "/auth/v1/.well-known/jwks.json";
-    return NimbusJwtDecoder.withJwkSetUri(jwksUri).build();
+    return NimbusJwtDecoder.withJwkSetUri(jwksUri)
+        .jwsAlgorithm(SignatureAlgorithm.ES256)
+        .build();
   }
 
   /**
