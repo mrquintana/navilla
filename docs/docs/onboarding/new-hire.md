@@ -18,7 +18,7 @@ Welcome to the Navilla team! This guide will help you get up to speed.
 
 ### 2. Set Up Development Environment
 
-Follow the [Setup Guide](../getting-started/setup) to get your local environment running.
+Follow the [Development Setup Guide](../getting-started/setup) to get your local environment running. Remember that the fastest way to get both backend and frontend running is with `./run.sh dev`.
 
 ### 3. Understand the Product
 
@@ -90,14 +90,14 @@ We prevent users from deducing who reported positive:
 
 | Topic | Contact |
 |-------|---------|
-| Architecture | TBD |
-| Backend | TBD |
-| Frontend | TBD |
-| Product | TBD |
-| Security/Privacy | TBD |
+| Architecture | TBD <!-- TODO: Fill in actual contact/role --> |
+| Backend | TBD <!-- TODO: Fill in actual contact/role --> |
+| Frontend | TBD <!-- TODO: Fill in actual contact/role --> |
+| Product | TBD <!-- TODO: Fill in actual contact/role --> |
+| Security/Privacy | TBD <!-- TODO: Fill in actual contact/role --> |
 
 ## Resources
 
-- Product Requirements: See `CONTEXT.md` in project root for location
+- Product Requirements: [`CONTEXT.md`](../../CONTEXT.md)
 - [Architecture Docs](../architecture/overview)
 - [API Reference](../api/overview)

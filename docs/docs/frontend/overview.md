@@ -7,21 +7,17 @@ title: Frontend Overview
 
 The Navilla frontend is a React application built with Vite and TypeScript.
 
-:::note Work in Progress
-This documentation will be updated as the frontend is implemented.
-:::
-
 ## Technology Stack
 
 | Technology | Version | Purpose |
 |------------|---------|---------|
-| React | 18.x | UI framework |
+| React | 19.2.0 | UI framework |
 | TypeScript | 5.x | Type safety |
-| Vite | 5.x | Build tool |
+| Vite | 7.2.4 | Build tool |
 | TailwindCSS | 3.x | Styling |
 | React Router | 6.x | Routing |
 | TanStack Query | 5.x | Data fetching |
-| Supabase JS | 2.x | Auth client |
+| Supabase JS | ^2.93.3 | Auth client |
 
 ## Design System
 

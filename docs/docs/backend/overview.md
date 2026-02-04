@@ -11,19 +11,19 @@ The Navilla backend is a Spring Boot application that handles business logic, gr
 
 | Technology | Version | Purpose |
 |------------|---------|---------|
-| Java | 21 | Language |
-| Spring Boot | 3.x | Framework |
+| Java | 25 | Language |
+| Spring Boot | 4.0 | Framework |
 | Spring Security | 6.x | Authentication/Authorization |
 | Spring Data JPA | 3.x | Database access |
 | PostgreSQL | 15+ | Database |
-| Gradle | 8.x | Build tool |
+| Maven | 3.9+ | Build tool |
 
 ## Project Structure
 
 ```
 backend/
 ├── src/main/java/app/navilla/
-│   ├── NavillaApplication.java
+│   ├── NavillaBackendApplication.java
 │   ├── config/           # Configuration classes
 │   ├── controller/       # REST controllers
 │   ├── service/          # Business logic
@@ -35,7 +35,7 @@ backend/
 ├── src/main/resources/
 │   ├── application.yml
 │   └── db/migration/     # Flyway migrations
-└── build.gradle
+└── pom.xml
 ```
 
 ## Key Components
@@ -48,9 +48,6 @@ REST API endpoints following OpenAPI 3.0 specification.
 
 - **UserService**: User management, profile operations
 - **ConnectionService**: Connection requests, confirmations
-- **HealthService**: Health status management
-- **ExposureService**: Graph traversal, exposure calculations
-- **NotificationService**: Notification queuing, delivery
 
 ### Security
 

@@ -7,10 +7,6 @@ title: Project Structure
 
 Detailed breakdown of the Spring Boot backend structure.
 
-:::note Work in Progress
-This documentation will be updated as the backend is implemented.
-:::
-
 ## Directory Layout
 
 ```
@@ -18,52 +14,23 @@ backend/
 ├── src/
 │   ├── main/
 │   │   ├── java/app/navilla/
-│   │   │   ├── NavillaApplication.java
-│   │   │   ├── config/
-│   │   │   │   ├── SecurityConfig.java
-│   │   │   │   ├── WebConfig.java
-│   │   │   │   └── EncryptionConfig.java
-│   │   │   ├── controller/
-│   │   │   │   ├── UserController.java
-│   │   │   │   ├── ConnectionController.java
-│   │   │   │   ├── HealthController.java
-│   │   │   │   └── ExposureController.java
-│   │   │   ├── service/
-│   │   │   │   ├── UserService.java
-│   │   │   │   ├── ConnectionService.java
-│   │   │   │   ├── HealthService.java
-│   │   │   │   ├── ExposureService.java
-│   │   │   │   └── NotificationService.java
-│   │   │   ├── repository/
-│   │   │   │   ├── UserRepository.java
-│   │   │   │   ├── ConnectionRepository.java
-│   │   │   │   ├── HealthStatusRepository.java
-│   │   │   │   └── NotificationRepository.java
-│   │   │   ├── model/
-│   │   │   │   ├── User.java
-│   │   │   │   ├── Connection.java
-│   │   │   │   ├── HealthStatus.java
-│   │   │   │   └── ExposureSnapshot.java
-│   │   │   ├── dto/
-│   │   │   │   ├── request/
-│   │   │   │   └── response/
-│   │   │   ├── security/
-│   │   │   │   ├── JwtTokenFilter.java
-│   │   │   │   └── EncryptionService.java
-│   │   │   └── util/
-│   │   │       └── HashUtil.java
+│   │   │   ├── NavillaBackendApplication.java
+│   │   │   ├── config/           # Spring configuration classes
+│   │   │   ├── controller/       # REST API endpoints
+│   │   │   ├── service/          # Business logic
+│   │   │   ├── repository/       # Data access layer
+│   │   │   ├── model/            # Domain entities
+│   │   │   ├── dto/              # Data transfer objects
+│   │   │   ├── security/         # Security components (JWT, encryption)
+│   │   │   └── util/             # Utility classes
 │   │   └── resources/
-│   │       ├── application.yml
-│   │       ├── application-dev.yml
-│   │       ├── application-prod.yml
-│   │       └── db/migration/
-│   │           ├── V1__initial_schema.sql
-│   │           └── V2__add_indexes.sql
-│   └── test/
-│       └── java/app/navilla/
-├── build.gradle
-├── settings.gradle
-└── gradle.properties
+│   │       ├── application.yaml
+│   │       ├── application-development.yaml
+│   │       ├── application-production.yaml
+│   │       └── application-staging.yaml
+│   ├── test/
+│   │   └── java/app/navilla/
+├── pom.xml
 ```
 
 ## Package Descriptions
@@ -71,13 +38,14 @@ backend/
 ### config
 
 Spring configuration classes:
-- Security setup
+- Security setup (`SecurityConfig.java`)
 - CORS configuration
-- Encryption beans
+- Message configuration (`MessageConfig.java`)
 
 ### controller
 
 REST API endpoints:
+- Handles incoming HTTP requests
 - Input validation
 - Response mapping
 - Error handling
@@ -85,28 +53,33 @@ REST API endpoints:
 ### service
 
 Business logic:
-- Graph traversal algorithms
-- Encryption/decryption
-- Notification scheduling
+- Orchestrates operations
+- Contains core application logic
+- Utilizes repositories and other services
 
 ### repository
 
 Data access layer:
 - Spring Data JPA repositories
-- Custom queries for graph operations
+- Custom queries for interacting with the database
+- Translates business objects to database entities
 
 ### model
 
-JPA entities mapping to database tables.
+JPA entities representing the domain model and mapping to database tables.
 
 ### dto
 
 Data Transfer Objects:
-- Request DTOs (validated input)
-- Response DTOs (API output)
+- Request DTOs (for validated input from clients)
+- Response DTOs (for structured API output to clients)
 
 ### security
 
 Security components:
-- JWT validation filter
-- Encryption service
+- JWT validation logic (`SecurityConfig.java`)
+- Encryption/decryption services (`EncryptionService.java`)
+
+### util
+
+General utility classes that provide helper functions.

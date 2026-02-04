@@ -9,6 +9,12 @@ title: Testing
 
 ### Unit Tests
 
+Spring Boot services and components are tested using JUnit 5 and Mockito.
+
+:::info Illustrative Example
+The following unit test example is for illustrative purposes to demonstrate testing concepts. It may not directly correspond to existing code in the codebase.
+:::
+
 ```java
 @Test
 void shouldCalculateExposureForDirectConnection() {
@@ -54,10 +60,11 @@ class ConnectionControllerIT {
 
 # Specific test class
 ./mvnw test -Dtest=ConnectionServiceTest
-
-# With coverage (JaCoCo report in target/site/jacoco)
-./mvnw test jacoco:report
 ```
+
+:::note JaCoCo Coverage
+JaCoCo is currently disabled due to Java 25 compatibility issues. Re-enable it in `pom.xml` when a compatible version is available.
+:::
 
 ## Frontend Testing
 
@@ -84,6 +91,10 @@ npm test -- --watch
 # Coverage
 npm test -- --coverage
 ```
+
+:::info TODO
+Unit tests for frontend components are not yet configured. The `npm test` script currently echoes a placeholder message.
+:::
 
 ## E2E Testing with Playwright
 
@@ -184,7 +195,7 @@ The Postman collection includes tests for all API endpoints.
 npm install -g newman
 newman run docs/static/postman/navilla-api.postman_collection.json \
   --env-var "baseUrl=http://localhost:8080" \
-  --env-var "accessToken=your-jwt-token"
+  --env-var "accessToken=your-jwt-token" # Obtain this token by logging in via Supabase and inspecting network requests.
 ```
 
 ### Collection Location

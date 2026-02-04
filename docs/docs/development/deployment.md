@@ -5,17 +5,13 @@ title: Deployment
 
 # Deployment Guide
 
-:::note Work in Progress
-Deployment configuration will be finalized during Phase 6.
-:::
-
 ## Environments
 
 | Environment | Purpose | URL |
 |-------------|---------|-----|
 | Development | Local development | localhost |
-| Staging | Pre-production testing | staging.navilla.app |
-| Production | Live application | navilla.app |
+| Staging | Pre-production testing | staging.navilla.app <!-- TODO: Update with actual staging URL --> |
+| Production | Live application | navilla.app <!-- TODO: Update with actual production URL --> |
 
 ## Frontend Deployment (Vercel)
 
@@ -57,7 +53,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Run tests
-        run: ./gradlew test
+        run: ./mvnw test # Changed from gradlew to mvnw
 
   deploy:
     needs: test

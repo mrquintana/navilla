@@ -29,7 +29,12 @@ Use the Supabase client to authenticate:
 ```typescript
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// Environment variables are typically loaded via a build process (e.g., Vite)
+// and prefixed with VITE_.
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 // Email/Password
 const { data, error } = await supabase.auth.signInWithPassword({
@@ -51,7 +56,7 @@ const token = data.session.access_token;
 Include the JWT in the Authorization header:
 
 ```bash
-curl -X GET https://api.navilla.app/api/users/me \
+curl -X GET http://localhost:8080/api/users/me \
   -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..."
 ```
 

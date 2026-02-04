@@ -79,16 +79,35 @@ sequenceDiagram
 ### JWT Validation
 
 ```java
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.web.SecurityFilterChain;
+
 @Configuration
 public class SecurityConfig {
+
+    @Value("${navilla.supabase.url}")
+    private String supabaseUrl;
+
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) {
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
             .oauth2ResourceServer(oauth2 -> oauth2
-                .jwt(jwt -> jwt
-                    .jwkSetUri(supabaseJwkUri)
-                )
+                .jwt(jwt -> jwt.decoder(jwtDecoder()))
             )
+            .build();
+    }
+
+    @Bean
+    public JwtDecoder jwtDecoder() {
+        String jwksUri = supabaseUrl + "/auth/v1/.well-known/jwks.json";
+        return NimbusJwtDecoder.withJwkSetUri(jwksUri)
+            .jwsAlgorithm(SignatureAlgorithm.ES256) // Explicitly set for Supabase
             .build();
     }
 }
@@ -244,5 +263,5 @@ Permissions-Policy: geolocation=(), microphone=(), camera=()
 - name: Security Audit
   run: |
     npm audit --audit-level=moderate
-    ./gradlew dependencyCheckAnalyze
+    ./mvnw dependency-check:check # Changed from gradlew to mvnw
 ```

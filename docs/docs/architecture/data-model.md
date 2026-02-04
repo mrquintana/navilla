@@ -77,7 +77,7 @@ Primary user table with encrypted PII.
 ```sql
 CREATE TABLE users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    email_hash VARCHAR(64) UNIQUE NOT NULL,
+    email_hash VARCHAR(64) UNIQUE NOT NULL, -- Application-level FK to identify users without direct PII
     email_encrypted BYTEA NOT NULL,
     display_name_encrypted BYTEA,
     dob_encrypted BYTEA,
@@ -103,8 +103,8 @@ CREATE TYPE connection_status AS ENUM (
 
 CREATE TABLE connections (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_a_hash VARCHAR(64) NOT NULL,
-    user_b_hash VARCHAR(64) NOT NULL,
+    user_a_hash VARCHAR(64) NOT NULL, -- Application-level FK
+    user_b_hash VARCHAR(64) NOT NULL, -- Application-level FK
     status connection_status DEFAULT 'pending',
     requested_at TIMESTAMPTZ DEFAULT NOW(),
     responded_at TIMESTAMPTZ,
@@ -145,7 +145,7 @@ CREATE TYPE health_status_value AS ENUM (
 
 CREATE TABLE health_status (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_hash VARCHAR(64) NOT NULL,
+    user_hash VARCHAR(64) NOT NULL, -- Application-level FK
     condition_type condition_type NOT NULL,
     status health_status_value NOT NULL,
     test_date DATE,
@@ -167,7 +167,7 @@ Cached exposure calculations.
 ```sql
 CREATE TABLE exposure_snapshots (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_hash VARCHAR(64) NOT NULL,
+    user_hash VARCHAR(64) NOT NULL, -- Application-level FK
     snapshot_data_encrypted BYTEA NOT NULL,
     computed_at TIMESTAMPTZ DEFAULT NOW(),
     expires_at TIMESTAMPTZ NOT NULL,
@@ -194,7 +194,7 @@ CREATE TYPE notification_type AS ENUM (
 
 CREATE TABLE notifications (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_hash VARCHAR(64) NOT NULL,
+    user_hash VARCHAR(64) NOT NULL, -- Application-level FK
     notification_type notification_type NOT NULL,
     payload_encrypted BYTEA NOT NULL,
     scheduled_for TIMESTAMPTZ NOT NULL,
@@ -218,6 +218,7 @@ ALTER TABLE exposure_snapshots ENABLE ROW LEVEL SECURITY;
 ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
 
 -- Users can only see their own data
+-- 'current_user_hash()' is a custom PostgreSQL function defined in the database migrations.
 CREATE POLICY users_own_data ON users
     FOR ALL USING (email_hash = current_user_hash());
 

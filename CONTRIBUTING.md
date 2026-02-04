@@ -10,7 +10,7 @@ By participating in this project, you agree to maintain a respectful and inclusi
 
 1. Fork the repository
 2. Clone your fork locally
-3. Set up the development environment (see [README.md](README.md))
+3. Set up the development environment (see [README.md](README.md) for quick start instructions)
 4. Create a new branch for your work
 
 ## Development Workflow

@@ -31,6 +31,7 @@ String userHash = hashEmail(email);
 
 ### Best Practices
 
+- Java 25 features are encouraged.
 ```java
 // Prefer Optional over null
 public Optional<User> findByEmail(String email);
@@ -49,7 +50,8 @@ connections.stream()
 
 ### Formatting
 
-- Use Prettier with default config
+- Formatting is enforced via ESLint, which may integrate Prettier rules.
+- There is no standalone `.prettierrc` configuration file.
 - Indent with 2 spaces
 
 ### Naming

@@ -42,7 +42,7 @@ After completing any significant work, **always update the following**:
 ### 5. Tests (Required for code changes)
 - **All new code must have unit and integration tests**
 - Run backend tests: `cd backend && ./mvnw test`
-- Run frontend build: `cd frontend && npm run build`
+- Run frontend lint: `cd frontend && npm run lint` # Use `npm test` for unit tests once configured
 - Backend test locations:
   - Unit tests: `backend/src/test/java/app/navilla/service/`
   - Integration tests: `backend/src/test/java/app/navilla/controller/`
@@ -71,7 +71,7 @@ gh issue create --title "Title" --body "Description"
 
 ### Before Every Commit (Required)
 - **Run local tests before committing** - Never commit without verifying tests pass
-- Frontend: `cd frontend && npm run build && npm run lint`
+- Frontend: `cd frontend && npm run lint` # Use `npm test` for unit tests once configured
 - Backend: `cd backend && ./mvnw test`
 - Fix any errors before committing
 

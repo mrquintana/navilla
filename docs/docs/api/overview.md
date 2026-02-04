@@ -10,8 +10,8 @@ The Navilla API is a RESTful API that provides access to all platform functional
 ## Base URL
 
 ```
-Production: https://api.navilla.app
-Staging:    https://api-staging.navilla.app
+Production: https://api.navilla.app # TODO: Update with actual production URL
+Staging:    https://api-staging.navilla.app # TODO: Update with actual staging URL
 Local:      http://localhost:8080
 ```
 
@@ -84,10 +84,3 @@ All responses follow this structure:
 | [Connections](./connections) | Connection requests |
 | [Health Status](./health-status) | STI status management |
 | [Exposures](./exposures) | Exposure calculations |
-
-## OpenAPI Specification
-
-Full OpenAPI 3.0 spec available at:
-```
-https://api.navilla.app/api/docs
-```

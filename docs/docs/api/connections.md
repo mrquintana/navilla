@@ -263,4 +263,4 @@ No response body.
 
 A Postman collection with all API endpoints is available for download:
 
-[Download Navilla API Postman Collection](/postman/navilla-api.postman_collection.json)
+[Download Navilla API Postman Collection](/postman/navilla-api.postman_collection.json) <!-- TODO: Update with an absolute URL or hosted version for deployed documentation -->

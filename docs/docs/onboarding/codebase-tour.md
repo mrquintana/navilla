@@ -11,7 +11,9 @@ A guided tour through the Navilla codebase.
 
 ```
 navilla/
+├── .github/             # GitHub Actions workflows
 ├── CONTEXT.md           # Project context and decisions log
+├── database/            # Database schema migrations and seed data
 ├── docs/                # Documentation (Docusaurus)
 ├── backend/             # Spring Boot API
 └── frontend/            # React application
@@ -19,7 +21,7 @@ navilla/
 
 ## Documentation (`/docs`)
 
-Built with Docusaurus. Contains all project documentation.
+Built with Docusaurus. Contains all project documentation. You can run the documentation site locally using `./run.sh docs`.
 
 ```bash
 cd docs
@@ -34,10 +36,10 @@ Spring Boot application handling all business logic.
 
 | File | Purpose |
 |------|---------|
-| `NavillaApplication.java` | Application entry point |
+| `NavillaBackendApplication.java` | Application entry point |
 | `SecurityConfig.java` | JWT validation setup |
-| `ExposureService.java` | Graph traversal algorithm |
-| `EncryptionService.java` | Data encryption/decryption |
+| `app.navilla.security.EncryptionService.java` | Data encryption/decryption |
+
 
 ### Important Patterns
 
@@ -101,4 +103,4 @@ PostgreSQL hosted on Supabase. Schema defined in migrations.
 | UI components | `frontend/src/components/` |
 | Page layouts | `frontend/src/pages/` |
 | Type definitions | `frontend/src/types/` |
-| Database schema | `backend/src/.../db/migration/` |
+| Database schema | `database/migrations/` |

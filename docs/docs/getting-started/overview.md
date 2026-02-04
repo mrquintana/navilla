@@ -33,10 +33,10 @@ Users can see statistics about their exposure risk (degrees of separation, poten
 
 | Layer | Technology |
 |-------|------------|
-| Frontend | React + Vite + TypeScript |
-| Backend | Java + Spring Boot |
+| Frontend | React 19 + Vite + TypeScript + TailwindCSS |
+| Backend | Java 25 + Spring Boot 4.0 + Maven |
 | Database | PostgreSQL (Supabase) |
-| Auth | Supabase Auth |
+| Auth | Supabase Auth (JWT) |
 | Docs | Docusaurus |
 
 ## Quick Links

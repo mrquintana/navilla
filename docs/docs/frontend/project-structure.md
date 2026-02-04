@@ -44,6 +44,8 @@ frontend/
 │   │   ├── LoginPage.tsx     # Login form
 │   │   ├── SignUpPage.tsx    # Registration form
 │   │   ├── DashboardPage.tsx # Protected dashboard
+│   │   ├── ForgotPasswordPage.tsx # Forgot password form
+│   │   ├── ResetPasswordPage.tsx  # Reset password form
 │   │   ├── Connections.tsx   # (planned)
 │   │   ├── Health.tsx        # (planned)
 │   │   └── Settings.tsx      # (planned)

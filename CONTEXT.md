@@ -22,7 +22,7 @@
 | Backend | Java 25 + Spring Boot 4.0.2 + Maven | ✅ Scaffolded |
 | Database | PostgreSQL (Supabase) | ✅ Migrations ready |
 | Auth | Supabase Auth | ✅ Frontend integrated |
-| Docs | Docusaurus | ✅ Complete |
+| Docs | Docusaurus | ✅ Maintained |
 | Hosting | Vercel (FE + Docs), TBD (BE) | Docs ready |
 
 ---
@@ -98,87 +98,7 @@
 
 ## Project Structure
 
-```
-navilla/
-├── CONTEXT.md                    # This file - project tracking
-├── .gitignore                    # Git ignore rules
-│
-├── docs/                         # Docusaurus documentation
-│   ├── docs/                     # Markdown documentation
-│   │   ├── getting-started/
-│   │   ├── architecture/
-│   │   ├── backend/
-│   │   ├── frontend/
-│   │   ├── development/
-│   │   ├── onboarding/
-│   │   ├── adrs/
-│   │   └── api/
-│   └── docusaurus.config.ts
-│
-├── database/                     # Database files
-│   ├── SUPABASE_SETUP.md        # Setup guide
-│   └── migrations/
-│       ├── 001_initial_schema.sql
-│       ├── 002_row_level_security.sql
-│       └── 003_functions.sql
-│
-├── backend/                      # Spring Boot API
-│   ├── pom.xml                  # Maven configuration
-│   ├── checkstyle/              # Google Java style
-│   ├── scripts/                 # Startup scripts
-│   │   ├── start-production.sh
-│   │   ├── start-development.sh
-│   │   ├── start-troubleshooting.sh
-│   │   └── STARTUP_GUIDE.md
-│   └── src/
-│       ├── main/
-│       │   ├── java/app/navilla/
-│       │   └── resources/
-│       │       └── application.yaml
-│       └── test/
-│
-└── frontend/                     # React application
-    ├── package.json
-    ├── vite.config.ts
-    ├── tailwind.config.js
-    ├── postcss.config.js
-    ├── playwright.config.ts     # E2E test config
-    ├── e2e/                     # E2E tests
-    │   └── auth.spec.ts
-    └── src/
-        ├── main.tsx             # App entry point
-        ├── App.tsx              # Root component with providers
-        ├── router.tsx           # React Router configuration
-        ├── queryClient.ts       # TanStack Query client
-        ├── i18n.ts              # i18n configuration
-        ├── index.css            # TailwindCSS + design system
-        ├── lib/
-        │   ├── supabase.ts      # Supabase client
-        │   ├── api.ts           # Backend API client
-        │   └── geolocation.ts   # IP geolocation and country list
-        ├── contexts/
-        │   └── AuthContext.tsx  # Auth state management
-        ├── hooks/
-        │   ├── useAuth.ts       # Auth hook
-        │   └── useUser.ts       # User profile query
-        ├── components/
-        │   ├── auth/
-        │   │   └── ProtectedRoute.tsx
-        │   └── layout/
-        │       ├── Header.tsx
-        │       ├── Layout.tsx
-        │       └── AuthLayout.tsx
-        ├── pages/
-        │   ├── HomePage.tsx
-        │   ├── LoginPage.tsx
-        │   ├── SignUpPage.tsx
-        │   ├── ForgotPasswordPage.tsx
-        │   ├── ResetPasswordPage.tsx
-        │   └── DashboardPage.tsx
-        └── locales/
-            ├── en_US.json
-            └── es_MX.json
-```
+A detailed breakdown of the project's directory layout and key files can be found in the [Codebase Tour](docs/docs/onboarding/codebase-tour.md) documentation.
 
 ---
 
@@ -572,38 +492,9 @@ navilla/
 
 ---
 
-## Running the Project
+## Running the Project & Quick Commands
 
-### Documentation
-```bash
-cd docs
-npm install  # First time only
-npm start    # Opens at http://localhost:3000
-```
-
-### Backend
-```bash
-cd backend
-
-# Build
-./mvnw clean package
-
-# Development mode (with debug)
-./scripts/start-development.sh
-
-# Production mode
-./scripts/start-production.sh
-
-# Or via Maven directly
-./mvnw spring-boot:run
-```
-
-### Frontend
-```bash
-cd frontend
-npm install
-npm run dev  # Opens at http://localhost:5173
-```
+For a quick start and a list of development commands, please refer to the main `README.md` file or run `./run.sh help`.
 
 ---
 
@@ -625,39 +516,3 @@ npm run dev  # Opens at http://localhost:5173
 14. **Comprehensive E2E test suite** - 10 test users, all edge cases (GitHub Issue #15)
 15. **Frontend Connections UI** - GitHub Issue #11
 16. **Frontend Unit Tests** - GitHub Issue #12
-
----
-
-## Quick Commands
-
-```bash
-# Backend - run tests
-cd backend && ./mvnw test
-
-# Backend - check code style
-cd backend && ./mvnw checkstyle:check
-
-# Backend - build JAR
-cd backend && ./mvnw clean package -DskipTests
-
-# Frontend - run dev server
-cd frontend && npm run dev
-
-# Frontend - build for production
-cd frontend && npm run build
-
-# Frontend - run E2E tests
-cd frontend && npm run test:e2e
-
-# Frontend - run E2E tests with UI
-cd frontend && npm run test:e2e:ui
-
-# Frontend - view E2E test report
-cd frontend && npm run test:e2e:report
-
-# Docs - run local server
-cd docs && npm start
-
-# Docs - build for production
-cd docs && npm run build
-```

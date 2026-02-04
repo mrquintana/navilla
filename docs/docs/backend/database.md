@@ -7,16 +7,12 @@ title: Database
 
 PostgreSQL database configuration and access patterns.
 
-:::note Work in Progress
-Implementation details will be added as the backend is built.
-:::
-
 ## Configuration
 
 ### Connection
 
 ```yaml
-# application.yml
+# application.yaml
 spring:
   datasource:
     url: ${DATABASE_URL}
@@ -27,13 +23,13 @@ spring:
 
 ### Migrations
 
-Using Flyway for schema migrations:
+Using Flyway for schema migrations. Migration files are located in the `database/migrations/` directory:
 
 ```
-src/main/resources/db/migration/
-├── V1__initial_schema.sql
-├── V2__add_indexes.sql
-└── V3__add_rls_policies.sql
+database/migrations/
+├── 001_initial_schema.sql
+├── 002_row_level_security.sql
+└── 003_functions.sql
 ```
 
 ## Schema
@@ -72,7 +68,7 @@ public interface ConnectionRepository extends JpaRepository<Connection, UUID> {
 
 ## Graph Queries
 
-For exposure calculation, we use native queries for performance:
+For exposure calculation, complex graph traversal logic often utilizes native SQL queries for performance. The following example demonstrates a recursive CTE to find connected users up to a certain degree. This type of query would typically be embedded within a service layer component responsible for exposure calculations.
 
 ```java
 @Query(nativeQuery = true, value = """

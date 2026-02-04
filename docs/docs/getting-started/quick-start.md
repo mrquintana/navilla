@@ -14,11 +14,8 @@ Get Navilla running in 5 minutes.
 git clone https://github.com/navilla/navilla.git
 cd navilla
 
-# Backend
-cd backend && ./gradlew bootRun &
-
-# Frontend
-cd ../frontend && npm install && npm run dev
+# Run everything with the development script
+./run.sh dev
 ```
 
 ## What You'll Have
@@ -28,6 +25,7 @@ After following this guide:
 - ✅ Backend API running on `localhost:8080`
 - ✅ Frontend app running on `localhost:5173`
 - ✅ Connected to Supabase for auth and database
+- ✅ Debugging enabled on `localhost:5005` for the backend
 
 ## Next Steps
 

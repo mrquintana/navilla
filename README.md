@@ -31,7 +31,7 @@ A privacy-preserving sexual health platform that helps users understand their po
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/your-org/navilla.git
+   git clone https://github.com/navilla/navilla.git
    cd navilla
    ```
 
@@ -46,22 +46,14 @@ A privacy-preserving sexual health platform that helps users understand their po
    # Edit frontend/.env with your Supabase credentials
    ```
 
-3. **Start the backend**
+3. **Run the application**
+   The easiest way to run the application in development mode is to use the provided `run.sh` script:
    ```bash
-   cd backend
-   ./mvnw spring-boot:run
-   # Or use the development script with debug enabled:
-   ./scripts/start-development.sh
+   ./run.sh
    ```
+   This will start both the backend and frontend with hot-reloading enabled.
 
-4. **Start the frontend**
-   ```bash
-   cd frontend
-   npm install
-   npm run dev
-   ```
-
-5. **View the documentation**
+4. **View the documentation**
    ```bash
    cd docs
    npm install
@@ -103,6 +95,8 @@ navilla/
 
 ## Development Commands
 
+See `run.sh help` for a list of available commands.
+
 ### Backend
 
 ```bash
@@ -116,10 +110,6 @@ cd backend
 
 # Build JAR
 ./mvnw clean package -DskipTests
-
-# Run with different profiles
-./scripts/start-development.sh   # Debug mode, port 5005
-./scripts/start-production.sh    # Optimized for production
 ```
 
 ### Frontend
@@ -154,9 +144,7 @@ npm run build
 
 ## API Documentation
 
-API documentation is available at:
-- Development: http://localhost:8080/swagger-ui.html (when enabled)
-- Documentation site: See `docs/docs/api/` for endpoint specifications
+API documentation is available in the documentation site. See `docs/docs/api/` for endpoint specifications.
 
 ## Security
 
@@ -174,7 +162,8 @@ We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guid
 
 ## License
 
-This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the Apache License 2.0.
+<!-- TODO: Add a LICENSE file -->
 
 ## Links
 
