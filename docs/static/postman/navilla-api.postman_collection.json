@@ -252,27 +252,14 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status code is 201', function() {",
-                  "    pm.response.to.have.status(201);",
+                  "pm.test('Status code is 202', function() {",
+                  "    pm.response.to.have.status(202);",
                   "});",
                   "",
-                  "pm.test('Connection has required fields', function() {",
+                  "pm.test('Response has message', function() {",
                   "    const json = pm.response.json();",
-                  "    pm.expect(json).to.have.property('id');",
-                  "    pm.expect(json).to.have.property('status');",
-                  "    pm.expect(json).to.have.property('created_at');",
-                  "});",
-                  "",
-                  "pm.test('Status is PENDING', function() {",
-                  "    const json = pm.response.json();",
-                  "    pm.expect(json.status).to.equal('PENDING');",
-                  "});",
-                  "",
-                  "// Save connection ID for later tests",
-                  "if (pm.response.code === 201) {",
-                  "    const json = pm.response.json();",
-                  "    pm.collectionVariables.set('connectionId', json.id);",
-                  "}"
+                  "    pm.expect(json).to.have.property('message');",
+                  "});"
                 ],
                 "type": "text/javascript"
               }
@@ -288,14 +275,14 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"recipientEmail\": \"{{testEmail}}\"\n}"
+              "raw": "{\n  \"identifier\": \"{{testEmail}}\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/connections",
               "host": ["{{baseUrl}}"],
               "path": ["api", "connections"]
             },
-            "description": "Create a new connection request to another user by their email. The request starts in PENDING status."
+            "description": "Create a new connection request to another user by their email or username."
           }
         },
         {
@@ -319,7 +306,7 @@
                   "    json.forEach(function(conn) {",
                   "        pm.expect(conn).to.have.property('id');",
                   "        pm.expect(conn).to.have.property('status');",
-                  "        pm.expect(conn).to.have.property('created_at');",
+                  "        pm.expect(conn).to.have.property('requestedAt');",
                   "    });",
                   "});"
                 ],
@@ -647,7 +634,7 @@
           }
         },
         {
-          "name": "Bad Request - Invalid Email Format",
+          "name": "Bad Request - Missing Identifier",
           "event": [
             {
               "listen": "test",
@@ -671,14 +658,93 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"recipientEmail\": \"not-an-email\"\n}"
+              "raw": "{\n  \"identifier\": \"\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/connections",
               "host": ["{{baseUrl}}"],
               "path": ["api", "connections"]
             },
-            "description": "Test that invalid email format returns 400"
+            "description": "Test that missing identifier returns 400"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Health Status",
+      "description": "Health status management endpoints",
+      "item": [
+        {
+          "name": "List Health Statuses",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/health-status",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "health-status"]
+            },
+            "description": "Get all health status records for the authenticated user"
+          }
+        },
+        {
+          "name": "Report Health Status",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"condition\": \"chlamydia\",\n  \"status\": \"positive\",\n  \"testDate\": \"2026-01-28\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/health-status",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "health-status"]
+            },
+            "description": "Report or update a health status"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Exposures",
+      "description": "Exposure snapshot endpoint",
+      "item": [
+        {
+          "name": "Get Exposure Snapshot",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/exposures",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "exposures"]
+            },
+            "description": "Get exposure snapshot for the authenticated user"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "description": "In-app notifications endpoints",
+      "item": [
+        {
+          "name": "List Notifications",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/notifications",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "notifications"]
+            },
+            "description": "Get notifications for the authenticated user"
           }
         }
       ]

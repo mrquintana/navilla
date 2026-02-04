@@ -23,7 +23,7 @@ Endpoints for managing user connections. All endpoints require authentication vi
 
 ## Create Connection Request
 
-Request a new connection with another user by their email address.
+Request a new connection with another user by their email or username.
 
 ```
 POST /api/connections
@@ -33,19 +33,15 @@ POST /api/connections
 
 ```json
 {
-  "recipientEmail": "partner@example.com"
+  "identifier": "partner@example.com"
 }
 ```
 
-### Response (201 Created)
+### Response (202 Accepted)
 
 ```json
 {
-  "id": "550e8400-e29b-41d4-a716-446655440004",
-  "status": "PENDING",
-  "isRequester": true,
-  "requestedAt": "2026-01-30T10:00:00Z",
-  "confirmedAt": null
+  "message": "connection.success.requestQueued"
 }
 ```
 
@@ -54,11 +50,10 @@ POST /api/connections
 | Status | Code | Description |
 |--------|------|-------------|
 | 400 | `connection.error.selfConnection` | Cannot connect with yourself |
-| 404 | `connection.error.recipientNotFound` | Recipient user not found |
 | 409 | `connection.error.alreadyExists` | Connection already exists |
 
 :::note Privacy
-The response does not reveal whether the target user has an account - you'll receive a generic "not found" error either way.
+The response does not reveal whether the target user has an account or a private profile.
 :::
 
 ## Get All Connections

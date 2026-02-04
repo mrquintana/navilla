@@ -28,33 +28,7 @@ Tokens are obtained from Supabase Auth. See [Authentication](./authentication) f
 
 ## Response Format
 
-All responses follow this structure:
-
-### Success Response
-
-```json
-{
-  "data": { ... },
-  "meta": {
-    "timestamp": "2026-01-30T10:00:00Z"
-  }
-}
-```
-
-### Error Response
-
-```json
-{
-  "error": {
-    "code": "VALIDATION_ERROR",
-    "message": "Email is required",
-    "details": { ... }
-  },
-  "meta": {
-    "timestamp": "2026-01-30T10:00:00Z"
-  }
-}
-```
+Responses return plain JSON objects or arrays. Error responses use the standard error shape defined by `ApiError`.
 
 ## Error Codes
 
@@ -84,3 +58,4 @@ All responses follow this structure:
 | [Connections](./connections) | Connection requests |
 | [Health Status](./health-status) | STI status management |
 | [Exposures](./exposures) | Exposure calculations |
+| [Notifications](./notifications) | In-app notifications |

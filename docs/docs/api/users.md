@@ -19,13 +19,24 @@ GET /api/users/me
 
 ```json
 {
-  "data": {
-    "id": "550e8400-e29b-41d4-a716-446655440000",
-    "displayName": "Anonymous User",
-    "verified": true,
-    "connectionCount": 5,
-    "createdAt": "2026-01-15T10:00:00Z"
-  }
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "email": "user@example.com",
+  "displayName": "Anonymous User",
+  "fullName": "Full Name",
+  "username": "user_handle",
+  "sex": "female",
+  "dateOfBirth": "1990-01-01",
+  "age": 34,
+  "showAge": true,
+  "country": "US",
+  "location": "New York, NY",
+  "profileVisibility": "PRIVATE",
+  "displayNamePublic": false,
+  "searchableByEmail": false,
+  "avatarUrl": "https://project.supabase.co/storage/v1/object/public/avatars/profiles/...",
+  "avatarThumbUrl": "https://project.supabase.co/storage/v1/object/public/avatars/profiles/...",
+  "verified": true,
+  "createdAt": "2026-01-15T10:00:00Z"
 }
 ```
 
@@ -34,14 +45,26 @@ GET /api/users/me
 Update the authenticated user's profile.
 
 ```
-PATCH /api/users/me
+PUT /api/users/me
 ```
 
 ### Request Body
 
 ```json
 {
-  "displayName": "New Display Name"
+  "displayName": "New Display Name",
+  "fullName": "Full Name",
+  "username": "user_handle",
+  "sex": "female",
+  "dateOfBirth": "1990-01-01",
+  "showAge": true,
+  "country": "US",
+  "location": "New York, NY",
+  "profileVisibility": "PUBLIC",
+  "displayNamePublic": true,
+  "searchableByEmail": true,
+  "avatarKey": "profiles/550e8400-e29b-41d4-a716-446655440000/profile.png",
+  "avatarThumbKey": "profiles/550e8400-e29b-41d4-a716-446655440000/thumb.png"
 }
 ```
 
@@ -49,13 +72,28 @@ PATCH /api/users/me
 
 ```json
 {
-  "data": {
-    "id": "550e8400-e29b-41d4-a716-446655440000",
-    "displayName": "New Display Name",
-    "verified": true,
-    "connectionCount": 5,
-    "createdAt": "2026-01-15T10:00:00Z"
-  }
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "displayName": "New Display Name",
+  "verified": true,
+  "createdAt": "2026-01-15T10:00:00Z"
+}
+```
+
+## Search Public Users
+
+Search for a public profile by email or username.
+
+```
+GET /api/users/search?q={email_or_username}
+```
+
+### Response
+
+```json
+{
+  "username": "user_handle",
+  "displayName": "Public Name",
+  "avatarThumbUrl": "https://project.supabase.co/storage/v1/object/public/avatars/profiles/..."
 }
 ```
 
@@ -67,22 +105,10 @@ Permanently delete the authenticated user's account and all associated data.
 DELETE /api/users/me
 ```
 
-### Request Body
-
-```json
-{
-  "confirmation": "DELETE MY ACCOUNT"
-}
-```
-
 ### Response
 
-```json
-{
-  "data": {
-    "message": "Account deleted successfully"
-  }
-}
+```
+204 No Content
 ```
 
 :::danger
