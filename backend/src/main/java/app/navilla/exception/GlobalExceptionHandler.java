@@ -18,6 +18,7 @@ package app.navilla.exception;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 
 import app.navilla.dto.ApiError;
 import jakarta.servlet.http.HttpServletRequest;
@@ -101,6 +102,27 @@ public class GlobalExceptionHandler {
   }
 
   /**
+   * Handles connection conflict exceptions.
+   */
+  @ExceptionHandler(ConnectionConflictException.class)
+  public ResponseEntity<ApiError> handleConnectionConflict(
+      ConnectionConflictException ex,
+      HttpServletRequest request,
+      Locale locale) {
+
+    String message = messageSource.getMessage(ex.getMessageKey(), null, ex.getMessageKey(), locale);
+    List<String> details = buildConnectionConflictDetails(ex.getExistingConnectionId());
+    ApiError error = ApiError.of(
+        HttpStatus.CONFLICT.value(),
+        HttpStatus.CONFLICT.getReasonPhrase(),
+        message,
+        request.getRequestURI(),
+        details
+    );
+    return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+  }
+
+  /**
    * Handles validation errors.
    */
   @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -148,5 +170,12 @@ public class GlobalExceptionHandler {
         request.getRequestURI()
     );
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+  }
+
+  private List<String> buildConnectionConflictDetails(UUID connectionId) {
+    if (connectionId == null) {
+      return null;
+    }
+    return List.of("existingConnectionId:" + connectionId);
   }
 }

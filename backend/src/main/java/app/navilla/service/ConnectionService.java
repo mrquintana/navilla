@@ -27,12 +27,14 @@ import app.navilla.entity.Connection;
 import app.navilla.entity.ConnectionStatus;
 import app.navilla.entity.ProfileVisibility;
 import app.navilla.entity.User;
+import app.navilla.exception.ConnectionConflictException;
 import app.navilla.exception.ResourceNotFoundException;
 import app.navilla.repository.ConnectionRepository;
 import app.navilla.repository.UserRepository;
 import app.navilla.security.EncryptionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -56,6 +58,12 @@ public class ConnectionService {
   private final EncryptionService encryptionService;
   private final NotificationService notificationService;
 
+  @Value("${navilla.storage.public-base-url}")
+  private String storagePublicBaseUrl;
+
+  @Value("${navilla.storage.avatar-bucket}")
+  private String avatarBucket;
+
   /**
    * Creates a new connection request.
    *
@@ -68,7 +76,11 @@ public class ConnectionService {
   public void createConnection(Jwt jwt, CreateConnectionRequest request) {
     String requesterEmail = jwt.getClaimAsString("email");
     String requesterHash = encryptionService.hashEmail(requesterEmail);
-    String identifier = request.identifier().trim();
+    String identifier = request.identifier() == null ? "" : request.identifier().trim();
+
+    if (identifier.isBlank()) {
+      throw new IllegalArgumentException("connection.error.identifierRequired");
+    }
 
     User recipientUser = resolveRecipient(identifier).orElse(null);
     if (recipientUser == null) {
@@ -84,9 +96,14 @@ public class ConnectionService {
     }
 
     // Check if connection already exists
-    if (connectionRepository.existsBetweenUsers(requesterHash, recipientHash)) {
-      throw new IllegalStateException("connection.error.alreadyExists");
-    }
+    connectionRepository.findBetweenUsers(requesterHash, recipientHash)
+        .ifPresent(existing -> {
+          if (existing.getStatus() == ConnectionStatus.PENDING
+              && requesterHash.equals(existing.getRecipientHash())) {
+            throw new ConnectionConflictException("connection.error.alreadyExists", existing.getId());
+          }
+          throw new IllegalStateException("connection.error.alreadyExists");
+        });
 
     Connection connection = Connection.builder()
         .requesterHash(requesterHash)
@@ -244,12 +261,12 @@ public class ConnectionService {
   }
 
   /**
-   * Cancels a pending connection request (requester only).
+   * Cancels or removes a connection.
    *
    * @param jwt the JWT token of the requester
    * @param connectionId the connection to cancel
    * @throws ResourceNotFoundException if connection not found
-   * @throws IllegalStateException if connection is not pending or user is not requester
+   * @throws IllegalStateException if user is not authorized to remove the connection
    */
   @Transactional
   public void cancelConnection(Jwt jwt, UUID connectionId) {
@@ -259,18 +276,29 @@ public class ConnectionService {
     Connection connection = connectionRepository.findById(connectionId)
         .orElseThrow(() -> new ResourceNotFoundException("connection.error.notFound"));
 
-    // Validate user is the requester
-    if (!connection.getRequesterHash().equals(userHash)) {
-      throw new IllegalStateException("connection.error.notRequester");
+    boolean isRequester = connection.getRequesterHash().equals(userHash);
+    boolean isRecipient = connection.getRecipientHash().equals(userHash);
+
+    if (!isRequester && !isRecipient) {
+      throw new IllegalStateException("connection.error.notParticipant");
     }
 
-    // Validate connection is pending
-    if (connection.getStatus() != ConnectionStatus.PENDING) {
-      throw new IllegalStateException("connection.error.notPending");
+    if (connection.getStatus() == ConnectionStatus.PENDING) {
+      if (!isRequester) {
+        throw new IllegalStateException("connection.error.notRequester");
+      }
+      connectionRepository.delete(connection);
+      log.info("Connection cancelled: {}", connectionId);
+      return;
     }
 
-    connectionRepository.delete(connection);
-    log.info("Connection cancelled: {}", connectionId);
+    if (connection.getStatus() == ConnectionStatus.CONFIRMED) {
+      connectionRepository.delete(connection);
+      log.info("Connection removed: {}", connectionId);
+      return;
+    }
+
+    throw new IllegalStateException("connection.error.notPending");
   }
 
   /**
@@ -310,22 +338,75 @@ public class ConnectionService {
     return recipient.getProfileVisibility() == ProfileVisibility.PUBLIC;
   }
 
+  /**
+   * Resolves a recipient user based on email or username input.
+   *
+   * @param identifier email or username
+   * @return matching user if found and visible
+   */
   private java.util.Optional<User> resolveRecipient(String identifier) {
-    if (identifier.contains("@")) {
-      String hash = encryptionService.hashEmail(identifier);
+    String normalized = normalizeIdentifier(identifier);
+    if (normalized.isBlank()) {
+      return java.util.Optional.empty();
+    }
+    if (isEmailIdentifier(normalized)) {
+      String hash = encryptionService.hashEmail(normalized);
       return userRepository.findByEmailHash(hash);
     }
-    String usernameHash = encryptionService.hashUsername(identifier);
-    return userRepository.findByUsernameHash(usernameHash)
-        .filter(user -> user.getProfileVisibility() == ProfileVisibility.PUBLIC);
+    String usernameHash = encryptionService.hashUsername(normalized);
+    return userRepository.findByUsernameHash(usernameHash);
   }
 
+  /**
+   * Masks a user-provided identifier for logs.
+   *
+   * @param identifier email or username input
+   * @return a masked representation safe for logs
+   */
   private String maskIdentifier(String identifier) {
-    if (identifier.contains("@")) {
-      String[] parts = identifier.split("@", 2);
-      return parts[0].charAt(0) + "***@" + parts[1];
+    String normalized = normalizeIdentifier(identifier);
+    if (normalized.isBlank()) {
+      return "***";
     }
-    return identifier.charAt(0) + "***";
+    if (isEmailIdentifier(normalized)) {
+      String[] parts = normalized.split("@", 2);
+      String local = parts[0];
+      String domain = parts.length > 1 ? parts[1] : "";
+      if (local.isBlank()) {
+        return "***" + (domain.isBlank() ? "" : "@" + domain);
+      }
+      return local.charAt(0) + "***@" + domain;
+    }
+    return normalized.charAt(0) + "***";
+  }
+
+  /**
+   * Determines whether the identifier should be treated as an email address.
+   *
+   * @param identifier normalized identifier
+   * @return true when it is an email-like identifier
+   */
+  private boolean isEmailIdentifier(String identifier) {
+    return !identifier.startsWith("@")
+        && identifier.contains("@")
+        && !identifier.endsWith("@");
+  }
+
+  /**
+   * Normalizes identifiers for lookups (trim, strip leading '@' for usernames).
+   *
+   * @param identifier raw identifier from request
+   * @return normalized identifier (never null)
+   */
+  private String normalizeIdentifier(String identifier) {
+    if (identifier == null) {
+      return "";
+    }
+    String trimmed = identifier.trim();
+    if (trimmed.startsWith("@")) {
+      return trimmed.substring(1);
+    }
+    return trimmed;
   }
 
   /**
@@ -333,13 +414,43 @@ public class ConnectionService {
    */
   private ConnectionResponse toConnectionResponse(Connection connection, String currentUserHash) {
     boolean isRequester = connection.getRequesterHash().equals(currentUserHash);
+    String partnerHash = isRequester ? connection.getRecipientHash() : connection.getRequesterHash();
+
+    User partner = userRepository.findByEmailHash(partnerHash).orElse(null);
+    String partnerDisplayName = null;
+    String partnerUsername = null;
+    String partnerAvatarThumbUrl = null;
+
+    if (partner != null) {
+      partnerDisplayName = partner.getDisplayNameEncrypted() != null
+          ? encryptionService.decryptFromBytes(partner.getDisplayNameEncrypted())
+          : null;
+      partnerUsername = partner.getUsername();
+      partnerAvatarThumbUrl = buildPublicUrl(partner.getAvatarThumbKey());
+    }
 
     return new ConnectionResponse(
         connection.getId(),
         connection.getStatus(),
         isRequester,
         connection.getRequestedAt(),
-        connection.getConfirmedAt()
+        connection.getConfirmedAt(),
+        partnerDisplayName,
+        partnerUsername,
+        partnerAvatarThumbUrl
     );
+  }
+
+  /**
+   * Builds a public URL for an avatar key in storage.
+   *
+   * @param key the storage key
+   * @return public URL or null when key is blank
+   */
+  private String buildPublicUrl(String key) {
+    if (key == null || key.isBlank()) {
+      return null;
+    }
+    return String.format("%s/%s/%s", storagePublicBaseUrl, avatarBucket, key);
   }
 }

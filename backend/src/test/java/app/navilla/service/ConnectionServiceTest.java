@@ -89,6 +89,7 @@ class ConnectionServiceTest {
     lenient().when(jwt.getClaimAsString("email")).thenReturn(REQUESTER_EMAIL);
     lenient().when(encryptionService.hashEmail(REQUESTER_EMAIL)).thenReturn(REQUESTER_HASH);
     lenient().when(encryptionService.hashEmail(RECIPIENT_EMAIL)).thenReturn(RECIPIENT_HASH);
+    lenient().when(userRepository.findByEmailHash(any())).thenReturn(Optional.empty());
   }
 
   @Nested

@@ -31,6 +31,9 @@ import app.navilla.entity.ConnectionStatus;
  * @param isRequester whether the current user initiated this connection
  * @param requestedAt when the connection request was sent
  * @param confirmedAt when the connection was confirmed (null if not confirmed)
+ * @param partnerDisplayName display name for the other user (nullable)
+ * @param partnerUsername username for the other user (nullable)
+ * @param partnerAvatarThumbUrl public avatar thumbnail URL (nullable)
  * @author Navilla Team
  * @since 2026-01-31
  */
@@ -39,5 +42,8 @@ public record ConnectionResponse(
     ConnectionStatus status,
     boolean isRequester,
     OffsetDateTime requestedAt,
-    OffsetDateTime confirmedAt
+    OffsetDateTime confirmedAt,
+    String partnerDisplayName,
+    String partnerUsername,
+    String partnerAvatarThumbUrl
 ) {}
