@@ -9,7 +9,7 @@ This guide covers the four startup modes available for the Navilla backend.
    ./mvnw clean package -DskipTests
    ```
 
-2. Ensure environment variables are set:
+2. Ensure environment variables are set. If you are using the main `run.sh` script, it will automatically load variables from `backend/.env`. If running these scripts directly, ensure your `.env` file is loaded:
    ```bash
    cp .env.example .env
    # Edit .env with your values

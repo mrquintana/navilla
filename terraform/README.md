@@ -98,6 +98,7 @@ ssh -i ~/.ssh/your-key.pem ec2-user@<public-ip>
 
 # Deploy latest images
 cd /opt/navilla
+# TODO: Replace YOUR_GHCR_TOKEN and YOUR_USERNAME with actual values
 echo "YOUR_GHCR_TOKEN" | docker login ghcr.io -u YOUR_USERNAME --password-stdin
 docker-compose pull
 docker-compose up -d
@@ -109,6 +110,7 @@ If you have a domain name:
 
 ```bash
 # SSH into server
+# TODO: Replace your-domain.com with your actual domain name
 sudo certbot --nginx -d your-domain.com
 ```
 

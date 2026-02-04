@@ -52,8 +52,8 @@ cd backend
 ```
 
 Key points:
-- 2-space indentation
-- 100-character line limit
+- 4-space indentation
+- 120-character line limit
 - Javadoc on all public methods
 - Use `final` for method parameters
 
@@ -91,6 +91,10 @@ cd backend
 cd frontend
 npm test
 ```
+
+:::info TODO
+Unit tests for frontend components are not yet configured. The `npm test` script currently echoes a placeholder message.
+:::
 
 - Test components with React Testing Library
 - Mock API calls in tests
@@ -131,35 +135,7 @@ npm test
 
 ## Project Structure
 
-```
-navilla/
-├── backend/           # Spring Boot API
-│   ├── src/main/
-│   │   ├── java/app/navilla/
-│   │   │   ├── config/       # Configuration classes
-│   │   │   ├── controller/   # REST controllers
-│   │   │   ├── service/      # Business logic
-│   │   │   ├── repository/   # Data access
-│   │   │   ├── entity/       # JPA entities
-│   │   │   ├── dto/          # Data transfer objects
-│   │   │   └── security/     # Security utilities
-│   │   └── resources/
-│   │       ├── application.yaml
-│   │       └── messages*.properties  # i18n
-│   └── src/test/     # Tests mirror main structure
-│
-├── frontend/         # React SPA
-│   └── src/
-│       ├── components/   # Reusable UI components
-│       ├── pages/        # Route pages
-│       ├── hooks/        # Custom React hooks
-│       ├── services/     # API client code
-│       ├── locales/      # i18n translation files
-│       └── types/        # TypeScript types
-│
-└── docs/             # Documentation site
-    └── docs/         # Markdown files
-```
+A detailed breakdown of the project's directory layout and key files can be found in the [Codebase Tour](docs/docs/onboarding/codebase-tour.md) documentation.
 
 ## Internationalization (i18n)
 

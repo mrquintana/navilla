@@ -31,11 +31,11 @@ Pending Requests:
    - testuser1@navilla.app through testuser10@navilla.app
    - All with password: `TestPassword123!`
 
-2. Create connections via API or SQL:
+2. Create connections via API or SQL. Ensure to use the `user_a_hash` and `user_b_hash` values for the respective users:
    ```sql
    -- Example: Create confirmed connection between user1 and user2
-   INSERT INTO connections (requester_id, partner_id, status, created_at)
-   VALUES ('user1-uuid', 'user2-uuid', 'CONFIRMED', NOW());
+   INSERT INTO connections (user_a_hash, user_b_hash, status, created_at)
+   VALUES ('user1_hashed_email', 'user2_hashed_email', 'CONFIRMED', NOW());
    ```
 
 3. Required connections:
@@ -50,6 +50,13 @@ Pending Requests:
 ## Running Tests
 
 ### Local Development
+
+First, ensure the frontend is built:
+```bash
+cd frontend && npm run build
+```
+
+Then, run the E2E tests:
 ```bash
 # Run all E2E tests
 npm run test:e2e

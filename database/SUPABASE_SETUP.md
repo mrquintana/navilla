@@ -42,6 +42,8 @@ Password:        [your database password]
    - `migrations/001_initial_schema.sql`
    - `migrations/002_row_level_security.sql`
    - `migrations/003_functions.sql`
+   - `migrations/004_add_user_profile_columns.sql`
+   - `migrations/004_user_enhancements.sql`
 3. Run each one
 
 ### Option B: Using psql CLI
@@ -54,6 +56,8 @@ export DATABASE_URL="postgresql://postgres:[PASSWORD]@db.xxxxxxxxxxxx.supabase.c
 psql $DATABASE_URL -f migrations/001_initial_schema.sql
 psql $DATABASE_URL -f migrations/002_row_level_security.sql
 psql $DATABASE_URL -f migrations/003_functions.sql
+psql $DATABASE_URL -f migrations/004_add_user_profile_columns.sql
+psql $DATABASE_URL -f migrations/004_user_enhancements.sql
 ```
 
 ## 4. Configure Authentication
@@ -100,7 +104,7 @@ SUPABASE_SERVICE_KEY=eyJhbGci...
 # Database (direct connection for backend)
 DATABASE_URL=postgresql://postgres:[PASSWORD]@db.xxxxxxxxxxxx.supabase.co:5432/postgres
 
-# Application
+# Application (used for encryption and hashing operations in the backend)
 APP_SECRET=generate-a-long-random-string-here
 ENCRYPTION_PEPPER=another-long-random-string-for-hashing
 ```
