@@ -48,6 +48,16 @@ Update the authenticated user's profile.
 PUT /api/users/me
 ```
 
+### Avatar Storage & RLS Note
+
+- Avatar files are stored in Supabase Storage bucket `avatars` under:
+  - `profiles/{auth_user_id}/profile.png`
+  - `profiles/{auth_user_id}/thumb.png`
+- The folder uses the **Supabase auth user id**, not the internal app user id.
+- Recommended RLS:
+  - **Public read** on `avatars`
+  - **Authenticated write/update/delete** only within `profiles/{auth_user_id}/...`
+
 ### Request Body
 
 ```json

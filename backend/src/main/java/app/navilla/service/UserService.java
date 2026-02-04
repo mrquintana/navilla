@@ -16,6 +16,7 @@
 
 package app.navilla.service;
 
+import java.util.Map;
 import java.util.UUID;
 
 import app.navilla.dto.UpdateProfileRequest;
@@ -72,10 +73,11 @@ public class UserService {
   public UserResponse getOrCreateCurrentUser(Jwt jwt) {
     UUID supabaseId = UUID.fromString(jwt.getSubject());
     String email = jwt.getClaimAsString("email");
+    Map<String, Object> userMetadata = jwt.getClaimAsMap("user_metadata");
 
     return userRepository.findBySupabaseId(supabaseId)
         .map(this::toUserResponse)
-        .orElseGet(() -> createUserFromJwt(supabaseId, email));
+        .orElseGet(() -> toUserResponse(createUserEntityFromJwt(supabaseId, email, userMetadata)));
   }
 
   /**
@@ -170,13 +172,15 @@ public class UserService {
    * @param jwt the JWT token from Supabase Auth
    * @param request the profile update request
    * @return the updated user profile
-   * @throws ResourceNotFoundException if user not found
+   * @throws ResourceNotFoundException if user cannot be created
    */
   @Transactional
   public UserResponse updateProfile(Jwt jwt, UpdateProfileRequest request) {
     UUID supabaseId = UUID.fromString(jwt.getSubject());
+    String email = jwt.getClaimAsString("email");
+    Map<String, Object> userMetadata = jwt.getClaimAsMap("user_metadata");
     User user = userRepository.findBySupabaseId(supabaseId)
-        .orElseThrow(() -> new ResourceNotFoundException("user.error.notFound"));
+        .orElseGet(() -> createUserEntityFromJwt(supabaseId, email, userMetadata));
 
     if (request.displayName() != null) {
       if (request.displayName().isBlank()) {
@@ -295,7 +299,8 @@ public class UserService {
   /**
    * Creates a new user from JWT claims (lazy sync).
    */
-  private UserResponse createUserFromJwt(UUID supabaseId, String email) {
+  private User createUserEntityFromJwt(UUID supabaseId, String email,
+      Map<String, Object> userMetadata) {
     if (email == null || email.isBlank()) {
       throw new IllegalStateException("JWT does not contain email claim");
     }
@@ -307,7 +312,7 @@ public class UserService {
       log.warn("User exists by email but not by Supabase ID. Linking accounts.");
       User existingUser = userRepository.findByEmailHash(emailHash).orElseThrow();
       existingUser.setSupabaseId(supabaseId);
-      return toUserResponse(userRepository.save(existingUser));
+      return userRepository.save(existingUser);
     }
 
     User user = User.builder()
@@ -321,11 +326,81 @@ public class UserService {
         .showAge(false)
         .build();
 
+    applyUserMetadata(user, userMetadata);
+
     User savedUser = userRepository.save(user);
     log.info("Created new user via lazy sync. supabase_id: {}, email_hash: {}...",
         supabaseId, emailHash.substring(0, 8));
 
-    return toUserResponse(savedUser);
+    return savedUser;
+  }
+
+  /**
+   * Applies Supabase user metadata to a new user entity.
+   *
+   * @param user the user entity to update
+   * @param userMetadata the metadata map from Supabase JWT
+   */
+  private void applyUserMetadata(User user, Map<String, Object> userMetadata) {
+    if (userMetadata == null || userMetadata.isEmpty()) {
+      return;
+    }
+
+    String fullName = readMetadata(userMetadata, "fullName", "full_name");
+    String username = readMetadata(userMetadata, "username", null);
+    String dateOfBirth = readMetadata(userMetadata, "dateOfBirth", "date_of_birth");
+    String sex = readMetadata(userMetadata, "sex", null);
+    String country = readMetadata(userMetadata, "country", null);
+    String location = readMetadata(userMetadata, "location", null);
+
+    if (fullName != null && !fullName.isBlank()) {
+      user.setFullNameEncrypted(encryptionService.encryptToBytes(fullName.trim()));
+      user.setDisplayNameEncrypted(encryptionService.encryptToBytes(fullName.trim()));
+    } else if (username != null && !username.isBlank()) {
+      user.setDisplayNameEncrypted(encryptionService.encryptToBytes(username.trim()));
+    }
+
+    if (username != null && !username.isBlank()) {
+      String normalized = username.trim().toLowerCase();
+      if (!userRepository.existsByUsernameIgnoreCase(normalized)) {
+        user.setUsername(normalized);
+        user.setUsernameHash(encryptionService.hashUsername(normalized));
+      } else {
+        log.warn("Username from metadata already taken: {}", normalized);
+      }
+    }
+
+    if (sex != null && !sex.isBlank()) {
+      user.setSex(sex.trim());
+    }
+
+    if (dateOfBirth != null && !dateOfBirth.isBlank()) {
+      user.setDobEncrypted(encryptionService.encryptToBytes(dateOfBirth.trim()));
+    }
+
+    if (country != null && !country.isBlank()) {
+      user.setCountry(country.trim().toUpperCase());
+    }
+
+    if (location != null && !location.isBlank()) {
+      user.setLocationEncrypted(encryptionService.encryptToBytes(location.trim()));
+    }
+  }
+
+  /**
+   * Reads a string value from metadata with optional fallback key.
+   *
+   * @param metadata metadata map
+   * @param primaryKey primary key to read
+   * @param fallbackKey fallback key to read
+   * @return string value or null
+   */
+  private String readMetadata(Map<String, Object> metadata, String primaryKey, String fallbackKey) {
+    Object value = metadata.get(primaryKey);
+    if (value == null && fallbackKey != null) {
+      value = metadata.get(fallbackKey);
+    }
+    return value != null ? value.toString() : null;
   }
 
   /**
