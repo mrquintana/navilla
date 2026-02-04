@@ -16,14 +16,54 @@
 
 package app.navilla.dto;
 
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 /**
  * Request DTO for updating user profile.
  *
  * @param displayName the user's display name (optional, max 100 characters)
+ * @param fullName the user's full name (optional, max 120 characters)
+ * @param username the public username (optional, 3-30, alphanumeric/underscore)
+ * @param sex self-reported sex (optional)
+ * @param dateOfBirth date of birth in YYYY-MM-DD (optional)
+ * @param showAge whether to display age (optional)
+ * @param country ISO 3166-1 alpha-2 country code (optional)
+ * @param location user location (optional, max 120 characters)
+ * @param profileVisibility profile visibility setting (optional)
+ * @param displayNamePublic whether to show display name publicly (optional)
+ * @param searchableByEmail whether to allow email search (optional)
+ * @param avatarKey storage key for profile avatar (optional)
+ * @param avatarThumbKey storage key for avatar thumbnail (optional)
  */
 public record UpdateProfileRequest(
     @Size(max = 100, message = "{validation.size.max}")
-    String displayName
+    String displayName,
+
+    @Size(max = 120, message = "{validation.size.max}")
+    String fullName,
+
+    @Size(min = 3, max = 30, message = "{validation.size.range}")
+    @Pattern(regexp = "^[a-zA-Z0-9_]+$", message = "{validation.username.invalid}")
+    String username,
+
+    @Size(max = 20, message = "{validation.size.max}")
+    String sex,
+
+    @Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2}$", message = "{validation.date.invalid}")
+    String dateOfBirth,
+
+    Boolean showAge,
+
+    @Pattern(regexp = "^[A-Za-z]{2}$", message = "{validation.country.invalid}")
+    String country,
+
+    @Size(max = 120, message = "{validation.size.max}")
+    String location,
+
+    String profileVisibility,
+    Boolean displayNamePublic,
+    Boolean searchableByEmail,
+    String avatarKey,
+    String avatarThumbKey
 ) {}

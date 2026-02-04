@@ -110,6 +110,19 @@ public class EncryptionService {
   }
 
   /**
+   * Hashes a username for privacy-preserving lookup.
+   *
+   * @param username the username to hash
+   * @return the hex-encoded hash (64 characters)
+   */
+  public String hashUsername(String username) {
+    if (username == null || username.isBlank()) {
+      throw new IllegalArgumentException("Username cannot be null or blank");
+    }
+    return hash(username.toLowerCase().trim());
+  }
+
+  /**
    * Encrypts sensitive data using AES-256-GCM.
    *
    * <p>Each encryption uses a random IV for semantic security.

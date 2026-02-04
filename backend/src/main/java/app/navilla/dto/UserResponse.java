@@ -28,6 +28,19 @@ import java.util.UUID;
  * @param id the user's unique identifier
  * @param email the user's email (only included for own profile)
  * @param displayName the user's display name (optional)
+ * @param fullName the user's full name (optional)
+ * @param username the user's public username (optional)
+ * @param sex the user's self-reported sex (optional)
+ * @param dateOfBirth the user's date of birth (optional)
+ * @param age the user's age (only if showAge is true)
+ * @param showAge whether age can be shown
+ * @param country the user's country (optional)
+ * @param location the user's location (optional)
+ * @param profileVisibility profile visibility setting
+ * @param displayNamePublic whether display name is public
+ * @param searchableByEmail whether email search is allowed
+ * @param avatarUrl public URL for avatar (optional)
+ * @param avatarThumbUrl public URL for avatar thumbnail (optional)
  * @param verified whether the user's email is verified
  * @param createdAt when the account was created
  */
@@ -35,6 +48,19 @@ public record UserResponse(
     UUID id,
     String email,
     String displayName,
+    String fullName,
+    String username,
+    String sex,
+    String dateOfBirth,
+    Integer age,
+    Boolean showAge,
+    String country,
+    String location,
+    String profileVisibility,
+    Boolean displayNamePublic,
+    Boolean searchableByEmail,
+    String avatarUrl,
+    String avatarThumbUrl,
     Boolean verified,
     OffsetDateTime createdAt
 ) {}

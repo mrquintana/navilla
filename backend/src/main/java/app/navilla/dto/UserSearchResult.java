@@ -16,19 +16,15 @@
 
 package app.navilla.dto;
 
-import jakarta.validation.constraints.NotBlank;
-
 /**
- * Request DTO for creating a new connection request.
+ * Response DTO for public user search results.
  *
- * <p>The recipient is identified by an email address or username.
- * The identifier will be normalized and hashed before storage for privacy.
- *
- * @param identifier the email or username of the user to connect with
- * @author Navilla Team
- * @since 2026-01-31
+ * @param username public username
+ * @param displayName public display name (if allowed)
+ * @param avatarThumbUrl public avatar thumbnail (optional)
  */
-public record CreateConnectionRequest(
-    @NotBlank(message = "{connection.error.identifierRequired}")
-    String identifier
+public record UserSearchResult(
+    String username,
+    String displayName,
+    String avatarThumbUrl
 ) {}

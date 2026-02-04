@@ -18,6 +18,7 @@ package app.navilla.controller;
 
 import app.navilla.dto.UpdateProfileRequest;
 import app.navilla.dto.UserResponse;
+import app.navilla.dto.UserSearchResult;
 import app.navilla.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -60,6 +62,18 @@ public class UserController {
   public ResponseEntity<UserResponse> getCurrentUser(@AuthenticationPrincipal Jwt jwt) {
     UserResponse user = userService.getOrCreateCurrentUser(jwt);
     return ResponseEntity.ok(user);
+  }
+
+  /**
+   * Searches for a public user profile by email or username.
+   *
+   * @param q the email or username
+   * @return public profile info or null if not found/visible
+   */
+  @GetMapping("/search")
+  public ResponseEntity<UserSearchResult> searchPublicUser(
+      @RequestParam("q") String q) {
+    return ResponseEntity.ok(userService.searchPublicUser(q));
   }
 
   /**

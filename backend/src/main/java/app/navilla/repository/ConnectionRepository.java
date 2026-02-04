@@ -122,4 +122,12 @@ public interface ConnectionRepository extends JpaRepository<Connection, UUID> {
    * @return count of incoming requests with the given status
    */
   long countByRecipientHashAndStatus(String recipientHash, ConnectionStatus status);
+
+  /**
+   * Finds all connections with a specific status.
+   *
+   * @param status the connection status
+   * @return list of connections with the given status
+   */
+  List<Connection> findByStatus(ConnectionStatus status);
 }

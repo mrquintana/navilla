@@ -72,6 +72,11 @@ navilla:
     anon-key: ${SUPABASE_ANON_KEY:}
     service-key: ${SUPABASE_SERVICE_KEY:}
 
+  # Storage configuration (Supabase Storage now, S3 later)
+  storage:
+    public-base-url: ${SUPABASE_URL:https://your-project.supabase.co}/storage/v1/object/public
+    avatar-bucket: ${AVATAR_BUCKET:avatars}
+
   # Encryption Configuration
   encryption:
     pepper: ${ENCRYPTION_PEPPER:change-this-in-production}
@@ -79,6 +84,10 @@ navilla:
   # Privacy Configuration
   privacy:
     minimum-connections: 3
+
+  exposure:
+    max-depth: 3
+    snapshot-ttl-days: 7
     max-exposure-degree: 3
 
   # Notification Configuration

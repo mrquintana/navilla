@@ -17,6 +17,7 @@
 package app.navilla.repository;
 
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import app.navilla.entity.User;
@@ -88,4 +89,28 @@ public interface UserRepository extends JpaRepository<User, UUID> {
    * @return true if the username is taken
    */
   boolean existsByUsernameIgnoreCase(String username);
+
+  /**
+   * Finds a user by their username hash.
+   *
+   * @param usernameHash the hashed username
+   * @return the user if found
+   */
+  Optional<User> findByUsernameHash(String usernameHash);
+
+  /**
+   * Checks if a user exists with the given username hash.
+   *
+   * @param usernameHash the hashed username
+   * @return true if a user exists with this username hash
+   */
+  boolean existsByUsernameHash(String usernameHash);
+
+  /**
+   * Finds all users by their email hashes.
+   *
+   * @param emailHashes the set of email hashes
+   * @return list of users
+   */
+  java.util.List<User> findByEmailHashIn(Set<String> emailHashes);
 }

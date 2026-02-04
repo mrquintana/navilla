@@ -99,12 +99,36 @@ public class User {
   private byte[] displayNameEncrypted;
 
   /**
+   * AES-256-GCM encrypted full name (optional).
+   */
+  @Column(name = "full_name_encrypted")
+  private byte[] fullNameEncrypted;
+
+  /**
    * AES-256-GCM encrypted date of birth for age verification (optional).
    *
    * <p>Stored as encrypted ISO date string (YYYY-MM-DD).
    */
   @Column(name = "dob_encrypted")
   private byte[] dobEncrypted;
+
+  /**
+   * Self-reported sex (optional, string for flexibility).
+   */
+  @Column(name = "sex", length = 20)
+  private String sex;
+
+  /**
+   * ISO 3166-1 alpha-2 country code (optional).
+   */
+  @Column(name = "country", length = 2)
+  private String country;
+
+  /**
+   * AES-256-GCM encrypted location (optional).
+   */
+  @Column(name = "location_encrypted")
+  private byte[] locationEncrypted;
 
   /**
    * Whether the user's email has been verified.
@@ -139,6 +163,13 @@ public class User {
   private Boolean searchableByEmail = false;
 
   /**
+   * Whether the user's age can be displayed.
+   */
+  @Column(name = "show_age", nullable = false)
+  @Builder.Default
+  private Boolean showAge = false;
+
+  /**
    * Optional public username (only meaningful for public profiles).
    */
   @Column(name = "username", length = 30, unique = true)
@@ -149,6 +180,18 @@ public class User {
    */
   @Column(name = "username_hash", length = 64, unique = true)
   private String usernameHash;
+
+  /**
+   * Storage key for profile avatar (original size).
+   */
+  @Column(name = "avatar_key", length = 255)
+  private String avatarKey;
+
+  /**
+   * Storage key for profile avatar thumbnail.
+   */
+  @Column(name = "avatar_thumb_key", length = 255)
+  private String avatarThumbKey;
 
   // ==================== Timestamps ====================
 

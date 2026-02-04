@@ -25,6 +25,8 @@ import app.navilla.dto.ConnectionStatsResponse;
 import app.navilla.dto.CreateConnectionRequest;
 import app.navilla.entity.Connection;
 import app.navilla.entity.ConnectionStatus;
+import app.navilla.entity.ProfileVisibility;
+import app.navilla.entity.User;
 import app.navilla.exception.ResourceNotFoundException;
 import app.navilla.repository.ConnectionRepository;
 import app.navilla.repository.UserRepository;
@@ -52,31 +54,33 @@ public class ConnectionService {
   private final ConnectionRepository connectionRepository;
   private final UserRepository userRepository;
   private final EncryptionService encryptionService;
+  private final NotificationService notificationService;
 
   /**
    * Creates a new connection request.
    *
    * @param jwt the JWT token of the requesting user
-   * @param request the connection request with recipient email
-   * @return the created connection
+   * @param request the connection request with recipient identifier
    * @throws IllegalArgumentException if trying to connect with self
    * @throws IllegalStateException if connection already exists
-   * @throws ResourceNotFoundException if recipient not found
    */
   @Transactional
-  public ConnectionResponse createConnection(Jwt jwt, CreateConnectionRequest request) {
+  public void createConnection(Jwt jwt, CreateConnectionRequest request) {
     String requesterEmail = jwt.getClaimAsString("email");
     String requesterHash = encryptionService.hashEmail(requesterEmail);
-    String recipientHash = encryptionService.hashEmail(request.recipientEmail());
+    String identifier = request.identifier().trim();
+
+    User recipientUser = resolveRecipient(identifier).orElse(null);
+    if (recipientUser == null) {
+      log.info("Connection request queued for unknown recipient: {}", maskIdentifier(identifier));
+      return;
+    }
+
+    String recipientHash = recipientUser.getEmailHash();
 
     // Validate not connecting to self
     if (requesterHash.equals(recipientHash)) {
       throw new IllegalArgumentException("connection.error.selfConnection");
-    }
-
-    // Validate recipient exists
-    if (!userRepository.existsByEmailHash(recipientHash)) {
-      throw new ResourceNotFoundException("connection.error.recipientNotFound");
     }
 
     // Check if connection already exists
@@ -93,8 +97,7 @@ public class ConnectionService {
     Connection saved = connectionRepository.save(connection);
     log.info("Connection request created: {} -> {}",
         requesterHash.substring(0, 8), recipientHash.substring(0, 8));
-
-    return toConnectionResponse(saved, requesterHash);
+    notificationService.createConnectionRequestNotification(recipientHash, saved.getId());
   }
 
   /**
@@ -109,6 +112,7 @@ public class ConnectionService {
     String userHash = encryptionService.hashEmail(email);
 
     return connectionRepository.findAllByUserHash(userHash).stream()
+        .filter(c -> isVisibleToRequester(c, userHash))
         .map(c -> toConnectionResponse(c, userHash))
         .toList();
   }
@@ -159,6 +163,7 @@ public class ConnectionService {
 
     return connectionRepository.findByRequesterHashAndStatus(userHash, ConnectionStatus.PENDING)
         .stream()
+        .filter(c -> isVisibleToRequester(c, userHash))
         .map(c -> toConnectionResponse(c, userHash))
         .toList();
   }
@@ -196,6 +201,7 @@ public class ConnectionService {
 
     Connection saved = connectionRepository.save(connection);
     log.info("Connection accepted: {}", connectionId);
+    notificationService.createConnectionConfirmedNotification(connection.getRequesterHash(), connectionId);
 
     return toConnectionResponse(saved, userHash);
   }
@@ -232,6 +238,7 @@ public class ConnectionService {
 
     Connection saved = connectionRepository.save(connection);
     log.info("Connection denied: {}", connectionId);
+    notificationService.createConnectionDeniedNotification(connection.getRequesterHash(), connectionId);
 
     return toConnectionResponse(saved, userHash);
   }
@@ -281,9 +288,44 @@ public class ConnectionService {
     long pendingIncomingCount = connectionRepository.countByRecipientHashAndStatus(
         userHash, ConnectionStatus.PENDING);
     long pendingSentCount = connectionRepository.findByRequesterHashAndStatus(
-        userHash, ConnectionStatus.PENDING).size();
+        userHash, ConnectionStatus.PENDING).stream()
+        .filter(c -> isVisibleToRequester(c, userHash))
+        .count();
 
     return new ConnectionStatsResponse(confirmedCount, pendingIncomingCount, pendingSentCount);
+  }
+
+  private boolean isVisibleToRequester(Connection connection, String currentUserHash) {
+    if (!connection.getRequesterHash().equals(currentUserHash)) {
+      return true;
+    }
+    if (connection.getStatus() != ConnectionStatus.PENDING) {
+      return true;
+    }
+
+    User recipient = userRepository.findByEmailHash(connection.getRecipientHash()).orElse(null);
+    if (recipient == null) {
+      return false;
+    }
+    return recipient.getProfileVisibility() == ProfileVisibility.PUBLIC;
+  }
+
+  private java.util.Optional<User> resolveRecipient(String identifier) {
+    if (identifier.contains("@")) {
+      String hash = encryptionService.hashEmail(identifier);
+      return userRepository.findByEmailHash(hash);
+    }
+    String usernameHash = encryptionService.hashUsername(identifier);
+    return userRepository.findByUsernameHash(usernameHash)
+        .filter(user -> user.getProfileVisibility() == ProfileVisibility.PUBLIC);
+  }
+
+  private String maskIdentifier(String identifier) {
+    if (identifier.contains("@")) {
+      String[] parts = identifier.split("@", 2);
+      return parts[0].charAt(0) + "***@" + parts[1];
+    }
+    return identifier.charAt(0) + "***";
   }
 
   /**

@@ -19,6 +19,7 @@ package app.navilla.controller;
 import java.util.List;
 import java.util.UUID;
 
+import app.navilla.dto.ConnectionRequestResponse;
 import app.navilla.dto.ConnectionResponse;
 import app.navilla.dto.ConnectionStatsResponse;
 import app.navilla.dto.CreateConnectionRequest;
@@ -61,12 +62,13 @@ public class ConnectionController {
    * @return the created connection
    */
   @PostMapping
-  public ResponseEntity<ConnectionResponse> createConnection(
+  public ResponseEntity<ConnectionRequestResponse> createConnection(
       @AuthenticationPrincipal Jwt jwt,
       @Valid @RequestBody CreateConnectionRequest request) {
 
-    ConnectionResponse connection = connectionService.createConnection(jwt, request);
-    return ResponseEntity.status(HttpStatus.CREATED).body(connection);
+    connectionService.createConnection(jwt, request);
+    return ResponseEntity.status(HttpStatus.ACCEPTED)
+        .body(new ConnectionRequestResponse("connection.success.requestQueued"));
   }
 
   /**
