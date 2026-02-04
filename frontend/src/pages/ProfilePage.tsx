@@ -8,6 +8,7 @@ import { useUser } from '../hooks/useUser';
 import { queryClient } from '../queryClient';
 import { LanguageSwitcher } from '../components/LanguageSwitcher';
 import { countries } from '../lib/geolocation';
+import { DEV_MODE } from '../lib/devMode';
 
 const AVATAR_BUCKET = 'avatars';
 const AVATAR_SIZE = 512;
@@ -58,9 +59,42 @@ export function ProfilePage() {
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [errorDetails, setErrorDetails] = useState<string[]>([]);
+  const [isEditing, setIsEditing] = useState(false);
   const isPublic = form.profileVisibility === 'PUBLIC';
 
-  useEffect(() => {
+  const fillRandomProfile = () => {
+    const names = ['Ana', 'Luis', 'Carla', 'Mateo', 'Sofia', 'Diego', 'Lucia', 'Javier'];
+    const surnames = ['Lopez', 'Garcia', 'Hernandez', 'Perez', 'Martinez', 'Santos', 'Diaz'];
+    const name = names[Math.floor(Math.random() * names.length)];
+    const surname = surnames[Math.floor(Math.random() * surnames.length)];
+    const fullName = `${name} ${surname}`;
+    const displayName = `${name} ${surname.charAt(0)}.`;
+    const username = `${name}${surname}`.toLowerCase();
+    const sexes = ['male', 'female', 'other'];
+    const visibilityOptions: UpdateProfileData['profileVisibility'][] = [
+      'PRIVATE',
+      'PUBLIC',
+      'CONNECTIONS_ONLY',
+    ];
+    const randomCountry = countries[Math.floor(Math.random() * countries.length)]?.code ?? '';
+
+    setForm({
+      ...form,
+      displayName,
+      fullName,
+      username: username.replace(/[^a-z0-9_]/g, ''),
+      sex: sexes[Math.floor(Math.random() * sexes.length)],
+      dateOfBirth: `19${80 + Math.floor(Math.random() * 20)}-${String(1 + Math.floor(Math.random() * 12)).padStart(2, '0')}-${String(1 + Math.floor(Math.random() * 28)).padStart(2, '0')}`,
+      showAge: Math.random() > 0.5,
+      country: randomCountry,
+      location: Math.random() > 0.5 ? 'Mexico City' : 'Austin, TX',
+      profileVisibility: visibilityOptions[Math.floor(Math.random() * visibilityOptions.length)],
+      displayNamePublic: Math.random() > 0.5,
+      searchableByEmail: Math.random() > 0.5,
+    });
+  };
+
+  const resetFormFromProfile = () => {
     if (!profile) {
       return;
     }
@@ -79,6 +113,10 @@ export function ProfilePage() {
       avatarKey: undefined,
       avatarThumbKey: undefined,
     });
+  };
+
+  useEffect(() => {
+    resetFormFromProfile();
   }, [profile]);
 
   const avatarUrl = useMemo(() => profile?.avatarUrl || profile?.avatarThumbUrl, [profile]);
@@ -89,6 +127,7 @@ export function ProfilePage() {
       setMessage(t('profile.saved'));
       setError(null);
       setErrorDetails([]);
+      setIsEditing(false);
       queryClient.invalidateQueries({ queryKey: ['user', 'me'] });
     },
     onError: (err: any) => {
@@ -199,140 +238,243 @@ export function ProfilePage() {
           updateMutation.mutate(cleaned);
         }}
       >
-        <h3 className="font-semibold">{t('profile.aboutYou')}</h3>
-
-        <div className="grid gap-4 md:grid-cols-2">
-          <div>
-            <label className="label">{t('auth.displayName')}</label>
-            <input
-              className="input"
-              value={form.displayName ?? ''}
-              onChange={(e) => setForm({ ...form, displayName: e.target.value })}
-            />
-          </div>
-          <div>
-            <label className="label">{t('auth.fullName')}</label>
-            <input
-              className="input"
-              value={form.fullName ?? ''}
-              onChange={(e) => setForm({ ...form, fullName: e.target.value })}
-            />
-          </div>
-        </div>
-
-        <div className="grid gap-4 md:grid-cols-2">
-          <div>
-            <label className="label">{t('auth.username')}</label>
-            <input
-              className="input"
-              value={form.username ?? ''}
-              onChange={(e) => setForm({ ...form, username: e.target.value })}
-            />
-          </div>
-          <div>
-            <label className="label">{t('auth.sex')}</label>
-            <select
-              className="input"
-              value={form.sex ?? ''}
-              onChange={(e) => setForm({ ...form, sex: e.target.value })}
-            >
-              <option value="">{t('common.select')}</option>
-              <option value="male">{t('auth.sexMale')}</option>
-              <option value="female">{t('auth.sexFemale')}</option>
-              <option value="other">{t('auth.sexOther')}</option>
-            </select>
+        <div className="flex items-center justify-between gap-4">
+          <h3 className="font-semibold">{t('profile.aboutYou')}</h3>
+          <div className="flex flex-wrap items-center gap-2">
+            {!isEditing ? (
+              <button
+                type="button"
+                className="btn btn-secondary btn-sm"
+                onClick={() => setIsEditing(true)}
+              >
+                {t('common.edit')}
+              </button>
+            ) : (
+              <>
+                {DEV_MODE && (
+                  <button
+                    type="button"
+                    className="btn btn-secondary btn-sm"
+                    onClick={fillRandomProfile}
+                  >
+                    {t('common.fillRandom')}
+                  </button>
+                )}
+                <button
+                  type="button"
+                  className="btn btn-secondary btn-sm"
+                  onClick={() => {
+                    resetFormFromProfile();
+                    setIsEditing(false);
+                  }}
+                >
+                  {t('common.cancel')}
+                </button>
+              </>
+            )}
           </div>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
-          <div>
-            <label className="label">{t('auth.dateOfBirth')}</label>
-            <input
-              type="date"
-              className="input"
-              value={form.dateOfBirth ?? ''}
-              onChange={(e) => setForm({ ...form, dateOfBirth: e.target.value })}
-            />
+        {!isEditing ? (
+          <div className="grid gap-4 md:grid-cols-2 text-sm">
+            <div>
+              <p className="text-muted">{t('auth.displayName')}</p>
+              <p>{profile?.displayName || '—'}</p>
+            </div>
+            <div>
+              <p className="text-muted">{t('auth.fullName')}</p>
+              <p>{profile?.fullName || '—'}</p>
+            </div>
+            <div>
+              <p className="text-muted">{t('auth.username')}</p>
+              <p>{profile?.username ? `@${profile.username}` : '—'}</p>
+            </div>
+            <div>
+              <p className="text-muted">{t('auth.sex')}</p>
+              <p>{profile?.sex || '—'}</p>
+            </div>
+            <div>
+              <p className="text-muted">{t('auth.dateOfBirth')}</p>
+              <p>{profile?.dateOfBirth || '—'}</p>
+            </div>
+            <div>
+              <p className="text-muted">{t('profile.showAge')}</p>
+              <p>{profile?.showAge ? t('common.confirm') : t('common.cancel')}</p>
+            </div>
+            <div>
+              <p className="text-muted">{t('auth.country')}</p>
+              <p>{profile?.country || '—'}</p>
+            </div>
+            <div>
+              <p className="text-muted">{t('auth.location')}</p>
+              <p>{profile?.location || '—'}</p>
+            </div>
+            <div className="md:col-span-2 pt-2">
+              <p className="text-muted">{t('profile.visibility')}</p>
+              <p className="text-sm">
+                {profile?.profileVisibility === 'PUBLIC' && t('profile.visibilityPublic')}
+                {profile?.profileVisibility === 'CONNECTIONS_ONLY' && t('profile.visibilityConnections')}
+                {profile?.profileVisibility === 'PRIVATE' && t('profile.visibilityPrivate')}
+              </p>
+              <p className="text-xs text-muted mt-1">
+                {t('profile.displayNamePublic')}: {profile?.displayNamePublic ? t('common.confirm') : t('common.cancel')} ·{' '}
+                {t('profile.searchableByEmail')}: {profile?.searchableByEmail ? t('common.confirm') : t('common.cancel')}
+              </p>
+            </div>
           </div>
-          <div className="flex items-center gap-2 pt-6">
-            <input
-              type="checkbox"
-              checked={!!form.showAge}
-              onChange={(e) => setForm({ ...form, showAge: e.target.checked })}
-            />
-            <span className="text-sm">{t('profile.showAge')}</span>
-          </div>
-        </div>
+        ) : (
+          <>
+            <div className="grid gap-4 md:grid-cols-2">
+              <div>
+                <label className="label" htmlFor="displayName">{t('auth.displayName')}</label>
+                <input
+                  id="displayName"
+                  className="input"
+                  value={form.displayName ?? ''}
+                  onChange={(e) => setForm({ ...form, displayName: e.target.value })}
+                />
+              </div>
+              <div>
+                <label className="label" htmlFor="fullName">{t('auth.fullName')}</label>
+                <input
+                  id="fullName"
+                  className="input"
+                  value={form.fullName ?? ''}
+                  onChange={(e) => setForm({ ...form, fullName: e.target.value })}
+                />
+              </div>
+            </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
-          <div>
-            <label className="label">{t('auth.country')}</label>
-            <select
-              className="input"
-              value={form.country ?? ''}
-              onChange={(e) => setForm({ ...form, country: e.target.value })}
-            >
-              <option value="">{t('common.select')}</option>
-              {countries.map((country) => (
-                <option key={country.code} value={country.code}>
-                  {country.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="label">{t('auth.location')}</label>
-            <input
-              className="input"
-              value={form.location ?? ''}
-              onChange={(e) => setForm({ ...form, location: e.target.value })}
-            />
-          </div>
-        </div>
+            <div className="grid gap-4 md:grid-cols-2">
+              <div>
+                <label className="label" htmlFor="username">{t('auth.username')}</label>
+                <input
+                  id="username"
+                  className="input"
+                  value={form.username ?? ''}
+                  onChange={(e) => setForm({
+                    ...form,
+                    username: e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''),
+                  })}
+                  minLength={3}
+                  maxLength={30}
+                  pattern="[a-zA-Z0-9_]+"
+                />
+              </div>
+              <div>
+                <label className="label" htmlFor="sex">{t('auth.sex')}</label>
+                <select
+                  id="sex"
+                  className="input"
+                  value={form.sex ?? ''}
+                  onChange={(e) => setForm({ ...form, sex: e.target.value })}
+                >
+                  <option value="">{t('common.select')}</option>
+                  <option value="male">{t('auth.sexMale')}</option>
+                  <option value="female">{t('auth.sexFemale')}</option>
+                  <option value="other">{t('auth.sexOther')}</option>
+                </select>
+              </div>
+            </div>
 
-        <h3 className="font-semibold pt-2">{t('profile.privacy')}</h3>
-        <div className="grid gap-4 md:grid-cols-2">
-          <div>
-            <label className="label">{t('profile.visibility')}</label>
-            <select
-              className="input"
-              value={form.profileVisibility ?? 'PRIVATE'}
-              onChange={(e) => {
-                const visibility = e.target.value;
-                setForm({
-                  ...form,
-                  profileVisibility: visibility,
-                  displayNamePublic: visibility === 'PUBLIC' ? form.displayNamePublic : false,
-                  searchableByEmail: visibility === 'PUBLIC' ? form.searchableByEmail : false,
-                });
-              }}
-            >
-              <option value="PUBLIC">{t('profile.visibilityPublic')}</option>
-              <option value="CONNECTIONS_ONLY">{t('profile.visibilityConnections')}</option>
-              <option value="PRIVATE">{t('profile.visibilityPrivate')}</option>
-            </select>
-          </div>
-          <div className="space-y-2 pt-2">
-            <label className="flex items-center gap-2 text-sm">
-              <input
-                type="checkbox"
-                checked={!!form.displayNamePublic && isPublic}
-                onChange={(e) => setForm({ ...form, displayNamePublic: e.target.checked })}
-                disabled={!isPublic}
-              />
-              {t('profile.displayNamePublic')}
-            </label>
-            <label className="flex items-center gap-2 text-sm">
-              <input
-                type="checkbox"
-                checked={!!form.searchableByEmail && isPublic}
-                onChange={(e) => setForm({ ...form, searchableByEmail: e.target.checked })}
-                disabled={!isPublic}
-              />
-              {t('profile.searchableByEmail')}
-            </label>
-          </div>
-        </div>
+            <div className="grid gap-4 md:grid-cols-2">
+              <div>
+                <label className="label" htmlFor="dateOfBirth">{t('auth.dateOfBirth')}</label>
+                <input
+                  id="dateOfBirth"
+                  type="date"
+                  className="input"
+                  value={form.dateOfBirth ?? ''}
+                  onChange={(e) => setForm({ ...form, dateOfBirth: e.target.value })}
+                />
+              </div>
+              <div className="flex items-center gap-2 pt-6">
+                <input
+                  id="showAge"
+                  type="checkbox"
+                  checked={!!form.showAge}
+                  onChange={(e) => setForm({ ...form, showAge: e.target.checked })}
+                />
+                <label className="text-sm" htmlFor="showAge">{t('profile.showAge')}</label>
+              </div>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <div>
+                <label className="label" htmlFor="country">{t('auth.country')}</label>
+                <select
+                  id="country"
+                  className="input"
+                  value={form.country ?? ''}
+                  onChange={(e) => setForm({ ...form, country: e.target.value })}
+                >
+                  <option value="">{t('common.select')}</option>
+                  {countries.map((country) => (
+                    <option key={country.code} value={country.code}>
+                      {country.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="label" htmlFor="location">{t('auth.location')}</label>
+                <input
+                  id="location"
+                  className="input"
+                  value={form.location ?? ''}
+                  onChange={(e) => setForm({ ...form, location: e.target.value })}
+                />
+              </div>
+            </div>
+
+            <h3 className="font-semibold pt-2">{t('profile.privacy')}</h3>
+            <div className="grid gap-4 md:grid-cols-2">
+              <div>
+                <label className="label" htmlFor="profileVisibility">{t('profile.visibility')}</label>
+                <select
+                  id="profileVisibility"
+                  className="input"
+                  value={form.profileVisibility ?? 'PRIVATE'}
+                  onChange={(e) => {
+                    const visibility = e.target.value;
+                    setForm({
+                      ...form,
+                      profileVisibility: visibility,
+                      displayNamePublic: visibility === 'PUBLIC' ? form.displayNamePublic : false,
+                      searchableByEmail: visibility === 'PUBLIC' ? form.searchableByEmail : false,
+                    });
+                  }}
+                >
+                  <option value="PUBLIC">{t('profile.visibilityPublic')}</option>
+                  <option value="CONNECTIONS_ONLY">{t('profile.visibilityConnections')}</option>
+                  <option value="PRIVATE">{t('profile.visibilityPrivate')}</option>
+                </select>
+              </div>
+              <div className="space-y-2 pt-2">
+                <label className="flex items-center gap-2 text-sm">
+                  <input
+                    id="displayNamePublic"
+                    type="checkbox"
+                    checked={!!form.displayNamePublic && isPublic}
+                    onChange={(e) => setForm({ ...form, displayNamePublic: e.target.checked })}
+                    disabled={!isPublic}
+                  />
+                  <span>{t('profile.displayNamePublic')}</span>
+                </label>
+                <label className="flex items-center gap-2 text-sm">
+                  <input
+                    id="searchableByEmail"
+                    type="checkbox"
+                    checked={!!form.searchableByEmail && isPublic}
+                    onChange={(e) => setForm({ ...form, searchableByEmail: e.target.checked })}
+                    disabled={!isPublic}
+                  />
+                  <span>{t('profile.searchableByEmail')}</span>
+                </label>
+              </div>
+            </div>
+          </>
+        )}
 
         {message && <div className="alert alert-success">{message}</div>}
       {error && (
@@ -348,16 +490,23 @@ export function ProfilePage() {
         </div>
       )}
 
-        <button className="btn btn-primary" type="submit" disabled={updateMutation.isPending}>
-          {updateMutation.isPending ? t('common.loading') : t('common.save')}
-        </button>
+        {isEditing && (
+          <button className="btn btn-primary" type="submit" disabled={updateMutation.isPending}>
+            {updateMutation.isPending ? (
+              <span className="inline-flex items-center gap-2">
+                <span className="spinner" aria-hidden="true" />
+                {t('common.loading')}
+              </span>
+            ) : t('common.save')}
+          </button>
+        )}
       </form>
 
       <div className="card card-elevated space-y-4">
         <h3 className="font-semibold">{t('settings.title')}</h3>
         <div>
-          <label className="label">{t('settings.language')}</label>
-          <LanguageSwitcher className="input" />
+          <label className="label" htmlFor="language">{t('settings.language')}</label>
+          <LanguageSwitcher className="input" id="language" />
         </div>
         <div className="pt-2">
           <button className="btn btn-secondary" onClick={() => signOut()}>

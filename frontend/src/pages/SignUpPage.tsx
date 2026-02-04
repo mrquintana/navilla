@@ -3,6 +3,7 @@ import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth, type UserMetadata } from '../contexts/AuthContext';
 import { detectCountry, countries } from '../lib/geolocation';
+import { DEV_MODE } from '../lib/devMode';
 
 type Sex = 'male' | 'female' | 'other';
 
@@ -27,6 +28,29 @@ export function SignUpPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [step, setStep] = useState(1); // Multi-step form
+
+  const fillRandomSignup = () => {
+    const names = ['Ana', 'Luis', 'Carla', 'Mateo', 'Sofia', 'Diego', 'Lucia', 'Javier'];
+    const surnames = ['Lopez', 'Garcia', 'Hernandez', 'Perez', 'Martinez', 'Santos', 'Diaz'];
+    const name = names[Math.floor(Math.random() * names.length)];
+    const surname = surnames[Math.floor(Math.random() * surnames.length)];
+    const fullNameValue = `${name} ${surname}`;
+    const usernameValue = `${name}${surname}`.toLowerCase();
+    const randomEmail = `${name}.${surname}${Math.floor(Math.random() * 900 + 100)}@navilla.app`.toLowerCase();
+    const sexes: Sex[] = ['male', 'female', 'other'];
+    const randomCountry = countries[Math.floor(Math.random() * countries.length)]?.code ?? '';
+
+    setEmail(randomEmail);
+    setPassword('Test1234');
+    setConfirmPassword('Test1234');
+    setUsername(usernameValue.replace(/[^a-z0-9_]/g, ''));
+    setFullName(fullNameValue);
+    setDateOfBirth(`19${80 + Math.floor(Math.random() * 20)}-${String(1 + Math.floor(Math.random() * 12)).padStart(2, '0')}-${String(1 + Math.floor(Math.random() * 28)).padStart(2, '0')}`);
+    setSex(sexes[Math.floor(Math.random() * sexes.length)]);
+    setCountry(randomCountry);
+    setLocation(Math.random() > 0.5 ? 'Mexico City' : 'Austin, TX');
+    setStep(2);
+  };
 
   // Detect country on mount
   useEffect(() => {
@@ -232,6 +256,11 @@ export function SignUpPage() {
             <button type="submit" className="btn btn-primary w-full">
               {t('common.next')}
             </button>
+            {DEV_MODE && (
+              <button type="button" className="btn btn-secondary w-full mt-3" onClick={fillRandomSignup}>
+                {t('common.fillRandom')}
+              </button>
+            )}
           </>
         )}
 

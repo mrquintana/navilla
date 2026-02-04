@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { api, type NotificationItem } from '../lib/api';
@@ -8,6 +9,7 @@ export function NotificationsPage() {
   const { t } = useTranslation();
   const { session } = useAuth();
   const token = session?.access_token ?? '';
+  const [pendingReadId, setPendingReadId] = useState<string | null>(null);
 
   const listQuery = useQuery({
     queryKey: ['notifications'],
@@ -22,6 +24,15 @@ export function NotificationsPage() {
     },
   });
 
+  const markRead = async (id: string) => {
+    setPendingReadId(id);
+    try {
+      await readMutation.mutateAsync(id);
+    } finally {
+      setPendingReadId(null);
+    }
+  };
+
   return (
     <div className="container py-8 space-y-6">
       <div>
@@ -30,7 +41,13 @@ export function NotificationsPage() {
       </div>
 
       <div className="card card-elevated">
-        {listQuery.data && listQuery.data.length > 0 ? (
+        {listQuery.isLoading ? (
+          <div className="flex items-center gap-2 text-sm text-muted">
+            <span className="spinner" aria-hidden="true" />
+            <span className="sr-only">{t('common.loading')}</span>
+            <span>{t('common.loading')}</span>
+          </div>
+        ) : listQuery.data && listQuery.data.length > 0 ? (
           <div className="space-y-3">
             {listQuery.data.map((item: NotificationItem) => (
               <div key={item.id} className="flex items-center justify-between gap-4 border-b pb-3 last:border-b-0 last:pb-0">
@@ -45,9 +62,15 @@ export function NotificationsPage() {
                 {!item.readAt && (
                   <button
                     className="btn btn-secondary btn-sm"
-                    onClick={() => readMutation.mutate(item.id)}
+                    onClick={() => markRead(item.id)}
+                    disabled={pendingReadId === item.id}
                   >
-                    {t('notifications.markRead')}
+                    {pendingReadId === item.id ? (
+                      <span className="inline-flex items-center gap-1">
+                        <span className="spinner" aria-hidden="true" />
+                        {t('common.loading')}
+                      </span>
+                    ) : t('notifications.markRead')}
                   </button>
                 )}
               </div>

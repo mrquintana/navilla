@@ -7,9 +7,10 @@ const languages = [
 
 interface LanguageSwitcherProps {
   className?: string;
+  id?: string;
 }
 
-export function LanguageSwitcher({ className }: LanguageSwitcherProps) {
+export function LanguageSwitcher({ className, id }: LanguageSwitcherProps) {
   const { i18n } = useTranslation();
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -20,6 +21,7 @@ export function LanguageSwitcher({ className }: LanguageSwitcherProps) {
 
   return (
     <select
+      id={id}
       value={i18n.language}
       onChange={handleChange}
       className={className ?? 'text-sm bg-transparent border border-border rounded px-2 py-1 cursor-pointer'}
