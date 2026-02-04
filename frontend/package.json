@@ -12,7 +12,8 @@
     "test": "echo 'No unit tests configured yet'",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "test:e2e:report": "playwright show-report"
+    "test:e2e:report": "playwright show-report",
+    "seed:users": "node scripts/seed-users.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.93.3",

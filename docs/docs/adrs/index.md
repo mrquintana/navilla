@@ -35,6 +35,9 @@ What becomes easier or more difficult because of this change?
 |-----|-------|--------|
 | [ADR-001](./adr-001-documentation-platform) | Documentation Platform | Accepted |
 | [ADR-002](./adr-002-tech-stack) | Technology Stack | Accepted |
+| [ADR-005](./adr-005-design-system) | Design System | Accepted |
+| [ADR-006](./adr-006-auth-email-confirmation) | Auth Email Confirmation | Accepted |
+| [ADR-007](./adr-007-icon-set) | Icon Set | Accepted |
 
 ## Creating New ADRs
 
