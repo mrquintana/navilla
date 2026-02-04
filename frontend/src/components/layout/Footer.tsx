@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 
 export function Footer() {
   const { t } = useTranslation();
@@ -10,33 +11,33 @@ export function Footer() {
           <div>
             <h4 className="footer-title">{t('footer.product')}</h4>
             <ul className="footer-list">
-              <li><a href="#">{t('footer.links.howItWorks')}</a></li>
-              <li><a href="#">{t('footer.links.privacy')}</a></li>
-              <li><a href="#">{t('footer.links.security')}</a></li>
+              <li><Link to="/how-it-works">{t('footer.links.howItWorks')}</Link></li>
+              <li><Link to="/privacy">{t('footer.links.privacy')}</Link></li>
+              <li><Link to="/security">{t('footer.links.security')}</Link></li>
             </ul>
           </div>
           <div>
             <h4 className="footer-title">{t('footer.company')}</h4>
             <ul className="footer-list">
-              <li><a href="#">{t('footer.links.about')}</a></li>
-              <li><a href="#">{t('footer.links.contact')}</a></li>
-              <li><a href="#">{t('footer.links.careers')}</a></li>
+              <li><Link to="/about">{t('footer.links.about')}</Link></li>
+              <li><Link to="/contact">{t('footer.links.contact')}</Link></li>
+              <li><Link to="/careers">{t('footer.links.careers')}</Link></li>
             </ul>
           </div>
           <div>
             <h4 className="footer-title">{t('footer.legal')}</h4>
             <ul className="footer-list">
-              <li><a href="#">{t('footer.links.terms')}</a></li>
-              <li><a href="#">{t('footer.links.policy')}</a></li>
-              <li><a href="#">{t('footer.links.cookies')}</a></li>
+              <li><Link to="/terms">{t('footer.links.terms')}</Link></li>
+              <li><Link to="/privacy-policy">{t('footer.links.policy')}</Link></li>
+              <li><Link to="/cookie-policy">{t('footer.links.cookies')}</Link></li>
             </ul>
           </div>
           <div>
             <h4 className="footer-title">{t('footer.support')}</h4>
             <ul className="footer-list">
-              <li><a href="#">{t('footer.links.help')}</a></li>
-              <li><a href="#">{t('footer.links.status')}</a></li>
-              <li><a href="#">{t('footer.links.accessibility')}</a></li>
+              <li><Link to="/help">{t('footer.links.help')}</Link></li>
+              <li><Link to="/status">{t('footer.links.status')}</Link></li>
+              <li><Link to="/accessibility">{t('footer.links.accessibility')}</Link></li>
             </ul>
           </div>
         </div>
