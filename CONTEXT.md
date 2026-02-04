@@ -118,6 +118,17 @@ A detailed breakdown of the project's directory layout and key files can be foun
 ## Architecture Decisions Records (ADRs)
 
 ### ADR-001: Documentation Platform
+
+---
+
+## Session Notes (2026-02-04)
+
+- ✅ KIS direction: store enum values as `varchar` in DB and use `@Enumerated(EnumType.STRING)` in backend.
+- ✅ Added seed SQL for 7 dev users + connections + health status:
+  - `database/seeds/dev-7-users.sql`
+  - `database/seeds/dev-7-users-revert.sql`
+- ⚠️ Pending Incoming UI shows a UUID instead of name/username/avatar. Needs UI + API support to show requester profile data.
+- ⚠️ Notifications and Pending Incoming require manual refresh; add lightweight polling.
 - **Status:** Accepted
 - **Decision:** Use Docusaurus
 - **Full details:** `docs/docs/adrs/adr-001-documentation-platform.md`
