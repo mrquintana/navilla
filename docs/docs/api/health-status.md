@@ -12,30 +12,28 @@ Endpoints for managing personal health records.
 Get all health status records for the authenticated user.
 
 ```
-GET /api/health
+GET /api/health-status
 ```
 
 ### Response
 
 ```json
-{
-  "data": [
-    {
-      "id": "550e8400-e29b-41d4-a716-446655440010",
-      "condition": "chlamydia",
-      "status": "negative",
-      "testDate": "2026-01-15",
-      "reportedAt": "2026-01-16T10:00:00Z"
-    },
-    {
-      "id": "550e8400-e29b-41d4-a716-446655440011",
-      "condition": "hiv",
-      "status": "negative",
-      "testDate": "2026-01-15",
-      "reportedAt": "2026-01-16T10:00:00Z"
-    }
-  ]
-}
+[
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440010",
+    "condition": "chlamydia",
+    "status": "negative",
+    "testDate": "2026-01-15",
+    "reportedAt": "2026-01-16T10:00:00Z"
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440011",
+    "condition": "hiv",
+    "status": "negative",
+    "testDate": "2026-01-15",
+    "reportedAt": "2026-01-16T10:00:00Z"
+  }
+]
 ```
 
 ## Report Status
@@ -43,7 +41,7 @@ GET /api/health
 Report a new health status or update an existing one.
 
 ```
-POST /api/health
+POST /api/health-status
 ```
 
 ### Request Body
@@ -83,13 +81,11 @@ POST /api/health
 
 ```json
 {
-  "data": {
-    "id": "550e8400-e29b-41d4-a716-446655440012",
-    "condition": "chlamydia",
-    "status": "positive",
-    "testDate": "2026-01-28",
-    "reportedAt": "2026-01-30T10:00:00Z"
-  }
+  "id": "550e8400-e29b-41d4-a716-446655440012",
+  "condition": "chlamydia",
+  "status": "positive",
+  "testDate": "2026-01-28",
+  "reportedAt": "2026-01-30T10:00:00Z"
 }
 ```
 
@@ -102,7 +98,7 @@ Reporting a positive status will trigger exposure calculations for connected use
 Mark a condition as cleared (for curable STIs).
 
 ```
-POST /api/health/{id}/clear
+POST /api/health-status/{id}/clear
 ```
 
 ### Request Body
@@ -117,13 +113,11 @@ POST /api/health/{id}/clear
 
 ```json
 {
-  "data": {
-    "id": "550e8400-e29b-41d4-a716-446655440012",
-    "condition": "chlamydia",
-    "status": "positive",
-    "testDate": "2026-01-28",
-    "clearedAt": "2026-01-30T00:00:00Z"
-  }
+  "id": "550e8400-e29b-41d4-a716-446655440012",
+  "condition": "chlamydia",
+  "status": "positive",
+  "testDate": "2026-01-28",
+  "clearedAt": "2026-01-30T00:00:00Z"
 }
 ```
 
@@ -136,15 +130,11 @@ Cleared statuses are marked as "resolved" in partners' exposure alerts. Historic
 Delete a health status record.
 
 ```
-DELETE /api/health/{id}
+DELETE /api/health-status/{id}
 ```
 
 ### Response
 
-```json
-{
-  "data": {
-    "message": "Health status deleted"
-  }
-}
+```
+204 No Content
 ```

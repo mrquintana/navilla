@@ -19,29 +19,27 @@ GET /api/exposures
 
 ```json
 {
-  "data": {
-    "connectionCount": 5,
-    "secondDegreeCount": 12,
-    "thirdDegreeCount": 28,
-    "exposures": [
-      {
-        "condition": "hiv",
-        "count": 1,
-        "closestDegree": 2,
-        "timeframe": "recent",
-        "status": "active"
-      },
-      {
-        "condition": "chlamydia",
-        "count": 2,
-        "closestDegree": 1,
-        "timeframe": "older",
-        "status": "resolved"
-      }
-    ],
-    "computedAt": "2026-01-28T00:00:00Z",
-    "nextUpdateAt": "2026-02-04T00:00:00Z"
-  }
+  "connectionCount": 5,
+  "secondDegreeCount": 12,
+  "thirdDegreeCount": 28,
+  "exposures": [
+    {
+      "condition": "hiv",
+      "count": 1,
+      "closestDegree": 2,
+      "timeframe": "recent",
+      "status": "active"
+    },
+    {
+      "condition": "chlamydia",
+      "count": 2,
+      "closestDegree": 1,
+      "timeframe": "older",
+      "status": "resolved"
+    }
+  ],
+  "computedAt": "2026-01-28T00:00:00Z",
+  "nextUpdateAt": "2026-02-04T00:00:00Z"
 }
 ```
 
@@ -49,16 +47,18 @@ GET /api/exposures
 
 ```json
 {
-  "data": {
-    "connectionCount": 2,
-    "message": "Add more connections for exposure insights",
-    "recommendation": "Consider regular STI testing every 3-6 months"
-  }
+  "connectionCount": 2,
+  "message": "exposure.message.insufficientConnections",
+  "recommendation": "exposure.message.recommendation"
 }
 ```
 
 :::note Minimum Threshold
 Users with fewer than 3 confirmed connections do not receive specific exposure information to prevent inference attacks.
+:::
+
+:::note Configurable Depth
+Exposure calculations default to 3 degrees of separation, but can be increased via configuration for future iterations.
 :::
 
 ## Exposure Fields
