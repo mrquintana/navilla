@@ -2,12 +2,31 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../hooks/useAuth';
 import { useUser } from '../../hooks/useUser';
-import { Bell, HeartPulse, LayoutDashboard, Users } from 'lucide-react';
+import { Bell, ChevronDown, HeartPulse, LayoutDashboard, LogOut, UserCircle2, Users } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 export function Header() {
   const { t } = useTranslation();
-  const { session } = useAuth();
+  const { session, signOut } = useAuth();
   const { data: profile } = useUser();
   const avatarThumb = profile?.avatarThumbUrl || profile?.avatarUrl;
+  const profileLabel = profile?.username
+    ? `(@${profile.username})`
+    : profile?.email
+      ? `(${profile.email})`
+      : '';
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const handleClick = (event: MouseEvent) => {
+      if (!menuRef.current) return;
+      if (!menuRef.current.contains(event.target as Node)) {
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
 
   return (
     <header className="navbar border-b border-border-light">
@@ -51,19 +70,46 @@ export function Header() {
                 <Bell className="nav-icon" aria-hidden="true" />
                 {t('nav.notifications')}
               </Link>
-              <Link
-                to="/profile"
-                className="hidden sm:inline-flex nav-link"
-              >
-                <span className="nav-avatar">
-                  {avatarThumb ? (
-                    <img src={avatarThumb} alt={t('profile.avatarAlt')} />
-                  ) : (
-                    <span className="nav-avatar-fallback" aria-hidden="true" />
-                  )}
-                </span>
-                {t('nav.profile')}
-              </Link>
+              <div className="hidden sm:inline-flex nav-menu" ref={menuRef}>
+                <button
+                  className="nav-link"
+                  type="button"
+                  onClick={() => setMenuOpen((open) => !open)}
+                  aria-expanded={menuOpen}
+                  aria-haspopup="menu"
+                >
+                  <span className="nav-avatar">
+                    {avatarThumb ? (
+                      <img src={avatarThumb} alt={t('profile.avatarAlt')} />
+                    ) : (
+                      <span className="nav-avatar-fallback" aria-hidden="true" />
+                    )}
+                  </span>
+                  {t('nav.profile')}
+                  {profileLabel && <span className="nav-username">{profileLabel}</span>}
+                  <ChevronDown className="nav-icon" aria-hidden="true" />
+                </button>
+                {menuOpen && (
+                  <div className="nav-dropdown" role="menu">
+                    <Link to="/profile" className="nav-dropdown-item" role="menuitem">
+                      <UserCircle2 className="nav-icon" aria-hidden="true" />
+                      {t('nav.profile')}
+                    </Link>
+                    <button
+                      type="button"
+                      className="nav-dropdown-item"
+                      onClick={() => {
+                        setMenuOpen(false);
+                        signOut();
+                      }}
+                      role="menuitem"
+                    >
+                      <LogOut className="nav-icon" aria-hidden="true" />
+                      {t('auth.signOut')}
+                    </button>
+                  </div>
+                )}
+              </div>
             </>
           ) : (
             <>
