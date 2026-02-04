@@ -51,6 +51,7 @@ const sidebars: SidebarsConfig = {
       items: [
         'development/contributing',
         'development/code-style',
+        'development/dev-tools',
         'development/testing',
         'development/deployment',
       ],
@@ -71,6 +72,9 @@ const sidebars: SidebarsConfig = {
         'adrs/index',
         'adrs/adr-001-documentation-platform',
         'adrs/adr-002-tech-stack',
+        'adrs/adr-005-design-system',
+        'adrs/adr-006-auth-email-confirmation',
+        'adrs/adr-007-icon-set',
       ],
     },
   ],

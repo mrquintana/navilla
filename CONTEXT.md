@@ -129,6 +129,17 @@ A detailed breakdown of the project's directory layout and key files can be foun
   - `database/seeds/dev-7-users-revert.sql`
 - ⚠️ Pending Incoming UI shows a UUID instead of name/username/avatar. Needs UI + API support to show requester profile data.
 - ⚠️ Notifications and Pending Incoming require manual refresh; add lightweight polling.
+- ✅ E2E tests reset to a minimal smoke suite; legacy specs removed.
+- ✅ Added `VITE_E2E_MODE` to use in-app auth/API mocks for stable CI and fast smoke tests.
+- ✅ New smoke coverage: homepage load, signup step 1 → step 2, login → dashboard, logout.
+- ✅ Dev-only tooling:
+  - `POST /api/exposures/recompute` for forcing exposure snapshot recompute.
+  - `GET /api/dev/users/hash?username=...|email=...` to retrieve user hashes.
+  - `GET /api/dev/exposures/inspect?username=...|email=...` to inspect exposure graph and results.
+  - Guarded by `NAVILLA_DEV_MODE=true` / `navilla.dev-mode` (default false).
+- 📝 TODO: Decide between hard-delete vs soft-delete for connections.
+  - Soft-delete benefits: auditability, undo, analytics, explainable exposure history.
+  - Hard-delete benefits: simpler logic, stronger privacy, cleaner graph.
 - **Status:** Accepted
 - **Decision:** Use Docusaurus
 - **Full details:** `docs/docs/adrs/adr-001-documentation-platform.md`

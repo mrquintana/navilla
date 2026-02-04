@@ -44,3 +44,4 @@ Users can see statistics about their exposure risk (degrees of separation, poten
 - [Setup Guide](./setup) - Get your development environment running
 - [Architecture Overview](../architecture/overview) - Understand the system design
 - [API Reference](../api/overview) - Explore the API endpoints
+- [Dev Tools](../development/dev-tools) - Dev-only endpoints and UI helpers
