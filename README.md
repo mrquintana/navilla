@@ -1,7 +1,7 @@
 # Navilla
 
-[![CI](https://github.com/your-org/navilla/actions/workflows/ci.yml/badge.svg)](https://github.com/your-org/navilla/actions/workflows/ci.yml)
-[![Security](https://github.com/your-org/navilla/actions/workflows/security.yml/badge.svg)](https://github.com/your-org/navilla/actions/workflows/security.yml)
+[![CI](https://github.com/mrquintana/navilla/actions/workflows/ci.yml/badge.svg)](https://github.com/mrquintana/navilla/actions/workflows/ci.yml)
+[![Security](https://github.com/mrquintana/navilla/actions/workflows/security.yml/badge.svg)](https://github.com/mrquintana/navilla/actions/workflows/security.yml)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
 A privacy-preserving sexual health platform that helps users understand their potential STI exposure through an anonymized connection network.
