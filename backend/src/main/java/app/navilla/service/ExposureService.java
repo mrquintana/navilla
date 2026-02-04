@@ -24,7 +24,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+import app.navilla.dto.ExposureDebugResponse;
 import app.navilla.dto.ExposureItem;
 import app.navilla.dto.ExposureResponse;
 import app.navilla.entity.Connection;
@@ -73,6 +75,51 @@ public class ExposureService {
       return decodeSnapshot(snapshot);
     }
 
+    ExposureResponse response = computeExposureSnapshot(userHash);
+    persistSnapshot(userHash, response);
+    return response;
+  }
+
+  /**
+   * Computes a debug view of exposure data without relying on cached snapshots.
+   *
+   * @param userHash hashed user identifier
+   * @return debug exposure response
+   */
+  @Transactional(readOnly = true)
+  public ExposureDebugResponse getExposureDebug(String userHash) {
+    Map<String, Set<String>> graph = buildConnectionGraph();
+    Map<String, Integer> degrees = computeDegrees(graph, userHash, maxDepth);
+    ExposureResponse response = computeExposureSnapshot(userHash);
+
+    List<String> firstDegree = degreeHashes(degrees, 1);
+    List<String> secondDegree = degreeHashes(degrees, 2);
+    List<String> thirdDegree = degreeHashes(degrees, 3);
+
+    return new ExposureDebugResponse(
+        userHash,
+        firstDegree.size(),
+        secondDegree.size(),
+        thirdDegree.size(),
+        firstDegree,
+        secondDegree,
+        thirdDegree,
+        response.exposures(),
+        response.message(),
+        response.recommendation(),
+        OffsetDateTime.now()
+    );
+  }
+
+  /**
+   * Forces recomputation of the exposure snapshot for the authenticated user.
+   *
+   * @param jwt the JWT token containing user info
+   * @return a newly computed exposure snapshot
+   */
+  @Transactional
+  public ExposureResponse recomputeExposureSnapshot(Jwt jwt) {
+    String userHash = encryptionService.hashEmail(jwt.getClaimAsString("email"));
     ExposureResponse response = computeExposureSnapshot(userHash);
     persistSnapshot(userHash, response);
     return response;
@@ -155,6 +202,14 @@ public class ExposureService {
         null,
         null
     );
+  }
+
+  private List<String> degreeHashes(Map<String, Integer> degrees, int depth) {
+    return degrees.entrySet().stream()
+        .filter(entry -> entry.getValue() == depth)
+        .map(Map.Entry::getKey)
+        .sorted()
+        .collect(Collectors.toList());
   }
 
   private Map<String, Set<String>> buildConnectionGraph() {

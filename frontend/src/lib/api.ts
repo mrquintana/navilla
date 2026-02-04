@@ -195,6 +195,10 @@ export const api = {
   exposures: {
     get: (token: string) =>
       apiRequest<ExposureSnapshot>('/api/exposures', token),
+    recompute: (token: string) =>
+      apiRequest<ExposureSnapshot>('/api/exposures/recompute', token, {
+        method: 'POST',
+      }),
   },
 };
 
@@ -241,6 +245,9 @@ export interface Connection {
   isRequester: boolean;
   requestedAt: string;
   confirmedAt?: string | null;
+  partnerDisplayName?: string | null;
+  partnerUsername?: string | null;
+  partnerAvatarThumbUrl?: string | null;
 }
 
 export interface ConnectionRequestResponse {

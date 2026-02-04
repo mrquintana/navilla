@@ -53,3 +53,4 @@ navilla:
     batch-day: MONDAY  # More frequent for testing
     batch-hour: 10
     random-delay-hours: 1
+  dev-mode: true

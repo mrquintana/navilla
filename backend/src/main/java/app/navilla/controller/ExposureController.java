@@ -19,10 +19,13 @@ package app.navilla.controller;
 import app.navilla.dto.ExposureResponse;
 import app.navilla.service.ExposureService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -33,9 +36,27 @@ public class ExposureController {
 
   private final ExposureService exposureService;
 
+  @Value("${navilla.dev-mode:false}")
+  private boolean devMode;
+
   @GetMapping
   public ResponseEntity<ExposureResponse> getExposureSnapshot(
       @AuthenticationPrincipal Jwt jwt) {
     return ResponseEntity.ok(exposureService.getExposureSnapshot(jwt));
+  }
+
+  /**
+   * Dev-only endpoint to recompute exposure snapshots immediately.
+   *
+   * @param jwt authenticated user token
+   * @return recomputed exposure snapshot
+   */
+  @PostMapping("/recompute")
+  public ResponseEntity<ExposureResponse> recomputeExposureSnapshot(
+      @AuthenticationPrincipal Jwt jwt) {
+    if (!devMode) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+    return ResponseEntity.ok(exposureService.recomputeExposureSnapshot(jwt));
   }
 }

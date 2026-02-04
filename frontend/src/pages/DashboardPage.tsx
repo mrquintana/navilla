@@ -1,12 +1,18 @@
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
 import { useUser } from '../hooks/useUser';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { api } from '../lib/api';
 import { Link } from 'react-router-dom';
+import { DEV_MODE } from '../lib/devMode';
+import { Eye, EyeOff, HelpCircle } from 'lucide-react';
+import { useState } from 'react';
+import { getConditionInfo } from '../lib/conditionInfo';
 
 export function DashboardPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const [showStatus, setShowStatus] = useState(true);
+  const [showExposureHelp, setShowExposureHelp] = useState(false);
   const { user, session } = useAuth();
   const { data: profile, isLoading, error } = useUser();
   const token = session?.access_token ?? '';
@@ -23,8 +29,42 @@ export function DashboardPage() {
     enabled: !!token,
   });
 
+  const healthQuery = useQuery({
+    queryKey: ['health', 'list'],
+    queryFn: () => api.health.list(token),
+    enabled: !!token,
+  });
+
+  const hasPositiveStatus = (healthQuery.data ?? []).some(
+    (status) => status.status === 'positive' && !status.clearedAt
+  );
+
+  const recomputeMutation = useMutation({
+    mutationFn: () => api.exposures.recompute(token),
+    onSuccess: (data) => {
+      exposureQuery.refetch();
+      if (DEV_MODE) {
+        const exposureCount = data.exposures?.length ?? 0;
+        console.info('[dev] Exposure recompute', {
+          connectionCount: data.connectionCount,
+          secondDegreeCount: data.secondDegreeCount,
+          thirdDegreeCount: data.thirdDegreeCount,
+          exposureCount,
+        });
+      }
+    },
+  });
+
   // Get display name or first part of email
   const displayName = profile?.displayName || user?.email?.split('@')[0] || '';
+
+  const formatDegree = (degree: number) => {
+    if (i18n.language.startsWith('es')) {
+      return `${degree}º`;
+    }
+    const suffix = degree === 1 ? 'st' : degree === 2 ? 'nd' : degree === 3 ? 'rd' : 'th';
+    return `${degree}${suffix}`;
+  };
 
   return (
     <div className="container py-8">
@@ -41,23 +81,133 @@ export function DashboardPage() {
         {/* Status Card - Most Important */}
         <div className="card card-elevated">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
-              <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div
+              className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                hasPositiveStatus ? 'bg-red-100' : 'bg-green-100'
+              }`}
+            >
+              <svg
+                className={`w-5 h-5 ${hasPositiveStatus ? 'text-red-600' : 'text-green-600'}`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <h3 className="font-semibold">{t('dashboard.exposureStatus')}</h3>
+            <div className="flex items-center gap-2">
+              <h3 className="font-semibold">{t('dashboard.exposureStatus')}</h3>
+              <button
+                type="button"
+                className="btn btn-secondary btn-sm"
+                onClick={() => setShowStatus((prev) => !prev)}
+                title={showStatus ? t('dashboard.hideStatus') : t('dashboard.showStatus')}
+              >
+                {showStatus ? (
+                  <EyeOff className="nav-icon" aria-hidden="true" />
+                ) : (
+                  <Eye className="nav-icon" aria-hidden="true" />
+                )}
+              </button>
+            </div>
           </div>
-          {exposureQuery.data?.message ? (
+          {!showStatus ? (
+            <span className="badge badge-warning text-sm">{t('dashboard.statusHidden')}</span>
+          ) : healthQuery.isLoading || exposureQuery.isLoading ? (
+            <span className="badge badge-warning text-sm">{t('common.loading')}</span>
+          ) : hasPositiveStatus ? (
+            <span className="badge badge-error text-sm">{t('dashboard.selfPositive')}</span>
+          ) : (exposureQuery.data?.exposures?.length ?? 0) > 0 ? (
+            <div className="flex items-center gap-2">
+              <span className="badge badge-warning text-sm">{t('dashboard.potentialExposure')}</span>
+              <button
+                type="button"
+                className="btn btn-secondary btn-sm"
+                onClick={() => setShowExposureHelp((prev) => !prev)}
+                title={t('dashboard.exposureHelpTitle')}
+              >
+                <HelpCircle className="nav-icon" aria-hidden="true" />
+              </button>
+            </div>
+          ) : exposureQuery.data?.message ? (
             <span className="badge badge-warning text-sm">{t(exposureQuery.data.message)}</span>
           ) : (
             <span className="badge badge-success text-sm">{t('dashboard.noExposure')}</span>
           )}
-          <div className="mt-3">
+          {showExposureHelp && (
+            <div className="mt-3 rounded-md border border-border-light bg-white/70 p-3 text-xs text-muted">
+              <p className="font-semibold text-foreground mb-1">{t('dashboard.exposureHelpTitle')}</p>
+              <p>{t('dashboard.exposureHelpBody')}</p>
+            </div>
+          )}
+          {showStatus && (exposureQuery.data?.exposures?.length ?? 0) > 0 && (
+            <div className="mt-3 space-y-2 text-sm">
+              <p className="text-xs text-muted">{t('dashboard.exposureSummary')}</p>
+              <div className="space-y-2">
+                {exposureQuery.data?.exposures?.slice(0, 3).map((item) => {
+                  const info = getConditionInfo(item.condition, i18n.language);
+                  return (
+                    <div
+                      key={item.condition}
+                      className="rounded-md border border-border-light bg-white/70 px-3 py-3"
+                    >
+                      <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-wide text-foreground">
+                        <span>{item.condition}</span>
+                        <a
+                          className="text-xs text-primary font-medium normal-case"
+                          href={info.url}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          {t('common.moreInfo')}
+                        </a>
+                      </div>
+                      <div className="mt-2 grid gap-2 text-xs sm:grid-cols-3">
+                        <div className="space-y-1">
+                          <div className="text-muted">{t('dashboard.exposureLabelDegree')}</div>
+                          <div className="font-medium">{formatDegree(item.closestDegree)}</div>
+                        </div>
+                        <div className="space-y-1">
+                          <div className="text-muted">{t('dashboard.exposureLabelCount')}</div>
+                          <div className="font-medium">{item.count}</div>
+                        </div>
+                        <div className="space-y-1">
+                          <div className="text-muted">{t('dashboard.exposureLabelStatus')}</div>
+                          <div className="font-medium">
+                            {t(`dashboard.exposureStatusLabels.${item.status}`)} · {t(`dashboard.exposureTimeframe.${item.timeframe}`)}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+          <div className="mt-3 flex flex-wrap items-center gap-3">
             <Link to="/health" className="text-sm text-primary font-medium">
               {t('dashboard.viewHealthStatus')}
             </Link>
+            {DEV_MODE && (
+              <button
+                className="btn btn-secondary btn-sm"
+                type="button"
+                onClick={() => recomputeMutation.mutate()}
+                disabled={recomputeMutation.isPending}
+              >
+                {recomputeMutation.isPending ? t('common.loading') : t('dashboard.recomputeExposure')}
+              </button>
+            )}
           </div>
+          {DEV_MODE && (
+            <div className="mt-4 rounded-md border border-red-200 bg-red-50 p-3 text-xs text-red-700">
+              <div className="font-semibold mb-1">{t('dashboard.devExposureDebug')}</div>
+              <div>{t('dashboard.devConnectionCount')}: {exposureQuery.data?.connectionCount ?? '—'}</div>
+              <div>{t('dashboard.devSecondDegree')}: {exposureQuery.data?.secondDegreeCount ?? '—'}</div>
+              <div>{t('dashboard.devThirdDegree')}: {exposureQuery.data?.thirdDegreeCount ?? '—'}</div>
+              <div>{t('dashboard.devExposureCount')}: {exposureQuery.data?.exposures?.length ?? 0}</div>
+            </div>
+          )}
         </div>
 
         {/* Connections Card */}
