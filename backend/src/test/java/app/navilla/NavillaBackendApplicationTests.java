@@ -19,6 +19,7 @@ package app.navilla;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 /**
  * Integration tests for the Navilla Backend Application.
@@ -31,6 +32,7 @@ import org.springframework.boot.test.context.SpringBootTest;
  * @since 2026-01-30
  */
 @SpringBootTest
+@ActiveProfiles("test")
 class NavillaBackendApplicationTests {
 
   /**

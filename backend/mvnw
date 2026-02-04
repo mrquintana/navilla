@@ -39,6 +39,11 @@ CYGWIN* | MINGW*)
   [ -z "${JAVA_HOME-}" ] || JAVA_HOME="$(cygpath --unix "$JAVA_HOME")"
   native_path() { cygpath --path --windows "$1"; }
   ;;
+Darwin*)
+  if [ -z "${JAVA_HOME-}" ] && [ -x "/usr/libexec/java_home" ]; then
+    JAVA_HOME="$(/usr/libexec/java_home -v 25 2>/dev/null || true)"
+  fi
+  ;;
 esac
 
 # set JAVACMD and JAVACCMD

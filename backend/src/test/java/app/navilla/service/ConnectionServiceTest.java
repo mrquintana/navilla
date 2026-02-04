@@ -34,6 +34,8 @@ import app.navilla.dto.ConnectionStatsResponse;
 import app.navilla.dto.CreateConnectionRequest;
 import app.navilla.entity.Connection;
 import app.navilla.entity.ConnectionStatus;
+import app.navilla.entity.ProfileVisibility;
+import app.navilla.entity.User;
 import app.navilla.exception.ResourceNotFoundException;
 import app.navilla.repository.ConnectionRepository;
 import app.navilla.repository.UserRepository;
@@ -68,6 +70,9 @@ class ConnectionServiceTest {
   private EncryptionService encryptionService;
 
   @Mock
+  private NotificationService notificationService;
+
+  @Mock
   private Jwt jwt;
 
   @InjectMocks
@@ -93,7 +98,11 @@ class ConnectionServiceTest {
     @Test
     @DisplayName("should create connection request successfully")
     void shouldCreateConnectionSuccessfully() {
-      when(userRepository.existsByEmailHash(RECIPIENT_HASH)).thenReturn(true);
+      User recipient = User.builder()
+          .emailHash(RECIPIENT_HASH)
+          .profileVisibility(ProfileVisibility.PRIVATE)
+          .build();
+      when(userRepository.findByEmailHash(RECIPIENT_HASH)).thenReturn(Optional.of(recipient));
       when(connectionRepository.existsBetweenUsers(REQUESTER_HASH, RECIPIENT_HASH))
           .thenReturn(false);
       when(connectionRepository.save(any(Connection.class))).thenAnswer(invocation -> {
@@ -104,11 +113,7 @@ class ConnectionServiceTest {
       });
 
       CreateConnectionRequest request = new CreateConnectionRequest(RECIPIENT_EMAIL);
-      ConnectionResponse response = connectionService.createConnection(jwt, request);
-
-      assertThat(response.id()).isEqualTo(CONNECTION_ID);
-      assertThat(response.status()).isEqualTo(ConnectionStatus.PENDING);
-      assertThat(response.isRequester()).isTrue();
+      connectionService.createConnection(jwt, request);
 
       ArgumentCaptor<Connection> captor = ArgumentCaptor.forClass(Connection.class);
       verify(connectionRepository).save(captor.capture());
@@ -120,6 +125,8 @@ class ConnectionServiceTest {
     @DisplayName("should throw exception when connecting to self")
     void shouldThrowExceptionWhenConnectingToSelf() {
       when(encryptionService.hashEmail(REQUESTER_EMAIL)).thenReturn(REQUESTER_HASH);
+      when(userRepository.findByEmailHash(REQUESTER_HASH)).thenReturn(
+          Optional.of(User.builder().emailHash(REQUESTER_HASH).build()));
       CreateConnectionRequest request = new CreateConnectionRequest(REQUESTER_EMAIL);
 
       assertThatThrownBy(() -> connectionService.createConnection(jwt, request))
@@ -130,22 +137,10 @@ class ConnectionServiceTest {
     }
 
     @Test
-    @DisplayName("should throw exception when recipient not found")
-    void shouldThrowExceptionWhenRecipientNotFound() {
-      when(userRepository.existsByEmailHash(RECIPIENT_HASH)).thenReturn(false);
-      CreateConnectionRequest request = new CreateConnectionRequest(RECIPIENT_EMAIL);
-
-      assertThatThrownBy(() -> connectionService.createConnection(jwt, request))
-          .isInstanceOf(ResourceNotFoundException.class)
-          .hasMessage("connection.error.recipientNotFound");
-
-      verify(connectionRepository, never()).save(any());
-    }
-
-    @Test
     @DisplayName("should throw exception when connection already exists")
     void shouldThrowExceptionWhenConnectionExists() {
-      when(userRepository.existsByEmailHash(RECIPIENT_HASH)).thenReturn(true);
+      when(userRepository.findByEmailHash(RECIPIENT_HASH)).thenReturn(
+          Optional.of(User.builder().emailHash(RECIPIENT_HASH).build()));
       when(connectionRepository.existsBetweenUsers(REQUESTER_HASH, RECIPIENT_HASH))
           .thenReturn(true);
       CreateConnectionRequest request = new CreateConnectionRequest(RECIPIENT_EMAIL);
@@ -153,6 +148,17 @@ class ConnectionServiceTest {
       assertThatThrownBy(() -> connectionService.createConnection(jwt, request))
           .isInstanceOf(IllegalStateException.class)
           .hasMessage("connection.error.alreadyExists");
+
+      verify(connectionRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("should not create connection for unknown recipient")
+    void shouldIgnoreUnknownRecipient() {
+      when(userRepository.findByEmailHash(RECIPIENT_HASH)).thenReturn(Optional.empty());
+      CreateConnectionRequest request = new CreateConnectionRequest(RECIPIENT_EMAIL);
+
+      connectionService.createConnection(jwt, request);
 
       verify(connectionRepository, never()).save(any());
     }
@@ -347,9 +353,27 @@ class ConnectionServiceTest {
           REQUESTER_HASH, ConnectionStatus.PENDING)).thenReturn(3L);
       when(connectionRepository.findByRequesterHashAndStatus(
           REQUESTER_HASH, ConnectionStatus.PENDING)).thenReturn(List.of(
-          Connection.builder().build(),
-          Connection.builder().build()
+          Connection.builder()
+              .requesterHash(REQUESTER_HASH)
+              .recipientHash("recipient-a")
+              .status(ConnectionStatus.PENDING)
+              .requestedAt(OffsetDateTime.now())
+              .build(),
+          Connection.builder()
+              .requesterHash(REQUESTER_HASH)
+              .recipientHash("recipient-b")
+              .status(ConnectionStatus.PENDING)
+              .requestedAt(OffsetDateTime.now())
+              .build()
       ));
+
+      User publicRecipient = User.builder()
+          .profileVisibility(ProfileVisibility.PUBLIC)
+          .build();
+      when(userRepository.findByEmailHash("recipient-a"))
+          .thenReturn(java.util.Optional.of(publicRecipient));
+      when(userRepository.findByEmailHash("recipient-b"))
+          .thenReturn(java.util.Optional.of(publicRecipient));
 
       ConnectionStatsResponse stats = connectionService.getStats(jwt);
 

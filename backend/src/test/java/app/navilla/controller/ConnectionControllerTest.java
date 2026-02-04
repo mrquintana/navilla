@@ -40,7 +40,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,14 +53,7 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
-@TestPropertySource(properties = {
-    "navilla.encryption.pepper=test-pepper-for-unit-tests",
-    "navilla.supabase.url=https://test.supabase.co",
-    "spring.security.oauth2.resourceserver.jwt.jwk-set-uri=https://test.supabase.co/auth/v1/.well-known/jwks.json",
-    "spring.datasource.url=jdbc:h2:mem:testdb",
-    "spring.datasource.driver-class-name=org.h2.Driver",
-    "spring.jpa.hibernate.ddl-auto=create-drop"
-})
+@ActiveProfiles("test")
 class ConnectionControllerTest {
 
   @Autowired
@@ -114,11 +107,9 @@ class ConnectionControllerTest {
                   .subject(USER_A_SUPABASE_ID.toString())
                   .claim("email", USER_A_EMAIL)))
               .contentType(MediaType.APPLICATION_JSON)
-              .content("{\"recipientEmail\": \"" + USER_B_EMAIL + "\"}"))
-          .andExpect(status().isCreated())
-          .andExpect(jsonPath("$.id").exists())
-          .andExpect(jsonPath("$.status").value("PENDING"))
-          .andExpect(jsonPath("$.isRequester").value(true));
+              .content("{\"identifier\": \"" + USER_B_EMAIL + "\"}"))
+          .andExpect(status().isAccepted())
+          .andExpect(jsonPath("$.message").exists());
     }
 
     @Test
@@ -126,20 +117,8 @@ class ConnectionControllerTest {
     void shouldReturnUnauthorizedWithoutAuth() throws Exception {
       mockMvc.perform(post("/api/connections")
               .contentType(MediaType.APPLICATION_JSON)
-              .content("{\"recipientEmail\": \"" + USER_B_EMAIL + "\"}"))
+              .content("{\"identifier\": \"" + USER_B_EMAIL + "\"}"))
           .andExpect(status().isUnauthorized());
-    }
-
-    @Test
-    @DisplayName("should return 400 for invalid email")
-    void shouldReturnBadRequestForInvalidEmail() throws Exception {
-      mockMvc.perform(post("/api/connections")
-              .with(jwt().jwt(builder -> builder
-                  .subject(USER_A_SUPABASE_ID.toString())
-                  .claim("email", USER_A_EMAIL)))
-              .contentType(MediaType.APPLICATION_JSON)
-              .content("{\"recipientEmail\": \"not-an-email\"}"))
-          .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -150,7 +129,7 @@ class ConnectionControllerTest {
                   .subject(USER_A_SUPABASE_ID.toString())
                   .claim("email", USER_A_EMAIL)))
               .contentType(MediaType.APPLICATION_JSON)
-              .content("{\"recipientEmail\": \"" + USER_A_EMAIL + "\"}"))
+              .content("{\"identifier\": \"" + USER_A_EMAIL + "\"}"))
           .andExpect(status().isBadRequest());
     }
 
@@ -170,8 +149,21 @@ class ConnectionControllerTest {
                   .subject(USER_A_SUPABASE_ID.toString())
                   .claim("email", USER_A_EMAIL)))
               .contentType(MediaType.APPLICATION_JSON)
-              .content("{\"recipientEmail\": \"" + USER_B_EMAIL + "\"}"))
+              .content("{\"identifier\": \"" + USER_B_EMAIL + "\"}"))
           .andExpect(status().isConflict());
+    }
+
+    @Test
+    @DisplayName("should not leak recipient existence for unknown identifier")
+    void shouldReturnAcceptedForUnknownRecipient() throws Exception {
+      mockMvc.perform(post("/api/connections")
+              .with(jwt().jwt(builder -> builder
+                  .subject(USER_A_SUPABASE_ID.toString())
+                  .claim("email", USER_A_EMAIL)))
+              .contentType(MediaType.APPLICATION_JSON)
+              .content("{\"identifier\": \"unknown@example.com\"}"))
+          .andExpect(status().isAccepted())
+          .andExpect(jsonPath("$.message").exists());
     }
   }
 

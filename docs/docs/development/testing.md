@@ -66,6 +66,10 @@ class ConnectionControllerIT {
 JaCoCo is currently disabled due to Java 25 compatibility issues. Re-enable it in `pom.xml` when a compatible version is available.
 :::
 
+:::info TODO
+Maven wrapper emits JDK warnings from bundled Guava (`sun.misc.Unsafe`). Consider updating the Maven wrapper distribution when a version removes these warnings.
+:::
+
 ## Frontend Testing
 
 ### Component Tests
