@@ -1,11 +1,13 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../hooks/useAuth';
-import { LanguageSwitcher } from '../LanguageSwitcher';
-
+import { useUser } from '../../hooks/useUser';
+import { Bell, HeartPulse, LayoutDashboard, Users } from 'lucide-react';
 export function Header() {
   const { t } = useTranslation();
-  const { session, signOut } = useAuth();
+  const { session } = useAuth();
+  const { data: profile } = useUser();
+  const avatarThumb = profile?.avatarThumbUrl || profile?.avatarUrl;
 
   return (
     <header className="navbar border-b border-border-light">
@@ -18,52 +20,56 @@ export function Header() {
         </Link>
 
         {/* Navigation */}
-        <nav className="flex items-center gap-2 sm:gap-4">
-          <LanguageSwitcher />
+        <nav className="flex items-center gap-2 sm:gap-3">
           {session ? (
             <>
               <Link
                 to="/dashboard"
-                className="hidden sm:inline-flex px-3 py-2 text-sm font-medium text-foreground-secondary hover:text-primary rounded-lg hover:bg-gray-100 transition-colors"
+                className="hidden sm:inline-flex nav-link"
               >
+                <LayoutDashboard className="nav-icon" aria-hidden="true" />
                 {t('nav.dashboard')}
               </Link>
               <Link
                 to="/connections"
-                className="hidden sm:inline-flex px-3 py-2 text-sm font-medium text-foreground-secondary hover:text-primary rounded-lg hover:bg-gray-100 transition-colors"
+                className="hidden sm:inline-flex nav-link"
               >
+                <Users className="nav-icon" aria-hidden="true" />
                 {t('nav.connections')}
               </Link>
               <Link
                 to="/health"
-                className="hidden sm:inline-flex px-3 py-2 text-sm font-medium text-foreground-secondary hover:text-primary rounded-lg hover:bg-gray-100 transition-colors"
+                className="hidden sm:inline-flex nav-link"
               >
+                <HeartPulse className="nav-icon" aria-hidden="true" />
                 {t('nav.health')}
               </Link>
               <Link
                 to="/notifications"
-                className="hidden sm:inline-flex px-3 py-2 text-sm font-medium text-foreground-secondary hover:text-primary rounded-lg hover:bg-gray-100 transition-colors"
+                className="hidden sm:inline-flex nav-link"
               >
+                <Bell className="nav-icon" aria-hidden="true" />
                 {t('nav.notifications')}
               </Link>
               <Link
                 to="/profile"
-                className="hidden sm:inline-flex px-3 py-2 text-sm font-medium text-foreground-secondary hover:text-primary rounded-lg hover:bg-gray-100 transition-colors"
+                className="hidden sm:inline-flex nav-link"
               >
+                <span className="nav-avatar">
+                  {avatarThumb ? (
+                    <img src={avatarThumb} alt={t('profile.avatarAlt')} />
+                  ) : (
+                    <span className="nav-avatar-fallback" aria-hidden="true" />
+                  )}
+                </span>
                 {t('nav.profile')}
               </Link>
-              <button
-                onClick={() => signOut()}
-                className="px-4 py-2 text-sm font-medium text-foreground-secondary hover:text-error rounded-lg hover:bg-gray-100 transition-colors"
-              >
-                {t('auth.signOut')}
-              </button>
             </>
           ) : (
             <>
               <Link
                 to="/login"
-                className="px-3 py-2 text-sm font-medium text-foreground-secondary hover:text-primary rounded-lg hover:bg-gray-100 transition-colors"
+                className="nav-link"
               >
                 {t('auth.signIn')}
               </Link>

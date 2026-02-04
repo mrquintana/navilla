@@ -12,6 +12,7 @@
     "next": "Siguiente",
     "submit": "Enviar",
     "close": "Cerrar",
+    "open": "Abrir",
     "select": "Seleccionar..."
   },
   "auth": {
@@ -62,7 +63,7 @@
     "health": "Estado de Salud",
     "notifications": "Notificaciones",
     "settings": "Configuración",
-    "profile": "Tu Perfil"
+    "profile": "Perfil"
   },
   "dashboard": {
     "title": "Tu Red",
@@ -74,7 +75,7 @@
     "connectionCount": "Tus Conexiones",
     "connectionDescription": "personas en tu red de confianza",
     "lastUpdated": "Última actualización",
-    "yourProfile": "Sobre Ti",
+    "yourProfile": "Perfil",
     "manageConnections": "Gestionar conexiones",
     "viewHealthStatus": "Ver estado de salud",
     "editProfile": "Editar perfil"
@@ -150,6 +151,7 @@
     "avatar": "Foto de perfil",
     "avatarAlt": "Foto de perfil",
     "noAvatar": "Sin foto",
+    "choosePhoto": "Elegir foto",
     "saved": "Perfil actualizado"
   },
   "exposure": {
@@ -186,5 +188,26 @@
   "privacy": {
     "tagline": "Números, no nombres",
     "description": "Tu privacidad es nuestra prioridad. Nunca compartimos información personal - solo estadísticas anónimas."
+  },
+  "footer": {
+    "product": "Producto",
+    "company": "Compañía",
+    "legal": "Legal",
+    "support": "Soporte",
+    "links": {
+      "howItWorks": "Cómo funciona",
+      "privacy": "Privacidad",
+      "security": "Seguridad",
+      "about": "Acerca de",
+      "contact": "Contacto",
+      "careers": "Carreras",
+      "terms": "Términos",
+      "policy": "Política de privacidad",
+      "cookies": "Política de cookies",
+      "help": "Centro de ayuda",
+      "status": "Estado",
+      "accessibility": "Accesibilidad"
+    },
+    "copyright": "© 2026 Navilla. Todos los derechos reservados."
   }
 }

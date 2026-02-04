@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { api, type UpdateProfileData } from '../lib/api';
+import { api, ApiError, type UpdateProfileData } from '../lib/api';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
 import { useUser } from '../hooks/useUser';
 import { queryClient } from '../queryClient';
+import { LanguageSwitcher } from '../components/LanguageSwitcher';
+import { countries } from '../lib/geolocation';
 
 const AVATAR_BUCKET = 'avatars';
 const AVATAR_SIZE = 512;
@@ -31,9 +33,10 @@ async function resizeImage(file: File, size: number): Promise<Blob> {
 
 export function ProfilePage() {
   const { t } = useTranslation();
-  const { session } = useAuth();
+  const { session, signOut } = useAuth();
   const { data: profile } = useUser();
   const token = session?.access_token ?? '';
+  const authUserId = session?.user?.id;
 
   const [form, setForm] = useState<UpdateProfileData>({
     displayName: '',
@@ -54,6 +57,7 @@ export function ProfilePage() {
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [errorDetails, setErrorDetails] = useState<string[]>([]);
   const isPublic = form.profileVisibility === 'PUBLIC';
 
   useEffect(() => {
@@ -84,20 +88,26 @@ export function ProfilePage() {
     onSuccess: () => {
       setMessage(t('profile.saved'));
       setError(null);
+      setErrorDetails([]);
       queryClient.invalidateQueries({ queryKey: ['user', 'me'] });
     },
     onError: (err: any) => {
-      setError(err.message || t('common.error'));
+      const message = err?.message || t('common.error');
+      const details = err instanceof ApiError && Array.isArray((err.data as any)?.details)
+        ? (err.data as any).details as string[]
+        : [];
+      setError(message);
+      setErrorDetails(details);
       setMessage(null);
     },
   });
 
   const handleAvatarUpload = async (file: File) => {
-    if (!profile) return;
+    if (!profile || !authUserId) return;
     setUploading(true);
     try {
-      const avatarKey = `profiles/${profile.id}/profile.png`;
-      const thumbKey = `profiles/${profile.id}/thumb.png`;
+      const avatarKey = `profiles/${authUserId}/profile.png`;
+      const thumbKey = `profiles/${authUserId}/thumb.png`;
       const [avatarBlob, thumbBlob] = await Promise.all([
         resizeImage(file, AVATAR_SIZE),
         resizeImage(file, AVATAR_THUMB_SIZE),
@@ -129,9 +139,18 @@ export function ProfilePage() {
 
   return (
     <div className="container py-8 space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold mb-2">{t('profile.title')}</h1>
-        <p className="text-muted">{t('profile.subtitle')}</p>
+      <div className="flex items-center gap-4">
+        <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden">
+          {avatarUrl ? (
+            <img src={avatarUrl} alt={t('profile.avatarAlt')} className="w-full h-full object-cover" />
+          ) : (
+            <span className="text-xs text-muted">{t('profile.noAvatar')}</span>
+          )}
+        </div>
+        <div>
+          <h1 className="text-3xl font-bold mb-1">{t('profile.title')}</h1>
+          <p className="text-muted">{t('profile.subtitle')}</p>
+        </div>
       </div>
 
       <div className="card card-elevated">
@@ -145,15 +164,19 @@ export function ProfilePage() {
             )}
           </div>
           <div className="space-y-2">
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) handleAvatarUpload(file);
-              }}
-              disabled={uploading}
-            />
+            <label className="btn btn-secondary btn-sm cursor-pointer">
+              {t('profile.choosePhoto')}
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) handleAvatarUpload(file);
+                }}
+                disabled={uploading}
+                className="sr-only"
+              />
+            </label>
             {uploading && <p className="text-xs text-muted">{t('common.loading')}</p>}
           </div>
         </div>
@@ -244,11 +267,18 @@ export function ProfilePage() {
         <div className="grid gap-4 md:grid-cols-2">
           <div>
             <label className="label">{t('auth.country')}</label>
-            <input
+            <select
               className="input"
               value={form.country ?? ''}
               onChange={(e) => setForm({ ...form, country: e.target.value })}
-            />
+            >
+              <option value="">{t('common.select')}</option>
+              {countries.map((country) => (
+                <option key={country.code} value={country.code}>
+                  {country.name}
+                </option>
+              ))}
+            </select>
           </div>
           <div>
             <label className="label">{t('auth.location')}</label>
@@ -305,12 +335,36 @@ export function ProfilePage() {
         </div>
 
         {message && <div className="alert alert-success">{message}</div>}
-        {error && <div className="alert alert-error">{error}</div>}
+      {error && (
+        <div className="alert alert-error space-y-2">
+          <div>{error}</div>
+          {errorDetails.length > 0 && (
+            <ul className="list-disc list-inside text-sm text-muted">
+              {errorDetails.map((detail) => (
+                <li key={detail}>{detail}</li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
 
         <button className="btn btn-primary" type="submit" disabled={updateMutation.isPending}>
           {updateMutation.isPending ? t('common.loading') : t('common.save')}
         </button>
       </form>
+
+      <div className="card card-elevated space-y-4">
+        <h3 className="font-semibold">{t('settings.title')}</h3>
+        <div>
+          <label className="label">{t('settings.language')}</label>
+          <LanguageSwitcher className="input" />
+        </div>
+        <div className="pt-2">
+          <button className="btn btn-secondary" onClick={() => signOut()}>
+            {t('auth.signOut')}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

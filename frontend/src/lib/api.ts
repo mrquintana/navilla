@@ -36,11 +36,8 @@ export async function apiRequest<T>(
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));
-    throw new ApiError(
-      error.message || `Request failed with status ${response.status}`,
-      response.status,
-      error
-    );
+    const message = error.message || `Request failed with status ${response.status}`;
+    throw new ApiError(message, response.status, error);
   }
 
   // Handle empty responses (204 No Content)

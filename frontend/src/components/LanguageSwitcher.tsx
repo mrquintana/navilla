@@ -5,7 +5,11 @@ const languages = [
   { code: 'es_MX', label: 'Español' },
 ];
 
-export function LanguageSwitcher() {
+interface LanguageSwitcherProps {
+  className?: string;
+}
+
+export function LanguageSwitcher({ className }: LanguageSwitcherProps) {
   const { i18n } = useTranslation();
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -18,7 +22,7 @@ export function LanguageSwitcher() {
     <select
       value={i18n.language}
       onChange={handleChange}
-      className="text-sm bg-transparent border border-border rounded px-2 py-1 cursor-pointer"
+      className={className ?? 'text-sm bg-transparent border border-border rounded px-2 py-1 cursor-pointer'}
       aria-label="Select language"
     >
       {languages.map((lang) => (
