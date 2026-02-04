@@ -43,4 +43,16 @@ public enum ConnectionStatus {
    * Connection request has expired (no response within time limit).
    */
   EXPIRED
+
+  ;
+
+  /**
+   * Parses a user-facing value into a {@link ConnectionStatus}.
+   *
+   * @param value status value (case-insensitive)
+   * @return matching {@link ConnectionStatus}
+   */
+  public static ConnectionStatus fromValue(String value) {
+    return ConnectionStatus.valueOf(value.toUpperCase());
+  }
 }
