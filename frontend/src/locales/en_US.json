@@ -44,6 +44,7 @@
     "username": "Username",
     "usernameHint": "Letters, numbers, and underscores only",
     "fullName": "Full Name",
+    "displayName": "Display Name",
     "dateOfBirth": "Date of Birth",
     "mustBe18": "You must be 18 or older",
     "sex": "Sex",
@@ -59,6 +60,7 @@
     "dashboard": "Your Network",
     "connections": "Connections",
     "health": "Health Status",
+    "notifications": "Notifications",
     "settings": "Settings",
     "profile": "Your Profile"
   },
@@ -72,26 +74,90 @@
     "connectionCount": "Your Connections",
     "connectionDescription": "people in your trusted network",
     "lastUpdated": "Last updated",
-    "yourProfile": "About You"
+    "yourProfile": "About You",
+    "manageConnections": "Manage connections",
+    "viewHealthStatus": "View health status",
+    "editProfile": "Edit profile"
   },
   "connections": {
     "title": "Connections",
+    "subtitle": "Connect privately without revealing identities",
     "addConnection": "Add Connection",
-    "pendingRequests": "Pending Requests",
+    "identifierPlaceholder": "Email or username",
+    "sendRequest": "Send Request",
+    "requestQueued": "If the user has an account, they will be notified.",
+    "pendingIncoming": "Pending Incoming",
+    "pendingSent": "Pending Sent",
+    "confirmed": "Confirmed Connections",
+    "noPending": "No pending requests",
+    "noPendingSent": "No pending outgoing requests",
+    "noConfirmed": "No confirmed connections yet",
+    "accept": "Accept",
+    "deny": "Deny",
+    "cancel": "Cancel",
     "noConnections": "No connections yet",
     "connectionDate": "Connected on",
     "removeConnection": "Remove Connection",
     "confirmRemove": "Are you sure you want to remove this connection?"
   },
+  "connection": {
+    "success": {
+      "requestQueued": "If the user has an account, they will be notified."
+    }
+  },
   "health": {
     "title": "Health Status",
+    "subtitle": "Update your status to help protect your network",
     "reportStatus": "Report Health Status",
     "currentStatus": "Current Status",
+    "condition": "Condition",
+    "status": "Status",
+    "statusPositive": "Positive",
+    "statusNegative": "Negative",
+    "statusUnknown": "Unknown",
+    "testDate": "Test Date",
+    "noTestDate": "No test date",
+    "clear": "Clear",
+    "noStatus": "No status reported yet",
     "healthy": "Healthy",
     "reportedCondition": "Reported Condition",
     "reportDate": "Report Date",
     "updateStatus": "Update Status",
     "statusUpdated": "Health status updated successfully"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "subtitle": "Updates from your network",
+    "markRead": "Mark read",
+    "empty": "No notifications yet",
+    "connectionRequest": "You have a new connection request",
+    "connectionConfirmed": "Your connection request was accepted",
+    "connectionDenied": "Your connection request was denied",
+    "generic": "You have a new notification"
+  },
+  "profile": {
+    "title": "Profile",
+    "subtitle": "Manage your public profile and privacy preferences",
+    "aboutYou": "About You",
+    "privacy": "Privacy",
+    "visibility": "Profile Visibility",
+    "visibilityPublic": "Public",
+    "visibilityConnections": "Connections Only",
+    "visibilityPrivate": "Private",
+    "displayNamePublic": "Show display name in search results",
+    "searchableByEmail": "Allow email search",
+    "showAge": "Show my age",
+    "age": "{{age}} years old",
+    "avatar": "Profile Photo",
+    "avatarAlt": "Profile photo",
+    "noAvatar": "No photo",
+    "saved": "Profile updated successfully"
+  },
+  "exposure": {
+    "message": {
+      "insufficientConnections": "Add more connections for exposure insights",
+      "recommendation": "Consider regular STI testing every 3-6 months"
+    }
   },
   "settings": {
     "title": "Settings",

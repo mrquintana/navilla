@@ -1,14 +1,30 @@
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
 import { useUser } from '../hooks/useUser';
+import { useQuery } from '@tanstack/react-query';
+import { api } from '../lib/api';
+import { Link } from 'react-router-dom';
 
 export function DashboardPage() {
   const { t } = useTranslation();
-  const { user } = useAuth();
+  const { user, session } = useAuth();
   const { data: profile, isLoading, error } = useUser();
+  const token = session?.access_token ?? '';
+
+  const statsQuery = useQuery({
+    queryKey: ['connections', 'stats'],
+    queryFn: () => api.connections.stats(token),
+    enabled: !!token,
+  });
+
+  const exposureQuery = useQuery({
+    queryKey: ['exposures'],
+    queryFn: () => api.exposures.get(token),
+    enabled: !!token,
+  });
 
   // Get display name or first part of email
-  const displayName = profile?.display_name || user?.email?.split('@')[0] || '';
+  const displayName = profile?.displayName || user?.email?.split('@')[0] || '';
 
   return (
     <div className="container py-8">
@@ -32,7 +48,16 @@ export function DashboardPage() {
             </div>
             <h3 className="font-semibold">{t('dashboard.exposureStatus')}</h3>
           </div>
-          <span className="badge badge-success text-sm">{t('dashboard.noExposure')}</span>
+          {exposureQuery.data?.message ? (
+            <span className="badge badge-warning text-sm">{t(exposureQuery.data.message)}</span>
+          ) : (
+            <span className="badge badge-success text-sm">{t('dashboard.noExposure')}</span>
+          )}
+          <div className="mt-3">
+            <Link to="/health" className="text-sm text-primary font-medium">
+              {t('dashboard.viewHealthStatus')}
+            </Link>
+          </div>
         </div>
 
         {/* Connections Card */}
@@ -45,8 +70,15 @@ export function DashboardPage() {
             </div>
             <h3 className="font-semibold">{t('dashboard.connectionCount')}</h3>
           </div>
-          <p className="text-4xl font-bold text-primary mb-1">0</p>
+          <p className="text-4xl font-bold text-primary mb-1">
+            {statsQuery.data?.confirmedCount ?? 0}
+          </p>
           <p className="text-sm text-muted">{t('dashboard.connectionDescription')}</p>
+          <div className="mt-3">
+            <Link to="/connections" className="text-sm text-primary font-medium">
+              {t('dashboard.manageConnections')}
+            </Link>
+          </div>
         </div>
 
         {/* Profile Card */}
@@ -66,9 +98,25 @@ export function DashboardPage() {
           ) : profile ? (
             <div className="space-y-2 text-sm">
               <p className="text-muted truncate">{profile.email}</p>
-              {profile.display_name && (
-                <p className="font-medium">{profile.display_name}</p>
+              {profile.displayName && (
+                <p className="font-medium">{profile.displayName}</p>
               )}
+              {profile.username && (
+                <p className="text-muted text-xs">@{profile.username}</p>
+              )}
+              {profile.showAge && profile.age !== undefined && (
+                <p className="text-muted text-xs">{t('profile.age', { age: profile.age })}</p>
+              )}
+              {(profile.country || profile.location) && (
+                <p className="text-muted text-xs">
+                  {[profile.location, profile.country].filter(Boolean).join(', ')}
+                </p>
+              )}
+              <div className="pt-2">
+                <Link to="/profile" className="text-sm text-primary font-medium">
+                  {t('dashboard.editProfile')}
+                </Link>
+              </div>
             </div>
           ) : (
             <p className="text-muted">—</p>

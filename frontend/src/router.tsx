@@ -8,6 +8,10 @@ import { SignUpPage } from './pages/SignUpPage';
 import { ForgotPasswordPage } from './pages/ForgotPasswordPage';
 import { ResetPasswordPage } from './pages/ResetPasswordPage';
 import { DashboardPage } from './pages/DashboardPage';
+import { ConnectionsPage } from './pages/ConnectionsPage';
+import { ProfilePage } from './pages/ProfilePage';
+import { HealthStatusPage } from './pages/HealthStatusPage';
+import { NotificationsPage } from './pages/NotificationsPage';
 
 export const router = createBrowserRouter([
   {
@@ -23,6 +27,38 @@ export const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <DashboardPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'connections',
+        element: (
+          <ProtectedRoute>
+            <ConnectionsPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'profile',
+        element: (
+          <ProtectedRoute>
+            <ProfilePage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'health',
+        element: (
+          <ProtectedRoute>
+            <HealthStatusPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'notifications',
+        element: (
+          <ProtectedRoute>
+            <NotificationsPage />
           </ProtectedRoute>
         ),
       },

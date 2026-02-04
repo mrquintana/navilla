@@ -117,8 +117,8 @@ export function SignUpPage() {
 
     const metadata: UserMetadata = {
       username,
-      full_name: fullName || undefined,
-      date_of_birth: dateOfBirth,
+      fullName: fullName || undefined,
+      dateOfBirth: dateOfBirth,
       sex: sex as Sex,
       country: country || undefined,
       location: location || undefined,

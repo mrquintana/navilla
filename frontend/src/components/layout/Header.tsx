@@ -28,6 +28,30 @@ export function Header() {
               >
                 {t('nav.dashboard')}
               </Link>
+              <Link
+                to="/connections"
+                className="hidden sm:inline-flex px-3 py-2 text-sm font-medium text-foreground-secondary hover:text-primary rounded-lg hover:bg-gray-100 transition-colors"
+              >
+                {t('nav.connections')}
+              </Link>
+              <Link
+                to="/health"
+                className="hidden sm:inline-flex px-3 py-2 text-sm font-medium text-foreground-secondary hover:text-primary rounded-lg hover:bg-gray-100 transition-colors"
+              >
+                {t('nav.health')}
+              </Link>
+              <Link
+                to="/notifications"
+                className="hidden sm:inline-flex px-3 py-2 text-sm font-medium text-foreground-secondary hover:text-primary rounded-lg hover:bg-gray-100 transition-colors"
+              >
+                {t('nav.notifications')}
+              </Link>
+              <Link
+                to="/profile"
+                className="hidden sm:inline-flex px-3 py-2 text-sm font-medium text-foreground-secondary hover:text-primary rounded-lg hover:bg-gray-100 transition-colors"
+              >
+                {t('nav.profile')}
+              </Link>
               <button
                 onClick={() => signOut()}
                 className="px-4 py-2 text-sm font-medium text-foreground-secondary hover:text-error rounded-lg hover:bg-gray-100 transition-colors"

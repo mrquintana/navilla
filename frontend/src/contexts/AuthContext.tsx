@@ -1,11 +1,12 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import type { Session, User, AuthError } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
+import { api } from '../lib/api';
 
 export interface UserMetadata {
   username: string;
-  full_name?: string;
-  date_of_birth: string;
+  fullName?: string;
+  dateOfBirth: string;
   sex: 'male' | 'female' | 'other';
   country?: string;
   location?: string;
@@ -56,6 +57,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
     // If user is auto-confirmed (no email verification required), session will exist
     const needsEmailConfirmation = !error && !data.session;
+    if (!error && data.session) {
+      try {
+        await api.users.update(data.session.access_token, {
+          displayName: metadata.fullName ?? metadata.username,
+          fullName: metadata.fullName,
+          username: metadata.username,
+          sex: metadata.sex,
+          dateOfBirth: metadata.dateOfBirth,
+          country: metadata.country,
+          location: metadata.location,
+        });
+      } catch {
+        // Avoid blocking signup if profile sync fails
+      }
+    }
     return { error, needsEmailConfirmation };
   };
 

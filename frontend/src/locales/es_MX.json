@@ -44,6 +44,7 @@
     "username": "Nombre de Usuario",
     "usernameHint": "Solo letras, números y guiones bajos",
     "fullName": "Nombre Completo",
+    "displayName": "Nombre para Mostrar",
     "dateOfBirth": "Fecha de Nacimiento",
     "mustBe18": "Debes tener 18 años o más",
     "sex": "Sexo",
@@ -59,6 +60,7 @@
     "dashboard": "Tu Red",
     "connections": "Conexiones",
     "health": "Estado de Salud",
+    "notifications": "Notificaciones",
     "settings": "Configuración",
     "profile": "Tu Perfil"
   },
@@ -72,26 +74,89 @@
     "connectionCount": "Tus Conexiones",
     "connectionDescription": "personas en tu red de confianza",
     "lastUpdated": "Última actualización",
-    "yourProfile": "Sobre Ti"
+    "yourProfile": "Sobre Ti",
+    "manageConnections": "Gestionar conexiones",
+    "viewHealthStatus": "Ver estado de salud",
+    "editProfile": "Editar perfil"
   },
   "connections": {
     "title": "Conexiones",
+    "subtitle": "Conecta de forma privada sin revelar identidades",
     "addConnection": "Agregar Conexión",
-    "pendingRequests": "Solicitudes Pendientes",
+    "identifierPlaceholder": "Correo o usuario",
+    "sendRequest": "Enviar solicitud",
+    "pendingIncoming": "Solicitudes recibidas",
+    "pendingSent": "Solicitudes enviadas",
+    "confirmed": "Conexiones confirmadas",
+    "noPending": "No hay solicitudes pendientes",
+    "noPendingSent": "No hay solicitudes enviadas",
+    "noConfirmed": "Aún no hay conexiones confirmadas",
+    "accept": "Aceptar",
+    "deny": "Rechazar",
+    "cancel": "Cancelar",
     "noConnections": "Aún no hay conexiones",
     "connectionDate": "Conectado el",
     "removeConnection": "Eliminar Conexión",
     "confirmRemove": "¿Estás seguro de que deseas eliminar esta conexión?"
   },
+  "connection": {
+    "success": {
+      "requestQueued": "Si el usuario tiene cuenta, será notificado."
+    }
+  },
   "health": {
     "title": "Estado de Salud",
+    "subtitle": "Actualiza tu estado para proteger a tu red",
     "reportStatus": "Reportar Estado de Salud",
     "currentStatus": "Estado Actual",
+    "condition": "Condición",
+    "status": "Estado",
+    "statusPositive": "Positivo",
+    "statusNegative": "Negativo",
+    "statusUnknown": "Desconocido",
+    "testDate": "Fecha de prueba",
+    "noTestDate": "Sin fecha",
+    "clear": "Limpiar",
+    "noStatus": "Aún no has reportado estado",
     "healthy": "Saludable",
     "reportedCondition": "Condición Reportada",
     "reportDate": "Fecha del Reporte",
     "updateStatus": "Actualizar Estado",
     "statusUpdated": "Estado de salud actualizado exitosamente"
+  },
+  "notifications": {
+    "title": "Notificaciones",
+    "subtitle": "Actualizaciones de tu red",
+    "markRead": "Marcar como leído",
+    "empty": "No hay notificaciones",
+    "connectionRequest": "Tienes una nueva solicitud de conexión",
+    "connectionConfirmed": "Tu solicitud fue aceptada",
+    "connectionDenied": "Tu solicitud fue rechazada",
+    "generic": "Tienes una nueva notificación"
+  },
+  "profile": {
+    "title": "Perfil",
+    "subtitle": "Gestiona tu perfil público y privacidad",
+    "aboutYou": "Sobre Ti",
+    "privacy": "Privacidad",
+    "visibility": "Visibilidad del perfil",
+    "visibilityPublic": "Público",
+    "visibilityConnections": "Solo conexiones",
+    "visibilityPrivate": "Privado",
+    "displayNamePublic": "Mostrar nombre en resultados",
+    "searchableByEmail": "Permitir búsqueda por correo",
+    "showAge": "Mostrar mi edad",
+    "age": "{{age}} años",
+    "avatar": "Foto de perfil",
+    "avatarAlt": "Foto de perfil",
+    "noAvatar": "Sin foto",
+    "saved": "Perfil actualizado"
+  },
+  "exposure": {
+    "message": {
+      "insufficientConnections": "Agrega más conexiones para ver exposición",
+      "recommendation": "Considera pruebas regulares cada 3-6 meses"
+    }
   },
   "settings": {
     "title": "Configuración",

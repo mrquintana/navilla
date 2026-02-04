@@ -143,6 +143,11 @@ a:hover {
   font-size: 1.25rem;
 }
 
+.btn-sm {
+  padding: 0.4rem 0.85rem;
+  font-size: 0.85rem;
+}
+
 /* Card styles */
 .card {
   background-color: var(--color-background);
