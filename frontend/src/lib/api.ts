@@ -2,6 +2,8 @@
  * API client for backend requests
  */
 
+import { E2E_MODE, getE2eUserFromToken, type E2eUser } from './e2eMocks';
+
 const API_URL = import.meta.env.VITE_API_URL || '';
 
 interface RequestOptions extends Omit<RequestInit, 'body'> {
@@ -16,6 +18,10 @@ export async function apiRequest<T>(
   accessToken: string,
   options: RequestOptions = {}
 ): Promise<T> {
+  if (E2E_MODE) {
+    return mockApiRequest<T>(endpoint, accessToken, options);
+  }
+
   const { body, headers, ...rest } = options;
 
   const response = await fetch(`${API_URL}${endpoint}`, {
@@ -43,6 +49,66 @@ export async function apiRequest<T>(
   }
 
   return response.json();
+}
+
+function mockApiRequest<T>(
+  endpoint: string,
+  accessToken: string,
+  options: RequestOptions
+): Promise<T> {
+  const user = getE2eUserFromToken(accessToken);
+  if (!user) {
+    return Promise.reject(new ApiError('Unauthorized', 401));
+  }
+
+  if (endpoint === '/api/users/me' && options.method === 'PUT') {
+    return Promise.resolve(mockUserProfile(user) as T);
+  }
+
+  if (endpoint === '/api/users/me') {
+    return Promise.resolve(mockUserProfile(user) as T);
+  }
+
+  if (endpoint.startsWith('/api/users/search')) {
+    return Promise.resolve(null as T);
+  }
+
+  if (endpoint === '/api/connections/stats') {
+    return Promise.resolve({
+      confirmedCount: user.confirmedCount,
+      pendingIncomingCount: 0,
+      pendingSentCount: 0,
+    } as T);
+  }
+
+  if (endpoint.startsWith('/api/connections')) {
+    return Promise.resolve([] as T);
+  }
+
+  if (endpoint === '/api/exposures') {
+    return Promise.resolve({ message: null } as T);
+  }
+
+  if (endpoint.startsWith('/api/health-status')) {
+    return Promise.resolve([] as T);
+  }
+
+  if (endpoint.startsWith('/api/notifications')) {
+    return Promise.resolve([] as T);
+  }
+
+  return Promise.reject(new ApiError(`Unhandled E2E endpoint: ${endpoint}`, 500));
+}
+
+function mockUserProfile(user: E2eUser): UserProfile {
+  return {
+    id: user.id,
+    email: user.email,
+    displayName: user.displayName,
+    fullName: user.displayName,
+    username: user.username,
+    createdAt: new Date().toISOString(),
+  };
 }
 
 /**

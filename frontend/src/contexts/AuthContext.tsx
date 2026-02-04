@@ -2,6 +2,12 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from '
 import type { Session, User, AuthError } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 import { api } from '../lib/api';
+import {
+  E2E_MODE,
+  getE2eUserByEmail,
+  makeE2eAccessToken,
+  verifyE2ePassword,
+} from '../lib/e2eMocks';
 
 export interface UserMetadata {
   username: string;
@@ -28,6 +34,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    if (E2E_MODE) {
+      const email = localStorage.getItem('navilla.e2e.email');
+      if (email) {
+        const e2eSession = buildE2eSession(email);
+        setSession(e2eSession);
+      }
+      setIsLoading(false);
+      return undefined;
+    }
+
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setIsLoading(false);
@@ -43,11 +59,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signIn = async (email: string, password: string) => {
+    if (E2E_MODE) {
+      const user = getE2eUserByEmail(email);
+      if (!user || !verifyE2ePassword(password)) {
+        return { error: { message: 'Invalid credentials' } as AuthError };
+      }
+      const e2eSession = buildE2eSession(email);
+      localStorage.setItem('navilla.e2e.email', email.toLowerCase());
+      setSession(e2eSession);
+      return { error: null };
+    }
+
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     return { error };
   };
 
   const signUp = async (email: string, password: string, metadata: UserMetadata) => {
+    if (E2E_MODE) {
+      if (!verifyE2ePassword(password)) {
+        return { error: { message: 'Password does not meet requirements' } as AuthError, needsEmailConfirmation: false };
+      }
+      const e2eSession = buildE2eSession(email, metadata);
+      localStorage.setItem('navilla.e2e.email', email.toLowerCase());
+      setSession(e2eSession);
+      return { error: null, needsEmailConfirmation: false };
+    }
+
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -76,6 +113,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signOut = async () => {
+    if (E2E_MODE) {
+      localStorage.removeItem('navilla.e2e.email');
+      setSession(null);
+      return;
+    }
     await supabase.auth.signOut();
   };
 
@@ -93,6 +135,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       {children}
     </AuthContext.Provider>
   );
+}
+
+function buildE2eSession(email: string, metadata?: UserMetadata): Session {
+  const user = getE2eUserByEmail(email);
+  const now = Math.floor(Date.now() / 1000);
+
+  return {
+    access_token: makeE2eAccessToken(email),
+    token_type: 'bearer',
+    expires_in: 3600,
+    expires_at: now + 3600,
+    refresh_token: 'e2e-refresh-token',
+    user: {
+      id: user?.id ?? `e2e-${email.toLowerCase()}`,
+      aud: 'authenticated',
+      role: 'authenticated',
+      email: email.toLowerCase(),
+      app_metadata: {},
+      user_metadata: {
+        full_name: metadata?.fullName ?? user?.displayName,
+        username: metadata?.username ?? user?.username,
+      },
+      created_at: new Date().toISOString(),
+    },
+  } as Session;
 }
 
 // eslint-disable-next-line react-refresh/only-export-components
