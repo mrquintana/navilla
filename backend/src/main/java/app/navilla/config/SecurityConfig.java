@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -36,6 +37,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 /**
  * Security configuration for the Navilla backend.
@@ -150,5 +152,21 @@ public class SecurityConfig {
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
     source.registerCorsConfiguration("/api/**", configuration);
     return source;
+  }
+
+  /**
+   * Registers a CORS filter early in the chain to ensure preflight requests
+   * receive CORS headers before security filters run.
+   *
+   * @param source the configured CORS configuration source
+   * @return filter registration bean for the CORS filter
+   */
+  @Bean
+  public FilterRegistrationBean<CorsFilter> corsFilterRegistration(
+      CorsConfigurationSource source) {
+    FilterRegistrationBean<CorsFilter> registration =
+        new FilterRegistrationBean<>(new CorsFilter(source));
+    registration.setOrder(0);
+    return registration;
   }
 }
