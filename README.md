@@ -97,6 +97,14 @@ navilla/
 
 See `start.sh help` for a list of available commands.
 
+### Deployment Validation
+
+After deploying, you can run the quick validation script:
+
+```bash
+scripts/validate-deploy.sh https://<backend-domain> https://<frontend-domain>
+```
+
 ### Backend
 
 ```bash
