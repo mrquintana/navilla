@@ -19,7 +19,6 @@ package app.navilla.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -86,10 +85,8 @@ class ConnectionServiceTest {
 
   @BeforeEach
   void setUp() {
-    lenient().when(jwt.getClaimAsString("email")).thenReturn(REQUESTER_EMAIL);
-    lenient().when(encryptionService.hashEmail(REQUESTER_EMAIL)).thenReturn(REQUESTER_HASH);
-    lenient().when(encryptionService.hashEmail(RECIPIENT_EMAIL)).thenReturn(RECIPIENT_HASH);
-    lenient().when(userRepository.findByEmailHash(any())).thenReturn(Optional.empty());
+    when(jwt.getClaimAsString("email")).thenReturn(REQUESTER_EMAIL);
+    when(encryptionService.hashEmail(REQUESTER_EMAIL)).thenReturn(REQUESTER_HASH);
   }
 
   @Nested
