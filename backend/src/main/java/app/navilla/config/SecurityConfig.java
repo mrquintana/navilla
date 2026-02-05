@@ -16,7 +16,6 @@
 
 package app.navilla.config;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -53,6 +52,17 @@ public class SecurityConfig {
 
   @Value("${navilla.supabase.url}")
   private String supabaseUrl;
+
+  private final CorsProperties corsProperties;
+
+  /**
+   * Creates the security configuration for the Navilla API.
+   *
+   * @param corsProperties the configured CORS allowlists
+   */
+  public SecurityConfig(CorsProperties corsProperties) {
+    this.corsProperties = corsProperties;
+  }
 
   /**
    * Configures the security filter chain.
@@ -123,17 +133,8 @@ public class SecurityConfig {
   @Bean
   public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
-    configuration.setAllowedOrigins(Arrays.asList(
-        "http://localhost:5173",  // Vite dev server
-        "http://localhost:3000",  // Alternative dev port
-        "http://54.159.90.88",    // AWS staging
-        "https://navilla.app",    // Production
-        "https://www.navilla.app" // Production with www
-    ));
-    configuration.setAllowedOriginPatterns(Arrays.asList(
-        "https://*.up.railway.app",
-        "https://*.railway.app"
-    ));
+    configuration.setAllowedOrigins(corsProperties.getAllowedOrigins());
+    configuration.setAllowedOriginPatterns(corsProperties.getAllowedOriginPatterns());
     configuration.setAllowedMethods(Arrays.asList(
         "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
     configuration.setAllowedHeaders(List.of("*"));

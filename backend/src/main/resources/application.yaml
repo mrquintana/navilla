@@ -98,3 +98,14 @@ navilla:
 
   # Dev-only features
   dev-mode: ${NAVILLA_DEV_MODE:false}
+
+  cors:
+    allowed-origins:
+      - http://localhost:5173
+      - http://localhost:3000
+      - http://54.159.90.88
+      - https://navilla.app
+      - https://www.navilla.app
+    allowed-origin-patterns:
+      - https://*.up.railway.app
+      - https://*.railway.app
