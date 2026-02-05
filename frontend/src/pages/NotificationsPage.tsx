@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { api, type NotificationItem } from '../lib/api';
@@ -9,8 +9,6 @@ export function NotificationsPage() {
   const { t } = useTranslation();
   const { session } = useAuth();
   const token = session?.access_token ?? '';
-  const [pendingReadId, setPendingReadId] = useState<string | null>(null);
-
   const listQuery = useQuery({
     queryKey: ['notifications'],
     queryFn: () => api.notifications.list(token),
@@ -26,15 +24,38 @@ export function NotificationsPage() {
     },
   });
 
-  const markRead = async (id: string) => {
-    setPendingReadId(id);
-    try {
-      await readMutation.mutateAsync(id);
-    } finally {
-      setPendingReadId(null);
-    }
-  };
   const unreadCount = listQuery.data?.filter((item) => !item.readAt).length ?? 0;
+  const unreadIds = useMemo(
+    () => (listQuery.data ?? []).filter((item) => !item.readAt).map((item) => item.id),
+    [listQuery.data]
+  );
+  const [isFocused, setIsFocused] = useState(true);
+
+  useEffect(() => {
+    const handleFocus = () => setIsFocused(true);
+    const handleBlur = () => setIsFocused(false);
+    window.addEventListener('focus', handleFocus);
+    window.addEventListener('blur', handleBlur);
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      window.removeEventListener('blur', handleBlur);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isFocused || unreadIds.length === 0 || readMutation.isPending) return;
+    const markAllRead = async () => {
+      for (const id of unreadIds) {
+        await readMutation.mutateAsync(id);
+      }
+    };
+    markAllRead().catch(() => null);
+  }, [isFocused, readMutation, unreadIds]);
+  const isStaleRead = (readAt?: string | null) => {
+    if (!readAt) return false;
+    const readTime = new Date(readAt).getTime();
+    return Number.isFinite(readTime) && Date.now() - readTime > 5 * 60 * 1000;
+  };
 
   return (
     <div className="container py-8 space-y-6">
@@ -56,7 +77,12 @@ export function NotificationsPage() {
         ) : listQuery.data && listQuery.data.length > 0 ? (
           <div className="space-y-3">
             {listQuery.data.map((item: NotificationItem) => (
-              <div key={item.id} className="flex items-center justify-between gap-4 border-b pb-3 last:border-b-0 last:pb-0">
+              <div
+                key={item.id}
+                className={`flex items-center justify-between gap-4 border-b pb-3 last:border-b-0 last:pb-0 ${
+                  isStaleRead(item.readAt) ? 'opacity-60' : ''
+                }`}
+              >
                 <div>
                   <p className={`text-sm ${item.readAt ? 'text-muted' : 'font-medium'}`}>
                     {t(item.messageKey)}
@@ -66,18 +92,9 @@ export function NotificationsPage() {
                   </p>
                 </div>
                 {!item.readAt && (
-                  <button
-                    className="btn btn-secondary btn-sm"
-                    onClick={() => markRead(item.id)}
-                    disabled={pendingReadId === item.id}
-                  >
-                    {pendingReadId === item.id ? (
-                      <span className="inline-flex items-center gap-1">
-                        <span className="spinner" aria-hidden="true" />
-                        {t('common.loading')}
-                      </span>
-                    ) : t('notifications.markRead')}
-                  </button>
+                  <span className="text-xs font-semibold text-primary">
+                    {t('notifications.unread')}
+                  </span>
                 )}
               </div>
             ))}
