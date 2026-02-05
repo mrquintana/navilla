@@ -106,6 +106,7 @@ navilla:
       - http://54.159.90.88
       - https://navilla.app
       - https://www.navilla.app
+      - https://navilla-production.up.railway.app
     allowed-origin-patterns:
       - https://*.up.railway.app
       - https://*.railway.app
