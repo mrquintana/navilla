@@ -9,6 +9,7 @@ import { queryClient } from '../queryClient';
 import { LanguageSwitcher } from '../components/LanguageSwitcher';
 import { countries } from '../lib/geolocation';
 import { DEV_MODE } from '../lib/devMode';
+import { AtSign, Calendar, Eye, MapPin, Shield, User, UserCircle2 } from 'lucide-react';
 
 const AVATAR_BUCKET = 'avatars';
 const AVATAR_SIZE = 512;
@@ -276,50 +277,103 @@ export function ProfilePage() {
         </div>
 
         {!isEditing ? (
-          <div className="grid gap-4 md:grid-cols-2 text-sm">
-            <div>
-              <p className="text-muted">{t('auth.displayName')}</p>
-              <p>{profile?.displayName || '—'}</p>
+          <div className="profile-card-details profile-card-grid">
+            <div className="profile-detail">
+              <UserCircle2 className="profile-detail-icon" aria-hidden="true" />
+              <div>
+                <p className="profile-detail-label">{t('auth.displayName')}</p>
+                <p className="profile-detail-value">{profile?.displayName || '—'}</p>
+              </div>
             </div>
-            <div>
-              <p className="text-muted">{t('auth.fullName')}</p>
-              <p>{profile?.fullName || '—'}</p>
+            <div className="profile-detail">
+              <User className="profile-detail-icon" aria-hidden="true" />
+              <div>
+                <p className="profile-detail-label">{t('auth.fullName')}</p>
+                <p className="profile-detail-value">{profile?.fullName || '—'}</p>
+              </div>
             </div>
-            <div>
-              <p className="text-muted">{t('auth.username')}</p>
-              <p>{profile?.username ? `@${profile.username}` : '—'}</p>
+            <div className="profile-detail">
+              <AtSign className="profile-detail-icon" aria-hidden="true" />
+              <div>
+                <p className="profile-detail-label">{t('auth.username')}</p>
+                <p className="profile-detail-value">{profile?.username ? `@${profile.username}` : '—'}</p>
+              </div>
             </div>
-            <div>
-              <p className="text-muted">{t('auth.sex')}</p>
-              <p>{profile?.sex || '—'}</p>
+            <div className="profile-detail">
+              <User className="profile-detail-icon" aria-hidden="true" />
+              <div>
+                <p className="profile-detail-label">{t('auth.sex')}</p>
+                <p className="profile-detail-value">{profile?.sex || '—'}</p>
+              </div>
             </div>
-            <div>
-              <p className="text-muted">{t('auth.dateOfBirth')}</p>
-              <p>{profile?.dateOfBirth || '—'}</p>
+            <div className="profile-detail">
+              <Calendar className="profile-detail-icon" aria-hidden="true" />
+              <div>
+                <p className="profile-detail-label">{t('auth.dateOfBirth')}</p>
+                <p className="profile-detail-value">{profile?.dateOfBirth || '—'}</p>
+              </div>
             </div>
-            <div>
-              <p className="text-muted">{t('profile.showAge')}</p>
-              <p>{profile?.showAge ? t('common.confirm') : t('common.cancel')}</p>
+            <div className="profile-detail">
+              <Eye className="profile-detail-icon" aria-hidden="true" />
+              <div>
+                <p className="profile-detail-label">{t('profile.showAge')}</p>
+                <p className="profile-detail-value">{profile?.showAge ? t('common.confirm') : t('common.cancel')}</p>
+              </div>
             </div>
-            <div>
-              <p className="text-muted">{t('auth.country')}</p>
-              <p>{profile?.country || '—'}</p>
+            <div className="profile-detail">
+              <MapPin className="profile-detail-icon" aria-hidden="true" />
+              <div>
+                <p className="profile-detail-label">{t('auth.country')}</p>
+                <p className="profile-detail-value">{profile?.country || '—'}</p>
+              </div>
             </div>
-            <div>
-              <p className="text-muted">{t('auth.location')}</p>
-              <p>{profile?.location || '—'}</p>
+            <div className="profile-detail">
+              <MapPin className="profile-detail-icon" aria-hidden="true" />
+              <div>
+                <p className="profile-detail-label">{t('auth.location')}</p>
+                <p className="profile-detail-value">{profile?.location || '—'}</p>
+              </div>
             </div>
-            <div className="md:col-span-2 pt-2">
-              <p className="text-muted">{t('profile.visibility')}</p>
-              <p className="text-sm">
-                {profile?.profileVisibility === 'PUBLIC' && t('profile.visibilityPublic')}
-                {profile?.profileVisibility === 'CONNECTIONS_ONLY' && t('profile.visibilityConnections')}
-                {profile?.profileVisibility === 'PRIVATE' && t('profile.visibilityPrivate')}
-              </p>
-              <p className="text-xs text-muted mt-1">
-                {t('profile.displayNamePublic')}: {profile?.displayNamePublic ? t('common.confirm') : t('common.cancel')} ·{' '}
-                {t('profile.searchableByEmail')}: {profile?.searchableByEmail ? t('common.confirm') : t('common.cancel')}
-              </p>
+            <div className="profile-detail">
+              <Shield className="profile-detail-icon" aria-hidden="true" />
+              <div>
+                <p className="profile-detail-label">{t('profile.visibility')}</p>
+                <p className="profile-detail-value">
+                  {profile?.profileVisibility === 'PUBLIC' && t('profile.visibilityPublic')}
+                  {profile?.profileVisibility === 'CONNECTIONS_ONLY' && t('profile.visibilityConnections')}
+                  {profile?.profileVisibility === 'PRIVATE' && t('profile.visibilityPrivate')}
+                </p>
+              </div>
+            </div>
+            <div className="profile-detail">
+              <Shield className="profile-detail-icon" aria-hidden="true" />
+              <div>
+                <p className="profile-detail-label">{t('profile.searchVisibility')}</p>
+                <div className="flex flex-wrap gap-2">
+                  {profile?.profileVisibility !== 'PUBLIC' ? (
+                    <span className="badge badge-warning text-xs">
+                      {t('profile.searchNotAvailable')}
+                    </span>
+                  ) : profile?.displayNamePublic || profile?.searchableByEmail ? (
+                    <>
+                      {profile?.displayNamePublic && (
+                        <span className="badge badge-success text-xs">
+                          {t('profile.searchBadgeDisplay')}
+                        </span>
+                      )}
+                      {profile?.searchableByEmail && (
+                        <span className="badge badge-success text-xs">
+                          {t('profile.searchBadgeEmail')}
+                        </span>
+                      )}
+                    </>
+                  ) : (
+                    <span className="badge badge-warning text-xs">
+                      {t('profile.searchDisabled')}
+                    </span>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         ) : (

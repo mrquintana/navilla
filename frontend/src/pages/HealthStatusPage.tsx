@@ -194,7 +194,7 @@ export function HealthStatusPage() {
                 );
 
                 return (
-                  <div key={status.id} className="flex items-center justify-between gap-4 border-b pb-3 last:border-b-0 last:pb-0">
+                  <div key={status.id} className="health-row-card flex items-center justify-between gap-4">
                     <div>
                       <div className="health-row-header">
                         <a
@@ -210,14 +210,29 @@ export function HealthStatusPage() {
                       {exposureMatch && (
                         <p className="text-xs text-muted">{t('health.exposureMatchNote')}</p>
                       )}
-                      <p className="text-xs text-muted">
-                        {status.status} · {status.testDate ?? t('health.noTestDate')}
-                      </p>
-                      {status.clearedAt && (
-                        <p className="text-xs text-muted">
-                          {t('health.clearedOn')} {new Date(status.clearedAt).toLocaleDateString()}
-                        </p>
-                      )}
+                      <div className="flex flex-wrap items-center gap-2 text-xs text-muted">
+                        <span
+                          className={`badge text-xs ${
+                            status.clearedAt
+                              ? 'badge-warning'
+                              : status.status === 'positive'
+                                ? 'badge-error'
+                                : 'badge-info'
+                          }`}
+                        >
+                          {status.clearedAt
+                            ? t('health.cleared')
+                            : status.status === 'positive'
+                              ? t('health.statusPositive')
+                              : t('health.statusNegative')}
+                        </span>
+                        <span>·</span>
+                        <span>
+                          {status.clearedAt
+                            ? `${t('health.clearedOn')} ${new Date(status.clearedAt).toLocaleDateString()}`
+                            : status.testDate ?? t('health.noTestDate')}
+                        </span>
+                      </div>
                     </div>
                     <div className="flex gap-2">
                       <button
@@ -282,7 +297,7 @@ export function HealthStatusPage() {
                   : '—'}</span>
               </div>
               {(showAllExposures ? exposureItems : exposureItems.slice(0, 6)).map((item) => (
-                <div key={item.condition} className="rounded-md border border-border-light bg-white/70 px-3 py-2">
+                <div key={item.condition} className="exposure-item">
                   <div className="text-xs font-semibold uppercase tracking-wide text-foreground">
                     <a
                       className="health-condition-link"

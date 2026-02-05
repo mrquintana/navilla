@@ -5,7 +5,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { api } from '../lib/api';
 import { Link } from 'react-router-dom';
 import { DEV_MODE } from '../lib/devMode';
-import { Eye, EyeOff, HelpCircle, ExternalLink } from 'lucide-react';
+import { Eye, EyeOff, HelpCircle, ExternalLink, Mail, MapPin, Shield, Calendar } from 'lucide-react';
 import { useState } from 'react';
 import { getConditionInfo } from '../lib/conditionInfo';
 
@@ -57,6 +57,25 @@ export function DashboardPage() {
 
   // Get display name or first part of email
   const displayName = profile?.displayName || user?.email?.split('@')[0] || '';
+  const profileName = profile?.displayName || profile?.fullName || profile?.username || profile?.email || '—';
+  const profileSubtitle = profile?.username
+    ? `@${profile.username}`
+    : profile?.email;
+  const visibilityKey = profile?.profileVisibility?.toLowerCase() || '';
+  const visibilityLabel = visibilityKey === 'public'
+    ? t('profile.visibilityPublic')
+    : visibilityKey === 'connections'
+      ? t('profile.visibilityConnections')
+      : visibilityKey === 'private'
+        ? t('profile.visibilityPrivate')
+        : '—';
+  const avatarUrl = profile?.avatarThumbUrl || profile?.avatarUrl;
+  const avatarInitials = profileName
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join('');
 
   const formatDegree = (degree: number) => {
     if (i18n.language.startsWith('es')) {
@@ -79,7 +98,7 @@ export function DashboardPage() {
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {/* Status Card - Most Important */}
-        <div className="card card-elevated">
+        <div className="card card-elevated dashboard-card">
           <div className="flex items-center gap-3 mb-4">
             <div
               className={`w-10 h-10 rounded-full flex items-center justify-center ${
@@ -96,7 +115,7 @@ export function DashboardPage() {
               </svg>
             </div>
             <div className="flex items-center gap-2">
-              <h3 className="font-semibold">{t('dashboard.exposureStatus')}</h3>
+              <h3 className="profile-card-title">{t('dashboard.exposureStatus')}</h3>
               <button
                 type="button"
                 className="btn btn-secondary btn-sm"
@@ -149,7 +168,7 @@ export function DashboardPage() {
                   return (
                     <div
                       key={item.condition}
-                      className="rounded-md border border-border-light bg-white/70 px-3 py-3"
+                      className="exposure-item"
                     >
                       <div className="text-xs font-semibold uppercase tracking-wide text-foreground">
                         <a
@@ -211,14 +230,14 @@ export function DashboardPage() {
         </div>
 
         {/* Connections Card */}
-        <div className="card card-elevated">
+        <div className="card card-elevated dashboard-card">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
               <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
               </svg>
             </div>
-            <h3 className="font-semibold">{t('dashboard.connectionCount')}</h3>
+            <h3 className="profile-card-title">{t('dashboard.connectionCount')}</h3>
           </div>
           <p className="text-4xl font-bold text-primary mb-1">
             {statsQuery.data?.confirmedCount ?? 0}
@@ -232,41 +251,66 @@ export function DashboardPage() {
         </div>
 
         {/* Profile Card */}
-        <div className="card card-elevated">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
-              <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
+        <div className="card card-elevated profile-card">
+          <div className="profile-card-header">
+            <div className="profile-card-avatar">
+              {avatarUrl ? (
+                <img src={avatarUrl} alt={t('profile.avatarAlt')} />
+              ) : (
+                <span className="profile-card-initials">{avatarInitials || 'N'}</span>
+              )}
             </div>
-            <h3 className="font-semibold">{t('dashboard.yourProfile')}</h3>
+            <div className="profile-card-heading">
+              <p className="profile-card-title">{t('dashboard.yourProfile')}</p>
+              <h3 className="profile-card-name">{profileName}</h3>
+              {profileSubtitle && <p className="profile-card-subtitle">{profileSubtitle}</p>}
+            </div>
+            <div className="profile-card-actions">
+              <Link to="/profile" className="btn btn-secondary btn-sm">
+                {t('dashboard.editProfile')}
+              </Link>
+            </div>
           </div>
           {isLoading ? (
             <p className="text-muted">{t('common.loading')}</p>
           ) : error ? (
             <p className="text-error">{t('common.error')}</p>
           ) : profile ? (
-            <div className="space-y-2 text-sm">
-              <p className="text-muted truncate">{profile.email}</p>
-              {profile.displayName && (
-                <p className="font-medium">{profile.displayName}</p>
-              )}
-              {profile.username && (
-                <p className="text-muted text-xs">@{profile.username}</p>
-              )}
-              {profile.showAge && profile.age !== undefined && (
-                <p className="text-muted text-xs">{t('profile.age', { age: profile.age })}</p>
-              )}
-              {(profile.country || profile.location) && (
-                <p className="text-muted text-xs">
-                  {[profile.location, profile.country].filter(Boolean).join(', ')}
-                </p>
-              )}
-              <div className="pt-2">
-                <Link to="/profile" className="text-sm text-primary font-medium">
-                  {t('dashboard.editProfile')}
-                </Link>
+            <div className="profile-card-details">
+              <div className="profile-detail">
+                <Mail className="profile-detail-icon" aria-hidden="true" />
+                <div>
+                  <p className="profile-detail-label">{t('auth.email')}</p>
+                  <p className="profile-detail-value">{profile.email}</p>
+                </div>
               </div>
+              {(profile.location || profile.country) && (
+                <div className="profile-detail">
+                  <MapPin className="profile-detail-icon" aria-hidden="true" />
+                  <div>
+                    <p className="profile-detail-label">{t('auth.location')}</p>
+                    <p className="profile-detail-value">
+                      {[profile.location, profile.country].filter(Boolean).join(', ')}
+                    </p>
+                  </div>
+                </div>
+              )}
+              <div className="profile-detail">
+                <Shield className="profile-detail-icon" aria-hidden="true" />
+                <div>
+                  <p className="profile-detail-label">{t('profile.visibility')}</p>
+                  <p className="profile-detail-value">{visibilityLabel}</p>
+                </div>
+              </div>
+              {profile.showAge && profile.age !== undefined && (
+                <div className="profile-detail">
+                  <Calendar className="profile-detail-icon" aria-hidden="true" />
+                  <div>
+                    <p className="profile-detail-label">{t('profile.ageLabel')}</p>
+                    <p className="profile-detail-value">{t('profile.age', { age: profile.age })}</p>
+                  </div>
+                </div>
+              )}
             </div>
           ) : (
             <p className="text-muted">—</p>
