@@ -552,7 +552,7 @@ A detailed breakdown of the project's directory layout and key files can be foun
 
 ## Running the Project & Quick Commands
 
-For a quick start and a list of development commands, please refer to the main `README.md` file or run `./run.sh help`.
+For a quick start and a list of development commands, please refer to the main `README.md` file or run `./start.sh help`.
 
 ---
 

@@ -15,7 +15,7 @@ git clone https://github.com/navilla/navilla.git
 cd navilla
 
 # Run everything with the development script
-./run.sh dev
+./start.sh dev
 ```
 
 ## What You'll Have

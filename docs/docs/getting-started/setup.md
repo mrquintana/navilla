@@ -49,10 +49,10 @@ Ensure you populate these `.env` files with the appropriate values from your Sup
 
 ## 4. Run the Application
 
-The easiest way to get the entire application (backend and frontend) running in development mode is by using the `run.sh` script:
+The easiest way to get the entire application (backend and frontend) running in development mode is by using the `start.sh` script:
 
 ```bash
-./run.sh dev
+./start.sh dev
 ```
 
 This command will:

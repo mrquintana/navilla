@@ -21,7 +21,7 @@ navilla/
 
 ## Documentation (`/docs`)
 
-Built with Docusaurus. Contains all project documentation. You can run the documentation site locally using `./run.sh docs`.
+Built with Docusaurus. Contains all project documentation. You can run the documentation site locally using `./start.sh docs`.
 
 ```bash
 cd docs

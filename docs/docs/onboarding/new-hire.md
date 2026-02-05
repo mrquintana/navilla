@@ -18,7 +18,7 @@ Welcome to the Navilla team! This guide will help you get up to speed.
 
 ### 2. Set Up Development Environment
 
-Follow the [Development Setup Guide](../getting-started/setup) to get your local environment running. Remember that the fastest way to get both backend and frontend running is with `./run.sh dev`.
+Follow the [Development Setup Guide](../getting-started/setup) to get your local environment running. Remember that the fastest way to get both backend and frontend running is with `./start.sh dev`.
 
 ### 3. Understand the Product
 

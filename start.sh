@@ -1,6 +1,6 @@
 #!/bin/bash
 # Navilla - Single command build and run
-# Usage: ./run.sh [command]
+# Usage: ./start.sh [command]
 #
 # Commands:
 #   build    - Build both backend and frontend
@@ -105,7 +105,7 @@ case "${1:-dev}" in
     help|--help|-h)
         echo "Navilla - Build and Run Script"
         echo ""
-        echo "Usage: ./run.sh [command]"
+        echo "Usage: ./start.sh [command]"
         echo ""
         echo "Commands:"
         echo "  build    Build both backend and frontend"
@@ -116,14 +116,14 @@ case "${1:-dev}" in
         echo "  help     Show this help message"
         echo ""
         echo "Examples:"
-        echo "  ./run.sh           # Start development servers"
-        echo "  ./run.sh build     # Build for production"
-        echo "  ./run.sh docker    # Run with Docker"
+        echo "  ./start.sh           # Start development servers"
+        echo "  ./start.sh build     # Build for production"
+        echo "  ./start.sh docker    # Run with Docker"
         ;;
 
     *)
         print_error "Unknown command: $1"
-        echo "Run './run.sh help' for usage"
+        echo "Run './start.sh help' for usage"
         exit 1
         ;;
 esac

@@ -47,9 +47,9 @@ A privacy-preserving sexual health platform that helps users understand their po
    ```
 
 3. **Run the application**
-   The easiest way to run the application in development mode is to use the provided `run.sh` script:
+   The easiest way to run the application in development mode is to use the provided `start.sh` script:
    ```bash
-   ./run.sh
+   ./start.sh
    ```
    This will start both the backend and frontend with hot-reloading enabled.
 
@@ -95,7 +95,7 @@ navilla/
 
 ## Development Commands
 
-See `run.sh help` for a list of available commands.
+See `start.sh help` for a list of available commands.
 
 ### Backend
 
