@@ -87,7 +87,9 @@ The lean preset is activated by overriding `JAVA_OPTS` in Railway's environment 
 
 ### Railway Environment Variables (Backend)
 
-To activate the lean JVM preset, set this in Railway:
+To activate the lean JVM preset, set this in Railway's environment variables UI.
+
+**Important:** Railway does not expand shell variable references. You must paste the full flags string — not a reference like `$JAVA_OPTS_LEAN`.
 
 ```
 JAVA_OPTS=-XX:+UseContainerSupport -XX:MaxRAMPercentage=70.0 -XX:InitialRAMPercentage=30.0 -XX:+UseSerialGC -XX:MaxMetaspaceSize=96m -XX:+TieredCompilation -XX:TieredStopAtLevel=1 -Xss256k -Djava.security.egd=file:/dev/./urandom -Dspring.profiles.active=production
