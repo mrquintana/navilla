@@ -4,16 +4,27 @@ import { useAuth } from '../../hooks/useAuth';
 import { useUser } from '../../hooks/useUser';
 import { Bell, ChevronDown, HeartPulse, LayoutDashboard, LogOut, UserCircle2, Users } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { api } from '../../lib/api';
 export function Header() {
   const { t } = useTranslation();
   const { session, signOut } = useAuth();
+  const token = session?.access_token ?? '';
   const { data: profile } = useUser();
+  const { data: notifications } = useQuery({
+    queryKey: ['notifications'],
+    queryFn: () => api.notifications.list(token),
+    enabled: !!token,
+    refetchInterval: 30000,
+    refetchIntervalInBackground: false,
+  });
   const avatarThumb = profile?.avatarThumbUrl || profile?.avatarUrl;
   const profileLabel = profile?.username
     ? `(@${profile.username})`
     : profile?.email
       ? `(${profile.email})`
       : '';
+  const unreadCount = notifications?.filter((item) => !item.readAt).length ?? 0;
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
 
@@ -67,7 +78,12 @@ export function Header() {
                 to="/notifications"
                 className="hidden sm:inline-flex nav-link"
               >
-                <Bell className="nav-icon" aria-hidden="true" />
+                <span className="nav-bell" aria-hidden="true">
+                  <Bell className="nav-icon" />
+                  {unreadCount > 0 && (
+                    <span className="nav-bell-badge">{unreadCount}</span>
+                  )}
+                </span>
                 {t('nav.notifications')}
               </Link>
               <div className="hidden sm:inline-flex nav-menu" ref={menuRef}>

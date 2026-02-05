@@ -34,11 +34,15 @@ export function NotificationsPage() {
       setPendingReadId(null);
     }
   };
+  const totalCount = listQuery.data?.length ?? 0;
 
   return (
     <div className="container py-8 space-y-6">
       <div>
-        <h1 className="text-3xl font-bold mb-2">{t('notifications.title')}</h1>
+        <h1 className="text-3xl font-bold mb-2">
+          {t('notifications.title')}
+          {totalCount > 0 ? ` (${totalCount})` : ''}
+        </h1>
         <p className="text-muted">{t('notifications.subtitle')}</p>
       </div>
 
