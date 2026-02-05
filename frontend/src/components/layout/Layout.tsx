@@ -5,6 +5,7 @@ import { Header } from './Header';
 import { Footer } from './Footer';
 import { DEV_MODE } from '../../lib/devMode';
 import { api } from '../../lib/api';
+import { API_URL } from '../../lib/api';
 import { useAuth } from '../../hooks/useAuth';
 
 export function Layout() {
@@ -28,6 +29,11 @@ export function Layout() {
       {DEV_MODE && (
         <div className="bg-red-600 text-white text-center text-sm font-semibold py-2">
           DEV MODE ENABLED
+        </div>
+      )}
+      {DEV_MODE && (
+        <div className="bg-blue-600 text-white text-center text-xs font-semibold py-2">
+          API URL: {API_URL || 'not set'}
         </div>
       )}
       <main className="pt-6 pb-12 flex-1">
