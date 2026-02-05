@@ -53,10 +53,11 @@ public class NavillaBackendApplication {
   /**
    * Logs the active profiles at startup to confirm runtime configuration.
    *
-   * @param environment the Spring environment
+   * @param event the application ready event
    */
   @EventListener(ApplicationReadyEvent.class)
-  public void logActiveProfiles(Environment environment) {
+  public void logActiveProfiles(ApplicationReadyEvent event) {
+    Environment environment = event.getApplicationContext().getEnvironment();
     String[] profiles = environment.getActiveProfiles();
     if (profiles.length == 0) {
       log.info("Active profiles: [default]");
