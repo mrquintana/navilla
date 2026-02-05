@@ -130,6 +130,10 @@ public class SecurityConfig {
         "https://navilla.app",    // Production
         "https://www.navilla.app" // Production with www
     ));
+    configuration.setAllowedOriginPatterns(Arrays.asList(
+        "https://*.up.railway.app",
+        "https://*.railway.app"
+    ));
     configuration.setAllowedMethods(Arrays.asList(
         "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
     configuration.setAllowedHeaders(List.of("*"));
