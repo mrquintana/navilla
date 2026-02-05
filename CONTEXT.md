@@ -206,6 +206,7 @@ A detailed breakdown of the project's directory layout and key files can be foun
   - Disease names now link directly to external info (MedlinePlus) with external icon.
 - ✅ Softened external link styling with shared `.health-condition-link` class.
 - ✅ Notifications polling added (30s interval) for fresher UX.
+- 📝 TODO: Move CORS allowlists to env vars (e.g., NAVILLA_CORS_ALLOWED_ORIGINS / NAVILLA_CORS_ALLOWED_ORIGIN_PATTERNS).
 
 ---
 
