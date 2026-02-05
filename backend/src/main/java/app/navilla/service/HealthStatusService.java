@@ -120,6 +120,29 @@ public class HealthStatusService {
   }
 
   /**
+   * Reactivates a cleared health status record.
+   *
+   * @param jwt the JWT token containing user info
+   * @param id the health status record id
+   * @return the updated health status record
+   */
+  @Transactional
+  public HealthStatusResponse activateStatus(Jwt jwt, UUID id) {
+    String userHash = encryptionService.hashEmail(jwt.getClaimAsString("email"));
+    HealthStatus record = healthStatusRepository.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("health.error.notFound"));
+
+    if (!record.getUserHash().equals(userHash)) {
+      throw new IllegalStateException("health.error.notOwner");
+    }
+
+    record.setClearedAt(null);
+    HealthStatus saved = healthStatusRepository.save(record);
+    log.info("Health status reactivated: {} {}", record.getConditionType(), record.getStatus());
+    return toResponse(saved);
+  }
+
+  /**
    * Deletes a health status record for the authenticated user.
    *
    * @param jwt the JWT token containing user info

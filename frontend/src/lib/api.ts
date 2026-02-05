@@ -238,6 +238,10 @@ export const api = {
         method: 'POST',
         body: data,
       }),
+    activate: (token: string, id: string) =>
+      apiRequest<HealthStatus>(`/api/health-status/${id}/activate`, token, {
+        method: 'POST',
+      }),
     delete: (token: string, id: string) =>
       apiRequest<void>(`/api/health-status/${id}`, token, {
         method: 'DELETE',
@@ -357,6 +361,8 @@ export interface ExposureSnapshot {
   connectionCount?: number;
   secondDegreeCount?: number | null;
   thirdDegreeCount?: number | null;
+  totalGraphNodes?: number | null;
+  maxDepth?: number | null;
   exposures?: ExposureItem[];
   computedAt?: string;
   nextUpdateAt?: string;

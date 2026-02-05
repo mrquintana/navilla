@@ -6,11 +6,19 @@ import { api } from '../lib/api';
 import { Link } from 'react-router-dom';
 import { DEV_MODE } from '../lib/devMode';
 import { Eye, EyeOff, HelpCircle, ExternalLink, Mail, MapPin, Shield, Calendar } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { getConditionInfo } from '../lib/conditionInfo';
 
 export function DashboardPage() {
   const { t, i18n } = useTranslation();
+  const [showSnapshotNotice, setShowSnapshotNotice] = useState(true);
+
+  useEffect(() => {
+    const dismissed = localStorage.getItem('navilla_hide_snapshot_notice') === 'true';
+    if (dismissed) {
+      setShowSnapshotNotice(false);
+    }
+  }, []);
   const [showStatus, setShowStatus] = useState(true);
   const [showExposureHelp, setShowExposureHelp] = useState(false);
   const { user, session } = useAuth();
@@ -95,6 +103,29 @@ export function DashboardPage() {
           {t('dashboard.subtitle')}
         </p>
       </div>
+
+      {showSnapshotNotice && (
+        <div className="card card-elevated mb-6">
+          <div className="flex items-start justify-between gap-4">
+            <div className="space-y-2">
+              <h3 className="font-semibold">{t('dashboard.snapshotTitle')}</h3>
+              <p className="text-sm text-muted">{t('dashboard.snapshotBody')}</p>
+            </div>
+            <button
+              type="button"
+              className="btn btn-secondary btn-sm"
+              onClick={() => {
+                setShowSnapshotNotice(false);
+                localStorage.setItem('navilla_hide_snapshot_notice', 'true');
+              }}
+              aria-label={t('common.close')}
+              title={t('common.close')}
+            >
+              {t('common.close')}
+            </button>
+          </div>
+        </div>
+      )}
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {/* Status Card - Most Important */}
@@ -243,6 +274,15 @@ export function DashboardPage() {
             {statsQuery.data?.confirmedCount ?? 0}
           </p>
           <p className="text-sm text-muted">{t('dashboard.connectionDescription')}</p>
+          <div className="mt-3 text-sm text-muted space-y-1">
+            <div className="flex items-center justify-between">
+              <span>{t('dashboard.networkSize')}</span>
+              <span className="font-semibold text-foreground">
+                {exposureQuery.data?.totalGraphNodes ?? '—'}
+              </span>
+            </div>
+            <p className="text-xs text-muted">{t('dashboard.networkSizeHint', { depth: exposureQuery.data?.maxDepth ?? 5 })}</p>
+          </div>
           <div className="mt-3">
             <Link to="/connections" className="text-sm text-primary font-medium">
               {t('dashboard.manageConnections')}

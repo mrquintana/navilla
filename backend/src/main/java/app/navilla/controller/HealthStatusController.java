@@ -64,6 +64,20 @@ public class HealthStatusController {
     return ResponseEntity.ok(healthStatusService.clearStatus(jwt, id, request));
   }
 
+  /**
+   * Reactivates a cleared health status record.
+   *
+   * @param jwt the JWT token containing user info
+   * @param id the health status record id
+   * @return the updated health status record
+   */
+  @PostMapping("/{id}/activate")
+  public ResponseEntity<HealthStatusResponse> activateStatus(
+      @AuthenticationPrincipal Jwt jwt,
+      @PathVariable UUID id) {
+    return ResponseEntity.ok(healthStatusService.activateStatus(jwt, id));
+  }
+
   @DeleteMapping("/{id}")
   public ResponseEntity<Void> deleteStatus(
       @AuthenticationPrincipal Jwt jwt,

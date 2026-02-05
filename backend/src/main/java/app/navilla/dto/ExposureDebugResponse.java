@@ -26,6 +26,8 @@ import java.util.List;
  * @param connectionCount first-degree connection count
  * @param secondDegreeCount second-degree count
  * @param thirdDegreeCount third-degree count
+ * @param totalGraphNodes total nodes in graph (within configured max depth)
+ * @param maxDepth configured max depth used for graph traversal
  * @param firstDegreeHashes hashes for first-degree connections
  * @param secondDegreeHashes hashes for second-degree connections
  * @param thirdDegreeHashes hashes for third-degree connections
@@ -39,6 +41,8 @@ public record ExposureDebugResponse(
     int connectionCount,
     int secondDegreeCount,
     int thirdDegreeCount,
+    int totalGraphNodes,
+    int maxDepth,
     List<String> firstDegreeHashes,
     List<String> secondDegreeHashes,
     List<String> thirdDegreeHashes,

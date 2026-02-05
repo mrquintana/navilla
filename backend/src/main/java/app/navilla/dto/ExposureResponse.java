@@ -26,6 +26,8 @@ public record ExposureResponse(
     Integer connectionCount,
     Integer secondDegreeCount,
     Integer thirdDegreeCount,
+    Integer totalGraphNodes,
+    Integer maxDepth,
     List<ExposureItem> exposures,
     OffsetDateTime computedAt,
     OffsetDateTime nextUpdateAt,

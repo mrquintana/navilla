@@ -62,7 +62,7 @@ function ConnectionList({
             return (
               <div
                 key={connection.id}
-                className="border-b pb-3 last:border-b-0 last:pb-0 space-y-3"
+                className="connection-item space-y-3"
               >
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
@@ -94,7 +94,7 @@ function ConnectionList({
                   )}
                 </div>
                 {renderDetails && isExpanded?.(connection) && (
-                  <div className="rounded-md border bg-white/60 p-3 text-sm">
+                  <div className="connection-detail-panel text-sm">
                     {renderDetails(connection)}
                   </div>
                 )}
@@ -356,6 +356,7 @@ export function ConnectionsPage() {
                 onClick={() => runAction(connection.id, () => acceptMutation.mutateAsync(connection.id))}
                 disabled={pendingActionIds.has(connection.id)}
                 title={t('connections.accept')}
+                aria-label={t('connections.accept')}
               >
                 {pendingActionIds.has(connection.id) ? (
                   <span className="inline-flex items-center gap-1">
@@ -363,10 +364,7 @@ export function ConnectionsPage() {
                     {t('common.loading')}
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1">
-                    <Check className="nav-icon" aria-hidden="true" />
-                    {t('connections.accept')}
-                  </span>
+                  <Check className="nav-icon" aria-hidden="true" />
                 )}
               </button>
               <button
@@ -374,6 +372,7 @@ export function ConnectionsPage() {
                 onClick={() => runAction(connection.id, () => denyMutation.mutateAsync(connection.id))}
                 disabled={pendingActionIds.has(connection.id)}
                 title={t('connections.deny')}
+                aria-label={t('connections.deny')}
               >
                 {pendingActionIds.has(connection.id) ? (
                   <span className="inline-flex items-center gap-1">
@@ -381,10 +380,7 @@ export function ConnectionsPage() {
                     {t('common.loading')}
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1">
-                    <X className="nav-icon" aria-hidden="true" />
-                    {t('connections.deny')}
-                  </span>
+                  <X className="nav-icon" aria-hidden="true" />
                 )}
               </button>
             </>
@@ -423,6 +419,7 @@ export function ConnectionsPage() {
               onClick={() => runAction(connection.id, () => cancelMutation.mutateAsync(connection.id))}
               disabled={pendingActionIds.has(connection.id)}
               title={t('connections.cancel')}
+              aria-label={t('connections.cancel')}
             >
               {pendingActionIds.has(connection.id) ? (
                 <span className="inline-flex items-center gap-1">
@@ -430,10 +427,7 @@ export function ConnectionsPage() {
                   {t('common.loading')}
                 </span>
               ) : (
-                <span className="inline-flex items-center gap-1">
-                  <X className="nav-icon" aria-hidden="true" />
-                  {t('connections.cancel')}
-                </span>
+                <X className="nav-icon" aria-hidden="true" />
               )}
             </button>
           )}
@@ -464,22 +458,18 @@ export function ConnectionsPage() {
               type="button"
               onClick={() => toggleExpanded(connection.id, 'profile')}
               title={t('connections.viewProfile')}
+              aria-label={t('connections.viewProfile')}
             >
-              <span className="inline-flex items-center gap-1">
-                <UserRound className="nav-icon" aria-hidden="true" />
-                {t('connections.viewProfile')}
-              </span>
+              <UserRound className="nav-icon" aria-hidden="true" />
             </button>
             <button
               className="btn btn-secondary btn-sm"
               type="button"
               onClick={() => toggleExpanded(connection.id, 'status')}
               title={t('connections.viewStatus')}
+              aria-label={t('connections.viewStatus')}
             >
-              <span className="inline-flex items-center gap-1">
-                <HeartPulse className="nav-icon" aria-hidden="true" />
-                {t('connections.viewStatus')}
-              </span>
+              <HeartPulse className="nav-icon" aria-hidden="true" />
             </button>
             <button
               className="btn btn-secondary btn-sm"
@@ -488,6 +478,7 @@ export function ConnectionsPage() {
                 setRemoveTarget(connection);
               }}
               title={t('connections.removeConnection')}
+              aria-label={t('connections.removeConnection')}
             >
               {pendingActionIds.has(connection.id) ? (
                 <span className="inline-flex items-center gap-1">
@@ -495,10 +486,7 @@ export function ConnectionsPage() {
                   {t('common.loading')}
                 </span>
               ) : (
-                <span className="inline-flex items-center gap-1">
-                  <X className="nav-icon" aria-hidden="true" />
-                  {t('connections.removeConnection')}
-                </span>
+                <X className="nav-icon" aria-hidden="true" />
               )}
             </button>
           </>

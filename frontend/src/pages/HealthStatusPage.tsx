@@ -6,7 +6,7 @@ import { useAuth } from '../hooks/useAuth';
 import { queryClient } from '../queryClient';
 import { DEV_MODE } from '../lib/devMode';
 import { getConditionInfo } from '../lib/conditionInfo';
-import { ExternalLink, HelpCircle, Plus } from 'lucide-react';
+import { ExternalLink, HelpCircle, Plus, Trash2 } from 'lucide-react';
 
 const CONDITIONS = [
   'chlamydia',
@@ -26,7 +26,7 @@ export function HealthStatusPage() {
   const { session } = useAuth();
   const token = session?.access_token ?? '';
   const [pendingHealthId, setPendingHealthId] = useState<string | null>(null);
-  const [pendingHealthAction, setPendingHealthAction] = useState<'clear' | 'delete' | null>(null);
+  const [pendingHealthAction, setPendingHealthAction] = useState<'clear' | 'activate' | 'delete' | null>(null);
 
   const [form, setForm] = useState<HealthStatusRequest>({
     condition: '',
@@ -85,6 +85,13 @@ export function HealthStatusPage() {
     },
   });
 
+  const activateMutation = useMutation({
+    mutationFn: (id: string) => api.health.activate(token, id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['health'] });
+    },
+  });
+
   const deleteMutation = useMutation({
     mutationFn: (id: string) => api.health.delete(token, id),
     onSuccess: () => {
@@ -92,12 +99,14 @@ export function HealthStatusPage() {
     },
   });
 
-  const runHealthAction = async (id: string, action: 'clear' | 'delete') => {
+  const runHealthAction = async (id: string, action: 'clear' | 'activate' | 'delete') => {
     setPendingHealthId(id);
     setPendingHealthAction(action);
     try {
       if (action === 'clear') {
         await clearMutation.mutateAsync(id);
+      } else if (action === 'activate') {
+        await activateMutation.mutateAsync(id);
       } else {
         await deleteMutation.mutateAsync(id);
       }
@@ -237,29 +246,34 @@ export function HealthStatusPage() {
                     <div className="flex gap-2">
                       <button
                         className="btn btn-secondary btn-sm"
-                        onClick={() => runHealthAction(status.id, 'clear')}
-                        disabled={status.clearedAt != null
-                          || (pendingHealthId === status.id && pendingHealthAction === 'clear')}
-                        title={status.clearedAt ? t('health.clearedTooltip') : t('health.clearTooltip')}
+                        onClick={() => runHealthAction(status.id, status.clearedAt ? 'activate' : 'clear')}
+                        disabled={pendingHealthId === status.id
+                          && (pendingHealthAction === 'clear' || pendingHealthAction === 'activate')}
+                        title={status.clearedAt ? t('health.activateTooltip') : t('health.clearTooltip')}
                       >
-                        {pendingHealthId === status.id && pendingHealthAction === 'clear' ? (
+                        {pendingHealthId === status.id
+                        && (pendingHealthAction === 'clear' || pendingHealthAction === 'activate') ? (
                           <span className="inline-flex items-center gap-1">
                             <span className="spinner" aria-hidden="true" />
                             {t('common.loading')}
                           </span>
-                        ) : status.clearedAt ? t('health.cleared') : t('health.clear')}
+                        ) : status.clearedAt ? t('health.markActive') : t('health.clear')}
                       </button>
                       <button
                         className="btn btn-secondary btn-sm"
                         onClick={() => runHealthAction(status.id, 'delete')}
                         disabled={pendingHealthId === status.id && pendingHealthAction === 'delete'}
+                        title={t('health.deleteTooltip')}
+                        aria-label={t('health.deleteTooltip')}
                       >
                         {pendingHealthId === status.id && pendingHealthAction === 'delete' ? (
                           <span className="inline-flex items-center gap-1">
                             <span className="spinner" aria-hidden="true" />
                             {t('common.loading')}
                           </span>
-                        ) : t('common.delete')}
+                        ) : (
+                          <Trash2 className="nav-icon" aria-hidden="true" />
+                        )}
                       </button>
                     </div>
                   </div>

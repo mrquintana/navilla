@@ -86,8 +86,8 @@ navilla:
     minimum-connections: 3
 
   exposure:
-    max-depth: 3
-    snapshot-ttl-days: 7
+    max-depth: 5
+    snapshot-ttl-days: 5
     max-exposure-degree: 3
 
   # Notification Configuration

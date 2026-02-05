@@ -45,6 +45,8 @@ class ExposureControllerTest {
                 .subject("test-subject")
                 .claim("email", "exposure@example.com"))))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.connectionCount").exists());
+        .andExpect(jsonPath("$.connectionCount").exists())
+        .andExpect(jsonPath("$.totalGraphNodes").exists())
+        .andExpect(jsonPath("$.maxDepth").exists());
   }
 }

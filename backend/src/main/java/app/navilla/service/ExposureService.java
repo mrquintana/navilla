@@ -101,6 +101,8 @@ public class ExposureService {
         firstDegree.size(),
         secondDegree.size(),
         thirdDegree.size(),
+        response.totalGraphNodes() == null ? 0 : response.totalGraphNodes(),
+        maxDepth,
         firstDegree,
         secondDegree,
         thirdDegree,
@@ -132,12 +134,17 @@ public class ExposureService {
     int connectionCount = (int) degrees.values().stream().filter(d -> d == 1).count();
     int secondDegreeCount = (int) degrees.values().stream().filter(d -> d == 2).count();
     int thirdDegreeCount = (int) degrees.values().stream().filter(d -> d == 3).count();
+    int totalGraphNodes = (int) degrees.values().stream()
+        .filter(d -> d >= 1 && d <= maxDepth)
+        .count();
 
     if (connectionCount < minimumConnections) {
       return new ExposureResponse(
           connectionCount,
           null,
           null,
+          totalGraphNodes,
+          maxDepth,
           List.of(),
           OffsetDateTime.now(),
           OffsetDateTime.now().plusDays(snapshotTtlDays),
@@ -196,6 +203,8 @@ public class ExposureService {
         connectionCount,
         secondDegreeCount,
         thirdDegreeCount,
+        totalGraphNodes,
+        maxDepth,
         items,
         OffsetDateTime.now(),
         OffsetDateTime.now().plusDays(snapshotTtlDays),

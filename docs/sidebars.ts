@@ -25,6 +25,13 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: 'category',
+      label: 'Product',
+      items: [
+        'product/exposure-transparency',
+      ],
+    },
+    {
+      type: 'category',
       label: 'Backend',
       items: [
         'backend/overview',
@@ -75,6 +82,8 @@ const sidebars: SidebarsConfig = {
         'adrs/adr-005-design-system',
         'adrs/adr-006-auth-email-confirmation',
         'adrs/adr-007-icon-set',
+        'adrs/adr-008-network-size-cache',
+        'adrs/adr-009-temporal-edges',
       ],
     },
   ],
