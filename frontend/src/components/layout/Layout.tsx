@@ -33,7 +33,7 @@ export function Layout() {
       )}
       {DEV_MODE && (
         <div className="bg-blue-600 text-white text-center text-xs font-semibold py-2">
-          API URL: {API_URL || 'not set'}
+          API URL: {API_URL || 'not set'} · Health: {API_URL ? `${API_URL}/api/health` : 'not set'}
         </div>
       )}
       <main className="pt-6 pb-12 flex-1">
