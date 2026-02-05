@@ -153,7 +153,7 @@ export function DashboardPage() {
                     >
                       <div className="text-xs font-semibold uppercase tracking-wide text-foreground">
                         <a
-                          className="inline-flex items-center gap-1 text-primary"
+                          className="health-condition-link"
                           href={info.url}
                           target="_blank"
                           rel="noreferrer"

@@ -15,6 +15,8 @@ export function NotificationsPage() {
     queryKey: ['notifications'],
     queryFn: () => api.notifications.list(token),
     enabled: !!token,
+    refetchInterval: 30000,
+    refetchIntervalInBackground: false,
   });
 
   const readMutation = useMutation({
