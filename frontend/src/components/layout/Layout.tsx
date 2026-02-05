@@ -7,12 +7,14 @@ import { DEV_MODE } from '../../lib/devMode';
 import { api } from '../../lib/api';
 import { API_URL } from '../../lib/api';
 import { useAuth } from '../../hooks/useAuth';
+import { useEffect, useState } from 'react';
 
 export function Layout() {
   const { t } = useTranslation();
   const { session } = useAuth();
   const location = useLocation();
   const isLanding = !session && location.pathname === '/';
+  const [healthFailures, setHealthFailures] = useState(0);
   const healthQuery = useQuery({
     queryKey: ['health'],
     queryFn: () => api.health.check(),
@@ -21,7 +23,17 @@ export function Layout() {
     retry: 1,
   });
 
-  const showOutage = healthQuery.isError;
+  useEffect(() => {
+    if (healthQuery.isSuccess) {
+      setHealthFailures(0);
+      return;
+    }
+    if (healthQuery.isError) {
+      setHealthFailures((count) => Math.min(count + 1, 3));
+    }
+  }, [healthQuery.isError, healthQuery.isSuccess]);
+
+  const showOutage = healthFailures >= 2;
 
   return (
     <div className={`min-h-screen bg-background flex flex-col${isLanding ? ' landing-surface' : ''}`}>
