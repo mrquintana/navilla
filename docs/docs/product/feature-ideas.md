@@ -77,7 +77,7 @@ connected to each other.
 **Categories:**
 - **Clustered** (>40% density): "Your connections tend to know each other"
 - **Mixed** (15–40%): "Your network has some clusters and some independent connections"
-- **Dispersed** (<15%): "Your connections mostly don't know each other"
+- **Dispersed** (under 15%): "Your connections mostly don't know each other"
 
 This is interesting data. Users will talk about it. "Apparently my network is clustered." That's word-of-mouth growth.
 
