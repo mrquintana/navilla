@@ -132,6 +132,10 @@ export const api = {
       if (E2E_MODE) {
         return { status: 'ok' };
       }
+      if (import.meta.env.DEV) {
+        // eslint-disable-next-line no-console
+        console.debug('[healthcheck] url', `${API_URL}/api/health`);
+      }
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 5000);
       try {
