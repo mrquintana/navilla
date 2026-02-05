@@ -76,6 +76,12 @@ Expected headers:
 - `access-control-allow-origin: https://<frontend-domain>`
 - `access-control-allow-methods` includes `GET`
 
+Quick script:
+
+```bash
+scripts/validate-deploy.sh https://<backend-domain> https://<frontend-domain>
+```
+
 ### Frontend (UI Smoke)
 
 1. Load homepage (no console errors).
