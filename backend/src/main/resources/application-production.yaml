@@ -62,3 +62,11 @@ navilla:
     batch-day: SUNDAY
     batch-hour: 18
     random-delay-hours: 6
+  cors:
+    allowed-origins:
+      - https://navilla.app
+      - https://www.navilla.app
+      - https://navilla-production.up.railway.app
+    allowed-origin-patterns:
+      - https://*.up.railway.app
+      - https://*.railway.app
