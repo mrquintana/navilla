@@ -264,6 +264,23 @@
     "tagline": "Numbers, not names",
     "description": "Your privacy is our priority. We never share personal information - only anonymized statistics."
   },
+  "landing": {
+    "kicker": "Private by design",
+    "heroNote": "Built for discretion, clarity, and control.",
+    "howTitle": "How Navilla works",
+    "stepOneTitle": "Build your trusted network",
+    "stepOneBody": "Connect privately using usernames or email. Only confirmed connections shape your network graph.",
+    "stepTwoTitle": "Share health status on your terms",
+    "stepTwoBody": "Log positive or negative results without exposing identities. You control what is visible.",
+    "stepThreeTitle": "See risk signals, not people",
+    "stepThreeBody": "Navilla shows exposure levels and counts by condition — never names.",
+    "valueOneTitle": "Privacy-first by default",
+    "valueOneBody": "We prioritize anonymized insights so you can act without exposing personal details.",
+    "valueTwoTitle": "Actionable, not alarming",
+    "valueTwoBody": "Clear, calm summaries help you decide next steps at your own pace.",
+    "valueThreeTitle": "Designed for trust",
+    "valueThreeBody": "No public identities, no social graph — just the information you need."
+  },
   "footer": {
     "product": "Product",
     "company": "Company",

@@ -1,13 +1,17 @@
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Header } from './Header';
 import { Footer } from './Footer';
 import { DEV_MODE } from '../../lib/devMode';
 import { api } from '../../lib/api';
+import { useAuth } from '../../hooks/useAuth';
 
 export function Layout() {
   const { t } = useTranslation();
+  const { session } = useAuth();
+  const location = useLocation();
+  const isLanding = !session && location.pathname === '/';
   const healthQuery = useQuery({
     queryKey: ['health'],
     queryFn: () => api.health.check(),
@@ -19,7 +23,7 @@ export function Layout() {
   const showOutage = healthQuery.isError;
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className={`min-h-screen bg-background flex flex-col${isLanding ? ' landing-surface' : ''}`}>
       <Header />
       {DEV_MODE && (
         <div className="bg-red-600 text-white text-center text-sm font-semibold py-2">

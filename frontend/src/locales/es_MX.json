@@ -263,6 +263,23 @@
     "tagline": "Números, no nombres",
     "description": "Tu privacidad es nuestra prioridad. Nunca compartimos información personal - solo estadísticas anónimas."
   },
+  "landing": {
+    "kicker": "Privado por diseño",
+    "heroNote": "Construido para discreción, claridad y control.",
+    "howTitle": "Cómo funciona Navilla",
+    "stepOneTitle": "Construye tu red de confianza",
+    "stepOneBody": "Conecta en privado con usuarios o correo. Solo conexiones confirmadas forman tu red.",
+    "stepTwoTitle": "Comparte tu estado en tus términos",
+    "stepTwoBody": "Registra resultados positivos o negativos sin exponer identidades. Tú controlas lo visible.",
+    "stepThreeTitle": "Ve señales de riesgo, no personas",
+    "stepThreeBody": "Navilla muestra niveles de exposición y conteos por condición — nunca nombres.",
+    "valueOneTitle": "Privacidad primero",
+    "valueOneBody": "Priorizamos información anonimizada para que puedas actuar sin exponer detalles personales.",
+    "valueTwoTitle": "Accionable, no alarmante",
+    "valueTwoBody": "Resúmenes claros y tranquilos para decidir tus siguientes pasos a tu ritmo.",
+    "valueThreeTitle": "Diseñado para confianza",
+    "valueThreeBody": "Sin identidades públicas ni grafo social — solo la información que necesitas."
+  },
   "footer": {
     "product": "Producto",
     "company": "Compañía",

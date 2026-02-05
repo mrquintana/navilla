@@ -14,6 +14,7 @@ export function HomePage() {
     <>
       <section className="hero">
         <div className="container">
+          <p className="hero-kicker">{t('landing.kicker')}</p>
           <h1 className="hero-title">{t('common.appName')}</h1>
           <p className="hero-subtitle">{t('privacy.tagline')}</p>
           <p className="hero-description">{t('privacy.description')}</p>
@@ -34,23 +35,43 @@ export function HomePage() {
               </>
             )}
           </div>
+          <p className="hero-note">{t('landing.heroNote')}</p>
         </div>
       </section>
 
-      <section className="container py-16">
-        <h2 className="text-center mb-8">How It Works</h2>
-        <div className="feature-grid">
+      <section className="container py-12 landing-section">
+        <div className="landing-panel">
+          <h2 className="text-center mb-6">{t('landing.howTitle')}</h2>
+          <div className="landing-steps">
+            <div>
+              <h3>{t('landing.stepOneTitle')}</h3>
+              <p>{t('landing.stepOneBody')}</p>
+            </div>
+            <div>
+              <h3>{t('landing.stepTwoTitle')}</h3>
+              <p>{t('landing.stepTwoBody')}</p>
+            </div>
+            <div>
+              <h3>{t('landing.stepThreeTitle')}</h3>
+              <p>{t('landing.stepThreeBody')}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="container pb-16 landing-section">
+        <div className="landing-grid">
           <div className="feature-card">
-            <h3>Connect Privately</h3>
-            <p>Add connections without sharing personal details. Your network stays anonymous.</p>
+            <h3>{t('landing.valueOneTitle')}</h3>
+            <p>{t('landing.valueOneBody')}</p>
           </div>
           <div className="feature-card">
-            <h3>Stay Informed</h3>
-            <p>Get notified about potential exposures in your network, without revealing who.</p>
+            <h3>{t('landing.valueTwoTitle')}</h3>
+            <p>{t('landing.valueTwoBody')}</p>
           </div>
           <div className="feature-card">
-            <h3>Take Control</h3>
-            <p>Manage your health status and help protect your community, all on your terms.</p>
+            <h3>{t('landing.valueThreeTitle')}</h3>
+            <p>{t('landing.valueThreeBody')}</p>
           </div>
         </div>
       </section>
