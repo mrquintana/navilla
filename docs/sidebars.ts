@@ -86,6 +86,7 @@ const sidebars: SidebarsConfig = {
         'adrs/adr-006-auth-email-confirmation',
         'adrs/adr-007-icon-set',
         'adrs/adr-008-network-graph-engine',
+        'adrs/adr-010-railway-memory-optimization',
       ],
     },
   ],

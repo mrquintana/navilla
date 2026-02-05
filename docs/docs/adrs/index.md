@@ -39,6 +39,7 @@ What becomes easier or more difficult because of this change?
 | [ADR-006](./adr-006-auth-email-confirmation) | Auth Email Confirmation | Accepted |
 | [ADR-007](./adr-007-icon-set) | Icon Set | Accepted |
 | [ADR-008](./adr-008-network-graph-engine) | Network Graph Engine | Accepted (MVP) / In Progress (temporal) |
+| [ADR-010](./adr-010-railway-memory-optimization) | Railway Memory Optimization | Accepted |
 
 ## Creating New ADRs
 
