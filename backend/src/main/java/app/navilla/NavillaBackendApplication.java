@@ -16,8 +16,13 @@
 
 package app.navilla;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
+import org.springframework.core.env.Environment;
 
 /**
  * Main entry point for the Navilla Backend Application.
@@ -34,6 +39,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 @SuppressWarnings("checkstyle:HideUtilityClassConstructor")
 public class NavillaBackendApplication {
+  private static final Logger log = LoggerFactory.getLogger(NavillaBackendApplication.class);
 
   /**
    * Main method that starts the Spring Boot application.
@@ -42,5 +48,20 @@ public class NavillaBackendApplication {
    */
   public static void main(String[] args) {
     SpringApplication.run(NavillaBackendApplication.class, args);
+  }
+
+  /**
+   * Logs the active profiles at startup to confirm runtime configuration.
+   *
+   * @param environment the Spring environment
+   */
+  @EventListener(ApplicationReadyEvent.class)
+  public void logActiveProfiles(Environment environment) {
+    String[] profiles = environment.getActiveProfiles();
+    if (profiles.length == 0) {
+      log.info("Active profiles: [default]");
+      return;
+    }
+    log.info("Active profiles: {}", String.join(", ", profiles));
   }
 }
