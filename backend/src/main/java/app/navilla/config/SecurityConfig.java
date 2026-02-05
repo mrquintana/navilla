@@ -18,6 +18,7 @@ package app.navilla.config;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -163,7 +164,7 @@ public class SecurityConfig {
    */
   @Bean
   public FilterRegistrationBean<CorsFilter> corsFilterRegistration(
-      CorsConfigurationSource source) {
+      @Qualifier("corsConfigurationSource") CorsConfigurationSource source) {
     FilterRegistrationBean<CorsFilter> registration =
         new FilterRegistrationBean<>(new CorsFilter(source));
     registration.setOrder(0);

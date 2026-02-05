@@ -39,7 +39,6 @@ import app.navilla.exception.ResourceNotFoundException;
 import app.navilla.repository.ConnectionRepository;
 import app.navilla.repository.UserRepository;
 import app.navilla.security.EncryptionService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -83,10 +82,14 @@ class ConnectionServiceTest {
   private static final String RECIPIENT_HASH = "recipient_hash_456";
   private static final UUID CONNECTION_ID = UUID.randomUUID();
 
-  @BeforeEach
-  void setUp() {
+  private void stubRequesterAuth() {
     when(jwt.getClaimAsString("email")).thenReturn(REQUESTER_EMAIL);
     when(encryptionService.hashEmail(REQUESTER_EMAIL)).thenReturn(REQUESTER_HASH);
+  }
+
+  private void stubRecipientAuth() {
+    when(jwt.getClaimAsString("email")).thenReturn(RECIPIENT_EMAIL);
+    when(encryptionService.hashEmail(RECIPIENT_EMAIL)).thenReturn(RECIPIENT_HASH);
   }
 
   @Nested
@@ -96,13 +99,15 @@ class ConnectionServiceTest {
     @Test
     @DisplayName("should create connection request successfully")
     void shouldCreateConnectionSuccessfully() {
+      stubRequesterAuth();
+      when(encryptionService.hashEmail(RECIPIENT_EMAIL)).thenReturn(RECIPIENT_HASH);
       User recipient = User.builder()
           .emailHash(RECIPIENT_HASH)
           .profileVisibility(ProfileVisibility.PRIVATE)
           .build();
       when(userRepository.findByEmailHash(RECIPIENT_HASH)).thenReturn(Optional.of(recipient));
-      when(connectionRepository.existsBetweenUsers(REQUESTER_HASH, RECIPIENT_HASH))
-          .thenReturn(false);
+      when(connectionRepository.findBetweenUsers(REQUESTER_HASH, RECIPIENT_HASH))
+          .thenReturn(Optional.empty());
       when(connectionRepository.save(any(Connection.class))).thenAnswer(invocation -> {
         Connection conn = invocation.getArgument(0);
         conn.setId(CONNECTION_ID);
@@ -122,7 +127,7 @@ class ConnectionServiceTest {
     @Test
     @DisplayName("should throw exception when connecting to self")
     void shouldThrowExceptionWhenConnectingToSelf() {
-      when(encryptionService.hashEmail(REQUESTER_EMAIL)).thenReturn(REQUESTER_HASH);
+      stubRequesterAuth();
       when(userRepository.findByEmailHash(REQUESTER_HASH)).thenReturn(
           Optional.of(User.builder().emailHash(REQUESTER_HASH).build()));
       CreateConnectionRequest request = new CreateConnectionRequest(REQUESTER_EMAIL);
@@ -137,10 +142,18 @@ class ConnectionServiceTest {
     @Test
     @DisplayName("should throw exception when connection already exists")
     void shouldThrowExceptionWhenConnectionExists() {
+      stubRequesterAuth();
+      when(encryptionService.hashEmail(RECIPIENT_EMAIL)).thenReturn(RECIPIENT_HASH);
       when(userRepository.findByEmailHash(RECIPIENT_HASH)).thenReturn(
           Optional.of(User.builder().emailHash(RECIPIENT_HASH).build()));
-      when(connectionRepository.existsBetweenUsers(REQUESTER_HASH, RECIPIENT_HASH))
-          .thenReturn(true);
+      Connection existing = Connection.builder()
+          .id(CONNECTION_ID)
+          .requesterHash(REQUESTER_HASH)
+          .recipientHash(RECIPIENT_HASH)
+          .status(ConnectionStatus.PENDING)
+          .build();
+      when(connectionRepository.findBetweenUsers(REQUESTER_HASH, RECIPIENT_HASH))
+          .thenReturn(Optional.of(existing));
       CreateConnectionRequest request = new CreateConnectionRequest(RECIPIENT_EMAIL);
 
       assertThatThrownBy(() -> connectionService.createConnection(jwt, request))
@@ -153,6 +166,8 @@ class ConnectionServiceTest {
     @Test
     @DisplayName("should not create connection for unknown recipient")
     void shouldIgnoreUnknownRecipient() {
+      stubRequesterAuth();
+      when(encryptionService.hashEmail(RECIPIENT_EMAIL)).thenReturn(RECIPIENT_HASH);
       when(userRepository.findByEmailHash(RECIPIENT_HASH)).thenReturn(Optional.empty());
       CreateConnectionRequest request = new CreateConnectionRequest(RECIPIENT_EMAIL);
 
@@ -169,8 +184,7 @@ class ConnectionServiceTest {
     @Test
     @DisplayName("should accept pending connection successfully")
     void shouldAcceptConnectionSuccessfully() {
-      when(jwt.getClaimAsString("email")).thenReturn(RECIPIENT_EMAIL);
-      when(encryptionService.hashEmail(RECIPIENT_EMAIL)).thenReturn(RECIPIENT_HASH);
+      stubRecipientAuth();
 
       Connection connection = Connection.builder()
           .id(CONNECTION_ID)
@@ -192,6 +206,7 @@ class ConnectionServiceTest {
     @Test
     @DisplayName("should throw exception when connection not found")
     void shouldThrowExceptionWhenConnectionNotFound() {
+      stubRecipientAuth();
       when(connectionRepository.findById(CONNECTION_ID)).thenReturn(Optional.empty());
 
       assertThatThrownBy(() -> connectionService.acceptConnection(jwt, CONNECTION_ID))
@@ -202,6 +217,7 @@ class ConnectionServiceTest {
     @Test
     @DisplayName("should throw exception when user is not recipient")
     void shouldThrowExceptionWhenNotRecipient() {
+      stubRecipientAuth();
       Connection connection = Connection.builder()
           .id(CONNECTION_ID)
           .requesterHash(REQUESTER_HASH)
@@ -219,8 +235,7 @@ class ConnectionServiceTest {
     @Test
     @DisplayName("should throw exception when connection not pending")
     void shouldThrowExceptionWhenNotPending() {
-      when(jwt.getClaimAsString("email")).thenReturn(RECIPIENT_EMAIL);
-      when(encryptionService.hashEmail(RECIPIENT_EMAIL)).thenReturn(RECIPIENT_HASH);
+      stubRecipientAuth();
 
       Connection connection = Connection.builder()
           .id(CONNECTION_ID)
@@ -244,8 +259,7 @@ class ConnectionServiceTest {
     @Test
     @DisplayName("should deny pending connection successfully")
     void shouldDenyConnectionSuccessfully() {
-      when(jwt.getClaimAsString("email")).thenReturn(RECIPIENT_EMAIL);
-      when(encryptionService.hashEmail(RECIPIENT_EMAIL)).thenReturn(RECIPIENT_HASH);
+      stubRecipientAuth();
 
       Connection connection = Connection.builder()
           .id(CONNECTION_ID)
@@ -271,6 +285,7 @@ class ConnectionServiceTest {
     @Test
     @DisplayName("should cancel pending connection successfully")
     void shouldCancelConnectionSuccessfully() {
+      stubRequesterAuth();
       Connection connection = Connection.builder()
           .id(CONNECTION_ID)
           .requesterHash(REQUESTER_HASH)
@@ -288,10 +303,11 @@ class ConnectionServiceTest {
     @Test
     @DisplayName("should throw exception when user is not requester")
     void shouldThrowExceptionWhenNotRequester() {
+      stubRequesterAuth();
       Connection connection = Connection.builder()
           .id(CONNECTION_ID)
           .requesterHash("other_user_hash")
-          .recipientHash(RECIPIENT_HASH)
+          .recipientHash(REQUESTER_HASH)
           .status(ConnectionStatus.PENDING)
           .build();
 
@@ -312,6 +328,7 @@ class ConnectionServiceTest {
     @Test
     @DisplayName("should return all connections for user")
     void shouldReturnAllConnectionsForUser() {
+      stubRequesterAuth();
       Connection conn1 = Connection.builder()
           .id(UUID.randomUUID())
           .requesterHash(REQUESTER_HASH)
@@ -346,6 +363,7 @@ class ConnectionServiceTest {
     @Test
     @DisplayName("should return correct connection statistics")
     void shouldReturnCorrectStats() {
+      stubRequesterAuth();
       when(connectionRepository.countConfirmedByUserHash(REQUESTER_HASH)).thenReturn(5L);
       when(connectionRepository.countByRecipientHashAndStatus(
           REQUESTER_HASH, ConnectionStatus.PENDING)).thenReturn(3L);
