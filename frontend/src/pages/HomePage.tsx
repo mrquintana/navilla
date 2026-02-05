@@ -1,10 +1,14 @@
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
 
 export function HomePage() {
   const { t } = useTranslation();
   const { session } = useAuth();
+
+  if (session) {
+    return <Navigate to="/connections" replace />;
+  }
 
   return (
     <>
