@@ -40,7 +40,8 @@ LABEL org.opencontainers.image.created="${BUILD_DATE}" \
       org.opencontainers.image.description="Privacy-preserving sexual health platform backend"
 
 # Create non-root user for security
-RUN addgroup -g 1001 -S navilla && \
+RUN apk add --no-cache curl && \
+    addgroup -g 1001 -S navilla && \
     adduser -u 1001 -S navilla -G navilla
 
 WORKDIR /app
@@ -59,7 +60,7 @@ EXPOSE 8080
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
-    CMD wget --no-verbose --tries=1 --spider http://localhost:8080/api/health || exit 1
+    CMD curl -fsS http://localhost:8080/api/health >/dev/null || exit 1
 
 # JVM settings for containers
 ENV JAVA_OPTS="-XX:+UseContainerSupport \
@@ -68,7 +69,7 @@ ENV JAVA_OPTS="-XX:+UseContainerSupport \
     -XX:+UseG1GC \
     -XX:+UseStringDeduplication \
     -Djava.security.egd=file:/dev/./urandom \
-    -Dspring.profiles.active=production"
+    -Dspring.profiles.active=prod"
 
 # Run the application
 ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
