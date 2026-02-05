@@ -24,12 +24,24 @@ title: Deployment
 }
 ```
 
-## Backend Deployment (TBD)
+## Backend Deployment (Railway)
 
-Options under consideration:
-- Railway
-- Fly.io
-- Render
+Recommended setup: deploy the backend as a Railway service with `backend/` as the root.
+
+1. Create a new Railway service from this repo.
+2. Set **Root Directory** to `backend`.
+3. Leave Build/Start commands empty.
+4. Railway will detect `backend/start.sh` and run it automatically.
+
+Environment variables (minimum):
+- `SPRING_PROFILES_ACTIVE=prod`
+- `DATABASE_URL=jdbc:postgresql://<supabase-host>:5432/postgres`
+- `DATABASE_USERNAME=<supabase-username>`
+- `DATABASE_PASSWORD=<supabase-password>`
+- `NAVILLA_ENCRYPTION_PEPPER=<secret>`
+- `NAVILLA_SUPABASE_URL=https://<project>.supabase.co`
+- `NAVILLA_SUPABASE_JWT=https://<project>.supabase.co/auth/v1/.well-known/jwks.json`
+- `JAVA_VERSION=25`
 
 ## Database (Supabase)
 
