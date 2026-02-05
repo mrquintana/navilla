@@ -46,7 +46,7 @@ Two JVM presets are defined in the Dockerfile:
 -XX:MaxRAMPercentage=70.0
 -XX:InitialRAMPercentage=30.0
 -XX:+UseSerialGC
--XX:MaxMetaspaceSize=96m
+-XX:MaxMetaspaceSize=150m
 -XX:+TieredCompilation
 -XX:TieredStopAtLevel=1
 -Xss256k
@@ -61,7 +61,7 @@ The lean preset is activated by overriding `JAVA_OPTS` in Railway's environment 
 | GC algorithm | G1GC | SerialGC | ~50MB (G1 remembered sets) | Stop-the-world pauses, but imperceptible at low RPS |
 | InitialRAMPercentage | 50% | 30% | Starts smaller, grows on demand | Slightly slower first few requests |
 | TieredStopAtLevel | 4 (full C2) | 1 (C1 only) | ~20-30MB code cache | ~15% throughput reduction under sustained load |
-| MaxMetaspaceSize | Unbounded | 96MB | Caps class metadata growth | Could hit limit if adding many libraries |
+| MaxMetaspaceSize | Unbounded | 150MB | Caps class metadata growth | Could hit limit if adding many libraries (96MB proved too tight for Spring Boot + Hibernate + Security + OAuth2) |
 | Thread stack size (Xss) | 1MB | 256KB | ~768KB per thread (x10 threads = ~7.5MB) | Limits deep recursion (not an issue for web handlers) |
 
 ### Backend: Connection Pool and Logging
@@ -92,7 +92,7 @@ To activate the lean JVM preset, set this in Railway's environment variables UI.
 **Important:** Railway does not expand shell variable references. You must paste the full flags string — not a reference like `$JAVA_OPTS_LEAN`.
 
 ```
-JAVA_OPTS=-XX:+UseContainerSupport -XX:MaxRAMPercentage=70.0 -XX:InitialRAMPercentage=30.0 -XX:+UseSerialGC -XX:MaxMetaspaceSize=96m -XX:+TieredCompilation -XX:TieredStopAtLevel=1 -Xss256k -Djava.security.egd=file:/dev/./urandom -Dspring.profiles.active=production
+JAVA_OPTS=-XX:+UseContainerSupport -XX:MaxRAMPercentage=70.0 -XX:InitialRAMPercentage=30.0 -XX:+UseSerialGC -XX:MaxMetaspaceSize=150m -XX:+TieredCompilation -XX:TieredStopAtLevel=1 -Xss256k -Djava.security.egd=file:/dev/./urandom -Dspring.profiles.active=production
 ```
 
 Optional fine-tuning:
