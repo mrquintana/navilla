@@ -49,6 +49,40 @@ Environment variables (minimum):
 - Regular backups enabled
 - Point-in-time recovery configured
 
+## Post-Deploy Validation
+
+Run these checks after each deploy to confirm the stack is healthy.
+
+### Backend (API)
+
+1. Health check:
+
+```bash
+curl -i https://<backend-domain>/api/health
+```
+
+Expected: `200 OK` and JSON body.
+
+2. CORS preflight:
+
+```bash
+curl -i -X OPTIONS https://<backend-domain>/api/health-status \
+  -H "Origin: https://<frontend-domain>" \
+  -H "Access-Control-Request-Method: GET" \
+  -H "Access-Control-Request-Headers: authorization,content-type"
+```
+
+Expected headers:
+- `access-control-allow-origin: https://<frontend-domain>`
+- `access-control-allow-methods` includes `GET`
+
+### Frontend (UI Smoke)
+
+1. Load homepage (no console errors).
+2. Sign in / sign up should reach the backend.
+3. Dashboard loads with user profile and stats.
+4. Notifications page loads and marks items read on focus.
+
 ## CI/CD Pipeline
 
 ```yaml
