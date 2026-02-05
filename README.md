@@ -175,6 +175,6 @@ This project is licensed under the Apache License 2.0.
 
 ## Links
 
-- [Documentation](docs/) - Full project documentation
+- [Documentation](docs/) - Full project documentation (`cd docs && yarn start` to view locally)
 - [API Reference](docs/docs/api/) - REST API specifications
 - [Architecture](docs/docs/architecture/) - System design and decisions

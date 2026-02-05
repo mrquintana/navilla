@@ -29,7 +29,7 @@ cd navilla
 
 Navilla uses Supabase for authentication and as its primary PostgreSQL database. You'll need to set up a Supabase project and configure your environment variables.
 
-See the [Supabase Setup Guide](../../database/SUPABASE_SETUP.md) for detailed instructions on creating a Supabase project, getting your credentials, and running initial migrations.
+See the [Supabase Setup Guide](https://github.com/mrquintana/navilla/blob/main/database/SUPABASE_SETUP.md) for detailed instructions on creating a Supabase project, getting your credentials, and running initial migrations.
 
 ## 3. Configure Environment Variables
 
@@ -45,7 +45,7 @@ cp frontend/.env.example frontend/.env
 # Edit frontend/.env with your Supabase credentials (VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY)
 ```
 
-Ensure you populate these `.env` files with the appropriate values from your Supabase project as described in the [Supabase Setup Guide](../../database/SUPABASE_SETUP.md).
+Ensure you populate these `.env` files with the appropriate values from your Supabase project as described in the [Supabase Setup Guide](https://github.com/mrquintana/navilla/blob/main/database/SUPABASE_SETUP.md).
 
 ## 4. Run the Application
 
@@ -105,7 +105,7 @@ kill -9 <PID>
 Ensure:
 - Your Supabase project is active.
 - The `DATABASE_URL` in `backend/.env` is correct and includes your database password.
-- You have run the necessary migrations (refer to the [Supabase Setup Guide](../../database/SUPABASE_SETUP.md)).
+- You have run the necessary migrations (refer to the [Supabase Setup Guide](https://github.com/mrquintana/navilla/blob/main/database/SUPABASE_SETUP.md)).
 
 ### Node Version Issues
 

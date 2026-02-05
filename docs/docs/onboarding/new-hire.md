@@ -98,6 +98,6 @@ We prevent users from deducing who reported positive:
 
 ## Resources
 
-- Product Requirements: [`CONTEXT.md`](../../CONTEXT.md)
+- Product Requirements: [`CONTEXT.md`](https://github.com/mrquintana/navilla/blob/main/CONTEXT.md)
 - [Architecture Docs](../architecture/overview)
 - [API Reference](../api/overview)
