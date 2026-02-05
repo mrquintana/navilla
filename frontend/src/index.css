@@ -49,6 +49,13 @@ body {
     linear-gradient(180deg, #f8fafc 0%, #e8f0fe 45%, #eef2ff 100%);
 }
 
+.app-surface {
+  background:
+    radial-gradient(circle at 15% 15%, rgba(59, 130, 246, 0.06), transparent 50%),
+    radial-gradient(circle at 85% 0%, rgba(37, 99, 235, 0.05), transparent 45%),
+    linear-gradient(180deg, #fbfcff 0%, #f5f8ff 45%, #ffffff 100%);
+}
+
 /* Background patterns */
 .bg-pattern {
   background-color: #f8fafc;
@@ -304,6 +311,10 @@ a:hover {
 .landing-section {
   position: relative;
   z-index: 1;
+}
+
+.landing-section + .landing-section {
+  margin-top: 3rem;
 }
 
 .landing-panel {

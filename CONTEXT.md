@@ -575,3 +575,13 @@ For a quick start and a list of development commands, please refer to the main `
 14. **Comprehensive E2E test suite** - 10 test users, all edge cases (GitHub Issue #15)
 15. **Frontend Connections UI** - GitHub Issue #11
 16. **Frontend Unit Tests** - GitHub Issue #12
+
+---
+
+## Open Decisions / Notes
+
+- **Login “Keep me signed in” checkbox** (Sign In page):
+  - Option 1: UI-only checkbox (no behavior change; Supabase already persists sessions).
+  - Option 2: Real behavior: when unchecked, store session in `sessionStorage`; when checked, use `localStorage` (requires updating Supabase client init).
+- **SEO / Discoverability**:
+  - Add metadata (title/description/keywords), Open Graph, sitemap, robots, and structured data to improve search ranking.

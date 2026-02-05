@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuthOptional } from '../../contexts/AuthContext';
 import { useUser } from '../../hooks/useUser';
 import { Bell, ChevronDown, HeartPulse, LayoutDashboard, LogOut, UserCircle2, Users } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
@@ -8,7 +8,9 @@ import { useQuery } from '@tanstack/react-query';
 import { api } from '../../lib/api';
 export function Header() {
   const { t } = useTranslation();
-  const { session, signOut } = useAuth();
+  const auth = useAuthOptional();
+  const session = auth?.session ?? null;
+  const signOut = auth?.signOut;
   const token = session?.access_token ?? '';
   const { data: profile } = useUser();
   const { data: notifications } = useQuery({
@@ -116,7 +118,9 @@ export function Header() {
                       className="nav-dropdown-item"
                       onClick={() => {
                         setMenuOpen(false);
-                        signOut();
+                        if (signOut) {
+                          signOut();
+                        }
                       }}
                       role="menuitem"
                     >
@@ -134,9 +138,6 @@ export function Header() {
                 className="nav-link"
               >
                 {t('auth.signIn')}
-              </Link>
-              <Link to="/signup" className="btn btn-primary text-sm">
-                {t('auth.signUp')}
               </Link>
             </>
           )}

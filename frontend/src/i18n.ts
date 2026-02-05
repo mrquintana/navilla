@@ -10,6 +10,17 @@ const resources = {
   es_MX: { translation: es_MX },
 };
 
+const isDev = import.meta.env.DEV;
+const languageStorageKey = 'navilla_language';
+
+const getDevLanguage = () => {
+  try {
+    return localStorage.getItem(languageStorageKey) || 'en_US';
+  } catch {
+    return 'en_US';
+  }
+};
+
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
@@ -17,11 +28,12 @@ i18n
     resources,
     fallbackLng: 'en_US',
     supportedLngs: ['en_US', 'es_MX'],
+    ...(isDev ? { lng: getDevLanguage() } : {}),
 
     detection: {
-      order: ['localStorage', 'navigator', 'htmlTag'],
+      order: isDev ? ['localStorage'] : ['localStorage', 'navigator', 'htmlTag'],
       caches: ['localStorage'],
-      lookupLocalStorage: 'navilla_language',
+      lookupLocalStorage: languageStorageKey,
     },
 
     interpolation: {

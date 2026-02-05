@@ -4,7 +4,21 @@
 
 import { E2E_MODE, getE2eUserFromToken, type E2eUser } from './e2eMocks';
 
-export const API_URL = import.meta.env.VITE_API_URL || '';
+const RAW_API_URL = import.meta.env.VITE_API_URL ?? '';
+const NORMALIZED_API_URL = RAW_API_URL.replace(/\/+$/, '');
+const DEFAULT_DEV_API_URL = 'http://localhost:8080';
+
+export const API_URL = NORMALIZED_API_URL || (import.meta.env.DEV ? DEFAULT_DEV_API_URL : '');
+
+function getApiBaseUrl(): string {
+  if (API_URL) {
+    return API_URL;
+  }
+  if (import.meta.env.DEV) {
+    return DEFAULT_DEV_API_URL;
+  }
+  throw new Error('API URL is not configured. Set VITE_API_URL.');
+}
 
 interface RequestOptions extends Omit<RequestInit, 'body'> {
   body?: unknown;
@@ -23,8 +37,9 @@ export async function apiRequest<T>(
   }
 
   const { body, headers, ...rest } = options;
+  const baseUrl = getApiBaseUrl();
 
-  const response = await fetch(`${API_URL}${endpoint}`, {
+  const response = await fetch(`${baseUrl}${endpoint}`, {
     ...rest,
     headers: {
       'Content-Type': 'application/json',
@@ -127,26 +142,37 @@ export class ApiError extends Error {
  * API endpoints helper
  */
 export const api = {
-  health: {
+  system: {
     check: async () => {
       if (E2E_MODE) {
         return { status: 'ok' };
       }
+      const baseUrl = getApiBaseUrl();
       if (import.meta.env.DEV) {
         // eslint-disable-next-line no-console
-        console.debug('[healthcheck] url', `${API_URL}/api/health`);
+        console.debug('[healthcheck] url', `${baseUrl}/api/health`);
       }
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 5000);
       try {
-        const response = await fetch(`${API_URL}/api/health`, {
+        const response = await fetch(`${baseUrl}/api/health`, {
           method: 'GET',
           signal: controller.signal,
         });
+        if (import.meta.env.DEV) {
+          // eslint-disable-next-line no-console
+          console.debug('[healthcheck] response', response.status);
+        }
         if (!response.ok) {
           throw new Error('Health check failed');
         }
         return response.json();
+      } catch (error) {
+        if (import.meta.env.DEV) {
+          // eslint-disable-next-line no-console
+          console.debug('[healthcheck] error', error);
+        }
+        throw error;
       } finally {
         clearTimeout(timeout);
       }

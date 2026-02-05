@@ -1,10 +1,10 @@
 import { Link, Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '../hooks/useAuth';
+import { useAuthOptional } from '../contexts/AuthContext';
 
 export function HomePage() {
   const { t } = useTranslation();
-  const { session } = useAuth();
+  const session = useAuthOptional()?.session ?? null;
 
   if (session) {
     return <Navigate to="/connections" replace />;
@@ -14,7 +14,6 @@ export function HomePage() {
     <>
       <section className="hero">
         <div className="container">
-          <p className="hero-kicker">{t('landing.kicker')}</p>
           <h1 className="hero-title">{t('common.appName')}</h1>
           <p className="hero-subtitle">{t('privacy.tagline')}</p>
           <p className="hero-description">{t('privacy.description')}</p>
@@ -35,31 +34,29 @@ export function HomePage() {
               </>
             )}
           </div>
-          <p className="hero-note">{t('landing.heroNote')}</p>
         </div>
       </section>
 
       <section className="container py-12 landing-section">
-        <div className="landing-panel">
-          <h2 className="text-center mb-6">{t('landing.howTitle')}</h2>
-          <div className="landing-steps">
-            <div>
-              <h3>{t('landing.stepOneTitle')}</h3>
-              <p>{t('landing.stepOneBody')}</p>
-            </div>
-            <div>
-              <h3>{t('landing.stepTwoTitle')}</h3>
-              <p>{t('landing.stepTwoBody')}</p>
-            </div>
-            <div>
-              <h3>{t('landing.stepThreeTitle')}</h3>
-              <p>{t('landing.stepThreeBody')}</p>
-            </div>
+        <h2 className="text-center mb-6">{t('landing.howTitle')}</h2>
+        <div className="landing-grid">
+          <div className="feature-card">
+            <h3>{t('landing.stepOneTitle')}</h3>
+            <p>{t('landing.stepOneBody')}</p>
+          </div>
+          <div className="feature-card">
+            <h3>{t('landing.stepTwoTitle')}</h3>
+            <p>{t('landing.stepTwoBody')}</p>
+          </div>
+          <div className="feature-card">
+            <h3>{t('landing.stepThreeTitle')}</h3>
+            <p>{t('landing.stepThreeBody')}</p>
           </div>
         </div>
       </section>
 
       <section className="container pb-16 landing-section">
+        <h2 className="text-center mb-6">{t('landing.valueTitle')}</h2>
         <div className="landing-grid">
           <div className="feature-card">
             <h3>{t('landing.valueOneTitle')}</h3>
