@@ -28,6 +28,9 @@ const sidebars: SidebarsConfig = {
       label: 'Product',
       items: [
         'product/exposure-transparency',
+        'product/platform-recommendations',
+        'product/feature-ideas',
+        'product/vision-verified-health-platform',
       ],
     },
     {
@@ -82,8 +85,7 @@ const sidebars: SidebarsConfig = {
         'adrs/adr-005-design-system',
         'adrs/adr-006-auth-email-confirmation',
         'adrs/adr-007-icon-set',
-        'adrs/adr-008-network-size-cache',
-        'adrs/adr-009-temporal-edges',
+        'adrs/adr-008-network-graph-engine',
       ],
     },
   ],
