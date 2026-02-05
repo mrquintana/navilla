@@ -5,6 +5,7 @@ import { Header } from './Header';
 import { Footer } from './Footer';
 import { DEV_MODE } from '../../lib/devMode';
 import { api } from '../../lib/api';
+import { API_URL } from '../../lib/api';
 import { useAuth } from '../../hooks/useAuth';
 
 export function Layout() {
@@ -15,12 +16,13 @@ export function Layout() {
   const healthQuery = useQuery({
     queryKey: ['health'],
     queryFn: () => api.health.check(),
+    enabled: API_URL.length > 0,
     refetchInterval: 30000,
     refetchIntervalInBackground: true,
     retry: 1,
   });
 
-  const showOutage = healthQuery.isError;
+  const showOutage = API_URL.length > 0 && healthQuery.isError;
 
   return (
     <div className={`min-h-screen bg-background flex flex-col${isLanding ? ' landing-surface' : ''}`}>

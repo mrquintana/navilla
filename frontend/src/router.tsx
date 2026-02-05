@@ -13,11 +13,14 @@ import { ProfilePage } from './pages/ProfilePage';
 import { HealthStatusPage } from './pages/HealthStatusPage';
 import { NotificationsPage } from './pages/NotificationsPage';
 import { InfoPage } from './pages/InfoPage';
+import { NotFoundPage } from './pages/NotFoundPage';
+import { ErrorPage } from './pages/ErrorPage';
 
 export const router = createBrowserRouter([
   {
     path: '/',
     element: <Layout />,
+    errorElement: <ErrorPage />,
     children: [
       {
         index: true,
@@ -123,6 +126,10 @@ export const router = createBrowserRouter([
       {
         path: 'accessibility',
         element: <InfoPage title="Accessibility" subtitle="Our accessibility commitment." />,
+      },
+      {
+        path: '*',
+        element: <NotFoundPage />,
       },
     ],
   },

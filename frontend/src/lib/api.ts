@@ -4,7 +4,7 @@
 
 import { E2E_MODE, getE2eUserFromToken, type E2eUser } from './e2eMocks';
 
-const API_URL = import.meta.env.VITE_API_URL || '';
+export const API_URL = import.meta.env.VITE_API_URL || '';
 
 interface RequestOptions extends Omit<RequestInit, 'body'> {
   body?: unknown;
