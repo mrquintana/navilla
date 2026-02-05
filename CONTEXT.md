@@ -140,6 +140,31 @@ A detailed breakdown of the project's directory layout and key files can be foun
 - 📝 TODO: Decide between hard-delete vs soft-delete for connections.
   - Soft-delete benefits: auditability, undo, analytics, explainable exposure history.
   - Hard-delete benefits: simpler logic, stronger privacy, cleaner graph.
+
+## MVP Checklist (Draft)
+
+### Core Flow (Must-have)
+- [ ] Sign up / sign in works end-to-end without confusion.
+- [ ] Profile basics: display name, username, avatar, visibility settings.
+- [ ] Connection flow: send request, accept/deny/remove, and show who’s who (name/username/avatar).
+- [ ] Health report flow: add positive/negative, clear/delete.
+- [ ] Exposure overview: specific conditions + closest degree + predictable refresh behavior.
+
+### UX & Trust (Should-have)
+- [ ] Clear “What this means” explanation on Health/Exposure.
+- [ ] Loading states for all mutations.
+- [ ] Human-readable error messages.
+- [ ] Notifications update (polling or refresh button).
+
+### Dev/Testing (Stability)
+- [ ] Seed data for local testing.
+- [ ] Dev tools: recompute exposure + inspect graph.
+- [ ] Smoke tests in CI.
+
+### Security/Privacy (Baseline)
+- [ ] No identity leakage in search/invites.
+- [ ] Private profiles accept requests without revealing existence.
+- [ ] External links disclaimer in Terms.
 - **Status:** Accepted
 - **Decision:** Use Docusaurus
 - **Full details:** `docs/docs/adrs/adr-001-documentation-platform.md`

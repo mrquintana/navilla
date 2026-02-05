@@ -5,7 +5,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { api } from '../lib/api';
 import { Link } from 'react-router-dom';
 import { DEV_MODE } from '../lib/devMode';
-import { Eye, EyeOff, HelpCircle } from 'lucide-react';
+import { Eye, EyeOff, HelpCircle, ExternalLink } from 'lucide-react';
 import { useState } from 'react';
 import { getConditionInfo } from '../lib/conditionInfo';
 
@@ -151,15 +151,15 @@ export function DashboardPage() {
                       key={item.condition}
                       className="rounded-md border border-border-light bg-white/70 px-3 py-3"
                     >
-                      <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-wide text-foreground">
-                        <span>{item.condition}</span>
+                      <div className="text-xs font-semibold uppercase tracking-wide text-foreground">
                         <a
-                          className="text-xs text-primary font-medium normal-case"
+                          className="inline-flex items-center gap-1 text-primary"
                           href={info.url}
                           target="_blank"
                           rel="noreferrer"
                         >
-                          {t('common.moreInfo')}
+                          {item.condition}
+                          <ExternalLink className="nav-icon" aria-hidden="true" />
                         </a>
                       </div>
                       <div className="mt-2 grid gap-2 text-xs sm:grid-cols-3">

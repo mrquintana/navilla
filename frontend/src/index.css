@@ -381,6 +381,23 @@ a:hover {
   margin-left: 0.25rem;
 }
 
+.health-row-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.health-condition-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #475569;
+}
+
 .nav-menu {
   position: relative;
 }
