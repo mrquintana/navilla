@@ -24,10 +24,12 @@ export function NotificationsPage() {
     },
   });
 
-  const unreadCount = listQuery.data?.filter((item) => !item.readAt).length ?? 0;
+  const unreadItems = (listQuery.data ?? []).filter((item) => !item.readAt);
+  const readItems = (listQuery.data ?? []).filter((item) => item.readAt);
+  const unreadCount = unreadItems.length;
   const unreadIds = useMemo(
-    () => (listQuery.data ?? []).filter((item) => !item.readAt).map((item) => item.id),
-    [listQuery.data]
+    () => unreadItems.map((item) => item.id),
+    [unreadItems]
   );
   const [isFocused, setIsFocused] = useState(true);
 
@@ -76,28 +78,55 @@ export function NotificationsPage() {
           </div>
         ) : listQuery.data && listQuery.data.length > 0 ? (
           <div className="space-y-3">
-            {listQuery.data.map((item: NotificationItem) => (
-              <div
-                key={item.id}
-                className={`flex items-center justify-between gap-4 border-b pb-3 last:border-b-0 last:pb-0 ${
-                  isStaleRead(item.readAt) ? 'opacity-60' : ''
-                }`}
-              >
-                <div>
-                  <p className={`text-sm ${item.readAt ? 'text-muted' : 'font-medium'}`}>
-                    {t(item.messageKey)}
-                  </p>
-                  <p className="text-xs text-muted">
-                    {new Date(item.createdAt).toLocaleString()}
-                  </p>
-                </div>
-                {!item.readAt && (
-                  <span className="text-xs font-semibold text-primary">
-                    {t('notifications.unread')}
-                  </span>
-                )}
+            {unreadItems.length > 0 && (
+              <div className="space-y-3">
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted">
+                  {t('notifications.newSection')}
+                </p>
+                {unreadItems.map((item: NotificationItem) => (
+                  <div
+                    key={item.id}
+                    className="flex items-center justify-between gap-4 border-b pb-3 last:border-b-0 last:pb-0"
+                  >
+                    <div>
+                      <p className="text-sm font-medium">
+                        {t(item.messageKey)}
+                      </p>
+                      <p className="text-xs text-muted">
+                        {new Date(item.createdAt).toLocaleString()}
+                      </p>
+                    </div>
+                    <span className="text-xs font-semibold text-primary">
+                      {t('notifications.unread')}
+                    </span>
+                  </div>
+                ))}
               </div>
-            ))}
+            )}
+            {readItems.length > 0 && (
+              <div className="space-y-3">
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted">
+                  {t('notifications.earlierSection')}
+                </p>
+                {readItems.map((item: NotificationItem) => (
+                  <div
+                    key={item.id}
+                    className={`flex items-center justify-between gap-4 border-b pb-3 last:border-b-0 last:pb-0 ${
+                      isStaleRead(item.readAt) ? 'opacity-60' : ''
+                    }`}
+                  >
+                    <div>
+                      <p className="text-sm text-muted">
+                        {t(item.messageKey)}
+                      </p>
+                      <p className="text-xs text-muted">
+                        {new Date(item.createdAt).toLocaleString()}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         ) : (
           <p className="text-sm text-muted">{t('notifications.empty')}</p>

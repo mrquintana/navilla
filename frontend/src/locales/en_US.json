@@ -196,6 +196,8 @@
     "subtitle": "Updates from your network",
     "markRead": "Mark read",
     "unread": "New",
+    "newSection": "New",
+    "earlierSection": "Earlier",
     "empty": "No notifications yet",
     "connectionRequest": "You have a new connection request",
     "connectionConfirmed": "Your connection request was accepted",

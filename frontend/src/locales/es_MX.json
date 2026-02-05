@@ -195,6 +195,8 @@
     "subtitle": "Actualizaciones de tu red",
     "markRead": "Marcar como leído",
     "unread": "Nuevo",
+    "newSection": "Nuevas",
+    "earlierSection": "Anteriores",
     "empty": "No hay notificaciones",
     "connectionRequest": "Tienes una nueva solicitud de conexión",
     "connectionConfirmed": "Tu solicitud fue aceptada",
