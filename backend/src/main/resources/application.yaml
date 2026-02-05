@@ -11,10 +11,10 @@ spring:
     username: ${DATABASE_USERNAME:postgres}
     password: ${DATABASE_PASSWORD:postgres}
     hikari:
-      maximum-pool-size: 10
-      minimum-idle: 2
+      maximum-pool-size: ${HIKARI_MAX_POOL:5}
+      minimum-idle: ${HIKARI_MIN_IDLE:1}
       connection-timeout: 30000
-      idle-timeout: 600000
+      idle-timeout: 300000
       max-lifetime: 1800000
 
   # JPA Configuration
@@ -48,7 +48,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics
+        include: health,info
   endpoint:
     health:
       show-details: when-authorized
@@ -57,10 +57,10 @@ management:
 logging:
   level:
     root: INFO
-    app.navilla: DEBUG
+    app.navilla: ${LOG_LEVEL_APP:INFO}
     org.springframework.security: INFO
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    org.hibernate.SQL: ${LOG_LEVEL_HIBERNATE:WARN}
+    org.hibernate.type.descriptor.sql.BasicBinder: ${LOG_LEVEL_HIBERNATE:WARN}
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
 

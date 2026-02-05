@@ -54,8 +54,7 @@ COPY nginx.conf /etc/nginx/nginx.conf
 COPY --from=builder /app/dist /usr/share/nginx/html
 
 # Create non-root user
-RUN apk add --no-cache curl && \
-    addgroup -g 1001 -S navilla && \
+RUN addgroup -g 1001 -S navilla && \
     adduser -u 1001 -S navilla -G navilla && \
     chown -R navilla:navilla /usr/share/nginx/html && \
     chown -R navilla:navilla /var/cache/nginx && \
@@ -69,9 +68,9 @@ USER navilla
 # Expose port
 EXPOSE 80
 
-# Health check
+# Health check (wget is built into alpine, no curl dependency needed)
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD curl -fsS http://localhost:80/health >/dev/null || exit 1
+    CMD wget -qO /dev/null http://localhost:80/health || exit 1
 
 # Run nginx
 CMD ["nginx", "-g", "daemon off;"]

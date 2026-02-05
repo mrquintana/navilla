@@ -63,11 +63,25 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
     CMD curl -fsS http://localhost:8080/api/health >/dev/null || exit 1
 
 # JVM settings for containers
+# Override JAVA_OPTS at deploy time for different environments
 ENV JAVA_OPTS="-XX:+UseContainerSupport \
     -XX:MaxRAMPercentage=75.0 \
     -XX:InitialRAMPercentage=50.0 \
     -XX:+UseG1GC \
     -XX:+UseStringDeduplication \
+    -Djava.security.egd=file:/dev/./urandom \
+    -Dspring.profiles.active=production"
+
+# Lean JVM preset for Railway / memory-constrained environments (256–512MB)
+# Set JAVA_OPTS=$JAVA_OPTS_LEAN in Railway env vars to use this
+ENV JAVA_OPTS_LEAN="-XX:+UseContainerSupport \
+    -XX:MaxRAMPercentage=70.0 \
+    -XX:InitialRAMPercentage=30.0 \
+    -XX:+UseSerialGC \
+    -XX:MaxMetaspaceSize=96m \
+    -XX:+TieredCompilation \
+    -XX:TieredStopAtLevel=1 \
+    -Xss256k \
     -Djava.security.egd=file:/dev/./urandom \
     -Dspring.profiles.active=production"
 
