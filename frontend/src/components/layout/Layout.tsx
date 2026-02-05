@@ -1,9 +1,23 @@
 import { Outlet } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { Header } from './Header';
 import { Footer } from './Footer';
 import { DEV_MODE } from '../../lib/devMode';
+import { api } from '../../lib/api';
 
 export function Layout() {
+  const { t } = useTranslation();
+  const healthQuery = useQuery({
+    queryKey: ['health'],
+    queryFn: () => api.health.check(),
+    refetchInterval: 30000,
+    refetchIntervalInBackground: true,
+    retry: 1,
+  });
+
+  const showOutage = healthQuery.isError;
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Header />
@@ -13,7 +27,28 @@ export function Layout() {
         </div>
       )}
       <main className="pt-6 pb-12 flex-1">
-        <Outlet />
+        {showOutage ? (
+          <div className="container py-8 space-y-4">
+            <div className="card card-elevated text-center space-y-3">
+              <h1 className="text-2xl font-semibold">{t('status.downTitle')}</h1>
+              <p className="text-sm text-muted">{t('status.downBody')}</p>
+              <div className="flex justify-center gap-3">
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={() => healthQuery.refetch()}
+                >
+                  {t('status.retry')}
+                </button>
+                <a className="btn btn-secondary" href="/status">
+                  {t('status.viewStatus')}
+                </a>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <Outlet />
+        )}
       </main>
       <Footer />
     </div>

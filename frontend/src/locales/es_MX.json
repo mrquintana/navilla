@@ -203,6 +203,12 @@
     "connectionDenied": "Tu solicitud fue rechazada",
     "generic": "Tienes una nueva notificación"
   },
+  "status": {
+    "downTitle": "Estamos trabajando en ello",
+    "downBody": "Navilla no está disponible temporalmente. Intenta de nuevo en un momento.",
+    "retry": "Reintentar",
+    "viewStatus": "Ver página de estado"
+  },
   "profile": {
     "title": "Perfil",
     "subtitle": "Gestiona tu perfil público y privacidad",

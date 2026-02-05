@@ -204,6 +204,12 @@
     "connectionDenied": "Your connection request was denied",
     "generic": "You have a new notification"
   },
+  "status": {
+    "downTitle": "We’re working on it",
+    "downBody": "Navilla is temporarily unavailable. Please try again in a moment.",
+    "retry": "Try again",
+    "viewStatus": "View status page"
+  },
   "profile": {
     "title": "Profile",
     "subtitle": "Manage your public profile and privacy preferences",
