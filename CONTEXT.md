@@ -196,6 +196,17 @@ A detailed breakdown of the project's directory layout and key files can be foun
 - **Why:** Works with any Supabase config, no code changes needed
 - **Full details:** `docs/docs/adrs/adr-006-auth-email-confirmation.md`
 
+## Session Notes (2026-02-05)
+
+- ✅ Health Status UX overhaul:
+  - Two-column layout on large screens: left = "My confirmed results", right = "Exposure overview".
+  - "My confirmed results" now includes summary stats (total reports, active positives, last report).
+  - Exposure overview shows last updated, list with "Cases: #" alignment, and "Show all/less".
+  - Added in-app help modals with detailed explanations and examples (bold emphasis supported).
+  - Disease names now link directly to external info (MedlinePlus) with external icon.
+- ✅ Softened external link styling with shared `.health-condition-link` class.
+- ✅ Notifications polling added (30s interval) for fresher UX.
+
 ---
 
 ## Session Notes
