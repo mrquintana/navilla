@@ -17,7 +17,8 @@ test.describe('Account Deletion', () => {
 
   test('opens confirmation modal on click', async ({ page }) => {
     await page.getByRole('button', { name: /delete account|eliminar cuenta/i }).click();
-    await expect(page.getByText(/permanently delete|eliminar.*permanente/i)).toBeVisible();
+    await expect(page.getByRole('heading', { name: /delete account|eliminar cuenta/i })).toBeVisible();
+    await expect(page.getByText(/type delete to confirm|escribe delete/i)).toBeVisible();
   });
 
   test('requires typing DELETE to confirm', async ({ page }) => {
@@ -32,9 +33,9 @@ test.describe('Account Deletion', () => {
 
   test('cancel closes the modal', async ({ page }) => {
     await page.getByRole('button', { name: /delete account|eliminar cuenta/i }).click();
-    await expect(page.getByText(/permanently delete|eliminar.*permanente/i)).toBeVisible();
+    await expect(page.getByText(/type delete to confirm|escribe delete/i)).toBeVisible();
 
-    await page.getByRole('button', { name: /cancel|cancelar/i }).click();
+    await page.getByRole('button', { name: /^cancel$|^cancelar$/i }).click();
     await expect(page.getByText(/type delete to confirm|escribe delete/i)).not.toBeVisible();
   });
 
@@ -52,6 +53,6 @@ test.describe('Account Deletion', () => {
     await page.getByRole('button', { name: /permanently delete|eliminar.*permanentemente/i }).click();
 
     // Should redirect to home after deletion
-    await expect(page).toHaveURL(/^\/$/, { timeout: 10000 });
+    await expect(page).toHaveURL('/', { timeout: 10000 });
   });
 });

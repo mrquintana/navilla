@@ -28,7 +28,7 @@ export default defineConfig({
 
   use: {
     baseURL: process.env.E2E_BASE_URL
-      || (process.env.CI ? 'http://localhost:4173' : 'http://localhost:5173'),
+      || (process.env.CI ? 'http://localhost:4173' : 'http://localhost:5174'),
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
@@ -54,9 +54,9 @@ export default defineConfig({
           env: { VITE_E2E_MODE: 'true' },
         }
       : {
-          // In development, use the dev server with E2E mocks
-          command: 'VITE_E2E_MODE=true npm run dev',
-          url: 'http://localhost:5173',
+          // E2E dev server on port 5174 (separate from regular dev server on 5173)
+          command: 'VITE_E2E_MODE=true npm run dev -- --port 5174',
+          url: 'http://localhost:5174',
           reuseExistingServer: true,
           timeout: 120000,
         },

@@ -62,7 +62,7 @@ test.describe('Dashboard', () => {
     });
 
     test('shows threshold progress indicator', async ({ page }) => {
-      await expect(page.getByText(/1.*of.*3|1.*de.*3/i)).toBeVisible();
+      await expect(page.getByText('1 / 3')).toBeVisible();
     });
 
     test('shows threshold message', async ({ page }) => {
@@ -75,12 +75,14 @@ test.describe('Dashboard', () => {
       await login(page, 'user7');
     });
 
-    test('shows zero connections', async ({ page }) => {
-      await expect(page.getByText('0')).toBeVisible();
+    test('shows zero connection count', async ({ page }) => {
+      // The large bold connection count number
+      const countDisplay = page.locator('.text-4xl.font-bold');
+      await expect(countDisplay).toContainText('0');
     });
 
     test('shows threshold progress indicator', async ({ page }) => {
-      await expect(page.getByText(/0.*of.*3|0.*de.*3/i)).toBeVisible();
+      await expect(page.getByText('0 / 3')).toBeVisible();
     });
   });
 });
