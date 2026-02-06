@@ -83,16 +83,22 @@
 - [x] User Entity & API (backend) - GitHub Issue #4
 - [x] User registration/login (frontend) - Auth system implemented
 - [x] Connection request system - Full API with tests and docs
-- [ ] Health status reporting
-- [ ] Basic exposure calculation
+- [x] Health status reporting
+- [x] Basic exposure calculation
+- [x] Multi-degree exposure calculation (BFS, up to 5 degrees)
 
-### Phase 3: Graph & Alerts
-- [ ] Multi-degree exposure calculation
-- [ ] Notification queue
-- [ ] Weekly batch processing
+### Phase 3: MVP Launch Readiness
+- [x] How It Works page (8 sections from ADR-008 user-facing disclosure)
+- [x] Account deletion UI (GDPR/CCPA - type DELETE to confirm)
+- [x] Dashboard threshold UX (progress bar, "X of 3 needed" message)
+- [x] Comprehensive E2E test suite (auth, connections, health, dashboard, how-it-works, account)
+- [ ] Landing page polish (deferred — functional but not blocking)
+- [ ] Notification improvements (polling added, more features post-MVP)
 
-### Phase 4-6: Frontend, Polish, Launch
-- [ ] (Details to be added as we progress)
+### Phase 4-6: Post-MVP
+- [ ] Temporal edges for exposure relevance
+- [ ] Verified test results
+- [ ] Spanish locale completion
 
 ---
 
@@ -144,27 +150,31 @@ A detailed breakdown of the project's directory layout and key files can be foun
 ## MVP Checklist (Draft)
 
 ### Core Flow (Must-have)
-- [ ] Sign up / sign in works end-to-end without confusion.
-- [ ] Profile basics: display name, username, avatar, visibility settings.
-- [ ] Connection flow: send request, accept/deny/remove, and show who’s who (name/username/avatar).
-- [ ] Health report flow: add positive/negative, clear/delete.
-- [ ] Exposure overview: specific conditions + closest degree + predictable refresh behavior.
+- [x] Sign up / sign in works end-to-end without confusion.
+- [x] Profile basics: display name, username, avatar, visibility settings.
+- [x] Connection flow: send request, accept/deny/remove, and show who's who (name/username/avatar).
+- [x] Health report flow: add positive/negative, clear/delete.
+- [x] Exposure overview: specific conditions + closest degree + predictable refresh behavior.
+- [x] How It Works page with full user-facing disclosure (ADR-008).
+- [x] Account deletion with confirmation modal (GDPR/CCPA).
+- [x] Network size on dashboard with threshold UX.
 
 ### UX & Trust (Should-have)
-- [ ] Clear “What this means” explanation on Health/Exposure.
-- [ ] Loading states for all mutations.
-- [ ] Human-readable error messages.
-- [ ] Notifications update (polling or refresh button).
+- [x] Clear "What this means" explanation on Health/Exposure.
+- [x] Loading states for all mutations.
+- [x] Human-readable error messages.
+- [x] Notifications update (polling or refresh button).
+- [x] Dashboard threshold progress bar ("X of 3 connections needed").
 
 ### Dev/Testing (Stability)
-- [ ] Seed data for local testing.
-- [ ] Dev tools: recompute exposure + inspect graph.
-- [ ] Smoke tests in CI.
+- [x] Seed data for local testing.
+- [x] Dev tools: recompute exposure + inspect graph.
+- [x] Comprehensive E2E tests in CI (auth, connections, health, dashboard, how-it-works, account).
 
 ### Security/Privacy (Baseline)
-- [ ] No identity leakage in search/invites.
-- [ ] Private profiles accept requests without revealing existence.
-- [ ] External links disclaimer in Terms.
+- [x] No identity leakage in search/invites.
+- [x] Private profiles accept requests without revealing existence.
+- [x] External links disclaimer in Terms.
 - **Status:** Accepted
 - **Decision:** Use Docusaurus
 - **Full details:** `docs/docs/adrs/adr-001-documentation-platform.md`
@@ -195,6 +205,35 @@ A detailed breakdown of the project's directory layout and key files can be foun
 - **Decision:** Dynamic detection of email confirmation requirement
 - **Why:** Works with any Supabase config, no code changes needed
 - **Full details:** `docs/docs/adrs/adr-006-auth-email-confirmation.md`
+
+## Session Notes (2026-02-05 - MVP Launch Blockers)
+
+### MVP Implementation Session
+- ✅ **How It Works page** (`HowItWorksPage.tsx`):
+  - 8 sections from ADR-008 user-facing disclosure: what we show, what we never show, data source, connections, exposure calculation, accuracy, what you can do, data rights
+  - Full i18n support (en_US + es_MX)
+  - Replaced placeholder InfoPage at `/how-it-works` with dedicated component
+- ✅ **Account deletion UI** (ProfilePage):
+  - "Danger Zone" section with red-bordered card below settings
+  - Confirmation modal requires typing "DELETE" to enable button
+  - Calls `DELETE /api/users/me` → signs out → redirects to home
+  - Added `api.users.delete()` with E2E mock
+  - Full i18n for all new strings
+- ✅ **Dashboard threshold UX** (DashboardPage):
+  - Progress bar showing X/3 when below privacy threshold
+  - "X of 3 connections needed to see exposure data" message
+  - "What does this mean?" link to `/how-it-works` next to network size
+- ✅ **E2E test suite rebuilt** (6 spec files, ~40 tests):
+  - `auth.spec.ts` — login, signup, logout, forgot password, protected routes
+  - `connections.spec.ts` — page rendering, add form, sections
+  - `health-status.spec.ts` — page, exposure overview, report form
+  - `dashboard.spec.ts` — cards, threshold UX, navigation links
+  - `how-it-works.spec.ts` — all 8 sections, navigation
+  - `account.spec.ts` — delete flow, confirmation modal, typing "DELETE"
+  - Updated test users with `confirmedCount` for threshold testing
+  - Playwright config auto-sets `VITE_E2E_MODE=true` for dev server
+
+---
 
 ## Session Notes (2026-02-05)
 
