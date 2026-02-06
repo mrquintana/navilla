@@ -6,11 +6,39 @@ Comprehensive Playwright test suite covering all MVP flows.
 
 The CI workflow sets `VITE_E2E_MODE=true`. In this mode, the frontend uses in-app mocks for auth and API calls so tests do not depend on Supabase or backend availability.
 
-To run locally:
+## Running Tests
+
+Run all tests (headless):
 
 ```bash
-VITE_E2E_MODE=true npx playwright test
+npx playwright test
 ```
+
+Run a specific test file:
+
+```bash
+npx playwright test e2e/auth.spec.ts
+```
+
+Run with the browser visible (headed mode):
+
+```bash
+npx playwright test --headed
+```
+
+Run in Playwright UI mode (interactive, with time-travel debugging):
+
+```bash
+npx playwright test --ui
+```
+
+View the HTML report from the last run:
+
+```bash
+npx playwright show-report
+```
+
+The Playwright config automatically starts a dev server on port 5174 with `VITE_E2E_MODE=true`, so no extra setup is needed.
 
 ## Test Files
 
