@@ -73,6 +73,10 @@ function mockApiRequest<T>(
     return Promise.reject(new ApiError('Unauthorized', 401));
   }
 
+  if (endpoint === '/api/users/me' && options.method === 'DELETE') {
+    return Promise.resolve(undefined as T);
+  }
+
   if (endpoint === '/api/users/me' && options.method === 'PUT') {
     return Promise.resolve(mockUserProfile(user) as T);
   }
@@ -186,6 +190,10 @@ export const api = {
       apiRequest<UserProfile>('/api/users/me', token, {
         method: 'PUT',
         body: data,
+      }),
+    delete: (token: string) =>
+      apiRequest<void>('/api/users/me', token, {
+        method: 'DELETE',
       }),
   },
   connections: {

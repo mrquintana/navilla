@@ -13,7 +13,8 @@ export async function login(page: Page, user: TestUser | keyof typeof testUsers)
 }
 
 export async function logout(page: Page) {
-  const signOutButton = page.getByRole('button', { name: /sign out|cerrar/i });
+  await page.goto('/profile');
+  const signOutButton = page.getByRole('button', { name: /sign out|cerrar sesión/i });
   await expect(signOutButton).toBeVisible();
   await signOutButton.click();
   await expect(page).toHaveURL(/\/login/, { timeout: 10000 });

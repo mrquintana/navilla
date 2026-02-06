@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { api, ApiError, type UpdateProfileData } from '../lib/api';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
@@ -9,7 +10,7 @@ import { queryClient } from '../queryClient';
 import { LanguageSwitcher } from '../components/LanguageSwitcher';
 import { countries } from '../lib/geolocation';
 import { DEV_MODE } from '../lib/devMode';
-import { AtSign, Calendar, Eye, MapPin, Shield, User, UserCircle2 } from 'lucide-react';
+import { AtSign, Calendar, Eye, MapPin, Shield, Trash2, User, UserCircle2 } from 'lucide-react';
 
 const AVATAR_BUCKET = 'avatars';
 const AVATAR_SIZE = 512;
@@ -35,6 +36,7 @@ async function resizeImage(file: File, size: number): Promise<Blob> {
 
 export function ProfilePage() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const { session, signOut } = useAuth();
   const { data: profile } = useUser();
   const token = session?.access_token ?? '';
@@ -61,6 +63,9 @@ export function ProfilePage() {
   const [error, setError] = useState<string | null>(null);
   const [errorDetails, setErrorDetails] = useState<string[]>([]);
   const [isEditing, setIsEditing] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   const isPublic = form.profileVisibility === 'PUBLIC';
 
   const fillRandomProfile = () => {
@@ -139,6 +144,18 @@ export function ProfilePage() {
       setError(message);
       setErrorDetails(details);
       setMessage(null);
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: () => api.users.delete(token),
+    onSuccess: async () => {
+      setShowDeleteModal(false);
+      await signOut();
+      navigate('/');
+    },
+    onError: (err: any) => {
+      setDeleteError(err?.message || t('common.error'));
     },
   });
 
@@ -568,6 +585,64 @@ export function ProfilePage() {
           </button>
         </div>
       </div>
+
+      <div className="card border-red-200 bg-red-50/50 space-y-4">
+        <h3 className="font-semibold text-red-700">{t('settings.dangerZone')}</h3>
+        <p className="text-sm text-red-600">{t('settings.dangerZoneDescription')}</p>
+        <button
+          type="button"
+          className="inline-flex items-center gap-2 rounded-md border border-red-300 bg-white px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-50 transition-colors"
+          onClick={() => {
+            setShowDeleteModal(true);
+            setDeleteConfirmText('');
+            setDeleteError(null);
+          }}
+        >
+          <Trash2 className="w-4 h-4" aria-hidden="true" />
+          {t('settings.deleteAccount')}
+        </button>
+      </div>
+
+      {showDeleteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl space-y-4">
+            <h3 className="text-lg font-semibold text-red-700">{t('settings.deleteAccount')}</h3>
+            <p className="text-sm text-muted">{t('settings.deleteAccountWarning')}</p>
+            <div>
+              <label className="label" htmlFor="deleteConfirm">
+                {t('settings.deleteAccountTypeConfirm')}
+              </label>
+              <input
+                id="deleteConfirm"
+                className="input"
+                value={deleteConfirmText}
+                onChange={(e) => setDeleteConfirmText(e.target.value)}
+                placeholder="DELETE"
+                autoComplete="off"
+              />
+            </div>
+            {deleteError && <div className="alert alert-error">{deleteError}</div>}
+            <div className="flex justify-end gap-3">
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => setShowDeleteModal(false)}
+                disabled={deleteMutation.isPending}
+              >
+                {t('common.cancel')}
+              </button>
+              <button
+                type="button"
+                className="inline-flex items-center gap-2 rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50 transition-colors"
+                disabled={deleteConfirmText !== 'DELETE' || deleteMutation.isPending}
+                onClick={() => deleteMutation.mutate()}
+              >
+                {deleteMutation.isPending ? t('common.loading') : t('settings.deleteAccountConfirmButton')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

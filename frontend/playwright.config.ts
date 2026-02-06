@@ -51,10 +51,11 @@ export default defineConfig({
           url: 'http://localhost:4173',
           reuseExistingServer: false,
           timeout: 120000,
+          env: { VITE_E2E_MODE: 'true' },
         }
       : {
-          // In development, use the dev server
-          command: 'npm run dev',
+          // In development, use the dev server with E2E mocks
+          command: 'VITE_E2E_MODE=true npm run dev',
           url: 'http://localhost:5173',
           reuseExistingServer: true,
           timeout: 120000,

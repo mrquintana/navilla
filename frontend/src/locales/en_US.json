@@ -86,7 +86,8 @@
     "connectionCount": "Your Connections",
     "connectionDescription": "people in your trusted network",
     "networkSize": "Network size",
-    "networkSizeHint": "Includes direct connections (up to {{depth}} degrees)",
+    "networkSizeHint": "Includes direct connections (up to {{depth}} degrees).",
+    "thresholdMessage": "{{current}} of {{needed}} connections needed to see exposure data",
     "lastUpdated": "Last updated",
     "yourProfile": "Profile",
     "manageConnections": "Manage connections",
@@ -255,7 +256,12 @@
     "privacy": "Privacy",
     "account": "Account",
     "deleteAccount": "Delete Account",
-    "confirmDeleteAccount": "Are you sure? This action cannot be undone."
+    "confirmDeleteAccount": "Are you sure? This action cannot be undone.",
+    "dangerZone": "Danger Zone",
+    "dangerZoneDescription": "Deleting your account is permanent and cannot be undone.",
+    "deleteAccountWarning": "Are you sure? This will permanently delete your account and anonymize all your data. Your connections, health statuses, and profile will be removed. This action cannot be undone.",
+    "deleteAccountTypeConfirm": "Type DELETE to confirm",
+    "deleteAccountConfirmButton": "Permanently Delete Account"
   },
   "errors": {
     "required": "This field is required",
@@ -300,6 +306,67 @@
     "valueTwoBody": "Clear, calm summaries help you decide next steps at your own pace.",
     "valueThreeTitle": "Designed for trust",
     "valueThreeBody": "No public identities, no social graph — just the information you need."
+  },
+  "howItWorks": {
+    "title": "How It Works",
+    "subtitle": "A plain-language overview of how Navilla protects your privacy and calculates exposure.",
+    "showYou": {
+      "title": "What we show you",
+      "intro": "When someone in your network reports a positive health status, you'll see:",
+      "item1": "The condition name (e.g. Chlamydia)",
+      "item2": "How many people in your network reported it",
+      "item3": "The closest degree — how many connections away the nearest case is (1st, 2nd, 3rd)",
+      "item4": "Whether the report is recent (last 30 days) or older",
+      "item5": "Whether the condition is still active or has been cleared"
+    },
+    "neverShowYou": {
+      "title": "What we never show you",
+      "intro": "Navilla is built so that you can't identify who reported what:",
+      "item1": "We never show names, usernames, or emails of people who report a condition",
+      "item2": "You can't see which specific connection triggered an alert",
+      "item3": "There is no way to browse other people's health statuses"
+    },
+    "dataSource": {
+      "title": "Where data comes from",
+      "body1": "All health status data is self-reported by users. Navilla does not verify results with labs or clinics. People may report inaccurately, forget to update, or not report at all.",
+      "body2": "Exposure data refreshes every few days — not in real time. This delay protects privacy by preventing you from adding a connection and immediately seeing if they reported something."
+    },
+    "connections": {
+      "title": "How connections work",
+      "body1": "When you connect with someone and they accept, a confirmed connection is created between you. Connections are stored using cryptographic hashes — not real names or emails.",
+      "body2": "Your network extends beyond direct connections. If you're connected to Ana and Ana is connected to Luis, Luis is in your 2nd-degree network. This extends up to 5 degrees.",
+      "body3": "Only confirmed connections count. Pending or denied requests are never part of the graph."
+    },
+    "exposure": {
+      "title": "How exposure is calculated",
+      "body1": "We build a graph of confirmed connections, traverse outward from you, and check for positive health reports. Results are grouped by condition showing counts and closest degree.",
+      "body2": "If you have fewer than 3 connections, we don't show exposure data at all. With only 1 or 2 connections, an alert could reveal a specific person's status. The 3-connection minimum protects everyone's privacy."
+    },
+    "accuracy": {
+      "title": "Accuracy and limitations",
+      "body1": "Exposure signals are useful, but they have limitations you should understand:",
+      "item1": "Exposure does not mean you are infected — it means someone in your extended network reported a condition",
+      "item2": "Exposure does not replace medical advice — use it as a signal to consider testing",
+      "item3": "Data is self-reported and may be inaccurate, delayed, or incomplete",
+      "item4": "The graph only includes Navilla users — your real-world exposure may differ",
+      "item5": "Snapshots may be up to several days old"
+    },
+    "whatYouCanDo": {
+      "title": "What you can do",
+      "item1": "Add connections to build your trusted network",
+      "item2": "Report, clear, or delete your own health statuses at any time",
+      "item3": "Remove connections — they'll disappear from your graph on the next refresh",
+      "item4": "Use exposure data as one input when deciding whether to get tested"
+    },
+    "dataRights": {
+      "title": "Your data rights",
+      "item1": "View your network size and exposure data at any time",
+      "item2": "Report, update, or delete your health statuses",
+      "item3": "Add or remove connections freely",
+      "item4": "Delete your account and all associated data permanently",
+      "item5": "Request an export of your personal data"
+    },
+    "goToDashboard": "Go to Dashboard"
   },
   "footer": {
     "product": "Product",

@@ -86,7 +86,8 @@
     "connectionCount": "Tus Conexiones",
     "connectionDescription": "personas en tu red de confianza",
     "networkSize": "Tamaño de red",
-    "networkSizeHint": "Incluye conexiones directas (hasta {{depth}} grados)",
+    "networkSizeHint": "Incluye conexiones directas (hasta {{depth}} grados).",
+    "thresholdMessage": "{{current}} de {{needed}} conexiones necesarias para ver datos de exposición",
     "lastUpdated": "Última actualización",
     "yourProfile": "Perfil",
     "manageConnections": "Gestionar conexiones",
@@ -254,7 +255,12 @@
     "privacy": "Privacidad",
     "account": "Cuenta",
     "deleteAccount": "Eliminar Cuenta",
-    "confirmDeleteAccount": "¿Estás seguro? Esta acción no se puede deshacer."
+    "confirmDeleteAccount": "¿Estás seguro? Esta acción no se puede deshacer.",
+    "dangerZone": "Zona de Peligro",
+    "dangerZoneDescription": "Eliminar tu cuenta es permanente y no se puede deshacer.",
+    "deleteAccountWarning": "¿Estás seguro? Esto eliminará permanentemente tu cuenta y anonimizará todos tus datos. Tus conexiones, estados de salud y perfil serán removidos. Esta acción no se puede deshacer.",
+    "deleteAccountTypeConfirm": "Escribe DELETE para confirmar",
+    "deleteAccountConfirmButton": "Eliminar Cuenta Permanentemente"
   },
   "errors": {
     "required": "Este campo es obligatorio",
@@ -299,6 +305,67 @@
     "valueTwoBody": "Resúmenes claros y tranquilos para decidir tus siguientes pasos a tu ritmo.",
     "valueThreeTitle": "Diseñado para confianza",
     "valueThreeBody": "Sin identidades públicas ni grafo social — solo la información que necesitas."
+  },
+  "howItWorks": {
+    "title": "Cómo Funciona",
+    "subtitle": "Una explicación clara de cómo Navilla protege tu privacidad y calcula la exposición.",
+    "showYou": {
+      "title": "Lo que te mostramos",
+      "intro": "Cuando alguien en tu red reporta un estado de salud positivo, verás:",
+      "item1": "El nombre de la condición (ej. Clamidia)",
+      "item2": "Cuántas personas en tu red lo reportaron",
+      "item3": "El grado más cercano — cuántas conexiones de distancia está el caso más próximo (1º, 2º, 3º)",
+      "item4": "Si el reporte es reciente (últimos 30 días) o anterior",
+      "item5": "Si la condición sigue activa o fue resuelta"
+    },
+    "neverShowYou": {
+      "title": "Lo que nunca te mostramos",
+      "intro": "Navilla está diseñado para que no puedas identificar quién reportó qué:",
+      "item1": "Nunca mostramos nombres, usuarios o correos de quienes reportan una condición",
+      "item2": "No puedes ver qué conexión específica generó una alerta",
+      "item3": "No hay forma de ver los estados de salud de otras personas"
+    },
+    "dataSource": {
+      "title": "De dónde vienen los datos",
+      "body1": "Todos los datos de salud son auto reportados por los usuarios. Navilla no verifica resultados con laboratorios o clínicas. Las personas pueden reportar de forma inexacta, olvidar actualizar, o no reportar.",
+      "body2": "Los datos de exposición se actualizan cada pocos días — no en tiempo real. Este retraso protege la privacidad evitando que agregues una conexión y veas inmediatamente si reportó algo."
+    },
+    "connections": {
+      "title": "Cómo funcionan las conexiones",
+      "body1": "Cuando te conectas con alguien y aceptan, se crea una conexión confirmada. Las conexiones se almacenan usando hashes criptográficos — no nombres reales ni correos.",
+      "body2": "Tu red se extiende más allá de conexiones directas. Si estás conectado con Ana y Ana con Luis, Luis está en tu red de 2º grado. Esto se extiende hasta 5 grados.",
+      "body3": "Solo las conexiones confirmadas cuentan. Las solicitudes pendientes o rechazadas nunca son parte del grafo."
+    },
+    "exposure": {
+      "title": "Cómo se calcula la exposición",
+      "body1": "Construimos un grafo de conexiones confirmadas, recorremos desde ti hacia afuera, y buscamos reportes positivos. Los resultados se agrupan por condición mostrando conteos y grado más cercano.",
+      "body2": "Si tienes menos de 3 conexiones, no mostramos datos de exposición. Con solo 1 o 2 conexiones, una alerta podría revelar el estado de una persona específica. El mínimo de 3 conexiones protege la privacidad de todos."
+    },
+    "accuracy": {
+      "title": "Precisión y limitaciones",
+      "body1": "Las señales de exposición son útiles, pero tienen limitaciones que debes entender:",
+      "item1": "Exposición no significa que estés infectado — significa que alguien en tu red extendida reportó una condición",
+      "item2": "La exposición no reemplaza el consejo médico — úsala como señal para considerar hacerte pruebas",
+      "item3": "Los datos son auto reportados y pueden ser inexactos, tardíos o incompletos",
+      "item4": "El grafo solo incluye usuarios de Navilla — tu exposición real puede ser diferente",
+      "item5": "Los datos pueden tener hasta varios días de antigüedad"
+    },
+    "whatYouCanDo": {
+      "title": "Lo que puedes hacer",
+      "item1": "Agrega conexiones para construir tu red de confianza",
+      "item2": "Reporta, resuelve o elimina tus estados de salud en cualquier momento",
+      "item3": "Elimina conexiones — desaparecerán de tu grafo en la siguiente actualización",
+      "item4": "Usa los datos de exposición como un factor al decidir si hacerte pruebas"
+    },
+    "dataRights": {
+      "title": "Tus derechos sobre tus datos",
+      "item1": "Ve tu tamaño de red y datos de exposición en cualquier momento",
+      "item2": "Reporta, actualiza o elimina tus estados de salud",
+      "item3": "Agrega o elimina conexiones libremente",
+      "item4": "Elimina tu cuenta y todos los datos asociados permanentemente",
+      "item5": "Solicita una exportación de tus datos personales"
+    },
+    "goToDashboard": "Ir al Panel"
   },
   "footer": {
     "product": "Producto",

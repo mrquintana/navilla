@@ -1,6 +1,6 @@
-# E2E Smoke Tests
+# E2E Tests
 
-This is a minimal smoke suite meant to stay stable while the product evolves.
+Comprehensive Playwright test suite covering all MVP flows.
 
 ## Mode
 
@@ -9,15 +9,26 @@ The CI workflow sets `VITE_E2E_MODE=true`. In this mode, the frontend uses in-ap
 To run locally:
 
 ```bash
-VITE_E2E_MODE=true npm run test:e2e
+VITE_E2E_MODE=true npx playwright test
 ```
 
-## Scope
+## Test Files
 
-These tests only verify:
-- The app boots
-- Signup step 1 renders and advances
-- Login reaches the dashboard
-- Logout works
+| File | Coverage |
+|------|----------|
+| `auth.spec.ts` | Login, signup, logout, forgot password, protected routes |
+| `connections.spec.ts` | Connections page, add connection form, sections |
+| `health-status.spec.ts` | Health page, exposure overview, report form |
+| `dashboard.spec.ts` | Dashboard cards, network size, threshold UX, navigation |
+| `how-it-works.spec.ts` | All 8 content sections, navigation links |
+| `account.spec.ts` | Delete account flow, confirmation modal |
 
-Expand only when flows stabilize.
+## Test Users
+
+| Key | Email | Connections | Use For |
+|-----|-------|-------------|---------|
+| `user1` | testuser1@navilla.app | 1 | Below privacy threshold |
+| `user2` | testuser2@navilla.app | 3 | Meets threshold |
+| `user7` | testuser7@navilla.app | 0 | New user |
+
+Password for all: `TestPassword123!`

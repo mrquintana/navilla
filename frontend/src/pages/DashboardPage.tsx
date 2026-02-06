@@ -274,6 +274,24 @@ export function DashboardPage() {
             {statsQuery.data?.confirmedCount ?? 0}
           </p>
           <p className="text-sm text-muted">{t('dashboard.connectionDescription')}</p>
+          {(statsQuery.data?.confirmedCount ?? 0) < 3 && (
+            <div className="mt-3 space-y-2">
+              <div className="flex items-center gap-2">
+                <div className="flex-1 h-2 rounded-full bg-gray-200">
+                  <div
+                    className="h-2 rounded-full bg-primary transition-all"
+                    style={{ width: `${((statsQuery.data?.confirmedCount ?? 0) / 3) * 100}%` }}
+                  />
+                </div>
+                <span className="text-xs font-medium text-muted whitespace-nowrap">
+                  {statsQuery.data?.confirmedCount ?? 0} / 3
+                </span>
+              </div>
+              <p className="text-xs text-muted">
+                {t('dashboard.thresholdMessage', { current: statsQuery.data?.confirmedCount ?? 0, needed: 3 })}
+              </p>
+            </div>
+          )}
           <div className="mt-3 text-sm text-muted space-y-1">
             <div className="flex items-center justify-between">
               <span>{t('dashboard.networkSize')}</span>
@@ -281,7 +299,13 @@ export function DashboardPage() {
                 {exposureQuery.data?.totalGraphNodes ?? '—'}
               </span>
             </div>
-            <p className="text-xs text-muted">{t('dashboard.networkSizeHint', { depth: exposureQuery.data?.maxDepth ?? 5 })}</p>
+            <p className="text-xs text-muted">
+              {t('dashboard.networkSizeHint', { depth: exposureQuery.data?.maxDepth ?? 5 })}
+              {' '}
+              <Link to="/how-it-works" className="text-primary font-medium">
+                {t('dashboard.exposureHelpTitle')}
+              </Link>
+            </p>
           </div>
           <div className="mt-3">
             <Link to="/connections" className="text-sm text-primary font-medium">

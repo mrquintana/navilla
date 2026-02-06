@@ -13,6 +13,7 @@ import { ProfilePage } from './pages/ProfilePage';
 import { HealthStatusPage } from './pages/HealthStatusPage';
 import { NotificationsPage } from './pages/NotificationsPage';
 import { InfoPage } from './pages/InfoPage';
+import { HowItWorksPage } from './pages/HowItWorksPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 import { ErrorPage } from './pages/ErrorPage';
 
@@ -68,7 +69,7 @@ export const router = createBrowserRouter([
       },
       {
         path: 'how-it-works',
-        element: <InfoPage title="How it works" subtitle="A short overview of how Navilla protects your privacy." />,
+        element: <HowItWorksPage />,
       },
       {
         path: 'privacy',
