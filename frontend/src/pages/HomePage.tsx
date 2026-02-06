@@ -7,7 +7,7 @@ export function HomePage() {
   const session = useAuthOptional()?.session ?? null;
 
   if (session) {
-    return <Navigate to="/connections" replace />;
+    return <Navigate to="/dashboard" replace />;
   }
 
   return (
@@ -18,7 +18,7 @@ export function HomePage() {
           <p className="hero-subtitle">{t('privacy.tagline')}</p>
           <p className="hero-description">{t('privacy.description')}</p>
 
-          <div className="flex justify-center gap-4">
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
             {session ? (
               <Link to="/dashboard" className="btn btn-primary btn-lg">
                 {t('nav.dashboard')}

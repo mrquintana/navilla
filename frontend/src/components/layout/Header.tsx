@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuthOptional } from '../../contexts/AuthContext';
 import { useUser } from '../../hooks/useUser';
-import { Bell, ChevronDown, HeartPulse, LayoutDashboard, LogOut, UserCircle2, Users } from 'lucide-react';
+import { Bell, ChevronDown, HeartPulse, LayoutDashboard, LogOut, Menu, UserCircle2, Users } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../../lib/api';
@@ -28,13 +28,19 @@ export function Header() {
       : '';
   const unreadCount = notifications?.filter((item) => !item.readAt).length ?? 0;
   const [menuOpen, setMenuOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
+  const mobileMenuRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const handleClick = (event: MouseEvent) => {
       if (!menuRef.current) return;
       if (!menuRef.current.contains(event.target as Node)) {
         setMenuOpen(false);
+      }
+      if (!mobileMenuRef.current) return;
+      if (!mobileMenuRef.current.contains(event.target as Node)) {
+        setMobileMenuOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClick);
@@ -53,42 +59,95 @@ export function Header() {
 
         {/* Navigation */}
         <nav className="flex items-center gap-2 sm:gap-3">
+          <div className="nav-mobile sm:hidden" ref={mobileMenuRef}>
+            <button
+              type="button"
+              className="nav-link"
+              onClick={() => setMobileMenuOpen((open) => !open)}
+              aria-expanded={mobileMenuOpen}
+              aria-haspopup="menu"
+            >
+              <Menu className="nav-icon" aria-hidden="true" />
+              <span className="sr-only">Menu</span>
+            </button>
+            {mobileMenuOpen && (
+              <div className="nav-dropdown" role="menu">
+                {session ? (
+                  <>
+                    <Link to="/dashboard" className="nav-dropdown-item" role="menuitem">
+                      <LayoutDashboard className="nav-icon" aria-hidden="true" />
+                      {t('nav.dashboard')}
+                    </Link>
+                    <Link to="/connections" className="nav-dropdown-item" role="menuitem">
+                      <Users className="nav-icon" aria-hidden="true" />
+                      {t('nav.connections')}
+                    </Link>
+                    <Link to="/health" className="nav-dropdown-item" role="menuitem">
+                      <HeartPulse className="nav-icon" aria-hidden="true" />
+                      {t('nav.health')}
+                    </Link>
+                    <Link to="/notifications" className="nav-dropdown-item" role="menuitem">
+                      <Bell className="nav-icon" aria-hidden="true" />
+                      {t('nav.notifications')}
+                      {unreadCount > 0 && <span className="nav-mobile-badge">{unreadCount}</span>}
+                    </Link>
+                    <Link to="/profile" className="nav-dropdown-item" role="menuitem">
+                      <UserCircle2 className="nav-icon" aria-hidden="true" />
+                      {t('nav.profile')}
+                    </Link>
+                    <button
+                      type="button"
+                      className="nav-dropdown-item"
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        if (signOut) {
+                          signOut();
+                        }
+                      }}
+                      role="menuitem"
+                    >
+                      <LogOut className="nav-icon" aria-hidden="true" />
+                      {t('auth.signOut')}
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link to="/login" className="nav-dropdown-item" role="menuitem">
+                      {t('auth.signIn')}
+                    </Link>
+                    <Link to="/signup" className="nav-dropdown-item" role="menuitem">
+                      {t('auth.signUp')}
+                    </Link>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
           {session ? (
             <>
-              <Link
-                to="/dashboard"
-                className="hidden sm:inline-flex nav-link"
-              >
-                <LayoutDashboard className="nav-icon" aria-hidden="true" />
-                {t('nav.dashboard')}
-              </Link>
-              <Link
-                to="/connections"
-                className="hidden sm:inline-flex nav-link"
-              >
-                <Users className="nav-icon" aria-hidden="true" />
-                {t('nav.connections')}
-              </Link>
-              <Link
-                to="/health"
-                className="hidden sm:inline-flex nav-link"
-              >
-                <HeartPulse className="nav-icon" aria-hidden="true" />
-                {t('nav.health')}
-              </Link>
-              <Link
-                to="/notifications"
-                className="hidden sm:inline-flex nav-link"
-              >
-                <span className="nav-bell" aria-hidden="true">
-                  <Bell className="nav-icon" />
-                  {unreadCount > 0 && (
-                    <span className="nav-bell-badge">{unreadCount}</span>
-                  )}
-                </span>
-                {t('nav.notifications')}
-              </Link>
-              <div className="hidden sm:inline-flex nav-menu" ref={menuRef}>
+              <div className="nav-desktop">
+                <Link to="/dashboard" className="nav-link">
+                  <LayoutDashboard className="nav-icon" aria-hidden="true" />
+                  {t('nav.dashboard')}
+                </Link>
+                <Link to="/connections" className="nav-link">
+                  <Users className="nav-icon" aria-hidden="true" />
+                  {t('nav.connections')}
+                </Link>
+                <Link to="/health" className="nav-link">
+                  <HeartPulse className="nav-icon" aria-hidden="true" />
+                  {t('nav.health')}
+                </Link>
+                <Link to="/notifications" className="nav-link">
+                  <span className="nav-bell" aria-hidden="true">
+                    <Bell className="nav-icon" />
+                    {unreadCount > 0 && (
+                      <span className="nav-bell-badge">{unreadCount}</span>
+                    )}
+                  </span>
+                  {t('nav.notifications')}
+                </Link>
+                <div className="nav-menu" ref={menuRef}>
                 <button
                   className="nav-link"
                   type="button"
@@ -129,6 +188,7 @@ export function Header() {
                     </button>
                   </div>
                 )}
+                </div>
               </div>
             </>
           ) : (

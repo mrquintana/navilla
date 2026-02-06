@@ -88,7 +88,7 @@ function ConnectionList({
                     </div>
                   </div>
                   {renderActions && (
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap gap-2">
                       {renderActions(connection)}
                     </div>
                   )}

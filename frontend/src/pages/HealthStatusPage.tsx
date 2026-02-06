@@ -203,7 +203,7 @@ export function HealthStatusPage() {
                 );
 
                 return (
-                  <div key={status.id} className="health-row-card flex items-center justify-between gap-4">
+                  <div key={status.id} className="health-row-card flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                       <div className="health-row-header">
                         <a
