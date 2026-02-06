@@ -7,6 +7,11 @@ title: Overview
 
 **Navilla** is a privacy-preserving sexual health platform that helps users understand their potential STI exposure through an anonymized connection network.
 
+## Licensing
+
+Navilla is proprietary software. Unauthorized copying, modification, or redistribution is prohibited.
+See `LICENSE` for details.
+
 ## Core Principle
 
 > "Numbers, not names."
