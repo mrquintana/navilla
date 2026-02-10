@@ -116,7 +116,7 @@ A detailed breakdown of the project's directory layout and key files can be foun
 | Connection deletion affects partner's graph? | Decided | Soft-delete (user removes from view, partner keeps history) |
 | STI clearing removes past alerts? | Decided | "Resolved" status (alerts remain but marked resolved) |
 | Email hashing algorithm? | Decided | SHA-256 with pepper for lookups |
-| Backend hosting? | Decided | Railway (EC2 was tried; see ADR-010) |
+| Backend hosting? | Decided | Railway for MVP (AWS/EC2 was tried first; see ADR-010). Terraform infra destroyed — `.tf` files kept for future AWS return. |
 | Email provider? | Decided | SendGrid (SMTP for Supabase Auth) |
 
 ---
@@ -606,7 +606,6 @@ All MVP features are implemented and verified. Remaining open work tracked in Gi
 | High | SendGrid SMTP for password reset | #14 | Infrastructure config — not code |
 | Medium | Frontend unit tests (Vitest) | #12 | No unit test framework set up yet |
 | Medium | User guide documentation | #19 | Screenshots + walkthrough for end users |
-| Low | EC2 scheduled start/stop | #20 | Cost savings (~$3/mo) |
 
 Run `gh issue list` for the full list.
 
