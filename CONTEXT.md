@@ -116,7 +116,7 @@ A detailed breakdown of the project's directory layout and key files can be foun
 | Connection deletion affects partner's graph? | Decided | Soft-delete (user removes from view, partner keeps history) |
 | STI clearing removes past alerts? | Decided | "Resolved" status (alerts remain but marked resolved) |
 | Email hashing algorithm? | Decided | SHA-256 with pepper for lookups |
-| Backend hosting? | Open | Railway vs Fly.io vs Render |
+| Backend hosting? | Decided | Railway (EC2 was tried; see ADR-010) |
 | Email provider? | Decided | SendGrid (SMTP for Supabase Auth) |
 
 ---
@@ -598,22 +598,17 @@ For a quick start and a list of development commands, please refer to the main `
 
 ## Next Steps
 
-1. ~~**Set up Supabase project**~~ ✅ Done
-2. ~~**Configure environment files**~~ ✅ Done
-3. ~~**Implement Security Config**~~ ✅ Done (JWT, CORS, encryption)
-4. ~~**Create first API endpoint**~~ ✅ Done (health check)
-5. ~~**Implement User Entity & API**~~ ✅ Done (GitHub Issue #4)
-6. ~~**Add i18n infrastructure**~~ ✅ Done (en_US, es_MX with placeholders)
-7. ~~**Create README & CONTRIBUTING**~~ ✅ Done
-8. ~~**Implement authentication flow**~~ ✅ Done - Frontend Supabase integration
-9. ~~**Implement Connection entity & API**~~ ✅ Done - Full CRUD with tests
-10. ~~**Set up E2E testing**~~ ✅ Done - Playwright with CI integration
-11. ~~**Fix API URL configuration**~~ ✅ Done - Centralized API client
-12. ~~**Add UI background styling**~~ ✅ Done - Pattern backgrounds
-13. **Implement Health Status entity & API** - GitHub Issue #10
-14. **Comprehensive E2E test suite** - 10 test users, all edge cases (GitHub Issue #15)
-15. **Frontend Connections UI** - GitHub Issue #11
-16. **Frontend Unit Tests** - GitHub Issue #12
+All MVP features are implemented and verified. Remaining open work tracked in GitHub Issues:
+
+| Priority | Item | GitHub Issue | Notes |
+|----------|------|-------------|-------|
+| High | Backend Spanish translations | #8 | Frontend done, backend messages_es_MX.properties still English |
+| High | SendGrid SMTP for password reset | #14 | Infrastructure config — not code |
+| Medium | Frontend unit tests (Vitest) | #12 | No unit test framework set up yet |
+| Medium | User guide documentation | #19 | Screenshots + walkthrough for end users |
+| Low | EC2 scheduled start/stop | #20 | Cost savings (~$3/mo) |
+
+Run `gh issue list` for the full list.
 
 ---
 
