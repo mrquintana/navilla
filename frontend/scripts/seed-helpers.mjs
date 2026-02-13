@@ -73,7 +73,10 @@ export async function login(page, baseUrl, email, password = DEFAULT_PASSWORD) {
   await emailField.fill(email);
   await page.getByLabel(/password/i).fill(password);
   await page.getByRole('button', { name: /sign in|iniciar/i }).click();
-  await page.waitForTimeout(1200);
+
+  // Wait until we leave the login page (redirect to dashboard/profile/etc.)
+  await page.waitForURL((url) => !url.pathname.endsWith('/login'), { timeout: 10000 }).catch(() => {});
+  await page.waitForTimeout(500);
 }
 
 // ─── Auth: signup ───────────────────────────────────────────────────────────────
@@ -152,9 +155,17 @@ export async function loginSync(page, baseUrl, user, password = DEFAULT_PASSWORD
 export async function updateProfile(page, baseUrl, user, profileOpts) {
   await page.goto(`${baseUrl}/profile`, { waitUntil: 'domcontentloaded' });
 
-  // Click Edit
+  // Click Edit — retry login if we got redirected
   const editBtn = page.getByRole('button', { name: /edit/i });
-  await editBtn.waitFor({ timeout: 8000 });
+  if (!(await editBtn.isVisible({ timeout: 5000 }).catch(() => false))) {
+    // Likely landed on login page — re-login and retry
+    if (page.url().includes('/login')) {
+      log(`  retrying login for ${user.email} (session lost)`);
+      await login(page, baseUrl, user.email);
+      await page.goto(`${baseUrl}/profile`, { waitUntil: 'domcontentloaded' });
+    }
+    await editBtn.waitFor({ timeout: 10000 });
+  }
   await editBtn.click();
   await page.waitForTimeout(300);
 
@@ -204,7 +215,13 @@ export async function sendConnectionRequest(page, baseUrl, toEmailOrUsername) {
   await page.goto(`${baseUrl}/connections`, { waitUntil: 'domcontentloaded' });
   await page.waitForTimeout(500);
   const input = page.getByPlaceholder(/email or username/i);
-  await input.waitFor({ timeout: 8000 });
+  if (!(await input.isVisible({ timeout: 3000 }).catch(() => false))) {
+    // Session may have expired — page redirected to login
+    if (page.url().includes('/login')) {
+      throw new Error('Session lost — redirected to login');
+    }
+    await input.waitFor({ timeout: 8000 });
+  }
   await input.fill(toEmailOrUsername);
   await page.getByRole('button', { name: /send request|enviar/i }).click();
   await page.waitForTimeout(800);
@@ -259,7 +276,12 @@ export async function reportHealth(page, baseUrl, condition, status, date) {
 
   // Click "Add result"
   const addBtn = page.getByRole('button', { name: /add result/i });
-  await addBtn.waitFor({ timeout: 8000 });
+  if (!(await addBtn.isVisible({ timeout: 3000 }).catch(() => false))) {
+    if (page.url().includes('/login')) {
+      throw new Error('Session lost — redirected to login');
+    }
+    await addBtn.waitFor({ timeout: 8000 });
+  }
   await addBtn.click();
   await page.waitForTimeout(500);
 
