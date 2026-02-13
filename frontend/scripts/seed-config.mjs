@@ -256,11 +256,15 @@ export function buildHealthPlan() {
   }
 
   // 3rd degree — pick from tier-3 indices
+  // These are solo-reporter conditions designed to show all 4 exposure combos:
+  //   HEPATITIS_B  → Active - Older   (solo, not cleared, >30 days)
+  //   HEPATITIS_C  → Resolved - Older (solo, cleared, >30 days)
+  //   TRICHOMONIASIS → Resolved - Recent (solo, cleared, <30 days)
   const t3 = tier3Indices;
   if (t3.length >= 3) {
     plan.push({ userIndex: t3[0], condition: 'HEPATITIS_B',    status: 'POSITIVE', date: daysAgoDate(45), cleared: false });
-    plan.push({ userIndex: t3[Math.floor(t3.length * 0.4)], condition: 'HEPATITIS_C', status: 'POSITIVE', date: daysAgoDate(60), cleared: false });
-    plan.push({ userIndex: t3[Math.floor(t3.length * 0.7)], condition: 'TRICHOMONIASIS', status: 'POSITIVE', date: daysAgoDate(15), cleared: false });
+    plan.push({ userIndex: t3[Math.floor(t3.length * 0.4)], condition: 'HEPATITIS_C', status: 'POSITIVE', date: daysAgoDate(60), cleared: true });
+    plan.push({ userIndex: t3[Math.floor(t3.length * 0.7)], condition: 'TRICHOMONIASIS', status: 'POSITIVE', date: daysAgoDate(10), cleared: true });
   }
   if (t3.length >= 5) {
     plan.push({ userIndex: t3[t3.length - 1], condition: 'GONORRHEA', status: 'POSITIVE', date: daysAgoDate(28), cleared: false });

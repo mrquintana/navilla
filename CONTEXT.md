@@ -611,10 +611,69 @@ Run `gh issue list` for the full list.
 
 ---
 
+## Session Notes (2026-02-12 — Seed Script Overhaul)
+
+### Accomplished
+- Rewrote `frontend/scripts/seed-users.mjs` into a modular 5-phase system:
+  - Phase 1: Create users (Supabase Admin API or UI signup, with login verification)
+  - Phase 2: Update profiles (PUBLIC / CONNECTIONS_ONLY / PRIVATE)
+  - Phase 3: Build connection topology (multi-tier + pending + denied)
+  - Phase 4: Report health across all 10 STI types (active, cleared, negative)
+  - Phase 5: migue1990 self-report (HPV negative)
+- New files: `seed-config.mjs` (topology/data), `seed-helpers.mjs` (Playwright interactions), `seed-revert.sql` (cleanup SQL)
+- Added `--size=N` flag for scalable topology (tested with 50 users)
+- Added `.seed-state.json` for resumability and per-phase CLI flags
+- Multiple fixes to handle: Supabase signup rate limits, silent signup failures, session loss during logout (switched to localStorage.clear()), slow profile loads
+
+### Lessons Learned
+- Supabase free tier rate-limits client signups (~30/hr) — use Admin API with service role key instead
+- UI signup can fail silently — always verify login works after signup before marking as "created"
+- Clicking UI buttons for logout is fragile (toasts/overlays block clicks) — clearing localStorage is more reliable
+- Backend must be running for connections and health to work (Supabase Auth is hosted, but `/api/*` hits local backend)
+
+### Seed Script Quick Reference
+```bash
+# Full seed (default 131 users)
+cd frontend && npm run seed:users -- --headed
+
+# Smaller test run
+npm run seed:users -- --size=50 --headed
+
+# With Supabase Admin API (bypasses rate limits)
+npm run seed:users -- --supabase-url=$SUPABASE_URL --supabase-key=$SUPABASE_SERVICE_ROLE_KEY
+
+# Single phase
+npm run seed:users -- --phase=connections --headed
+
+# Clean slate
+rm -f scripts/.seed-state.json
+
+# Revert all seed data (run in Supabase SQL Editor)
+# → database/seeds/seed-revert.sql
+```
+
+### Next Steps (continue tomorrow)
+- [ ] Verify full 131-user seed against Railway production URL
+- [ ] Investigate: user048 wasn't created (rate limit) — retry or use Admin API
+- [ ] Remove DEBUG logging from seed-helpers once stable
+- [ ] Update docs for seed script usage
+- [ ] Adjust seed health data to demonstrate all 4 exposure combos:
+  - "Active - Recent" (already works)
+  - "Resolved - Recent" → need a condition with only 1 reporter who clears it
+  - "Active - Older" → need a condition where all reports are >30 days old, not cleared
+  - "Resolved - Older" → need a condition >30 days old where reporter also clears it
+- [ ] Add tooltip/info icon next to exposure status badges explaining what Active/Resolved and Recent/Older mean (keep cards clean, show detail on hover/tap)
+
+---
+
 ## Open Decisions / Notes
 
-- **Login “Keep me signed in” checkbox** (Sign In page):
+- **Login "Keep me signed in" checkbox** (Sign In page):
   - Option 1: UI-only checkbox (no behavior change; Supabase already persists sessions).
   - Option 2: Real behavior: when unchecked, store session in `sessionStorage`; when checked, use `localStorage` (requires updating Supabase client init).
 - **SEO / Discoverability**:
   - Add metadata (title/description/keywords), Open Graph, sitemap, robots, and structured data to improve search ranking.
+
+### Exposure Display Notes
+- **"Exposure Overview" vs "In Your Network"**: Same data source (`exposureQuery.data?.exposures`), different display limits. Dashboard shows top 3, Health page shows 6 (expandable with "Show all").
+- **Status labels**: `active` (clearedAt is null) vs `resolved` (clearedAt set). Timeframe: `recent` (≤30 days) vs `older` (>30 days). Four possible combos: "Active - Recent", "Active - Older", "Resolved - Recent", "Resolved - Older".

@@ -86,7 +86,8 @@
     "connectionCount": "Your Connections",
     "connectionDescription": "people in your trusted network",
     "networkSize": "Network size",
-    "networkSizeHint": "Includes direct connections (up to {{depth}} degrees).",
+    "networkSizeHint": "Your network size includes your direct and indirect connections up to {{depth}} degrees.",
+    "networkSizeHelpLink": "How network size is calculated",
     "thresholdMessage": "{{current}} of {{needed}} connections needed to see exposure data",
     "lastUpdated": "Last updated",
     "yourProfile": "Profile",
@@ -112,6 +113,14 @@
     "exposureTimeframe": {
       "recent": "Recent",
       "older": "Older"
+    },
+    "exposureStatusHint": {
+      "active": "At least one person in your network currently has this condition",
+      "resolved": "All reports of this condition in your network have been cleared"
+    },
+    "exposureTimeframeHint": {
+      "recent": "Reported within the last 30 days",
+      "older": "Reported more than 30 days ago"
     }
   },
   "connections": {

@@ -223,7 +223,10 @@ export function DashboardPage() {
                         </div>
                         <div className="space-y-1">
                           <div className="text-muted">{t('dashboard.exposureLabelStatus')}</div>
-                          <div className="font-medium">
+                          <div
+                            className="font-medium cursor-help"
+                            title={`${t(`dashboard.exposureStatusHint.${item.status}`)} · ${t(`dashboard.exposureTimeframeHint.${item.timeframe}`)}`}
+                          >
                             {t(`dashboard.exposureStatusLabels.${item.status}`)} · {t(`dashboard.exposureTimeframe.${item.timeframe}`)}
                           </div>
                         </div>
@@ -302,8 +305,8 @@ export function DashboardPage() {
             <p className="text-xs text-muted">
               {t('dashboard.networkSizeHint', { depth: exposureQuery.data?.maxDepth ?? 5 })}
               {' '}
-              <Link to="/how-it-works" className="text-primary font-medium">
-                {t('dashboard.exposureHelpTitle')}
+              <Link to="/how-it-works#network-size-explainer" className="text-primary font-medium">
+                {t('dashboard.networkSizeHelpLink')}
               </Link>
             </p>
           </div>

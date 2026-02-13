@@ -328,7 +328,10 @@ export function HealthStatusPage() {
                     <span>•</span>
                     <span>{t('health.exposureCases')} {item.count}</span>
                   </div>
-                  <p className="text-xs text-muted">
+                  <p
+                    className="text-xs text-muted cursor-help"
+                    title={`${t(`dashboard.exposureStatusHint.${item.status}`)} · ${t(`dashboard.exposureTimeframeHint.${item.timeframe}`)}`}
+                  >
                     {t(`dashboard.exposureStatusLabels.${item.status}`)} · {t(`dashboard.exposureTimeframe.${item.timeframe}`)}
                   </p>
                 </div>

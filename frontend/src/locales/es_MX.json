@@ -86,7 +86,8 @@
     "connectionCount": "Tus Conexiones",
     "connectionDescription": "personas en tu red de confianza",
     "networkSize": "Tamaño de red",
-    "networkSizeHint": "Incluye conexiones directas (hasta {{depth}} grados).",
+    "networkSizeHint": "Tu tamaño de red incluye tus conexiones directas e indirectas hasta {{depth}} grados.",
+    "networkSizeHelpLink": "Cómo se calcula el tamaño de red",
     "thresholdMessage": "{{current}} de {{needed}} conexiones necesarias para ver datos de exposición",
     "lastUpdated": "Última actualización",
     "yourProfile": "Perfil",
@@ -112,6 +113,14 @@
     "exposureTimeframe": {
       "recent": "Reciente",
       "older": "Anterior"
+    },
+    "exposureStatusHint": {
+      "active": "Al menos una persona en tu red tiene actualmente esta condicion",
+      "resolved": "Todos los reportes de esta condicion en tu red han sido resueltos"
+    },
+    "exposureTimeframeHint": {
+      "recent": "Reportado en los ultimos 30 dias",
+      "older": "Reportado hace mas de 30 dias"
     }
   },
   "connections": {
