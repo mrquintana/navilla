@@ -101,6 +101,8 @@
     "devThirdDegree": "Conteo 3º grado",
     "devExposureCount": "Exposiciones encontradas",
     "exposureSummary": "Resumen de exposición",
+    "exposureSummaryMore": "Más",
+    "exposureSummaryPreview": "Mostrando {{shown}} de {{total}} condiciones. Ve a Estado de Salud para ver todo el detalle.",
     "exposureLabelDegree": "Grado",
     "exposureLabelCount": "Casos",
     "exposureLabelStatus": "Estado",

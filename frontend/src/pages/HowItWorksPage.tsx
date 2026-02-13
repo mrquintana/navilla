@@ -12,14 +12,19 @@ import {
 } from 'lucide-react';
 
 interface SectionProps {
+  sectionId?: string;
   icon: React.ReactNode;
   title: string;
   children: React.ReactNode;
 }
 
-function Section({ icon, title, children }: SectionProps) {
+function Section({ sectionId, icon, title, children }: SectionProps) {
   return (
-    <section className="card card-elevated space-y-3">
+    <section
+      id={sectionId}
+      className="card card-elevated space-y-3"
+      style={sectionId ? { scrollMarginTop: '5rem' } : undefined}
+    >
       <div className="flex items-center gap-3">
         <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
           {icon}
@@ -76,6 +81,7 @@ export function HowItWorksPage() {
       </Section>
 
       <Section
+        sectionId="network-size-explainer"
         icon={<Users className="w-5 h-5 text-primary" />}
         title={t('howItWorks.connections.title')}
       >

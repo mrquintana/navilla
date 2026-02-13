@@ -101,6 +101,8 @@
     "devThirdDegree": "3rd-degree count",
     "devExposureCount": "Exposures found",
     "exposureSummary": "Exposure summary",
+    "exposureSummaryMore": "More",
+    "exposureSummaryPreview": "Showing {{shown}} of {{total}} conditions. See Health Status for full details.",
     "exposureLabelDegree": "Closest degree",
     "exposureLabelCount": "Cases",
     "exposureLabelStatus": "Status",

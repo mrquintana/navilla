@@ -25,6 +25,21 @@ Centered layout for auth pages (login/signup):
 - App name link at top
 - Centered card container for forms
 
+#### Brand Wordmark Consistency
+The `Navilla` wordmark should use the same style in every app surface (header, login, signup, and future auth pages).
+
+Current canonical wordmark classes:
+- `text-2xl font-extrabold tracking-tight text-primary`
+
+Rules:
+- Do not use alternate weights for `Navilla` in app chrome (avoid `font-semibold`/regular variants).
+- Keep brand color as `text-primary` for the wordmark in navigation/auth headers.
+- Keep responsive behavior consistent by reusing the same class set rather than page-specific overrides.
+
+Favicon guidance:
+- The favicon should be derived from the same brand system as the wordmark (same visual identity and primary color family).
+- If the circular mark is preferred, keep it as the favicon base, but ensure it is an official logo mark (not a placeholder icon).
+
 ### Auth Components
 
 #### ProtectedRoute (`components/auth/ProtectedRoute.tsx`)

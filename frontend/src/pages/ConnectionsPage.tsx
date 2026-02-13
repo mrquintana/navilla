@@ -17,6 +17,7 @@ function ConnectionList({
   isExpanded,
   footer,
   isLoading,
+  compact,
 }: {
   title: string;
   headerExtra?: ReactNode;
@@ -27,6 +28,7 @@ function ConnectionList({
   isExpanded?: (connection: Connection) => boolean;
   footer?: ReactNode;
   isLoading?: boolean;
+  compact?: boolean;
 }) {
   const { t } = useTranslation();
 
@@ -45,7 +47,7 @@ function ConnectionList({
       ) : connections.length === 0 ? (
         <p className="text-sm text-muted">{emptyText}</p>
       ) : (
-        <div className="space-y-3">
+        <div className={compact ? 'space-y-2' : 'space-y-3'}>
           {connections.map((connection) => {
             // TODO: Revisit identity fields (display name vs full name vs username) to reduce redundancy.
             const maskIdentifier = (value: string) => `${value.charAt(0)}***`;
@@ -62,11 +64,11 @@ function ConnectionList({
             return (
               <div
                 key={connection.id}
-                className="connection-item space-y-3"
+                className={`connection-item ${compact ? 'connection-item--compact space-y-2' : 'space-y-3'}`}
               >
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden">
+                    <div className={`${compact ? 'w-9 h-9' : 'w-10 h-10'} rounded-full bg-gray-100 flex items-center justify-center overflow-hidden`}>
                       {connection.partnerAvatarThumbUrl ? (
                         <img
                           src={connection.partnerAvatarThumbUrl}
@@ -78,7 +80,7 @@ function ConnectionList({
                       )}
                     </div>
                     <div>
-                      <p className="text-sm font-medium">{nameToShow}</p>
+                      <p className={`${compact ? 'text-xs' : 'text-sm'} font-medium`}>{nameToShow}</p>
                       {connection.partnerDisplayName && connection.partnerUsername && (
                         <p className="text-xs text-muted">@{connection.partnerUsername}</p>
                       )}
@@ -88,7 +90,7 @@ function ConnectionList({
                     </div>
                   </div>
                   {renderActions && (
-                    <div className="flex flex-wrap gap-2">
+                    <div className={`${compact ? 'flex gap-1.5' : 'flex flex-wrap gap-2'}`}>
                       {renderActions(connection)}
                     </div>
                   )}
@@ -436,6 +438,7 @@ export function ConnectionsPage() {
 
       <ConnectionList
         title={t('connections.confirmed')}
+        compact
         headerExtra={(
           <div className="relative w-full max-w-xs">
             <Search className="nav-icon input-icon" aria-hidden="true" />

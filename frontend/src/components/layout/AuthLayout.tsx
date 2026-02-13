@@ -5,9 +5,9 @@ export function AuthLayout() {
   const { t } = useTranslation();
 
   return (
-    <div className="min-h-screen bg-pattern flex flex-col">
+    <div className="min-h-screen bg-auth-fractal flex flex-col">
       <header className="p-4">
-        <Link to="/" className="text-xl font-semibold text-foreground">
+        <Link to="/" className="text-2xl font-extrabold tracking-tight text-primary hover:no-underline">
           {t('common.appName')}
         </Link>
       </header>

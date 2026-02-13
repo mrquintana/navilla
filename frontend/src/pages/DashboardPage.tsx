@@ -5,7 +5,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { api } from '../lib/api';
 import { Link } from 'react-router-dom';
 import { DEV_MODE } from '../lib/devMode';
-import { Eye, EyeOff, HelpCircle, ExternalLink, Mail, MapPin, Shield, Calendar, Pencil } from 'lucide-react';
+import { HelpCircle, ExternalLink, Mail, MapPin, Shield, Calendar, Pencil } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { getConditionInfo } from '../lib/conditionInfo';
 
@@ -19,7 +19,6 @@ export function DashboardPage() {
       setShowSnapshotNotice(false);
     }
   }, []);
-  const [showStatus, setShowStatus] = useState(true);
   const [showExposureHelp, setShowExposureHelp] = useState(false);
   const { user, session } = useAuth();
   const { data: profile, isLoading, error } = useUser();
@@ -145,25 +144,9 @@ export function DashboardPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <div className="flex items-center gap-2">
-              <h3 className="profile-card-title">{t('dashboard.exposureStatus')}</h3>
-              <button
-                type="button"
-                className="btn btn-secondary btn-sm"
-                onClick={() => setShowStatus((prev) => !prev)}
-                title={showStatus ? t('dashboard.hideStatus') : t('dashboard.showStatus')}
-              >
-                {showStatus ? (
-                  <EyeOff className="nav-icon" aria-hidden="true" />
-                ) : (
-                  <Eye className="nav-icon" aria-hidden="true" />
-                )}
-              </button>
-            </div>
+            <h3 className="profile-card-title">{t('dashboard.exposureStatus')}</h3>
           </div>
-          {!showStatus ? (
-            <span className="badge badge-warning text-sm">{t('dashboard.statusHidden')}</span>
-          ) : healthQuery.isLoading || exposureQuery.isLoading ? (
+          {healthQuery.isLoading || exposureQuery.isLoading ? (
             <span className="badge badge-warning text-sm">{t('common.loading')}</span>
           ) : hasPositiveStatus ? (
             <span className="badge badge-error text-sm">{t('dashboard.selfPositive')}</span>
@@ -190,9 +173,20 @@ export function DashboardPage() {
               <p>{t('dashboard.exposureHelpBody')}</p>
             </div>
           )}
-          {showStatus && (exposureQuery.data?.exposures?.length ?? 0) > 0 && (
+          {(exposureQuery.data?.exposures?.length ?? 0) > 0 && (
             <div className="mt-3 space-y-2 text-sm">
-              <p className="text-xs text-muted">{t('dashboard.exposureSummary')}</p>
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-xs text-muted">{t('dashboard.exposureSummary')}</p>
+                <Link to="/health" className="text-[11px] font-semibold tracking-wide uppercase text-primary">
+                  {t('dashboard.exposureSummaryMore')}
+                </Link>
+              </div>
+              <p className="text-[11px] text-muted">
+                {t('dashboard.exposureSummaryPreview', {
+                  shown: Math.min(3, exposureQuery.data?.exposures?.length ?? 0),
+                  total: exposureQuery.data?.exposures?.length ?? 0,
+                })}
+              </p>
               <div className="space-y-2">
                 {exposureQuery.data?.exposures?.slice(0, 3).map((item) => {
                   const info = getConditionInfo(item.condition, i18n.language);
