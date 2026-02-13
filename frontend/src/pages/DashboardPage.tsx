@@ -5,7 +5,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { api } from '../lib/api';
 import { Link } from 'react-router-dom';
 import { DEV_MODE } from '../lib/devMode';
-import { Eye, EyeOff, HelpCircle, ExternalLink, Mail, MapPin, Shield, Calendar } from 'lucide-react';
+import { Eye, EyeOff, HelpCircle, ExternalLink, Mail, MapPin, Shield, Calendar, Pencil } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { getConditionInfo } from '../lib/conditionInfo';
 
@@ -333,8 +333,8 @@ export function DashboardPage() {
               {profileSubtitle && <p className="profile-card-subtitle">{profileSubtitle}</p>}
             </div>
             <div className="profile-card-actions">
-              <Link to="/profile" className="btn btn-secondary btn-sm">
-                {t('dashboard.editProfile')}
+              <Link to="/profile" className="btn btn-secondary btn-sm" title={t('dashboard.editProfile')}>
+                <Pencil className="nav-icon" aria-hidden="true" />
               </Link>
             </div>
           </div>
