@@ -104,21 +104,36 @@ async function phaseUsers(browser, state) {
       } else {
         // Full UI signup
         await signup(page, baseUrl, user, password);
+
+        // Verify login works — logout then login again
+        await ensureLoggedOut(page, baseUrl);
+        await login(page, baseUrl, user.email, password);
+        if (page.url().includes('/login')) {
+          throw new Error(`Login verification failed for ${user.email} after signup`);
+        }
       }
 
       state.usersCreated.push(user.email);
       saveState(state);
       log(`  [${i + 1}/${USERS.length}] ${user.email} done`);
     } catch (err) {
-      // Check if "already registered" in the error
+      // Check if "already registered" — verify login still works
       if (err.message?.includes('already') || err.message?.includes('registered')) {
-        log(`  skip ${user.email} (already registered)`);
-        state.usersCreated.push(user.email);
-        saveState(state);
+        try {
+          await ensureLoggedOut(page, baseUrl);
+          await login(page, baseUrl, user.email, password);
+          if (page.url().includes('/login')) {
+            throw new Error('login failed');
+          }
+          log(`  skip ${user.email} (already registered, login verified)`);
+          state.usersCreated.push(user.email);
+          saveState(state);
+        } catch {
+          log(`  ERROR ${user.email}: already registered but login fails — skipping`);
+        }
         continue;
       }
       log(`  ERROR creating ${user.email}: ${err.message}`);
-      // Try to continue with next user
     }
 
     await ensureLoggedOut(page, baseUrl);

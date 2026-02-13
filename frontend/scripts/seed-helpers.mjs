@@ -107,7 +107,16 @@ export async function signup(page, baseUrl, user, password = DEFAULT_PASSWORD) {
   await page.getByLabel(/city|region|location/i).fill(user.location);
 
   await page.getByRole('button', { name: /sign up|registr/i }).click();
-  await page.waitForTimeout(1500);
+
+  // Verify signup succeeded — should redirect away from /signup
+  await page.waitForURL((url) => !url.pathname.endsWith('/signup'), { timeout: 15000 }).catch(() => {});
+  await page.waitForTimeout(500);
+
+  // Check for error messages still on signup page
+  if (page.url().includes('/signup')) {
+    const alertText = await page.locator('.alert').innerText().catch(() => '');
+    throw new Error(`Signup failed for ${user.email}: ${alertText || 'still on signup page'}`);
+  }
 }
 
 // ─── Auth: admin user creation (Supabase Admin API) ─────────────────────────────
