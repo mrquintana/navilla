@@ -13,7 +13,8 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:report": "playwright show-report",
-    "seed:users": "node scripts/seed-users.mjs"
+    "seed:users": "node scripts/seed-users.mjs",
+    "seed:revert": "echo 'Run database/seeds/seed-revert.sql in Supabase SQL Editor'"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.93.3",
