@@ -35,26 +35,14 @@ const selectOptionSafe = async (selectLocator, desiredValue, fallbackValue) => {
 // ─── Auth: logout ───────────────────────────────────────────────────────────────
 
 export async function ensureLoggedOut(page, baseUrl) {
-  await page.goto(`${baseUrl}/profile`, { waitUntil: 'domcontentloaded' });
-
-  // Try sign-out on profile page
-  const signOut = page.getByRole('button', { name: /sign out|cerrar/i });
-  if (await signOut.isVisible().catch(() => false)) {
-    await signOut.click();
-    await page.waitForTimeout(800);
-    return;
-  }
-
-  // Try header profile menu
-  const profileMenu = page.getByRole('button', { name: /profile/i }).first();
-  if (await profileMenu.isVisible().catch(() => false)) {
-    await profileMenu.click();
-    const menuSignOut = page.getByRole('menuitem', { name: /sign out|cerrar/i });
-    if (await menuSignOut.isVisible().catch(() => false)) {
-      await menuSignOut.click();
-      await page.waitForTimeout(800);
-    }
-  }
+  // Clear session via JS — much more reliable than clicking UI buttons
+  await page.goto(`${baseUrl}/login`, { waitUntil: 'domcontentloaded' });
+  await page.evaluate(() => {
+    localStorage.clear();
+    sessionStorage.clear();
+  });
+  await page.goto(`${baseUrl}/login`, { waitUntil: 'domcontentloaded' });
+  await page.waitForTimeout(300);
 }
 
 // ─── Auth: login ────────────────────────────────────────────────────────────────
