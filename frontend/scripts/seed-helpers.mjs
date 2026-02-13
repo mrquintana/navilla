@@ -158,11 +158,20 @@ export async function updateProfile(page, baseUrl, user, profileOpts) {
   // Click Edit — retry login if we got redirected
   const editBtn = page.getByRole('button', { name: /edit/i });
   if (!(await editBtn.isVisible({ timeout: 5000 }).catch(() => false))) {
-    // Likely landed on login page — re-login and retry
-    if (page.url().includes('/login')) {
+    const currentUrl = page.url();
+    const bodyText = await page.locator('body').innerText().catch(() => '(empty)');
+    log(`  DEBUG ${user.email}: url=${currentUrl} body="${bodyText.slice(0, 200)}"`);
+
+    if (currentUrl.includes('/login')) {
       log(`  retrying login for ${user.email} (session lost)`);
       await login(page, baseUrl, user.email);
       await page.goto(`${baseUrl}/profile`, { waitUntil: 'domcontentloaded' });
+    } else if (currentUrl.includes('/signup')) {
+      // User doesn't exist — skip
+      throw new Error(`User ${user.email} not found (redirected to signup)`);
+    } else {
+      // On profile page but Edit not visible — profile may still be loading
+      await page.waitForTimeout(3000);
     }
     await editBtn.waitFor({ timeout: 10000 });
   }
