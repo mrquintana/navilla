@@ -18,7 +18,9 @@
     "open": "Abrir",
     "page": "Página",
     "of": "de",
-    "select": "Seleccionar..."
+    "select": "Seleccionar...",
+    "darkMode": "Cambiar a modo oscuro",
+    "lightMode": "Cambiar a modo claro"
   },
   "auth": {
     "signIn": "Iniciar Sesión",
