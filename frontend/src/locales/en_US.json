@@ -18,9 +18,7 @@
     "open": "Open",
     "page": "Page",
     "of": "of",
-    "select": "Select...",
-    "darkMode": "Switch to dark mode",
-    "lightMode": "Switch to light mode"
+    "select": "Select..."
   },
   "auth": {
     "signIn": "Sign In",

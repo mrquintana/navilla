@@ -1,15 +1,13 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuthOptional } from '../../contexts/AuthContext';
-import { useTheme } from '../../contexts/ThemeContext';
 import { useUser } from '../../hooks/useUser';
-import { Bell, ChevronDown, HeartPulse, LayoutDashboard, LogOut, Menu, Moon, Sun, UserCircle2, Users } from 'lucide-react';
+import { Bell, ChevronDown, HeartPulse, LayoutDashboard, LogOut, Menu, UserCircle2, Users } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../../lib/api';
 export function Header() {
   const { t } = useTranslation();
-  const { theme, toggleTheme } = useTheme();
   const auth = useAuthOptional();
   const session = auth?.session ?? null;
   const signOut = auth?.signOut;
@@ -61,19 +59,6 @@ export function Header() {
 
         {/* Navigation */}
         <nav className="flex items-center gap-2 sm:gap-3">
-          <button
-            type="button"
-            className="nav-link"
-            onClick={toggleTheme}
-            aria-label={theme === 'dark' ? t('common.lightMode') : t('common.darkMode')}
-            title={theme === 'dark' ? t('common.lightMode') : t('common.darkMode')}
-          >
-            {theme === 'dark' ? (
-              <Sun className="nav-icon" aria-hidden="true" />
-            ) : (
-              <Moon className="nav-icon" aria-hidden="true" />
-            )}
-          </button>
           <div className="nav-mobile sm:hidden" ref={mobileMenuRef}>
             <button
               type="button"
