@@ -25,6 +25,15 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: 'category',
+      label: 'Design',
+      collapsed: false,
+      items: [
+        'design/overview',
+        'design/brand-identity',
+      ],
+    },
+    {
+      type: 'category',
       label: 'Product',
       items: [
         'product/exposure-transparency',
