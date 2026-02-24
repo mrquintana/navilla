@@ -41,13 +41,7 @@ export function PrivacyPolicyPage() {
         },
         {
           heading: 'Third-party services',
-          body: 'We use a small number of trusted services to operate the platform:',
-          list: [
-            'Supabase — authentication and database (hosted on AWS)',
-            'SendGrid — transactional email delivery',
-            'Railway — application hosting',
-          ],
-          note: 'Each of these providers has their own data processing agreements and security practices. We do not share more data than necessary with any of them.',
+          body: 'We use a small number of trusted infrastructure providers to operate the platform. These cover authentication, database hosting, email delivery, and application hosting. We do not share more data than necessary with any of them, and each operates under their own data processing agreements and security standards.',
         },
         {
           heading: 'Data retention',

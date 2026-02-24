@@ -4,7 +4,7 @@ export function SecurityPage() {
   return (
     <ContentPage
       seoTitle="Security — Navilla"
-      seoDescription="How Navilla secures your data. Our technical security practices and infrastructure."
+      seoDescription="How Navilla secures your data. Our technical security practices and commitments."
       canonical="https://www.navilla.app/security"
       title="Security"
       subtitle="Our approach to keeping your data safe."
@@ -15,13 +15,13 @@ export function SecurityPage() {
         },
         {
           heading: 'Authentication',
-          body: 'Authentication is handled by Supabase Auth, which provides industry-standard JWT-based session management. Passwords are never stored in plain text. Sessions expire and require re-authentication.',
+          body: 'Authentication uses industry-standard JWT-based session management. Passwords are never stored in plain text. Sessions expire and require re-authentication.',
         },
         {
           heading: 'Data storage',
           body: [
-            'All data is stored in a PostgreSQL database managed by Supabase, hosted on AWS infrastructure.',
-            'Sensitive fields are encrypted at the application layer before storage, in addition to Supabase\'s database-level encryption at rest.',
+            'All data is stored in a managed relational database with encryption at rest.',
+            'Sensitive fields are additionally encrypted at the application layer before storage.',
           ],
         },
         {
@@ -30,7 +30,7 @@ export function SecurityPage() {
         },
         {
           heading: 'Email security',
-          body: 'Transactional emails are sent via SendGrid with full DKIM, SPF, and DMARC authentication on the navilla.app domain. This prevents spoofing and ensures that emails from no-reply@navilla.app are genuinely from us.',
+          body: 'Transactional emails are sent with full DKIM, SPF, and DMARC authentication on the navilla.app domain. This prevents spoofing and ensures that emails from no-reply@navilla.app are genuinely from us.',
         },
         {
           heading: 'What we do not do',

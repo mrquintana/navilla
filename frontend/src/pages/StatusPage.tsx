@@ -20,15 +20,6 @@ export function StatusPage() {
           ],
         },
         {
-          heading: 'Infrastructure',
-          list: [
-            'Frontend: Railway (nginx)',
-            'Backend: Railway (Spring Boot / Java 25)',
-            'Database: Supabase (PostgreSQL on AWS)',
-            'Email: SendGrid',
-          ],
-        },
-        {
           heading: 'Reporting an issue',
           body: 'If you are experiencing a problem that is not reflected here, please contact us at contact@navilla.app with a description of the issue and we will investigate promptly.',
         },
