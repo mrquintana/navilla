@@ -63,6 +63,7 @@ const sidebars: SidebarsConfig = {
         'frontend/components',
         'frontend/state-management',
         'frontend/styling',
+        'frontend/i18n',
       ],
     },
     {
@@ -98,6 +99,7 @@ const sidebars: SidebarsConfig = {
         'adrs/adr-008-network-graph-engine',
         'adrs/adr-010-railway-memory-optimization',
         'adrs/adr-011-domain-navilla-app',
+        'adrs/adr-012-browser-native-language-detection',
       ],
     },
   ],
