@@ -15,7 +15,7 @@ interface GeoLocation {
  */
 export async function detectCountry(): Promise<GeoLocation | null> {
   try {
-    const response = await fetch('http://ip-api.com/json/?fields=country,countryCode,city,regionName');
+    const response = await fetch('https://ip-api.com/json/?fields=country,countryCode,city,regionName');
     if (!response.ok) return null;
 
     const data = await response.json();
