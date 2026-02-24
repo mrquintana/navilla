@@ -13,25 +13,29 @@ interface LanguageSwitcherProps {
 export function LanguageSwitcher({ className, id }: LanguageSwitcherProps) {
   const { i18n } = useTranslation();
 
-  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newLang = e.target.value;
-    i18n.changeLanguage(newLang);
-    localStorage.setItem('navilla_language', newLang);
+  const switchTo = (code: string) => {
+    i18n.changeLanguage(code);
+    localStorage.setItem('navilla_language', code);
   };
 
   return (
-    <select
-      id={id}
-      value={i18n.language}
-      onChange={handleChange}
-      className={className ?? 'text-sm bg-transparent border border-border rounded px-2 py-1 cursor-pointer'}
-      aria-label="Select language"
-    >
-      {languages.map((lang) => (
-        <option key={lang.code} value={lang.code}>
-          {lang.label}
-        </option>
+    <div id={id} className={className} role="group" aria-label="Select language">
+      {languages.map((lang, idx) => (
+        <span key={lang.code}>
+          {idx > 0 && <span className="mx-2 opacity-40">|</span>}
+          <button
+            onClick={() => switchTo(lang.code)}
+            lang={lang.code.split('_')[0]}
+            className={
+              i18n.language === lang.code
+                ? 'font-semibold underline underline-offset-2'
+                : 'opacity-50 hover:opacity-80 transition-opacity'
+            }
+          >
+            {lang.label}
+          </button>
+        </span>
       ))}
-    </select>
+    </div>
   );
 }

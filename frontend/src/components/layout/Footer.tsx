@@ -45,7 +45,7 @@ export function Footer() {
         <div className="footer-bottom">
           <span>{t('footer.copyright')}</span>
           <span className="footer-tagline">{t('privacy.tagline')}</span>
-          <LanguageSwitcher className="text-sm bg-transparent border border-gray-500 rounded px-2 py-1 cursor-pointer text-gray-200" />
+          <LanguageSwitcher className="flex items-center text-sm text-gray-200" />
         </div>
       </div>
     </footer>

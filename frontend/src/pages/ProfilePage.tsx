@@ -577,7 +577,7 @@ export function ProfilePage() {
         <h3 className="font-semibold">{t('settings.title')}</h3>
         <div>
           <label className="label" htmlFor="language">{t('settings.language')}</label>
-          <LanguageSwitcher className="input" id="language" />
+          <LanguageSwitcher className="flex items-center text-sm mt-1" id="language" />
         </div>
         <div className="pt-2">
           <button className="btn btn-secondary" onClick={() => signOut()}>
