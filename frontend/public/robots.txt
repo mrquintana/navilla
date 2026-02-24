@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /connections
+Disallow: /health
+Disallow: /notifications
+Disallow: /profile
+Disallow: /reset-password
+
+Sitemap: https://www.navilla.app/sitemap.xml

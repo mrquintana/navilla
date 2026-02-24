@@ -13,6 +13,12 @@ export function HomePage() {
 
   return (
     <>
+      <title>Navilla — Know your exposure risk, protect your privacy</title>
+      <meta name="description" content="Navilla shows you anonymized health exposure signals from your trusted network. Numbers, not names. Your privacy is our priority." />
+      <link rel="canonical" href="https://www.navilla.app/" />
+      <meta property="og:url" content="https://www.navilla.app/" />
+      <meta property="og:title" content="Navilla — Know your exposure risk, protect your privacy" />
+      <meta property="og:description" content="Navilla shows you anonymized health exposure signals from your trusted network. Numbers, not names. Your privacy is our priority." />
       <section className="hero">
         <div className="container">
           <h1 className="hero-title">{t('common.appName')}</h1>
