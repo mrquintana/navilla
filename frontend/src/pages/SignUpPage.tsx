@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth, type UserMetadata } from '../contexts/AuthContext';
@@ -20,7 +20,7 @@ export function SignUpPage() {
   const [fullName, setFullName] = useState('');
   const [dateOfBirth, setDateOfBirth] = useState('');
   const [sex, setSex] = useState<Sex | ''>('');
-  const [country, setCountry] = useState('');
+  const [country, setCountry] = useState(() => detectCountry()?.countryCode ?? '');
   const [location, setLocation] = useState('');
 
   // UI state
@@ -52,14 +52,6 @@ export function SignUpPage() {
     setStep(2);
   };
 
-  // Detect country on mount
-  useEffect(() => {
-    detectCountry().then((geo) => {
-      if (geo?.countryCode) {
-        setCountry(geo.countryCode);
-      }
-    });
-  }, []);
 
   if (session) {
     return <Navigate to="/dashboard" replace />;

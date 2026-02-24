@@ -10,21 +10,99 @@ interface GeoLocation {
 }
 
 /**
- * Detect user's country based on IP address
- * Uses ip-api.com (free, no API key required, 45 req/min limit)
+ * Maps IANA timezone to a country code for common cases.
+ * Only covers zones that unambiguously map to a single country.
  */
-export async function detectCountry(): Promise<GeoLocation | null> {
-  try {
-    const response = await fetch('https://ip-api.com/json/?fields=country,countryCode,city,regionName');
-    if (!response.ok) return null;
+const TIMEZONE_TO_COUNTRY: Record<string, string> = {
+  'America/Mexico_City': 'MX',
+  'America/Monterrey': 'MX',
+  'America/Merida': 'MX',
+  'America/Cancun': 'MX',
+  'America/Chihuahua': 'MX',
+  'America/Hermosillo': 'MX',
+  'America/Mazatlan': 'MX',
+  'America/Tijuana': 'MX',
+  'America/New_York': 'US',
+  'America/Chicago': 'US',
+  'America/Denver': 'US',
+  'America/Los_Angeles': 'US',
+  'America/Phoenix': 'US',
+  'America/Anchorage': 'US',
+  'Pacific/Honolulu': 'US',
+  'America/Toronto': 'CA',
+  'America/Vancouver': 'CA',
+  'America/Winnipeg': 'CA',
+  'America/Halifax': 'CA',
+  'America/Sao_Paulo': 'BR',
+  'America/Buenos_Aires': 'AR',
+  'America/Argentina/Buenos_Aires': 'AR',
+  'America/Bogota': 'CO',
+  'America/Santiago': 'CL',
+  'America/Lima': 'PE',
+  'Europe/London': 'GB',
+  'Europe/Paris': 'FR',
+  'Europe/Berlin': 'DE',
+  'Europe/Rome': 'IT',
+  'Europe/Madrid': 'ES',
+  'Europe/Amsterdam': 'NL',
+  'Europe/Brussels': 'BE',
+  'Europe/Stockholm': 'SE',
+  'Europe/Oslo': 'NO',
+  'Europe/Copenhagen': 'DK',
+  'Europe/Helsinki': 'FI',
+  'Europe/Lisbon': 'PT',
+  'Europe/Athens': 'GR',
+  'Europe/Vienna': 'AT',
+  'Europe/Zurich': 'CH',
+  'Europe/Dublin': 'IE',
+  'Europe/Warsaw': 'PL',
+  'Europe/Istanbul': 'TR',
+  'Europe/Moscow': 'RU',
+  'Asia/Dubai': 'AE',
+  'Asia/Riyadh': 'SA',
+  'Asia/Jerusalem': 'IL',
+  'Asia/Tokyo': 'JP',
+  'Asia/Seoul': 'KR',
+  'Asia/Shanghai': 'CN',
+  'Asia/Kolkata': 'IN',
+  'Asia/Singapore': 'SG',
+  'Asia/Bangkok': 'TH',
+  'Asia/Manila': 'PH',
+  'Asia/Kuala_Lumpur': 'MY',
+  'Asia/Jakarta': 'ID',
+  'Asia/Ho_Chi_Minh': 'VN',
+  'Africa/Johannesburg': 'ZA',
+  'Africa/Lagos': 'NG',
+  'Africa/Cairo': 'EG',
+  'Australia/Sydney': 'AU',
+  'Australia/Melbourne': 'AU',
+  'Australia/Perth': 'AU',
+  'Pacific/Auckland': 'NZ',
+};
 
-    const data = await response.json();
-    return {
-      country: data.country,
-      countryCode: data.countryCode,
-      city: data.city,
-      region: data.regionName,
-    };
+/**
+ * Detect user's likely country from browser locale and timezone.
+ * No network request — uses navigator.language and Intl APIs only.
+ */
+export function detectCountry(): GeoLocation | null {
+  try {
+    // 1. Try timezone first — more precise than locale for location
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    if (tz && TIMEZONE_TO_COUNTRY[tz]) {
+      return { country: '', countryCode: TIMEZONE_TO_COUNTRY[tz] };
+    }
+
+    // 2. Fall back to browser locale (e.g. "es-MX" → "MX", "en-US" → "US")
+    const lang = navigator.language || '';
+    const parts = lang.split('-');
+    if (parts.length >= 2) {
+      const code = parts[parts.length - 1].toUpperCase();
+      if (code.length === 2) {
+        return { country: '', countryCode: code };
+      }
+    }
+
+    return null;
   } catch {
     return null;
   }
