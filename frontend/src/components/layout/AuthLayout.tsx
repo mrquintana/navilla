@@ -1,5 +1,6 @@
 import { Outlet, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { Footer } from './Footer';
 
 export function AuthLayout() {
   const { t } = useTranslation();
@@ -16,6 +17,7 @@ export function AuthLayout() {
           <Outlet />
         </div>
       </main>
+      <Footer />
     </div>
   );
 }

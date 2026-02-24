@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+import { LanguageSwitcher } from '../LanguageSwitcher';
 
 export function Footer() {
   const { t } = useTranslation();
@@ -44,6 +45,7 @@ export function Footer() {
         <div className="footer-bottom">
           <span>{t('footer.copyright')}</span>
           <span className="footer-tagline">{t('privacy.tagline')}</span>
+          <LanguageSwitcher className="text-sm bg-transparent border border-gray-500 rounded px-2 py-1 cursor-pointer text-gray-200" />
         </div>
       </div>
     </footer>
