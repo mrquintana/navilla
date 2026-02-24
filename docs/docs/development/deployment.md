@@ -9,31 +9,39 @@ title: Deployment
 
 | Environment | Purpose | URL |
 |-------------|---------|-----|
-| Development | Local development | localhost |
-| Staging | Pre-production testing | staging.navilla.app <!-- TODO: Update with actual staging URL --> |
-| Production | Live application | navilla.app <!-- TODO: Update with actual production URL --> |
+| Development | Local development | `localhost:5173` (frontend) · `localhost:8080` (backend) |
+| Production | Live application | `https://www.navilla.app` (frontend) · `https://api.navilla.app` (backend) |
 
-## Frontend Deployment (Vercel)
+## Frontend Deployment (Railway)
 
-```yaml
-# vercel.json
-{
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist",
-  "framework": "vite"
-}
+The frontend is deployed as a Railway service running nginx. Railway builds the Vite app and serves the `dist/` output via nginx on port 80.
+
+**Railway service name:** `navilla-frontend`
+**Custom domain:** `www.navilla.app` (port 80)
+**Internal Railway URL:** `navilla-production.up.railway.app`
+
+Railway auto-detects the Vite project and runs:
+```bash
+npm run build   # outputs to dist/
 ```
+Then serves `dist/` via nginx.
+
+No environment variables are required for the frontend at build time beyond what Vite inlines via `import.meta.env`.
 
 ## Backend Deployment (Railway)
 
-Recommended setup: deploy the backend as a Railway service with `backend/` as the root.
+The backend is deployed as a Railway service running Spring Boot.
 
-1. Create a new Railway service from this repo.
+**Railway service name:** `navilla-backend`
+**Custom domain:** `api.navilla.app`
+**Internal Railway URL:** `outstanding-flexibility-production.up.railway.app`
+
+Setup:
+1. Create a Railway service from this repo.
 2. Set **Root Directory** to `backend`.
-3. Leave Build/Start commands empty.
-4. Railway will detect `backend/start.sh` and run it automatically.
+3. Leave Build/Start commands empty — Railway detects `backend/start.sh` automatically.
 
-Environment variables (minimum):
+Required environment variables:
 - `SPRING_PROFILES_ACTIVE=prod`
 - `DATABASE_URL=jdbc:postgresql://<supabase-host>:5432/postgres`
 - `DATABASE_USERNAME=<supabase-username>`
@@ -53,64 +61,25 @@ Environment variables (minimum):
 
 Run these checks after each deploy to confirm the stack is healthy.
 
-### Backend (API)
-
-1. Health check:
+### Backend
 
 ```bash
-curl -i https://<backend-domain>/api/health
-```
+# Health check
+curl -i https://api.navilla.app/api/health
 
-Expected: `200 OK` and JSON body.
-
-2. CORS preflight:
-
-```bash
-curl -i -X OPTIONS https://<backend-domain>/api/health-status \
-  -H "Origin: https://<frontend-domain>" \
+# CORS preflight
+curl -i -X OPTIONS https://api.navilla.app/api/health-status \
+  -H "Origin: https://www.navilla.app" \
   -H "Access-Control-Request-Method: GET" \
   -H "Access-Control-Request-Headers: authorization,content-type"
 ```
 
-Expected headers:
-- `access-control-allow-origin: https://<frontend-domain>`
-- `access-control-allow-methods` includes `GET`
+Expected: `200 OK`, JSON body, and `access-control-allow-origin: https://www.navilla.app` header.
 
-Quick script:
+### Frontend
 
-```bash
-scripts/validate-deploy.sh https://<backend-domain> https://<frontend-domain>
-```
-
-### Frontend (UI Smoke)
-
-1. Load homepage (no console errors).
-2. Sign in / sign up should reach the backend.
-3. Dashboard loads with user profile and stats.
-4. Notifications page loads and marks items read on focus.
-
-## CI/CD Pipeline
-
-```yaml
-# .github/workflows/deploy.yml
-name: Deploy
-
-on:
-  push:
-    branches: [main]
-
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Run tests
-        run: ./mvnw test # Changed from gradlew to mvnw
-
-  deploy:
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deploy to production
-        run: # deployment steps
-```
+1. `https://navilla.app` redirects to `https://www.navilla.app`
+2. Homepage loads with no console errors
+3. Sign in / sign up reaches the backend
+4. Dashboard loads with user profile and stats
+5. Notifications page loads and marks items read on focus

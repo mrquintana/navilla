@@ -21,6 +21,7 @@ const sidebars: SidebarsConfig = {
         'architecture/data-model',
         'architecture/privacy-model',
         'architecture/security',
+        'architecture/infrastructure',
       ],
     },
     {
@@ -96,6 +97,7 @@ const sidebars: SidebarsConfig = {
         'adrs/adr-007-icon-set',
         'adrs/adr-008-network-graph-engine',
         'adrs/adr-010-railway-memory-optimization',
+        'adrs/adr-011-domain-navilla-app',
       ],
     },
   ],
