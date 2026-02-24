@@ -12,9 +12,18 @@ import { ConnectionsPage } from './pages/ConnectionsPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { HealthStatusPage } from './pages/HealthStatusPage';
 import { NotificationsPage } from './pages/NotificationsPage';
-import { InfoPage } from './pages/InfoPage';
 import { HowItWorksPage } from './pages/HowItWorksPage';
 import { ContactPage } from './pages/ContactPage';
+import { AboutPage } from './pages/AboutPage';
+import { CareersPage } from './pages/CareersPage';
+import { PrivacyPage } from './pages/PrivacyPage';
+import { SecurityPage } from './pages/SecurityPage';
+import { TermsPage } from './pages/TermsPage';
+import { PrivacyPolicyPage } from './pages/PrivacyPolicyPage';
+import { CookiePolicyPage } from './pages/CookiePolicyPage';
+import { HelpPage } from './pages/HelpPage';
+import { StatusPage } from './pages/StatusPage';
+import { AccessibilityPage } from './pages/AccessibilityPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 import { ErrorPage } from './pages/ErrorPage';
 
@@ -68,67 +77,18 @@ export const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
-      {
-        path: 'how-it-works',
-        element: <HowItWorksPage />,
-      },
-      {
-        path: 'privacy',
-        element: <InfoPage title="Privacy" subtitle="How we protect your identity and data." />,
-      },
-      {
-        path: 'security',
-        element: <InfoPage title="Security" subtitle="Our approach to securing your data." />,
-      },
-      {
-        path: 'about',
-        element: <InfoPage title="About" subtitle="Why Navilla exists and who we serve." />,
-      },
-      {
-        path: 'contact',
-        element: <ContactPage />,
-      },
-      {
-        path: 'careers',
-        element: <InfoPage title="Careers" subtitle="Join us in building privacy-first health tools." />,
-      },
-      {
-        path: 'terms',
-        element: (
-          <InfoPage
-            title="Terms"
-            subtitle="Terms of service (placeholder)."
-            notice={(
-              <p>
-                Some pages link to external health resources for your convenience. These links
-                are provided for informational purposes only. Navilla does not control external
-                sites and is not responsible for their content, accuracy, or availability. Your
-                decision to use external resources is your responsibility.
-              </p>
-            )}
-          />
-        ),
-      },
-      {
-        path: 'privacy-policy',
-        element: <InfoPage title="Privacy Policy" subtitle="Privacy policy (placeholder)." />,
-      },
-      {
-        path: 'cookie-policy',
-        element: <InfoPage title="Cookie Policy" subtitle="Cookie policy (placeholder)." />,
-      },
-      {
-        path: 'help',
-        element: <InfoPage title="Help Center" subtitle="Find answers to common questions." />,
-      },
-      {
-        path: 'status',
-        element: <InfoPage title="Status" subtitle="Current system status (placeholder)." />,
-      },
-      {
-        path: 'accessibility',
-        element: <InfoPage title="Accessibility" subtitle="Our accessibility commitment." />,
-      },
+      { path: 'how-it-works', element: <HowItWorksPage /> },
+      { path: 'about', element: <AboutPage /> },
+      { path: 'contact', element: <ContactPage /> },
+      { path: 'careers', element: <CareersPage /> },
+      { path: 'privacy', element: <PrivacyPage /> },
+      { path: 'security', element: <SecurityPage /> },
+      { path: 'terms', element: <TermsPage /> },
+      { path: 'privacy-policy', element: <PrivacyPolicyPage /> },
+      { path: 'cookie-policy', element: <CookiePolicyPage /> },
+      { path: 'help', element: <HelpPage /> },
+      { path: 'status', element: <StatusPage /> },
+      { path: 'accessibility', element: <AccessibilityPage /> },
       {
         path: '*',
         element: <NotFoundPage />,
@@ -138,22 +98,10 @@ export const router = createBrowserRouter([
   {
     element: <AuthLayout />,
     children: [
-      {
-        path: 'login',
-        element: <LoginPage />,
-      },
-      {
-        path: 'signup',
-        element: <SignUpPage />,
-      },
-      {
-        path: 'forgot-password',
-        element: <ForgotPasswordPage />,
-      },
-      {
-        path: 'reset-password',
-        element: <ResetPasswordPage />,
-      },
+      { path: 'login', element: <LoginPage /> },
+      { path: 'signup', element: <SignUpPage /> },
+      { path: 'forgot-password', element: <ForgotPasswordPage /> },
+      { path: 'reset-password', element: <ResetPasswordPage /> },
     ],
   },
 ]);
