@@ -4,6 +4,7 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 
 import en_US from './locales/en_US.json';
 import es_MX from './locales/es_MX.json';
+import { detectLanguage } from './lib/geolocation';
 
 const resources = {
   en_US: { translation: en_US },
@@ -21,8 +22,23 @@ const getDevLanguage = () => {
   }
 };
 
+// Custom detector: timezone + browser locale → supported language code.
+// Runs after localStorage (user preference always wins).
+const timezoneLocaleDetector = {
+  name: 'timezoneLocale',
+  lookup() {
+    return detectLanguage();
+  },
+  cacheUserLanguage() {
+    // Detection only — caching is handled by the localStorage detector.
+  },
+};
+
+const detector = new LanguageDetector();
+detector.addDetector(timezoneLocaleDetector);
+
 i18n
-  .use(LanguageDetector)
+  .use(detector)
   .use(initReactI18next)
   .init({
     resources,
@@ -31,13 +47,13 @@ i18n
     ...(isDev ? { lng: getDevLanguage() } : {}),
 
     detection: {
-      order: isDev ? ['localStorage'] : ['localStorage', 'navigator', 'htmlTag'],
+      order: isDev ? ['localStorage'] : ['localStorage', 'timezoneLocale'],
       caches: ['localStorage'],
       lookupLocalStorage: languageStorageKey,
     },
 
     interpolation: {
-      escapeValue: false, // React already escapes values
+      escapeValue: false,
     },
 
     react: {

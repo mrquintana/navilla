@@ -80,6 +80,34 @@ const TIMEZONE_TO_COUNTRY: Record<string, string> = {
   'Pacific/Auckland': 'NZ',
 };
 
+const SPANISH_COUNTRIES = new Set([
+  'MX', 'ES', 'AR', 'CO', 'CL', 'PE', 'VE', 'EC', 'BO', 'PY', 'UY',
+  'CR', 'DO', 'GT', 'HN', 'NI', 'PA', 'SV', 'CU', 'PR', 'GQ',
+]);
+
+/**
+ * Detect the best-fit supported language from browser timezone and locale.
+ * Returns 'es_MX' for Spanish-speaking contexts, 'en_US' otherwise.
+ * No network request.
+ */
+export function detectLanguage(): 'en_US' | 'es_MX' {
+  try {
+    // 1. Timezone → country → language (most reliable for location)
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    if (tz && TIMEZONE_TO_COUNTRY[tz] && SPANISH_COUNTRIES.has(TIMEZONE_TO_COUNTRY[tz])) {
+      return 'es_MX';
+    }
+
+    // 2. Browser language tag — 'es', 'es-MX', 'es-419', etc.
+    const lang = navigator.language || '';
+    if (lang.toLowerCase().startsWith('es')) return 'es_MX';
+  } catch {
+    // ignore
+  }
+
+  return 'en_US';
+}
+
 /**
  * Detect user's likely country from browser locale and timezone.
  * No network request — uses navigator.language and Intl APIs only.
