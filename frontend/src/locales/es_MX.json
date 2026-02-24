@@ -398,5 +398,13 @@
       "accessibility": "Accesibilidad"
     },
     "copyright": "© 2026 Navilla. Todos los derechos reservados."
+  },
+  "contact": {
+    "pageTitle": "Contacto — Navilla",
+    "metaDescription": "Ponte en contacto con el equipo de Navilla. Nos encantaría saber de ti.",
+    "title": "Contacto",
+    "subtitle": "Ponte en contacto con el equipo de Navilla.",
+    "body": "¿Tienes una pregunta, comentario o simplemente quieres saludar? Envíanos un correo y te responderemos.",
+    "responseTime": "Normalmente respondemos en 1–2 días hábiles."
   }
 }

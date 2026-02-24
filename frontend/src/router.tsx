@@ -14,6 +14,7 @@ import { HealthStatusPage } from './pages/HealthStatusPage';
 import { NotificationsPage } from './pages/NotificationsPage';
 import { InfoPage } from './pages/InfoPage';
 import { HowItWorksPage } from './pages/HowItWorksPage';
+import { ContactPage } from './pages/ContactPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 import { ErrorPage } from './pages/ErrorPage';
 
@@ -85,7 +86,7 @@ export const router = createBrowserRouter([
       },
       {
         path: 'contact',
-        element: <InfoPage title="Contact" subtitle="Get in touch with the Navilla team." />,
+        element: <ContactPage />,
       },
       {
         path: 'careers',

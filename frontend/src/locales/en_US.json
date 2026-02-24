@@ -399,5 +399,13 @@
       "accessibility": "Accessibility"
     },
     "copyright": "© 2026 Navilla. All rights reserved."
+  },
+  "contact": {
+    "pageTitle": "Contact — Navilla",
+    "metaDescription": "Get in touch with the Navilla team. We'd love to hear from you.",
+    "title": "Contact",
+    "subtitle": "Get in touch with the Navilla team.",
+    "body": "Have a question, feedback, or just want to say hello? Send us an email and we'll get back to you.",
+    "responseTime": "We typically respond within 1–2 business days."
   }
 }
