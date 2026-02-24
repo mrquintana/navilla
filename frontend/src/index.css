@@ -27,6 +27,12 @@
   --color-info: #0969da;
 }
 
+/* Brand wordmark font — loaded in index.html, applied only to the logo */
+.brand-wordmark {
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-weight: 800;
+}
+
 /* Typography - System font stack like Docusaurus */
 html {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;

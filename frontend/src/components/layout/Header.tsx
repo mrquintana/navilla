@@ -52,7 +52,7 @@ export function Header() {
       <div className="container flex justify-between items-center h-full">
         {/* Logo - Bold and substantial */}
         <Link to="/" className="flex items-center gap-2 hover:no-underline">
-          <span className="text-2xl font-extrabold tracking-tight text-primary">
+          <span className="brand-wordmark text-2xl tracking-tight text-primary">
             {t('common.appName')}
           </span>
         </Link>
