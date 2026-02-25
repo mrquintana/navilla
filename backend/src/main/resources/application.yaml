@@ -57,6 +57,12 @@ management:
     tags:
       application: navilla-backend
       environment: ${SPRING_PROFILES_ACTIVE:unknown}
+    distribution:
+      # Export histogram buckets so histogram_quantile() works in Grafana dashboards.
+      # Without this, Micrometer only emits _count/_sum; _bucket data is never sent.
+      percentiles-histogram:
+        http.server.requests: true
+        navilla.exposure.computation.duration: true
 
   # OTLP export — controlled entirely by env vars, no profile dependency
   otlp:
@@ -67,6 +73,10 @@ management:
         headers:
           Authorization: Basic ${OTLP_METRICS_AUTH:}
         step: 60s
+        # Use explicit bucket boundaries so histogram_quantile() PromQL works.
+        # Default BASE2_EXPONENTIAL_BUCKET_HISTOGRAM is not compatible with
+        # classic Prometheus histogram_quantile queries.
+        histogram-flavor: EXPLICIT_BOUNDARY_HISTOGRAM
 
 # Logging Configuration
 logging:
