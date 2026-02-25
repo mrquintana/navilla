@@ -59,12 +59,14 @@ management:
       application: navilla-backend
       environment: ${SPRING_PROFILES_ACTIVE:unknown}
 
-  # OTLP export — disabled by default, enabled per environment via env vars
+  # OTLP export — controlled entirely by env vars, no profile dependency
   otlp:
     metrics:
       export:
-        enabled: false
+        enabled: ${OTLP_METRICS_ENABLED:false}
         url: ${OTLP_METRICS_URL:http://localhost:4318/v1/metrics}
+        headers:
+          Authorization: Basic ${OTLP_METRICS_AUTH:}
         step: 60s
 
 # Logging Configuration
