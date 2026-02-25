@@ -14,6 +14,9 @@ spring:
       max-lifetime: 1800000
       leak-detection-threshold: 60000
       data-source-properties:
+        # Supabase uses PgBouncer in transaction mode, which doesn't support
+        # server-side prepared statements. Without this, Hibernate reuses
+        # statement names (S_1, S_2…) that collide across pooled connections.
         prepareThreshold: 0
 
   # JPA - strict validation, no changes
