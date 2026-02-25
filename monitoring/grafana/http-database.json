@@ -1,183 +1,291 @@
 {
-  "dashboard": {
-    "title": "Navilla — HTTP & Database",
-    "tags": ["navilla", "http", "database", "hikari"],
-    "timezone": "browser",
-    "refresh": "30s",
-    "time": { "from": "now-1h", "to": "now" },
-    "panels": [
-      {
-        "title": "Request Rate (req/s)",
-        "type": "timeseries",
-        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
-        "fieldConfig": {
-          "defaults": { "unit": "reqps", "color": { "mode": "palette-classic" } }
-        },
-        "targets": [
-          {
-            "expr": "sum(rate(http_server_requests_seconds_count{application=\"navilla-backend\"}[5m])) by (uri)",
-            "legendFormat": "{{uri}}"
-          }
-        ]
-      },
-      {
-        "title": "Request Latency p95",
-        "type": "timeseries",
-        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
-        "fieldConfig": {
-          "defaults": { "unit": "s", "color": { "mode": "palette-classic" } }
-        },
-        "targets": [
-          {
-            "expr": "histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{application=\"navilla-backend\"}[5m])) by (le, uri))",
-            "legendFormat": "p95 {{uri}}"
-          }
-        ]
-      },
-      {
-        "title": "Error Rate (5xx)",
-        "type": "timeseries",
-        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
-        "fieldConfig": {
-          "defaults": { "unit": "reqps", "color": { "fixedColor": "red", "mode": "fixed" } }
-        },
-        "targets": [
-          {
-            "expr": "sum(rate(http_server_requests_seconds_count{application=\"navilla-backend\", status=~\"5..\"}[5m])) by (uri, status)",
-            "legendFormat": "{{status}} {{uri}}"
-          }
-        ]
-      },
-      {
-        "title": "Requests by Status Code",
-        "type": "piechart",
-        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
-        "targets": [
-          {
-            "expr": "sum(increase(http_server_requests_seconds_count{application=\"navilla-backend\"}[1h])) by (status)",
-            "legendFormat": "{{status}}"
-          }
-        ]
-      },
-      {
-        "title": "Request Latency p50 / p95 / p99",
-        "type": "timeseries",
-        "gridPos": { "h": 8, "w": 24, "x": 0, "y": 16 },
-        "fieldConfig": {
-          "defaults": { "unit": "s", "color": { "mode": "palette-classic" } }
-        },
-        "targets": [
-          {
-            "expr": "histogram_quantile(0.50, sum(rate(http_server_requests_seconds_bucket{application=\"navilla-backend\"}[5m])) by (le))",
-            "legendFormat": "p50"
-          },
-          {
-            "expr": "histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{application=\"navilla-backend\"}[5m])) by (le))",
-            "legendFormat": "p95"
-          },
-          {
-            "expr": "histogram_quantile(0.99, sum(rate(http_server_requests_seconds_bucket{application=\"navilla-backend\"}[5m])) by (le))",
-            "legendFormat": "p99"
-          }
-        ]
-      },
-      {
-        "title": "— HikariCP Connection Pool —",
-        "type": "row",
-        "gridPos": { "h": 1, "w": 24, "x": 0, "y": 24 },
-        "collapsed": false
-      },
-      {
-        "title": "Active Connections",
-        "type": "timeseries",
-        "gridPos": { "h": 8, "w": 8, "x": 0, "y": 25 },
-        "fieldConfig": {
-          "defaults": { "color": { "fixedColor": "orange", "mode": "fixed" } }
-        },
-        "targets": [
-          {
-            "expr": "hikaricp_connections_active{application=\"navilla-backend\"}",
-            "legendFormat": "Active"
-          }
-        ]
-      },
-      {
-        "title": "Idle Connections",
-        "type": "timeseries",
-        "gridPos": { "h": 8, "w": 8, "x": 8, "y": 25 },
-        "fieldConfig": {
-          "defaults": { "color": { "fixedColor": "green", "mode": "fixed" } }
-        },
-        "targets": [
-          {
-            "expr": "hikaricp_connections_idle{application=\"navilla-backend\"}",
-            "legendFormat": "Idle"
-          }
-        ]
-      },
-      {
-        "title": "Pending Connections",
-        "type": "timeseries",
-        "gridPos": { "h": 8, "w": 8, "x": 16, "y": 25 },
-        "fieldConfig": {
-          "defaults": { "color": { "fixedColor": "red", "mode": "fixed" } }
-        },
-        "targets": [
-          {
-            "expr": "hikaricp_connections_pending{application=\"navilla-backend\"}",
-            "legendFormat": "Pending"
-          }
-        ]
-      },
-      {
-        "title": "Connection Pool Overview",
-        "type": "timeseries",
-        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 33 },
-        "fieldConfig": {
-          "defaults": { "color": { "mode": "palette-classic" } }
-        },
-        "targets": [
-          {
-            "expr": "hikaricp_connections{application=\"navilla-backend\"}",
-            "legendFormat": "Total"
-          },
-          {
-            "expr": "hikaricp_connections_active{application=\"navilla-backend\"}",
-            "legendFormat": "Active"
-          },
-          {
-            "expr": "hikaricp_connections_idle{application=\"navilla-backend\"}",
-            "legendFormat": "Idle"
-          },
-          {
-            "expr": "hikaricp_connections_max{application=\"navilla-backend\"}",
-            "legendFormat": "Max"
-          },
-          {
-            "expr": "hikaricp_connections_min{application=\"navilla-backend\"}",
-            "legendFormat": "Min"
-          }
-        ]
-      },
-      {
-        "title": "Connection Acquisition Time",
-        "type": "timeseries",
-        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 33 },
-        "fieldConfig": {
-          "defaults": { "unit": "s", "color": { "mode": "palette-classic" } }
-        },
-        "targets": [
-          {
-            "expr": "rate(hikaricp_connections_acquire_seconds_sum{application=\"navilla-backend\"}[5m]) / rate(hikaricp_connections_acquire_seconds_count{application=\"navilla-backend\"}[5m])",
-            "legendFormat": "Avg Acquire"
-          },
-          {
-            "expr": "rate(hikaricp_connections_creation_seconds_sum{application=\"navilla-backend\"}[5m]) / rate(hikaricp_connections_creation_seconds_count{application=\"navilla-backend\"}[5m])",
-            "legendFormat": "Avg Creation"
-          }
-        ]
-      }
-    ]
+  "title": "Navilla — HTTP & Database",
+  "tags": [
+    "navilla",
+    "http",
+    "database",
+    "hikari"
+  ],
+  "timezone": "browser",
+  "refresh": "30s",
+  "time": {
+    "from": "now-1h",
+    "to": "now"
   },
-  "overwrite": true
+  "panels": [
+    {
+      "title": "Request Rate (req/s)",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "color": {
+            "mode": "palette-classic"
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(http_server_requests_seconds_count{application=\"navilla-backend\"}[5m])) by (uri)",
+          "legendFormat": "{{uri}}"
+        }
+      ]
+    },
+    {
+      "title": "Request Latency p95",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "color": {
+            "mode": "palette-classic"
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{application=\"navilla-backend\"}[5m])) by (le, uri))",
+          "legendFormat": "p95 {{uri}}"
+        }
+      ]
+    },
+    {
+      "title": "Error Rate (5xx)",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "color": {
+            "fixedColor": "red",
+            "mode": "fixed"
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(http_server_requests_seconds_count{application=\"navilla-backend\", status=~\"5..\"}[5m])) by (uri, status)",
+          "legendFormat": "{{status}} {{uri}}"
+        }
+      ]
+    },
+    {
+      "title": "Requests by Status Code",
+      "type": "piechart",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 8
+      },
+      "targets": [
+        {
+          "expr": "sum(increase(http_server_requests_seconds_count{application=\"navilla-backend\"}[1h])) by (status)",
+          "legendFormat": "{{status}}"
+        }
+      ]
+    },
+    {
+      "title": "Request Latency p50 / p95 / p99",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 16
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "color": {
+            "mode": "palette-classic"
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.50, sum(rate(http_server_requests_seconds_bucket{application=\"navilla-backend\"}[5m])) by (le))",
+          "legendFormat": "p50"
+        },
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{application=\"navilla-backend\"}[5m])) by (le))",
+          "legendFormat": "p95"
+        },
+        {
+          "expr": "histogram_quantile(0.99, sum(rate(http_server_requests_seconds_bucket{application=\"navilla-backend\"}[5m])) by (le))",
+          "legendFormat": "p99"
+        }
+      ]
+    },
+    {
+      "title": "— HikariCP Connection Pool —",
+      "type": "row",
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 24
+      },
+      "collapsed": false
+    },
+    {
+      "title": "Active Connections",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 25
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "orange",
+            "mode": "fixed"
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "hikaricp_connections_active{application=\"navilla-backend\"}",
+          "legendFormat": "Active"
+        }
+      ]
+    },
+    {
+      "title": "Idle Connections",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 25
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "green",
+            "mode": "fixed"
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "hikaricp_connections_idle{application=\"navilla-backend\"}",
+          "legendFormat": "Idle"
+        }
+      ]
+    },
+    {
+      "title": "Pending Connections",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 25
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "red",
+            "mode": "fixed"
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "hikaricp_connections_pending{application=\"navilla-backend\"}",
+          "legendFormat": "Pending"
+        }
+      ]
+    },
+    {
+      "title": "Connection Pool Overview",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 33
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "hikaricp_connections{application=\"navilla-backend\"}",
+          "legendFormat": "Total"
+        },
+        {
+          "expr": "hikaricp_connections_active{application=\"navilla-backend\"}",
+          "legendFormat": "Active"
+        },
+        {
+          "expr": "hikaricp_connections_idle{application=\"navilla-backend\"}",
+          "legendFormat": "Idle"
+        },
+        {
+          "expr": "hikaricp_connections_max{application=\"navilla-backend\"}",
+          "legendFormat": "Max"
+        },
+        {
+          "expr": "hikaricp_connections_min{application=\"navilla-backend\"}",
+          "legendFormat": "Min"
+        }
+      ]
+    },
+    {
+      "title": "Connection Acquisition Time",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 33
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "color": {
+            "mode": "palette-classic"
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "rate(hikaricp_connections_acquire_seconds_sum{application=\"navilla-backend\"}[5m]) / rate(hikaricp_connections_acquire_seconds_count{application=\"navilla-backend\"}[5m])",
+          "legendFormat": "Avg Acquire"
+        },
+        {
+          "expr": "rate(hikaricp_connections_creation_seconds_sum{application=\"navilla-backend\"}[5m]) / rate(hikaricp_connections_creation_seconds_count{application=\"navilla-backend\"}[5m])",
+          "legendFormat": "Avg Creation"
+        }
+      ]
+    }
+  ],
+  "id": null,
+  "uid": null,
+  "schemaVersion": 39
 }

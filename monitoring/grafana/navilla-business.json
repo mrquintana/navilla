@@ -1,289 +1,523 @@
 {
-  "dashboard": {
-    "title": "Navilla — Business Metrics",
-    "tags": ["navilla", "business", "custom"],
-    "timezone": "browser",
-    "refresh": "30s",
-    "time": { "from": "now-6h", "to": "now" },
-    "panels": [
-      {
-        "title": "— Exposure Engine —",
-        "type": "row",
-        "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
-        "collapsed": false
-      },
-      {
-        "title": "Exposure Snapshot Cache",
-        "description": "Cache hits vs misses for exposure snapshots",
-        "type": "timeseries",
-        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 1 },
-        "fieldConfig": {
-          "defaults": { "unit": "ops", "color": { "mode": "palette-classic" } },
-          "overrides": [
-            { "matcher": { "id": "byName", "options": "Hit" }, "properties": [{ "id": "color", "value": { "fixedColor": "green", "mode": "fixed" } }] },
-            { "matcher": { "id": "byName", "options": "Miss" }, "properties": [{ "id": "color", "value": { "fixedColor": "orange", "mode": "fixed" } }] }
-          ]
-        },
-        "targets": [
-          {
-            "expr": "rate(navilla_exposure_snapshot_total{cache=\"hit\", application=\"navilla-backend\"}[5m])",
-            "legendFormat": "Hit"
-          },
-          {
-            "expr": "rate(navilla_exposure_snapshot_total{cache=\"miss\", application=\"navilla-backend\"}[5m])",
-            "legendFormat": "Miss"
-          }
-        ]
-      },
-      {
-        "title": "Cache Hit Ratio",
-        "description": "Percentage of exposure requests served from cache",
-        "type": "gauge",
-        "gridPos": { "h": 8, "w": 6, "x": 12, "y": 1 },
-        "fieldConfig": {
-          "defaults": {
-            "unit": "percentunit", "min": 0, "max": 1,
-            "thresholds": {
-              "steps": [
-                { "color": "red", "value": null },
-                { "color": "yellow", "value": 0.5 },
-                { "color": "green", "value": 0.8 }
-              ]
-            }
-          }
-        },
-        "targets": [
-          {
-            "expr": "sum(rate(navilla_exposure_snapshot_total{cache=\"hit\", application=\"navilla-backend\"}[30m])) / sum(rate(navilla_exposure_snapshot_total{application=\"navilla-backend\"}[30m]))",
-            "legendFormat": "Hit Ratio"
-          }
-        ]
-      },
-      {
-        "title": "Exposure Computation Duration",
-        "description": "Time to compute BFS graph traversal + health status aggregation",
-        "type": "timeseries",
-        "gridPos": { "h": 8, "w": 6, "x": 18, "y": 1 },
-        "fieldConfig": {
-          "defaults": { "unit": "s", "color": { "mode": "palette-classic" } }
-        },
-        "targets": [
-          {
-            "expr": "rate(navilla_exposure_computation_duration_seconds_sum{application=\"navilla-backend\"}[5m]) / rate(navilla_exposure_computation_duration_seconds_count{application=\"navilla-backend\"}[5m])",
-            "legendFormat": "Avg"
-          },
-          {
-            "expr": "navilla_exposure_computation_duration_seconds_max{application=\"navilla-backend\"}",
-            "legendFormat": "Max"
-          }
-        ]
-      },
-      {
-        "title": "Graph Nodes per Computation",
-        "description": "Number of reachable nodes in the connection graph",
-        "type": "timeseries",
-        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 9 },
-        "fieldConfig": {
-          "defaults": { "color": { "fixedColor": "purple", "mode": "fixed" } }
-        },
-        "targets": [
-          {
-            "expr": "rate(navilla_exposure_graph_nodes_sum{application=\"navilla-backend\"}[5m]) / rate(navilla_exposure_graph_nodes_count{application=\"navilla-backend\"}[5m])",
-            "legendFormat": "Avg Nodes"
-          }
-        ]
-      },
-      {
-        "title": "Insufficient Connections",
-        "description": "Users who had fewer than the minimum required connections",
-        "type": "stat",
-        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 9 },
-        "fieldConfig": {
-          "defaults": {
-            "color": { "fixedColor": "yellow", "mode": "fixed" }
-          }
-        },
-        "targets": [
-          {
-            "expr": "increase(navilla_exposure_insufficient_connections_total{application=\"navilla-backend\"}[1h])",
-            "legendFormat": "Last 1h"
-          }
-        ]
-      },
-      {
-        "title": "— Connections —",
-        "type": "row",
-        "gridPos": { "h": 1, "w": 24, "x": 0, "y": 17 },
-        "collapsed": false
-      },
-      {
-        "title": "Connection Requests Created",
-        "type": "timeseries",
-        "gridPos": { "h": 8, "w": 8, "x": 0, "y": 18 },
-        "fieldConfig": {
-          "defaults": { "unit": "ops", "color": { "fixedColor": "blue", "mode": "fixed" } }
-        },
-        "targets": [
-          {
-            "expr": "rate(navilla_connection_created_total{application=\"navilla-backend\"}[5m])",
-            "legendFormat": "Created ({{outcome}})"
-          }
-        ]
-      },
-      {
-        "title": "Connection Accepted / Denied",
-        "type": "timeseries",
-        "gridPos": { "h": 8, "w": 8, "x": 8, "y": 18 },
-        "fieldConfig": {
-          "defaults": { "unit": "ops", "color": { "mode": "palette-classic" } },
-          "overrides": [
-            { "matcher": { "id": "byName", "options": "Accepted" }, "properties": [{ "id": "color", "value": { "fixedColor": "green", "mode": "fixed" } }] },
-            { "matcher": { "id": "byName", "options": "Denied" }, "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }] }
-          ]
-        },
-        "targets": [
-          {
-            "expr": "rate(navilla_connection_accepted_total{application=\"navilla-backend\"}[5m])",
-            "legendFormat": "Accepted"
-          },
-          {
-            "expr": "rate(navilla_connection_denied_total{application=\"navilla-backend\"}[5m])",
-            "legendFormat": "Denied"
-          }
-        ]
-      },
-      {
-        "title": "Connection Cancelled",
-        "type": "timeseries",
-        "gridPos": { "h": 8, "w": 8, "x": 16, "y": 18 },
-        "fieldConfig": {
-          "defaults": { "unit": "ops", "color": { "fixedColor": "orange", "mode": "fixed" } }
-        },
-        "targets": [
-          {
-            "expr": "rate(navilla_connection_cancelled_total{application=\"navilla-backend\"}[5m])",
-            "legendFormat": "Cancelled ({{prior_status}})"
-          }
-        ]
-      },
-      {
-        "title": "Connection Totals (cumulative)",
-        "type": "stat",
-        "gridPos": { "h": 6, "w": 24, "x": 0, "y": 26 },
-        "fieldConfig": {
-          "defaults": { "color": { "mode": "palette-classic" } }
-        },
-        "options": { "graphMode": "area", "colorMode": "background" },
-        "targets": [
-          {
-            "expr": "increase(navilla_connection_created_total{application=\"navilla-backend\"}[24h])",
-            "legendFormat": "Created (24h)"
-          },
-          {
-            "expr": "increase(navilla_connection_accepted_total{application=\"navilla-backend\"}[24h])",
-            "legendFormat": "Accepted (24h)"
-          },
-          {
-            "expr": "increase(navilla_connection_denied_total{application=\"navilla-backend\"}[24h])",
-            "legendFormat": "Denied (24h)"
-          },
-          {
-            "expr": "increase(navilla_connection_cancelled_total{application=\"navilla-backend\"}[24h])",
-            "legendFormat": "Cancelled (24h)"
-          }
-        ]
-      },
-      {
-        "title": "— Health Status —",
-        "type": "row",
-        "gridPos": { "h": 1, "w": 24, "x": 0, "y": 32 },
-        "collapsed": false
-      },
-      {
-        "title": "Health Status Reports",
-        "type": "timeseries",
-        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 33 },
-        "fieldConfig": {
-          "defaults": { "unit": "ops", "color": { "mode": "palette-classic" } }
-        },
-        "targets": [
-          {
-            "expr": "rate(navilla_health_status_reported_total{application=\"navilla-backend\"}[5m])",
-            "legendFormat": "{{condition}} — {{outcome}}"
-          }
-        ]
-      },
-      {
-        "title": "Health Status Cleared / Activated / Deleted",
-        "type": "timeseries",
-        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 33 },
-        "fieldConfig": {
-          "defaults": { "unit": "ops", "color": { "mode": "palette-classic" } }
-        },
-        "targets": [
-          {
-            "expr": "rate(navilla_health_status_cleared_total{application=\"navilla-backend\"}[5m])",
-            "legendFormat": "Cleared ({{condition}})"
-          },
-          {
-            "expr": "rate(navilla_health_status_activated_total{application=\"navilla-backend\"}[5m])",
-            "legendFormat": "Activated ({{condition}})"
-          },
-          {
-            "expr": "rate(navilla_health_status_deleted_total{application=\"navilla-backend\"}[5m])",
-            "legendFormat": "Deleted ({{condition}})"
-          }
-        ]
-      },
-      {
-        "title": "— Notifications —",
-        "type": "row",
-        "gridPos": { "h": 1, "w": 24, "x": 0, "y": 41 },
-        "collapsed": false
-      },
-      {
-        "title": "Notifications Created",
-        "type": "timeseries",
-        "gridPos": { "h": 8, "w": 8, "x": 0, "y": 42 },
-        "fieldConfig": {
-          "defaults": { "unit": "ops", "color": { "fixedColor": "blue", "mode": "fixed" } }
-        },
-        "targets": [
-          {
-            "expr": "rate(navilla_notification_created_total{application=\"navilla-backend\"}[5m])",
-            "legendFormat": "Created ({{type}})"
-          }
-        ]
-      },
-      {
-        "title": "Notifications Read",
-        "type": "timeseries",
-        "gridPos": { "h": 8, "w": 8, "x": 8, "y": 42 },
-        "fieldConfig": {
-          "defaults": { "unit": "ops", "color": { "fixedColor": "green", "mode": "fixed" } }
-        },
-        "targets": [
-          {
-            "expr": "rate(navilla_notification_read_total{application=\"navilla-backend\"}[5m])",
-            "legendFormat": "Read"
-          }
-        ]
-      },
-      {
-        "title": "Notification Creation Failures",
-        "type": "timeseries",
-        "gridPos": { "h": 8, "w": 8, "x": 16, "y": 42 },
-        "fieldConfig": {
-          "defaults": { "unit": "ops", "color": { "fixedColor": "red", "mode": "fixed" } }
-        },
-        "targets": [
-          {
-            "expr": "rate(navilla_notification_creation_failed_total{application=\"navilla-backend\"}[5m])",
-            "legendFormat": "Failed ({{type}})"
-          }
-        ]
-      }
-    ]
+  "title": "Navilla — Business Metrics",
+  "tags": [
+    "navilla",
+    "business",
+    "custom"
+  ],
+  "timezone": "browser",
+  "refresh": "30s",
+  "time": {
+    "from": "now-6h",
+    "to": "now"
   },
-  "overwrite": true
+  "panels": [
+    {
+      "title": "— Exposure Engine —",
+      "type": "row",
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "collapsed": false
+    },
+    {
+      "title": "Exposure Snapshot Cache",
+      "description": "Cache hits vs misses for exposure snapshots",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 1
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Hit"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Miss"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "orange",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "targets": [
+        {
+          "expr": "rate(navilla_exposure_snapshot_total{cache=\"hit\", application=\"navilla-backend\"}[5m])",
+          "legendFormat": "Hit"
+        },
+        {
+          "expr": "rate(navilla_exposure_snapshot_total{cache=\"miss\", application=\"navilla-backend\"}[5m])",
+          "legendFormat": "Miss"
+        }
+      ]
+    },
+    {
+      "title": "Cache Hit Ratio",
+      "description": "Percentage of exposure requests served from cache",
+      "type": "gauge",
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 12,
+        "y": 1
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "min": 0,
+          "max": 1,
+          "thresholds": {
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0.5
+              },
+              {
+                "color": "green",
+                "value": 0.8
+              }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(navilla_exposure_snapshot_total{cache=\"hit\", application=\"navilla-backend\"}[30m])) / sum(rate(navilla_exposure_snapshot_total{application=\"navilla-backend\"}[30m]))",
+          "legendFormat": "Hit Ratio"
+        }
+      ]
+    },
+    {
+      "title": "Exposure Computation Duration",
+      "description": "Time to compute BFS graph traversal + health status aggregation",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 18,
+        "y": 1
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "color": {
+            "mode": "palette-classic"
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "rate(navilla_exposure_computation_duration_seconds_sum{application=\"navilla-backend\"}[5m]) / rate(navilla_exposure_computation_duration_seconds_count{application=\"navilla-backend\"}[5m])",
+          "legendFormat": "Avg"
+        },
+        {
+          "expr": "navilla_exposure_computation_duration_seconds_max{application=\"navilla-backend\"}",
+          "legendFormat": "Max"
+        }
+      ]
+    },
+    {
+      "title": "Graph Nodes per Computation",
+      "description": "Number of reachable nodes in the connection graph",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 9
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "purple",
+            "mode": "fixed"
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "rate(navilla_exposure_graph_nodes_sum{application=\"navilla-backend\"}[5m]) / rate(navilla_exposure_graph_nodes_count{application=\"navilla-backend\"}[5m])",
+          "legendFormat": "Avg Nodes"
+        }
+      ]
+    },
+    {
+      "title": "Insufficient Connections",
+      "description": "Users who had fewer than the minimum required connections",
+      "type": "stat",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 9
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "yellow",
+            "mode": "fixed"
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "increase(navilla_exposure_insufficient_connections_total{application=\"navilla-backend\"}[1h])",
+          "legendFormat": "Last 1h"
+        }
+      ]
+    },
+    {
+      "title": "— Connections —",
+      "type": "row",
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 17
+      },
+      "collapsed": false
+    },
+    {
+      "title": "Connection Requests Created",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 18
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "color": {
+            "fixedColor": "blue",
+            "mode": "fixed"
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "rate(navilla_connection_created_total{application=\"navilla-backend\"}[5m])",
+          "legendFormat": "Created ({{outcome}})"
+        }
+      ]
+    },
+    {
+      "title": "Connection Accepted / Denied",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 18
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Accepted"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Denied"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "targets": [
+        {
+          "expr": "rate(navilla_connection_accepted_total{application=\"navilla-backend\"}[5m])",
+          "legendFormat": "Accepted"
+        },
+        {
+          "expr": "rate(navilla_connection_denied_total{application=\"navilla-backend\"}[5m])",
+          "legendFormat": "Denied"
+        }
+      ]
+    },
+    {
+      "title": "Connection Cancelled",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 18
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "color": {
+            "fixedColor": "orange",
+            "mode": "fixed"
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "rate(navilla_connection_cancelled_total{application=\"navilla-backend\"}[5m])",
+          "legendFormat": "Cancelled ({{prior_status}})"
+        }
+      ]
+    },
+    {
+      "title": "Connection Totals (cumulative)",
+      "type": "stat",
+      "gridPos": {
+        "h": 6,
+        "w": 24,
+        "x": 0,
+        "y": 26
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          }
+        }
+      },
+      "options": {
+        "graphMode": "area",
+        "colorMode": "background"
+      },
+      "targets": [
+        {
+          "expr": "increase(navilla_connection_created_total{application=\"navilla-backend\"}[24h])",
+          "legendFormat": "Created (24h)"
+        },
+        {
+          "expr": "increase(navilla_connection_accepted_total{application=\"navilla-backend\"}[24h])",
+          "legendFormat": "Accepted (24h)"
+        },
+        {
+          "expr": "increase(navilla_connection_denied_total{application=\"navilla-backend\"}[24h])",
+          "legendFormat": "Denied (24h)"
+        },
+        {
+          "expr": "increase(navilla_connection_cancelled_total{application=\"navilla-backend\"}[24h])",
+          "legendFormat": "Cancelled (24h)"
+        }
+      ]
+    },
+    {
+      "title": "— Health Status —",
+      "type": "row",
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 32
+      },
+      "collapsed": false
+    },
+    {
+      "title": "Health Status Reports",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 33
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "color": {
+            "mode": "palette-classic"
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "rate(navilla_health_status_reported_total{application=\"navilla-backend\"}[5m])",
+          "legendFormat": "{{condition}} — {{outcome}}"
+        }
+      ]
+    },
+    {
+      "title": "Health Status Cleared / Activated / Deleted",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 33
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "color": {
+            "mode": "palette-classic"
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "rate(navilla_health_status_cleared_total{application=\"navilla-backend\"}[5m])",
+          "legendFormat": "Cleared ({{condition}})"
+        },
+        {
+          "expr": "rate(navilla_health_status_activated_total{application=\"navilla-backend\"}[5m])",
+          "legendFormat": "Activated ({{condition}})"
+        },
+        {
+          "expr": "rate(navilla_health_status_deleted_total{application=\"navilla-backend\"}[5m])",
+          "legendFormat": "Deleted ({{condition}})"
+        }
+      ]
+    },
+    {
+      "title": "— Notifications —",
+      "type": "row",
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 41
+      },
+      "collapsed": false
+    },
+    {
+      "title": "Notifications Created",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 42
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "color": {
+            "fixedColor": "blue",
+            "mode": "fixed"
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "rate(navilla_notification_created_total{application=\"navilla-backend\"}[5m])",
+          "legendFormat": "Created ({{type}})"
+        }
+      ]
+    },
+    {
+      "title": "Notifications Read",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 42
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "color": {
+            "fixedColor": "green",
+            "mode": "fixed"
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "rate(navilla_notification_read_total{application=\"navilla-backend\"}[5m])",
+          "legendFormat": "Read"
+        }
+      ]
+    },
+    {
+      "title": "Notification Creation Failures",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 42
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "color": {
+            "fixedColor": "red",
+            "mode": "fixed"
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "rate(navilla_notification_creation_failed_total{application=\"navilla-backend\"}[5m])",
+          "legendFormat": "Failed ({{type}})"
+        }
+      ]
+    }
+  ],
+  "id": null,
+  "uid": null,
+  "schemaVersion": 39
 }
