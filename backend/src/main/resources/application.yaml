@@ -76,7 +76,7 @@ management:
         # Use explicit bucket boundaries so histogram_quantile() PromQL works.
         # Default BASE2_EXPONENTIAL_BUCKET_HISTOGRAM is not compatible with
         # classic Prometheus histogram_quantile queries.
-        histogram-flavor: EXPLICIT_BOUNDARY_HISTOGRAM
+        histogram-flavor: EXPLICIT_BUCKET_HISTOGRAM
 
 # Logging Configuration
 logging:
