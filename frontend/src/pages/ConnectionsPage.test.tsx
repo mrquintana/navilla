@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { ConnectionsPage } from './ConnectionsPage';
+import { MemoryRouter } from 'react-router-dom';
 
 const useAuthMock = vi.fn();
 const useQueryMock = vi.fn();
@@ -47,7 +48,11 @@ describe('ConnectionsPage loading behavior', () => {
       isLoading: true,
     });
 
-    const { container } = render(<ConnectionsPage />);
+    const { container } = render(
+      <MemoryRouter>
+        <ConnectionsPage />
+      </MemoryRouter>
+    );
 
     expect(container.querySelectorAll('.skeleton').length).toBeGreaterThan(0);
     expect(screen.queryByText('connections.title')).not.toBeInTheDocument();
@@ -68,7 +73,11 @@ describe('ConnectionsPage loading behavior', () => {
       return { data: [], isLoading: false };
     });
 
-    const { container } = render(<ConnectionsPage />);
+    const { container } = render(
+      <MemoryRouter>
+        <ConnectionsPage />
+      </MemoryRouter>
+    );
 
     expect(screen.getByText('connections.title')).toBeInTheDocument();
     expect(screen.getByText('connections.noPending')).toBeInTheDocument();

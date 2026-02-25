@@ -50,7 +50,12 @@ export function formatRelativeTime(createdAt: string, locale: string, nowMs: num
 
 export function getNotificationRoute(item: NotificationItem): string {
   const category = getNotificationCategory(item.type);
-  if (category === 'connections') return '/connections';
+  if (category === 'connections') {
+    if (item.connectionId) {
+      return `/connections?focus=${encodeURIComponent(item.connectionId)}`;
+    }
+    return '/connections';
+  }
   if (category === 'health') return '/health';
   return '/profile';
 }

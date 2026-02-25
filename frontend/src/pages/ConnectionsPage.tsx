@@ -1,4 +1,4 @@
-import { useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { api, ApiError, type Connection } from '../lib/api';
@@ -7,6 +7,7 @@ import { queryClient } from '../queryClient';
 import { Check, HeartPulse, Search, Send, UserRound, X } from 'lucide-react';
 import { DEV_MODE } from '../lib/devMode';
 import { PageSkeleton, SkeletonBlock, SkeletonRows } from '../components/ui/LoadingShell';
+import { useSearchParams } from 'react-router-dom';
 
 function ConnectionList({
   title,
@@ -19,6 +20,7 @@ function ConnectionList({
   footer,
   isLoading,
   compact,
+  focusedConnectionId,
 }: {
   title: string;
   headerExtra?: ReactNode;
@@ -30,6 +32,7 @@ function ConnectionList({
   footer?: ReactNode;
   isLoading?: boolean;
   compact?: boolean;
+  focusedConnectionId?: string | null;
 }) {
   const { t } = useTranslation();
 
@@ -64,7 +67,7 @@ function ConnectionList({
             return (
               <div
                 key={connection.id}
-                className={`connection-item ${compact ? 'connection-item--compact space-y-2' : 'space-y-3'}`}
+                className={`connection-item ${compact ? 'connection-item--compact space-y-2' : 'space-y-3'}${focusedConnectionId === connection.id ? ' ring-2 ring-blue-300' : ''}`}
               >
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
@@ -113,6 +116,8 @@ function ConnectionList({
 export function ConnectionsPage() {
   const { t } = useTranslation();
   const { session } = useAuth();
+  const [searchParams] = useSearchParams();
+  const focusConnectionId = searchParams.get('focus');
   const token = session?.access_token ?? '';
   const [pendingActionIds, setPendingActionIds] = useState<Set<string>>(new Set());
   const [pendingIncomingPage, setPendingIncomingPage] = useState(1);
@@ -189,6 +194,19 @@ export function ConnectionsPage() {
     const start = (pendingIncomingPage - 1) * pendingIncomingPageSize;
     return pendingIncoming.slice(start, start + pendingIncomingPageSize);
   }, [pendingIncoming, pendingIncomingPage]);
+  const focusedIncomingConnection = focusConnectionId
+    ? pendingIncoming.find((connection) => connection.id === focusConnectionId)
+    : undefined;
+
+  useEffect(() => {
+    if (!focusConnectionId) return;
+    const index = pendingIncoming.findIndex((connection) => connection.id === focusConnectionId);
+    if (index < 0) return;
+    const page = Math.floor(index / pendingIncomingPageSize) + 1;
+    if (page !== pendingIncomingPage) {
+      setPendingIncomingPage(page);
+    }
+  }, [focusConnectionId, pendingIncoming, pendingIncomingPage]);
 
   const runAction = async (id: string, action: () => Promise<unknown>) => {
     setPendingActionIds((prev) => new Set(prev).add(id));
@@ -263,6 +281,9 @@ export function ConnectionsPage() {
   const sentLoading = pendingSentQuery.isLoading && !pendingSentQuery.data;
   const confirmedLoading = confirmedQuery.isLoading && !confirmedQuery.data;
   const isInitialLoading = incomingLoading && sentLoading && confirmedLoading;
+  const showResolvedFocusNotice = !!focusConnectionId
+    && !incomingLoading
+    && !focusedIncomingConnection;
 
   if (isInitialLoading) {
     return (
@@ -292,6 +313,16 @@ export function ConnectionsPage() {
         <h1 className="text-3xl font-bold mb-2">{t('connections.title')}</h1>
         <p className="text-muted">{t('connections.subtitle')}</p>
       </div>
+      {focusConnectionId && focusedIncomingConnection && (
+        <div className="alert alert-info">
+          {t('connections.focusedRequest')}
+        </div>
+      )}
+      {showResolvedFocusNotice && (
+        <div className="alert alert-info">
+          {t('connections.focusResolved')}
+        </div>
+      )}
 
       <div className="card card-elevated">
         <h3 className="font-semibold mb-4">{t('connections.addConnection')}</h3>
@@ -378,6 +409,7 @@ export function ConnectionsPage() {
           connections={pendingIncomingSlice}
           emptyText={t('connections.noPending')}
           isLoading={incomingLoading}
+          focusedConnectionId={focusConnectionId}
           renderActions={(connection) => (
             <>
               <button

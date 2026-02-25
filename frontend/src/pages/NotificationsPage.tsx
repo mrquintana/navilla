@@ -30,6 +30,11 @@ export function NotificationsPage() {
     refetchInterval: 30000,
     refetchIntervalInBackground: false,
   });
+  const pendingIncomingQuery = useQuery({
+    queryKey: ['connections', 'pendingIncoming'],
+    queryFn: () => api.connections.pendingIncoming(token),
+    enabled: !!token,
+  });
 
   const readMutation = useMutation({
     mutationFn: (id: string) => api.notifications.markRead(token, id),
@@ -53,6 +58,7 @@ export function NotificationsPage() {
   });
 
   const allItems = (listQuery.data ?? []).filter((item) => !dismissedIds.has(item.id));
+  const pendingIncomingIds = new Set((pendingIncomingQuery.data ?? []).map((item) => item.id));
   const filteredItems = allItems.filter((item) => {
     if (activeFilter === 'unread') return !item.readAt;
     if (activeFilter === 'action') return isActionNeededNotification(item);
@@ -137,6 +143,9 @@ export function NotificationsPage() {
                     {groupedItems[sectionKey].map((item: NotificationItem) => {
                       const category = getNotificationCategory(item.type);
                       const actionNeeded = isActionNeededNotification(item);
+                      const isResolvedConnectionRequest = item.type === 'CONNECTION_REQUEST'
+                        && !!item.connectionId
+                        && !pendingIncomingIds.has(item.connectionId);
                       const categoryIcon = category === 'connections'
                         ? <UserCheck className="nav-icon" aria-hidden="true" />
                         : category === 'health'
@@ -156,6 +165,8 @@ export function NotificationsPage() {
                               <span className="badge badge-info text-xs">{t(`notifications.category.${category}`)}</span>
                               {actionNeeded ? (
                                 <span className="badge badge-warning text-xs">{t('notifications.actionNeeded')}</span>
+                              ) : isResolvedConnectionRequest ? (
+                                <span className="badge text-xs">{t('notifications.resolved')}</span>
                               ) : !item.readAt ? (
                                 <span className="badge badge-success text-xs">{t('notifications.unread')}</span>
                               ) : (
@@ -181,7 +192,7 @@ export function NotificationsPage() {
                                   {t('notifications.markRead')}
                                 </button>
                               )}
-                              {item.type === 'CONNECTION_REQUEST' && item.connectionId && (
+                              {item.type === 'CONNECTION_REQUEST' && item.connectionId && !isResolvedConnectionRequest && (
                                 <>
                                   <button
                                     type="button"

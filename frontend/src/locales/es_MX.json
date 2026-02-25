@@ -152,7 +152,9 @@
     "noConnections": "Aún no hay conexiones",
     "connectionDate": "Conectado el",
     "removeConnection": "Eliminar Conexión",
-    "confirmRemove": "¿Estás seguro de que deseas eliminar esta conexión?"
+    "confirmRemove": "¿Estás seguro de que deseas eliminar esta conexión?",
+    "focusedRequest": "Mostrando la solicitud vinculada desde tu notificación.",
+    "focusResolved": "Esa solicitud ya no está pendiente. Puede haber sido aceptada, rechazada o vencida."
   },
   "connection": {
     "success": {
@@ -216,6 +218,7 @@
     "markAllRead": "Marcar todo leído",
     "dismiss": "Descartar",
     "read": "Leído",
+    "resolved": "Resuelta",
     "actionNeeded": "Acción requerida",
     "viewDetails": "Ver detalle",
     "previewTitle": "Notificaciones recientes",
