@@ -25,6 +25,7 @@ import app.navilla.dto.NotificationResponse;
 import app.navilla.entity.Notification;
 import app.navilla.entity.NotificationType;
 import app.navilla.exception.ResourceNotFoundException;
+import app.navilla.metrics.NotificationMetrics;
 import app.navilla.repository.NotificationRepository;
 import app.navilla.security.EncryptionService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -42,6 +43,7 @@ public class NotificationService {
   private final NotificationRepository notificationRepository;
   private final EncryptionService encryptionService;
   private final ObjectMapper objectMapper;
+  private final NotificationMetrics notificationMetrics;
 
   /**
    * Creates a connection request notification.
@@ -113,6 +115,7 @@ public class NotificationService {
     if (notification.getReadAt() == null) {
       notification.setReadAt(OffsetDateTime.now());
       notificationRepository.save(notification);
+      notificationMetrics.recordRead();
     }
   }
 
@@ -129,8 +132,10 @@ public class NotificationService {
           .build();
 
       notificationRepository.save(notification);
+      notificationMetrics.recordCreated(type);
     } catch (Exception ex) {
       log.error("Failed to create notification", ex);
+      notificationMetrics.recordCreationFailed(type);
     }
   }
 

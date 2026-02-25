@@ -36,6 +36,7 @@ import app.navilla.entity.ConnectionStatus;
 import app.navilla.entity.ProfileVisibility;
 import app.navilla.entity.User;
 import app.navilla.exception.ResourceNotFoundException;
+import app.navilla.metrics.ConnectionMetrics;
 import app.navilla.repository.ConnectionRepository;
 import app.navilla.repository.UserRepository;
 import app.navilla.security.EncryptionService;
@@ -69,6 +70,9 @@ class ConnectionServiceTest {
 
   @Mock
   private NotificationService notificationService;
+
+  @Mock
+  private ConnectionMetrics connectionMetrics;
 
   @Mock
   private Jwt jwt;

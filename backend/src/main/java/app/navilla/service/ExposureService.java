@@ -34,6 +34,7 @@ import app.navilla.entity.ConnectionStatus;
 import app.navilla.entity.ExposureSnapshot;
 import app.navilla.entity.HealthStatus;
 import app.navilla.entity.HealthStatusValue;
+import app.navilla.metrics.ExposureMetrics;
 import app.navilla.repository.ConnectionRepository;
 import app.navilla.repository.ExposureSnapshotRepository;
 import app.navilla.repository.HealthStatusRepository;
@@ -56,6 +57,7 @@ public class ExposureService {
   private final ExposureSnapshotRepository exposureSnapshotRepository;
   private final EncryptionService encryptionService;
   private final ObjectMapper objectMapper;
+  private final ExposureMetrics exposureMetrics;
 
   @Value("${navilla.privacy.minimum-connections}")
   private int minimumConnections;
@@ -72,10 +74,12 @@ public class ExposureService {
 
     ExposureSnapshot snapshot = exposureSnapshotRepository.findByUserHash(userHash).orElse(null);
     if (snapshot != null && snapshot.getExpiresAt().isAfter(OffsetDateTime.now())) {
+      exposureMetrics.recordCacheHit();
       return decodeSnapshot(snapshot);
     }
 
-    ExposureResponse response = computeExposureSnapshot(userHash);
+    exposureMetrics.recordCacheMiss();
+    ExposureResponse response = exposureMetrics.timeComputation(() -> computeExposureSnapshot(userHash));
     persistSnapshot(userHash, response);
     return response;
   }
@@ -122,7 +126,7 @@ public class ExposureService {
   @Transactional
   public ExposureResponse recomputeExposureSnapshot(Jwt jwt) {
     String userHash = encryptionService.hashEmail(jwt.getClaimAsString("email"));
-    ExposureResponse response = computeExposureSnapshot(userHash);
+    ExposureResponse response = exposureMetrics.timeComputation(() -> computeExposureSnapshot(userHash));
     persistSnapshot(userHash, response);
     return response;
   }
@@ -138,7 +142,10 @@ public class ExposureService {
         .filter(d -> d >= 1 && d <= maxDepth)
         .count();
 
+    exposureMetrics.recordGraphNodes(totalGraphNodes);
+
     if (connectionCount < minimumConnections) {
+      exposureMetrics.recordInsufficientConnections();
       return new ExposureResponse(
           connectionCount,
           null,

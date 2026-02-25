@@ -29,6 +29,7 @@ import app.navilla.entity.ProfileVisibility;
 import app.navilla.entity.User;
 import app.navilla.exception.ConnectionConflictException;
 import app.navilla.exception.ResourceNotFoundException;
+import app.navilla.metrics.ConnectionMetrics;
 import app.navilla.repository.ConnectionRepository;
 import app.navilla.repository.UserRepository;
 import app.navilla.security.EncryptionService;
@@ -57,6 +58,7 @@ public class ConnectionService {
   private final UserRepository userRepository;
   private final EncryptionService encryptionService;
   private final NotificationService notificationService;
+  private final ConnectionMetrics connectionMetrics;
 
   @Value("${navilla.storage.public-base-url}")
   private String storagePublicBaseUrl;
@@ -85,6 +87,7 @@ public class ConnectionService {
     User recipientUser = resolveRecipient(identifier).orElse(null);
     if (recipientUser == null) {
       log.info("Connection request queued for unknown recipient: {}", maskIdentifier(identifier));
+      connectionMetrics.recordQueuedUnknown();
       return;
     }
 
@@ -114,6 +117,7 @@ public class ConnectionService {
     Connection saved = connectionRepository.save(connection);
     log.info("Connection request created: {} -> {}",
         requesterHash.substring(0, 8), recipientHash.substring(0, 8));
+    connectionMetrics.recordCreated();
     notificationService.createConnectionRequestNotification(recipientHash, saved.getId());
   }
 
@@ -218,6 +222,7 @@ public class ConnectionService {
 
     Connection saved = connectionRepository.save(connection);
     log.info("Connection accepted: {}", connectionId);
+    connectionMetrics.recordAccepted();
     notificationService.createConnectionConfirmedNotification(connection.getRequesterHash(), connectionId);
 
     return toConnectionResponse(saved, userHash);
@@ -255,6 +260,7 @@ public class ConnectionService {
 
     Connection saved = connectionRepository.save(connection);
     log.info("Connection denied: {}", connectionId);
+    connectionMetrics.recordDenied();
     notificationService.createConnectionDeniedNotification(connection.getRequesterHash(), connectionId);
 
     return toConnectionResponse(saved, userHash);
@@ -289,12 +295,14 @@ public class ConnectionService {
       }
       connectionRepository.delete(connection);
       log.info("Connection cancelled: {}", connectionId);
+      connectionMetrics.recordCancelledPending();
       return;
     }
 
     if (connection.getStatus() == ConnectionStatus.CONFIRMED) {
       connectionRepository.delete(connection);
       log.info("Connection removed: {}", connectionId);
+      connectionMetrics.recordRemovedConfirmed();
       return;
     }
 

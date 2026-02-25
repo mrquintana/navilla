@@ -49,6 +49,16 @@ management:
     health:
       show-details: never
 
+  # OTLP metrics export — enabled in production via env vars
+  otlp:
+    metrics:
+      export:
+        enabled: ${OTLP_METRICS_ENABLED:false}
+        url: ${OTLP_METRICS_URL:}
+        headers:
+          Authorization: Basic ${OTLP_METRICS_AUTH:}
+        step: 60s
+
 # Server - production settings
 server:
   error:

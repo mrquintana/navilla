@@ -29,6 +29,7 @@ import app.navilla.entity.ConditionType;
 import app.navilla.entity.HealthStatus;
 import app.navilla.entity.HealthStatusValue;
 import app.navilla.exception.ResourceNotFoundException;
+import app.navilla.metrics.HealthStatusMetrics;
 import app.navilla.repository.HealthStatusRepository;
 import app.navilla.security.EncryptionService;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +45,7 @@ public class HealthStatusService {
 
   private final HealthStatusRepository healthStatusRepository;
   private final EncryptionService encryptionService;
+  private final HealthStatusMetrics healthMetrics;
 
   /**
    * Lists the authenticated user's health status records.
@@ -81,12 +83,14 @@ public class HealthStatusService {
             .conditionType(condition)
             .build());
 
+    boolean isUpdate = record.getId() != null;
     record.setStatus(status);
     record.setTestDate(testDate);
     record.setClearedAt(null);
 
     HealthStatus saved = healthStatusRepository.save(record);
     log.info("Health status reported: {} {}", condition, status);
+    healthMetrics.recordReported(condition.name().toLowerCase(), status.name().toLowerCase(), isUpdate);
     return toResponse(saved);
   }
 
@@ -116,6 +120,7 @@ public class HealthStatusService {
 
     record.setClearedAt(clearedAt);
     HealthStatus saved = healthStatusRepository.save(record);
+    healthMetrics.recordCleared(saved.getConditionType().name().toLowerCase());
     return toResponse(saved);
   }
 
@@ -139,6 +144,7 @@ public class HealthStatusService {
     record.setClearedAt(null);
     HealthStatus saved = healthStatusRepository.save(record);
     log.info("Health status reactivated: {} {}", record.getConditionType(), record.getStatus());
+    healthMetrics.recordActivated(saved.getConditionType().name().toLowerCase());
     return toResponse(saved);
   }
 
@@ -159,6 +165,7 @@ public class HealthStatusService {
     }
 
     healthStatusRepository.delete(record);
+    healthMetrics.recordDeleted(record.getConditionType().name().toLowerCase());
   }
 
   private HealthStatusResponse toResponse(HealthStatus record) {

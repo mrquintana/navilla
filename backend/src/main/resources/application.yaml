@@ -43,7 +43,7 @@ server:
     include-message: always
     include-binding-errors: always
 
-# Actuator Configuration
+# Actuator & Metrics Configuration
 management:
   endpoints:
     web:
@@ -52,6 +52,20 @@ management:
   endpoint:
     health:
       show-details: when-authorized
+
+  # Common tags applied to every metric — visible as dimensions in Grafana
+  metrics:
+    tags:
+      application: navilla-backend
+      environment: ${SPRING_PROFILES_ACTIVE:unknown}
+
+  # OTLP export — disabled by default, enabled per environment via env vars
+  otlp:
+    metrics:
+      export:
+        enabled: false
+        url: ${OTLP_METRICS_URL:http://localhost:4318/v1/metrics}
+        step: 60s
 
 # Logging Configuration
 logging:
