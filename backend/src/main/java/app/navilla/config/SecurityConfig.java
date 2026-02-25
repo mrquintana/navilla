@@ -16,6 +16,7 @@
 
 package app.navilla.config;
 
+import java.time.Duration;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -25,6 +26,7 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -35,6 +37,7 @@ import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -125,8 +128,15 @@ public class SecurityConfig {
   @Bean
   public JwtDecoder jwtDecoder() {
     String jwksUri = supabaseUrl + "/auth/v1/.well-known/jwks.json";
+
+    SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+    factory.setConnectTimeout(Duration.ofSeconds(15));
+    factory.setReadTimeout(Duration.ofSeconds(15));
+    RestTemplate restTemplate = new RestTemplate(factory);
+
     return NimbusJwtDecoder.withJwkSetUri(jwksUri)
         .jwsAlgorithm(SignatureAlgorithm.ES256)
+        .restOperations(restTemplate)
         .build();
   }
 
