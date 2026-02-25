@@ -127,6 +127,26 @@ A detailed breakdown of the project's directory layout and key files can be foun
 
 ---
 
+## Session Notes (2026-02-24)
+
+- ✅ Removed infrastructure/vendor names from public pages (StatusPage, SecurityPage, PrivacyPolicyPage) — no more "Railway", "Supabase", "SendGrid", "Spring Boot", "nginx" in user-facing content.
+- ✅ Fixed Mixed Content error: replaced `http://ip-api.com/json/` with browser-native detection using `Intl.DateTimeFormat().resolvedOptions().timeZone` + `navigator.language`.
+- ✅ Extended geolocation detection to drive i18n language (not just signup country dropdown). Priority: `localStorage` → `timezoneLocale` custom detector → `en_US` fallback.
+- ✅ Documented i18n + language detection in Docusaurus (`docs/docs/frontend/i18n.md`) and ADR-012.
+- ✅ Fixed cross-platform font rendering inconsistency by loading Plus Jakarta Sans (weights 400–800) as site-wide web font.
+- ✅ Implemented Micrometer OTLP observability (backend):
+  - `NavillaMetrics.java` — central constants class (Names, TagKeys, TagValues); no inline string literals.
+  - Domain metric beans: `HealthStatusMetrics`, `ConnectionMetrics`, `ExposureMetrics`, `NotificationMetrics`.
+  - All four services instrumented with tagged counters, a Timer (exposure BFS computation), and a DistributionSummary (graph node count).
+  - `pom.xml`: added `micrometer-registry-otlp` (Spring Boot BOM managed).
+  - `application.yaml`: common tags (`application`, `environment`) + OTLP export block (disabled by default).
+  - `application-production.yaml`: OTLP export enabled via `OTLP_METRICS_ENABLED` / `OTLP_METRICS_URL` / `OTLP_METRICS_AUTH` env vars.
+  - Grafana Cloud (free tier) is the recommended OTLP target — set Railway env vars once account is created.
+  - Fixed `ConnectionServiceTest` to mock `ConnectionMetrics` (was causing NPE after service refactor).
+- 📝 TODO: Set `OTLP_METRICS_ENABLED=true`, `OTLP_METRICS_URL`, and `OTLP_METRICS_AUTH` Railway env vars once Grafana Cloud account is provisioned.
+
+---
+
 ## Session Notes (2026-02-04)
 
 - ✅ KIS direction: store enum values as `varchar` in DB and use `@Enumerated(EnumType.STRING)` in backend.
