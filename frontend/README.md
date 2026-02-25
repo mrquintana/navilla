@@ -2,7 +2,7 @@
 
 This directory contains the React frontend application.
 
-For project-specific information, how to set up the development environment, and how to run the application, please refer to the main [README.md](../../README.md) at the project root or the comprehensive [Documentation](docs/) website.
+For project-specific information, setup, and architecture, see the root [README.md](../README.md) and Docusaurus docs in `docs/`.
 
 ## Tech Stack Quick Reference
 
@@ -13,3 +13,23 @@ For project-specific information, how to set up the development environment, and
 - **Routing:** React Router 7
 - **Data Fetching:** TanStack Query 5
 - **Authentication Client:** Supabase JS
+- **Unit Testing:** Vitest + React Testing Library
+- **E2E Testing:** Playwright
+
+## Testing Commands
+
+```bash
+cd frontend
+
+# Unit tests
+npm test
+
+# Unit tests in watch mode
+npm run test:watch
+
+# Unit test coverage
+npm run test:coverage
+
+# E2E tests
+npm run test:e2e
+```

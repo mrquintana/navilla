@@ -72,7 +72,12 @@ Maven wrapper emits JDK warnings from bundled Guava (`sun.misc.Unsafe`). Conside
 
 ## Frontend Testing
 
-### Component Tests
+Frontend uses:
+- **Vitest** for unit/component tests
+- **React Testing Library** for behavior-focused UI assertions
+- **Playwright** for end-to-end flows
+
+### Unit / Component Test Example
 
 ```typescript
 import { render, screen } from '@testing-library/react';
@@ -86,19 +91,27 @@ test('renders exposure count', () => {
 ### Running Tests
 
 ```bash
-# All tests
+# Unit tests (run once)
 npm test
 
 # Watch mode
-npm test -- --watch
+npm run test:watch
 
 # Coverage
-npm test -- --coverage
+npm run test:coverage
 ```
 
-:::info TODO
-Unit tests for frontend components are not yet configured. The `npm test` script currently echoes a placeholder message.
-:::
+### Current Frontend Unit Test Scope
+
+Current high-value unit tests cover:
+- Shared loading primitives (`LoadingShell`)
+- Route auth gating (`ProtectedRoute`)
+- Dashboard loading and greeting stability
+- Connections loading transitions (initial load vs refetch)
+- Notifications loading transitions (initial load vs refetch)
+- Health Status loading transitions
+- Profile loading transitions
+- Header auth navigation and unread badge behavior
 
 ## E2E Testing with Playwright
 
@@ -118,9 +131,12 @@ npx playwright install chromium
 frontend/e2e/
 ├── auth.spec.ts        # Authentication flows
 ├── connections.spec.ts # Connection management
-├── exposure.spec.ts    # Exposure calculations
+├── dashboard.spec.ts   # Dashboard cards and network UX
+├── health-status.spec.ts
+├── account.spec.ts
+├── how-it-works.spec.ts
 ├── fixtures/
-│   └── test-users.ts   # Test user definitions
+│   └── ...             # Test fixtures
 ├── helpers/
 │   └── auth.ts         # Authentication helpers
 └── README.md           # E2E test documentation

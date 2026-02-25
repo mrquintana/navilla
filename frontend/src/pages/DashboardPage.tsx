@@ -8,6 +8,7 @@ import { DEV_MODE } from '../lib/devMode';
 import { HelpCircle, ExternalLink, Mail, MapPin, Shield, Calendar, Pencil } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { getConditionInfo } from '../lib/conditionInfo';
+import { PageSkeleton, SkeletonBlock } from '../components/ui/LoadingShell';
 
 export function DashboardPage() {
   const { t, i18n } = useTranslation();
@@ -20,7 +21,7 @@ export function DashboardPage() {
     }
   }, []);
   const [showExposureHelp, setShowExposureHelp] = useState(false);
-  const { user, session } = useAuth();
+  const { user, session, isLoading: authLoading } = useAuth();
   const { data: profile, isLoading, error } = useUser();
   const token = session?.access_token ?? '';
 
@@ -45,6 +46,8 @@ export function DashboardPage() {
   const hasPositiveStatus = (healthQuery.data ?? []).some(
     (status) => status.status === 'positive' && !status.clearedAt
   );
+  const healthInitialLoading = healthQuery.isLoading && !healthQuery.data;
+  const exposureInitialLoading = exposureQuery.isLoading && !exposureQuery.data;
 
   const recomputeMutation = useMutation({
     mutationFn: () => api.exposures.recompute(token),
@@ -62,9 +65,25 @@ export function DashboardPage() {
     },
   });
 
-  // Get display name or first part of email
-  const displayName = profile?.displayName || user?.email?.split('@')[0] || '';
-  const profileName = profile?.displayName || profile?.fullName || profile?.username || profile?.email || '—';
+  const isInitialLoading = authLoading
+    || isLoading
+    || statsQuery.isLoading
+    || exposureInitialLoading
+    || healthInitialLoading;
+
+  // Get display name or first part of email (once content is ready)
+  const displayName = profile?.displayName
+    || profile?.fullName
+    || profile?.username
+    || user?.user_metadata?.full_name
+    || user?.user_metadata?.username
+    || user?.email?.split('@')[0]
+    || '';
+  const profileName = profile?.displayName
+    || profile?.fullName
+    || profile?.username
+    || profile?.email
+    || '—';
   const profileSubtitle = profile?.username
     ? `@${profile.username}`
     : profile?.email;
@@ -91,6 +110,19 @@ export function DashboardPage() {
     const suffix = degree === 1 ? 'st' : degree === 2 ? 'nd' : degree === 3 ? 'rd' : 'th';
     return `${degree}${suffix}`;
   };
+
+  if (isInitialLoading) {
+    return (
+      <PageSkeleton loadingLabel={t('common.loading')}>
+        <SkeletonBlock className="h-20 w-full rounded-2xl" />
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <SkeletonBlock className="h-80 rounded-2xl" />
+          <SkeletonBlock className="h-80 rounded-2xl" />
+          <SkeletonBlock className="h-80 rounded-2xl" />
+        </div>
+      </PageSkeleton>
+    );
+  }
 
   return (
     <div className="container py-8">
@@ -146,8 +178,11 @@ export function DashboardPage() {
             </div>
             <h3 className="profile-card-title">{t('dashboard.exposureStatus')}</h3>
           </div>
-          {healthQuery.isLoading || exposureQuery.isLoading ? (
-            <span className="badge badge-warning text-sm">{t('common.loading')}</span>
+          {healthInitialLoading || exposureInitialLoading ? (
+            <div role="status" aria-live="polite" className="mt-1">
+              <span className="sr-only">{t('common.loading')}</span>
+              <SkeletonBlock className="h-7 w-44 rounded-full" />
+            </div>
           ) : hasPositiveStatus ? (
             <span className="badge badge-error text-sm">{t('dashboard.selfPositive')}</span>
           ) : (exposureQuery.data?.exposures?.length ?? 0) > 0 ? (

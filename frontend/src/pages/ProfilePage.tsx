@@ -11,6 +11,7 @@ import { LanguageSwitcher } from '../components/LanguageSwitcher';
 import { countries } from '../lib/geolocation';
 import { DEV_MODE } from '../lib/devMode';
 import { AtSign, Calendar, Eye, MapPin, Shield, Trash2, User, UserCircle2 } from 'lucide-react';
+import { PageSkeleton, SkeletonBlock, SkeletonRows } from '../components/ui/LoadingShell';
 
 const AVATAR_BUCKET = 'avatars';
 const AVATAR_SIZE = 512;
@@ -38,7 +39,7 @@ export function ProfilePage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { session, signOut } = useAuth();
-  const { data: profile } = useUser();
+  const { data: profile, isLoading: profileLoading } = useUser();
   const token = session?.access_token ?? '';
   const authUserId = session?.user?.id;
 
@@ -158,6 +159,24 @@ export function ProfilePage() {
       setDeleteError(err?.message || t('common.error'));
     },
   });
+
+  if (profileLoading) {
+    return (
+      <PageSkeleton titleWidth="w-52" subtitleWidth="w-80" loadingLabel={t('common.loading')}>
+        <div className="card card-elevated space-y-4">
+          <SkeletonBlock className="h-5 w-36 rounded-full" />
+          <div className="flex items-center gap-4">
+            <SkeletonBlock className="h-20 w-20 rounded-full" />
+            <SkeletonBlock className="h-9 w-44 rounded-full" />
+          </div>
+        </div>
+        <div className="card card-elevated space-y-4">
+          <SkeletonBlock className="h-5 w-40 rounded-full" />
+          <SkeletonRows rows={6} />
+        </div>
+      </PageSkeleton>
+    );
+  }
 
   const handleAvatarUpload = async (file: File) => {
     if (!profile || !authUserId) return;

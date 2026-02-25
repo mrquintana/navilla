@@ -6,6 +6,7 @@ import { useAuth } from '../hooks/useAuth';
 import { queryClient } from '../queryClient';
 import { Check, HeartPulse, Search, Send, UserRound, X } from 'lucide-react';
 import { DEV_MODE } from '../lib/devMode';
+import { PageSkeleton, SkeletonBlock, SkeletonRows } from '../components/ui/LoadingShell';
 
 function ConnectionList({
   title,
@@ -39,10 +40,9 @@ function ConnectionList({
         {headerExtra}
       </div>
       {isLoading ? (
-        <div className="flex items-center gap-2 text-sm text-muted">
-          <span className="spinner" aria-hidden="true" />
+        <div role="status" aria-live="polite">
           <span className="sr-only">{t('common.loading')}</span>
-          <span>{t('common.loading')}</span>
+          <SkeletonRows rows={compact ? 4 : 3} rowClassName={compact ? 'h-12 rounded-xl' : 'h-14 rounded-xl'} />
         </div>
       ) : connections.length === 0 ? (
         <p className="text-sm text-muted">{emptyText}</p>
@@ -259,6 +259,33 @@ export function ConnectionsPage() {
     },
   });
 
+  const incomingLoading = pendingIncomingQuery.isLoading && !pendingIncomingQuery.data;
+  const sentLoading = pendingSentQuery.isLoading && !pendingSentQuery.data;
+  const confirmedLoading = confirmedQuery.isLoading && !confirmedQuery.data;
+  const isInitialLoading = incomingLoading && sentLoading && confirmedLoading;
+
+  if (isInitialLoading) {
+    return (
+      <PageSkeleton loadingLabel={t('common.loading')}>
+        <SkeletonBlock className="h-44 rounded-2xl" />
+        <div className="grid gap-6 md:grid-cols-2">
+          <div className="card card-elevated space-y-4">
+            <SkeletonBlock className="h-5 w-48 rounded-full" />
+            <SkeletonRows rows={3} />
+          </div>
+          <div className="card card-elevated space-y-4">
+            <SkeletonBlock className="h-5 w-48 rounded-full" />
+            <SkeletonRows rows={3} />
+          </div>
+        </div>
+        <div className="card card-elevated space-y-4">
+          <SkeletonBlock className="h-5 w-56 rounded-full" />
+          <SkeletonRows rows={4} />
+        </div>
+      </PageSkeleton>
+    );
+  }
+
   return (
     <div className="container py-8 space-y-6">
       <div>
@@ -350,7 +377,7 @@ export function ConnectionsPage() {
           title={t('connections.pendingIncoming')}
           connections={pendingIncomingSlice}
           emptyText={t('connections.noPending')}
-          isLoading={pendingIncomingQuery.isLoading}
+          isLoading={incomingLoading}
           renderActions={(connection) => (
             <>
               <button
@@ -414,7 +441,7 @@ export function ConnectionsPage() {
           title={t('connections.pendingSent')}
           connections={pendingSentQuery.data ?? []}
           emptyText={t('connections.noPendingSent')}
-          isLoading={pendingSentQuery.isLoading}
+          isLoading={sentLoading}
           renderActions={(connection) => (
             <button
               className="btn btn-secondary btn-sm"
@@ -452,7 +479,7 @@ export function ConnectionsPage() {
         )}
         connections={filteredConfirmed}
         emptyText={t('connections.noConfirmed')}
-        isLoading={confirmedQuery.isLoading}
+        isLoading={confirmedLoading}
         isExpanded={(connection) => expandedConnectionId === connection.id}
         renderActions={(connection) => (
           <>

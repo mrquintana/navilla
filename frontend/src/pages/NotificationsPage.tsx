@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { api, type NotificationItem } from '../lib/api';
 import { useAuth } from '../hooks/useAuth';
 import { queryClient } from '../queryClient';
+import { PageSkeleton, SkeletonRows } from '../components/ui/LoadingShell';
 
 export function NotificationsPage() {
   const { t } = useTranslation();
@@ -58,6 +59,17 @@ export function NotificationsPage() {
     const readTime = new Date(readAt).getTime();
     return Number.isFinite(readTime) && Date.now() - readTime > 5 * 60 * 1000;
   };
+  const listInitialLoading = listQuery.isLoading && !listQuery.data;
+
+  if (listInitialLoading) {
+    return (
+      <PageSkeleton titleWidth="w-56" subtitleWidth="w-80" loadingLabel={t('common.loading')}>
+        <div className="card card-elevated">
+          <SkeletonRows rows={5} />
+        </div>
+      </PageSkeleton>
+    );
+  }
 
   return (
     <div className="container py-8 space-y-6">
@@ -70,13 +82,7 @@ export function NotificationsPage() {
       </div>
 
       <div className="card card-elevated">
-        {listQuery.isLoading ? (
-          <div className="flex items-center gap-2 text-sm text-muted">
-            <span className="spinner" aria-hidden="true" />
-            <span className="sr-only">{t('common.loading')}</span>
-            <span>{t('common.loading')}</span>
-          </div>
-        ) : listQuery.data && listQuery.data.length > 0 ? (
+        {listQuery.data && listQuery.data.length > 0 ? (
           <div className="space-y-3">
             {unreadItems.length > 0 && (
               <div className="space-y-3">

@@ -130,6 +130,18 @@ cd frontend
 # Development server
 npm run dev
 
+# Unit tests (Vitest + React Testing Library)
+npm test
+
+# Unit tests in watch mode
+npm run test:watch
+
+# Unit test coverage
+npm run test:coverage
+
+# E2E tests (Playwright)
+npm run test:e2e
+
 # Type check
 npx tsc --noEmit
 

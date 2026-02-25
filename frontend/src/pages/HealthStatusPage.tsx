@@ -7,6 +7,7 @@ import { queryClient } from '../queryClient';
 import { DEV_MODE } from '../lib/devMode';
 import { getConditionInfo } from '../lib/conditionInfo';
 import { ExternalLink, HelpCircle, Plus, Trash2 } from 'lucide-react';
+import { PageSkeleton, SkeletonBlock, SkeletonRows } from '../components/ui/LoadingShell';
 
 const CONDITIONS = [
   'chlamydia',
@@ -120,6 +121,9 @@ export function HealthStatusPage() {
   const latestStatus = statuses[0];
   const activePositives = statuses.filter((status) => status.status === 'positive' && !status.clearedAt);
   const exposureItems = exposureQuery.data?.exposures ?? [];
+  const listInitialLoading = listQuery.isLoading && !listQuery.data;
+  const exposureInitialLoading = exposureQuery.isLoading && !exposureQuery.data;
+  const isInitialLoading = listInitialLoading && exposureInitialLoading;
 
   const renderWithBold = (text: string) => {
     return text.split(/(\*\*[^*]+\*\*)/g).map((part, index) => {
@@ -129,6 +133,24 @@ export function HealthStatusPage() {
       return <span key={index}>{part}</span>;
     });
   };
+
+  if (isInitialLoading) {
+    return (
+      <PageSkeleton loadingLabel={t('common.loading')}>
+        <SkeletonBlock className="h-20 rounded-2xl" />
+        <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
+          <div className="card card-elevated space-y-4">
+            <SkeletonBlock className="h-5 w-56 rounded-full" />
+            <SkeletonRows rows={4} />
+          </div>
+          <div className="card card-elevated space-y-4">
+            <SkeletonBlock className="h-5 w-48 rounded-full" />
+            <SkeletonRows rows={4} />
+          </div>
+        </div>
+      </PageSkeleton>
+    );
+  }
 
   return (
     <div className="container py-8 space-y-6">
@@ -300,8 +322,11 @@ export function HealthStatusPage() {
             <HelpCircle className="nav-icon" aria-hidden="true" />
           </button>
         </div>
-          {exposureQuery.isLoading ? (
-            <p className="text-sm text-muted">{t('common.loading')}</p>
+          {exposureInitialLoading ? (
+            <div role="status" aria-live="polite">
+              <span className="sr-only">{t('common.loading')}</span>
+              <SkeletonRows rows={4} />
+            </div>
           ) : exposureItems.length > 0 ? (
             <div className="space-y-2 text-sm">
               <div className="flex items-center justify-between text-xs text-muted">

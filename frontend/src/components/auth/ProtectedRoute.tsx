@@ -1,6 +1,6 @@
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
-import { useTranslation } from 'react-i18next';
+import { FullPageLoader } from '../ui/LoadingShell';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -9,14 +9,9 @@ interface ProtectedRouteProps {
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const { session, isLoading } = useAuth();
   const location = useLocation();
-  const { t } = useTranslation();
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <p className="text-muted">{t('common.loading')}</p>
-      </div>
-    );
+    return <FullPageLoader />;
   }
 
   if (!session) {
