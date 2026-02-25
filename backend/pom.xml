@@ -40,6 +40,13 @@
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-registry-otlp</artifactId>
         </dependency>
+
+        <!-- Logging: Loki4j appender (push logs to Grafana Cloud Loki) -->
+        <dependency>
+            <groupId>com.github.loki4j</groupId>
+            <artifactId>loki-logback-appender</artifactId>
+            <version>2.0.3</version>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>

@@ -108,6 +108,27 @@
     <!-- PRODUCTION PROFILE                           -->
     <!-- ============================================ -->
     <springProfile name="production,prod">
+        <!-- Loki appender — push logs to Grafana Cloud -->
+        <appender name="LOKI" class="com.github.loki4j.logback.Loki4jAppender">
+            <http>
+                <url>${LOKI_URL:-https://logs-prod-021.grafana.net}/loki/api/v1/push</url>
+                <auth>
+                    <username>${LOKI_USERNAME:-}</username>
+                    <password>${LOKI_PASSWORD:-}</password>
+                </auth>
+                <requestTimeoutMs>15000</requestTimeoutMs>
+            </http>
+            <format>
+                <label>
+                    <pattern>application=navilla-backend,environment=production,level=%level,logger=%logger{36}</pattern>
+                </label>
+                <message class="com.github.loki4j.logback.JsonLayout">
+                    <customProvider class="com.github.loki4j.logback.LogbackScopedVarsProvider"/>
+                </message>
+            </format>
+            <batchMaxBytes>65536</batchMaxBytes>
+        </appender>
+
         <!-- Application loggers -->
         <logger name="app.navilla" level="INFO"/>
 
@@ -117,9 +138,10 @@
         <logger name="org.hibernate" level="WARN"/>
         <logger name="com.zaxxer.hikari" level="WARN"/>
 
-        <!-- stdout only — Railway containers have no persistent filesystem -->
+        <!-- stdout + Loki — Railway containers have no persistent filesystem -->
         <root level="WARN">
             <appender-ref ref="CONSOLE_PLAIN"/>
+            <appender-ref ref="LOKI"/>
         </root>
     </springProfile>
 
