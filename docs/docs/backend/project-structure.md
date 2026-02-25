@@ -21,6 +21,7 @@ backend/
 │   │   │   ├── repository/       # Data access layer
 │   │   │   ├── model/            # Domain entities
 │   │   │   ├── dto/              # Data transfer objects
+│   │   │   ├── metrics/          # Micrometer instrumentation beans
 │   │   │   ├── security/         # Security components (JWT, encryption)
 │   │   │   └── util/             # Utility classes
 │   │   └── resources/
@@ -79,6 +80,17 @@ Data Transfer Objects:
 Security components:
 - JWT validation logic (`SecurityConfig.java`)
 - Encryption/decryption services (`EncryptionService.java`)
+
+### metrics
+
+Micrometer instrumentation beans — one per domain:
+- `NavillaMetrics.java` — central registry of all metric name and tag key constants
+- `ConnectionMetrics.java` — connection lifecycle counters
+- `ExposureMetrics.java` — exposure snapshot cache counters, computation Timer, graph node DistributionSummary
+- `HealthStatusMetrics.java` — health status CRUD counters tagged by condition and status
+- `NotificationMetrics.java` — notification creation and read counters
+
+See [Monitoring & Metrics](./monitoring) for full instrumentation reference.
 
 ### util
 

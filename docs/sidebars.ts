@@ -52,6 +52,7 @@ const sidebars: SidebarsConfig = {
         'backend/authentication',
         'backend/database',
         'backend/services',
+        'backend/monitoring',
       ],
     },
     {
@@ -100,6 +101,7 @@ const sidebars: SidebarsConfig = {
         'adrs/adr-010-railway-memory-optimization',
         'adrs/adr-011-domain-navilla-app',
         'adrs/adr-012-browser-native-language-detection',
+        'adrs/adr-013-metrics-observability',
       ],
     },
   ],
