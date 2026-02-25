@@ -1,0 +1,190 @@
+{
+  "dashboard": {
+    "title": "Navilla — Auth & Security",
+    "tags": ["navilla", "auth", "security"],
+    "timezone": "browser",
+    "refresh": "30s",
+    "time": { "from": "now-3h", "to": "now" },
+    "panels": [
+      {
+        "title": "— Authentication —",
+        "type": "row",
+        "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+        "collapsed": false
+      },
+      {
+        "title": "Auth Failures (401)",
+        "description": "Unauthorized requests — expired/invalid JWT tokens",
+        "type": "timeseries",
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 1 },
+        "fieldConfig": {
+          "defaults": { "unit": "reqps", "color": { "fixedColor": "orange", "mode": "fixed" } }
+        },
+        "targets": [
+          {
+            "expr": "sum(rate(http_server_requests_seconds_count{application=\"navilla-backend\", status=\"401\"}[5m])) by (uri)",
+            "legendFormat": "401 {{uri}}"
+          }
+        ]
+      },
+      {
+        "title": "Auth Forbidden (403)",
+        "description": "Forbidden requests — valid token but insufficient permissions",
+        "type": "timeseries",
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 1 },
+        "fieldConfig": {
+          "defaults": { "unit": "reqps", "color": { "fixedColor": "red", "mode": "fixed" } }
+        },
+        "targets": [
+          {
+            "expr": "sum(rate(http_server_requests_seconds_count{application=\"navilla-backend\", status=\"403\"}[5m])) by (uri)",
+            "legendFormat": "403 {{uri}}"
+          }
+        ]
+      },
+      {
+        "title": "Auth Failure Rate (401+403) vs Total",
+        "description": "Ratio of auth failures to total requests",
+        "type": "gauge",
+        "gridPos": { "h": 8, "w": 6, "x": 0, "y": 9 },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percentunit", "min": 0, "max": 1, "decimals": 2,
+            "thresholds": {
+              "steps": [
+                { "color": "green", "value": null },
+                { "color": "yellow", "value": 0.05 },
+                { "color": "red", "value": 0.15 }
+              ]
+            }
+          }
+        },
+        "targets": [
+          {
+            "expr": "sum(rate(http_server_requests_seconds_count{application=\"navilla-backend\", status=~\"40[13]\"}[15m])) / sum(rate(http_server_requests_seconds_count{application=\"navilla-backend\"}[15m]))",
+            "legendFormat": "Auth Fail %"
+          }
+        ]
+      },
+      {
+        "title": "401 vs 403 Totals (24h)",
+        "type": "stat",
+        "gridPos": { "h": 8, "w": 6, "x": 6, "y": 9 },
+        "fieldConfig": {
+          "defaults": { "color": { "mode": "palette-classic" } }
+        },
+        "options": { "graphMode": "area", "colorMode": "background" },
+        "targets": [
+          {
+            "expr": "sum(increase(http_server_requests_seconds_count{application=\"navilla-backend\", status=\"401\"}[24h]))",
+            "legendFormat": "401 (24h)"
+          },
+          {
+            "expr": "sum(increase(http_server_requests_seconds_count{application=\"navilla-backend\", status=\"403\"}[24h]))",
+            "legendFormat": "403 (24h)"
+          }
+        ]
+      },
+      {
+        "title": "Auth Endpoint Latency (p95)",
+        "description": "Latency for endpoints that hit JWT validation",
+        "type": "timeseries",
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 9 },
+        "fieldConfig": {
+          "defaults": { "unit": "s", "color": { "mode": "palette-classic" } }
+        },
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{application=\"navilla-backend\", uri=~\"/api/.*\"}[5m])) by (le, uri))",
+            "legendFormat": "p95 {{uri}}"
+          }
+        ]
+      },
+      {
+        "title": "— HTTP Status Distribution —",
+        "type": "row",
+        "gridPos": { "h": 1, "w": 24, "x": 0, "y": 17 },
+        "collapsed": false
+      },
+      {
+        "title": "2xx Success Rate",
+        "type": "timeseries",
+        "gridPos": { "h": 8, "w": 8, "x": 0, "y": 18 },
+        "fieldConfig": {
+          "defaults": { "unit": "reqps", "color": { "fixedColor": "green", "mode": "fixed" } }
+        },
+        "targets": [
+          {
+            "expr": "sum(rate(http_server_requests_seconds_count{application=\"navilla-backend\", status=~\"2..\"}[5m]))",
+            "legendFormat": "2xx"
+          }
+        ]
+      },
+      {
+        "title": "4xx Client Errors",
+        "type": "timeseries",
+        "gridPos": { "h": 8, "w": 8, "x": 8, "y": 18 },
+        "fieldConfig": {
+          "defaults": { "unit": "reqps", "color": { "mode": "palette-classic" } }
+        },
+        "targets": [
+          {
+            "expr": "sum(rate(http_server_requests_seconds_count{application=\"navilla-backend\", status=~\"4..\"}[5m])) by (status)",
+            "legendFormat": "{{status}}"
+          }
+        ]
+      },
+      {
+        "title": "5xx Server Errors",
+        "type": "timeseries",
+        "gridPos": { "h": 8, "w": 8, "x": 16, "y": 18 },
+        "fieldConfig": {
+          "defaults": { "unit": "reqps", "color": { "fixedColor": "red", "mode": "fixed" } }
+        },
+        "targets": [
+          {
+            "expr": "sum(rate(http_server_requests_seconds_count{application=\"navilla-backend\", status=~\"5..\"}[5m])) by (status, uri)",
+            "legendFormat": "{{status}} {{uri}}"
+          }
+        ]
+      },
+      {
+        "title": "Status Code Breakdown (1h)",
+        "type": "piechart",
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 26 },
+        "targets": [
+          {
+            "expr": "sum(increase(http_server_requests_seconds_count{application=\"navilla-backend\"}[1h])) by (status)",
+            "legendFormat": "{{status}}"
+          }
+        ]
+      },
+      {
+        "title": "Top Error Endpoints (1h)",
+        "description": "Endpoints with the most 4xx/5xx errors",
+        "type": "bargauge",
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 26 },
+        "fieldConfig": {
+          "defaults": {
+            "color": { "mode": "thresholds" },
+            "thresholds": {
+              "steps": [
+                { "color": "green", "value": null },
+                { "color": "yellow", "value": 10 },
+                { "color": "red", "value": 50 }
+              ]
+            }
+          }
+        },
+        "options": { "displayMode": "gradient", "orientation": "horizontal" },
+        "targets": [
+          {
+            "expr": "topk(10, sum(increase(http_server_requests_seconds_count{application=\"navilla-backend\", status=~\"[45]..\"}[1h])) by (uri, status))",
+            "legendFormat": "{{status}} {{uri}}"
+          }
+        ]
+      }
+    ]
+  },
+  "overwrite": true
+}
