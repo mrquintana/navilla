@@ -20,14 +20,6 @@
     <!-- APPENDERS                                    -->
     <!-- ============================================ -->
 
-    <!-- Console Appender - Colored output for development -->
-    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder>
-            <pattern>%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr([%X{requestId:-}]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}</pattern>
-            <charset>UTF-8</charset>
-        </encoder>
-    </appender>
-
     <springProfile name="staging,production">
         <!-- Console Appender - Plain output for staging/production -->
         <appender name="CONSOLE_PLAIN" class="ch.qos.logback.core.ConsoleAppender">
@@ -36,8 +28,10 @@
                 <charset>UTF-8</charset>
             </encoder>
         </appender>
+    </springProfile>
 
-        <!-- File Appender - Rolling file for staging/production -->
+    <springProfile name="staging">
+        <!-- File Appender - Rolling file for staging only -->
         <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
             <file>${LOG_PATH}/${LOG_FILE}.log</file>
             <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
@@ -52,7 +46,7 @@
             </encoder>
         </appender>
 
-        <!-- Async wrapper for file appenders -->
+        <!-- Async wrapper for file appender -->
         <appender name="ASYNC_FILE" class="ch.qos.logback.classic.AsyncAppender">
             <appender-ref ref="FILE"/>
             <queueSize>512</queueSize>
@@ -65,6 +59,14 @@
     <!-- DEVELOPMENT PROFILE                          -->
     <!-- ============================================ -->
     <springProfile name="development">
+        <!-- Console Appender - Colored output for development -->
+        <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr([%X{requestId:-}]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}</pattern>
+                <charset>UTF-8</charset>
+            </encoder>
+        </appender>
+
         <!-- Application loggers -->
         <logger name="app.navilla" level="DEBUG"/>
 
@@ -115,9 +117,9 @@
         <logger name="org.hibernate" level="WARN"/>
         <logger name="com.zaxxer.hikari" level="WARN"/>
 
+        <!-- stdout only — Railway containers have no persistent filesystem -->
         <root level="WARN">
             <appender-ref ref="CONSOLE_PLAIN"/>
-            <appender-ref ref="ASYNC_FILE"/>
         </root>
     </springProfile>
 
@@ -125,6 +127,12 @@
     <!-- DEFAULT (no profile)                         -->
     <!-- ============================================ -->
     <springProfile name="default">
+        <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr([%X{requestId:-}]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}</pattern>
+                <charset>UTF-8</charset>
+            </encoder>
+        </appender>
         <root level="INFO">
             <appender-ref ref="CONSOLE"/>
         </root>
@@ -134,6 +142,12 @@
     <!-- TEST PROFILE                                 -->
     <!-- ============================================ -->
     <springProfile name="test">
+        <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr([%X{requestId:-}]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}</pattern>
+                <charset>UTF-8</charset>
+            </encoder>
+        </appender>
         <root level="INFO">
             <appender-ref ref="CONSOLE"/>
         </root>
