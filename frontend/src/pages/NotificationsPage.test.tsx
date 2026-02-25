@@ -12,6 +12,7 @@ vi.mock('../hooks/useAuth', () => ({
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => key,
+    i18n: { language: 'en_US' },
   }),
 }));
 
@@ -57,6 +58,7 @@ describe('NotificationsPage loading behavior', () => {
       data: [
         {
           id: 'n1',
+          type: 'CONNECTION_REQUEST',
           messageKey: 'notifications.connectionRequest',
           createdAt: '2026-02-01T00:00:00.000Z',
           readAt: null,

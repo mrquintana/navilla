@@ -938,6 +938,113 @@ select.input {
   background-color: rgba(37, 99, 235, 0.1);
 }
 
+.nav-notifications-dropdown {
+  width: min(420px, calc(100vw - 2rem));
+}
+
+.nav-notifications-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.25rem 0.25rem 0.5rem;
+  margin-bottom: 0.25rem;
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.nav-notification-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-border-light);
+  background-color: #fff;
+}
+
+.nav-notification-item-unread {
+  border-color: rgba(37, 99, 235, 0.25);
+  background-color: rgba(37, 99, 235, 0.04);
+}
+
+.notification-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.notification-filter-btn {
+  border: 1px solid var(--color-border-light);
+  border-radius: 9999px;
+  background: #fff;
+  color: var(--color-foreground-secondary);
+  padding: 0.35rem 0.75rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease, background-color 0.2s ease;
+}
+
+.notification-filter-btn:hover {
+  border-color: rgba(37, 99, 235, 0.35);
+  color: var(--color-primary);
+}
+
+.notification-filter-btn-active {
+  border-color: transparent;
+  background: rgba(37, 99, 235, 0.12);
+  color: var(--color-primary);
+}
+
+.notification-row {
+  display: grid;
+  grid-template-columns: 34px 1fr;
+  gap: 0.75rem;
+  border: 1px solid var(--color-border-light);
+  border-radius: 0.9rem;
+  padding: 0.85rem;
+  background-color: #fff;
+}
+
+.notification-row-unread {
+  border-color: rgba(37, 99, 235, 0.28);
+  background-color: rgba(37, 99, 235, 0.04);
+}
+
+.notification-row-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-primary);
+  background: rgba(37, 99, 235, 0.12);
+}
+
+.notification-row-content {
+  min-width: 0;
+}
+
+.notification-row-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.4rem;
+}
+
+.notification-row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  align-items: center;
+  margin-top: 0.45rem;
+}
+
 /* Footer */
 .footer {
   background-color: #1f2937;

@@ -213,7 +213,28 @@
     "title": "Notificaciones",
     "subtitle": "Actualizaciones de tu red",
     "markRead": "Marcar como leído",
+    "markAllRead": "Marcar todo leído",
+    "dismiss": "Descartar",
+    "read": "Leído",
+    "actionNeeded": "Acción requerida",
+    "viewDetails": "Ver detalle",
+    "previewTitle": "Notificaciones recientes",
+    "viewAll": "Ver todas",
+    "filterAll": "Todas",
+    "filterUnread": "No leídas",
+    "filterActionNeeded": "Acción requerida",
+    "noMatching": "No hay notificaciones para este filtro",
     "unread": "Nuevo",
+    "section": {
+      "today": "Hoy",
+      "yesterday": "Ayer",
+      "earlier": "Anteriores"
+    },
+    "category": {
+      "connections": "Conexiones",
+      "health": "Salud",
+      "system": "Sistema"
+    },
     "newSection": "Nuevas",
     "earlierSection": "Anteriores",
     "empty": "No hay notificaciones",

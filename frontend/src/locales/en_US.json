@@ -214,7 +214,28 @@
     "title": "Notifications",
     "subtitle": "Updates from your network",
     "markRead": "Mark read",
+    "markAllRead": "Mark all read",
+    "dismiss": "Dismiss",
+    "read": "Read",
+    "actionNeeded": "Action needed",
+    "viewDetails": "View details",
+    "previewTitle": "Recent notifications",
+    "viewAll": "View all",
+    "filterAll": "All",
+    "filterUnread": "Unread",
+    "filterActionNeeded": "Action needed",
+    "noMatching": "No notifications match this filter",
     "unread": "New",
+    "section": {
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "earlier": "Earlier"
+    },
+    "category": {
+      "connections": "Connections",
+      "health": "Health",
+      "system": "System"
+    },
     "newSection": "New",
     "earlierSection": "Earlier",
     "empty": "No notifications yet",

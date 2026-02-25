@@ -4,10 +4,12 @@ import { useAuthOptional } from '../../contexts/AuthContext';
 import { useUser } from '../../hooks/useUser';
 import { Bell, ChevronDown, HeartPulse, LayoutDashboard, LogOut, Menu, UserCircle2, Users } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { api } from '../../lib/api';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { api, type NotificationItem } from '../../lib/api';
+import { queryClient } from '../../queryClient';
+import { formatRelativeTime } from '../../lib/notifications';
 export function Header() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const auth = useAuthOptional();
   const session = auth?.session ?? null;
   const signOut = auth?.signOut;
@@ -21,16 +23,26 @@ export function Header() {
     refetchInterval: 30000,
     refetchIntervalInBackground: false,
   });
+  const readMutation = useMutation({
+    mutationFn: (id: string) => api.notifications.markRead(token, id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+    },
+  });
   const avatarThumb = profile?.avatarThumbUrl || profile?.avatarUrl;
   const profileLabel = profile?.username
     ? `(@${profile.username})`
     : profile?.email
       ? `(${profile.email})`
       : '';
+  const [nowMs] = useState(() => Date.now());
   const unreadCount = notifications?.filter((item) => !item.readAt).length ?? 0;
+  const previewItems = (notifications ?? []).slice(0, 5);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
+  const notificationsRef = useRef<HTMLDivElement | null>(null);
   const mobileMenuRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -42,6 +54,10 @@ export function Header() {
       if (!mobileMenuRef.current) return;
       if (!mobileMenuRef.current.contains(event.target as Node)) {
         setMobileMenuOpen(false);
+      }
+      if (!notificationsRef.current) return;
+      if (!notificationsRef.current.contains(event.target as Node)) {
+        setNotificationsOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClick);
@@ -139,15 +155,60 @@ export function Header() {
                   <HeartPulse className="nav-icon" aria-hidden="true" />
                   {t('nav.health')}
                 </Link>
-                <Link to="/notifications" className={`nav-link${pathname === '/notifications' ? ' nav-link-active' : ''}`}>
-                  <span className="nav-bell" aria-hidden="true">
-                    <Bell className="nav-icon" />
-                    {unreadCount > 0 && (
-                      <span className="nav-bell-badge">{unreadCount}</span>
-                    )}
-                  </span>
-                  {t('nav.notifications')}
-                </Link>
+                <div className="nav-menu" ref={notificationsRef}>
+                  <button
+                    className={`nav-link${pathname === '/notifications' ? ' nav-link-active' : ''}`}
+                    type="button"
+                    onClick={() => setNotificationsOpen((open) => !open)}
+                    aria-expanded={notificationsOpen}
+                    aria-haspopup="menu"
+                  >
+                    <span className="nav-bell" aria-hidden="true">
+                      <Bell className="nav-icon" />
+                      {unreadCount > 0 && (
+                        <span className="nav-bell-badge">{unreadCount}</span>
+                      )}
+                    </span>
+                    {t('nav.notifications')}
+                  </button>
+                  {notificationsOpen && (
+                    <div className="nav-dropdown nav-notifications-dropdown" role="menu">
+                      <div className="nav-notifications-head">
+                        <span className="text-xs font-semibold uppercase tracking-wide text-muted">
+                          {t('notifications.previewTitle')}
+                        </span>
+                        <Link to="/notifications" className="text-xs font-medium text-primary" onClick={() => setNotificationsOpen(false)}>
+                          {t('notifications.viewAll')}
+                        </Link>
+                      </div>
+                      <div className="space-y-2">
+                        {previewItems.length > 0 ? previewItems.map((item: NotificationItem) => (
+                          <div key={item.id} className={`nav-notification-item${item.readAt ? '' : ' nav-notification-item-unread'}`}>
+                            <div className="min-w-0">
+                              <p className={`text-xs truncate ${item.readAt ? 'text-muted' : 'font-semibold text-foreground'}`}>
+                                {t(item.messageKey)}
+                              </p>
+                              <p className="text-[11px] text-muted" title={new Date(item.createdAt).toLocaleString()}>
+                                {formatRelativeTime(item.createdAt, i18n.language, nowMs)}
+                              </p>
+                            </div>
+                            {!item.readAt && (
+                              <button
+                                type="button"
+                                className="btn btn-secondary btn-sm"
+                                onClick={() => readMutation.mutate(item.id)}
+                              >
+                                {t('notifications.markRead')}
+                              </button>
+                            )}
+                          </div>
+                        )) : (
+                          <p className="text-xs text-muted">{t('notifications.empty')}</p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
                 <div className="nav-menu" ref={menuRef}>
                 <button
                   className="nav-link"

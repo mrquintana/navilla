@@ -5,6 +5,7 @@ import { Header } from './Header';
 const useAuthOptionalMock = vi.fn();
 const useUserMock = vi.fn();
 const useQueryMock = vi.fn();
+const useMutationMock = vi.fn();
 
 vi.mock('../../contexts/AuthContext', () => ({
   useAuthOptional: () => useAuthOptionalMock(),
@@ -19,6 +20,7 @@ vi.mock('@tanstack/react-query', async () => {
   return {
     ...actual,
     useQuery: (options: unknown) => useQueryMock(options),
+    useMutation: (options: unknown) => useMutationMock(options),
   };
 });
 
@@ -41,6 +43,11 @@ describe('Header', () => {
     useAuthOptionalMock.mockReset();
     useUserMock.mockReset();
     useQueryMock.mockReset();
+    useMutationMock.mockReset();
+    useMutationMock.mockReturnValue({
+      mutate: vi.fn(),
+      isPending: false,
+    });
   });
 
   it('renders sign-in nav for unauthenticated users', () => {
