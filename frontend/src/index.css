@@ -775,6 +775,11 @@ select.input {
   background-color: rgba(37, 99, 235, 0.08);
 }
 
+.nav-link-active {
+  color: var(--color-primary);
+  background-color: rgba(37, 99, 235, 0.1);
+}
+
 .nav-icon {
   width: 16px;
   height: 16px;
@@ -926,6 +931,11 @@ select.input {
 .nav-dropdown-item:hover {
   background-color: rgba(37, 99, 235, 0.08);
   color: var(--color-primary);
+}
+
+.nav-dropdown-item-active {
+  color: var(--color-primary);
+  background-color: rgba(37, 99, 235, 0.1);
 }
 
 /* Footer */

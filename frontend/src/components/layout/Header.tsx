@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuthOptional } from '../../contexts/AuthContext';
 import { useUser } from '../../hooks/useUser';
@@ -13,6 +13,7 @@ export function Header() {
   const signOut = auth?.signOut;
   const token = session?.access_token ?? '';
   const { data: profile } = useUser();
+  const { pathname } = useLocation();
   const { data: notifications } = useQuery({
     queryKey: ['notifications'],
     queryFn: () => api.notifications.list(token),
@@ -74,19 +75,19 @@ export function Header() {
               <div className="nav-dropdown" role="menu">
                 {session ? (
                   <>
-                    <Link to="/dashboard" className="nav-dropdown-item" role="menuitem">
+                    <Link to="/dashboard" className={`nav-dropdown-item${pathname === '/dashboard' ? ' nav-dropdown-item-active' : ''}`} role="menuitem">
                       <LayoutDashboard className="nav-icon" aria-hidden="true" />
                       {t('nav.dashboard')}
                     </Link>
-                    <Link to="/connections" className="nav-dropdown-item" role="menuitem">
+                    <Link to="/connections" className={`nav-dropdown-item${pathname === '/connections' ? ' nav-dropdown-item-active' : ''}`} role="menuitem">
                       <Users className="nav-icon" aria-hidden="true" />
                       {t('nav.connections')}
                     </Link>
-                    <Link to="/health" className="nav-dropdown-item" role="menuitem">
+                    <Link to="/health" className={`nav-dropdown-item${pathname === '/health' ? ' nav-dropdown-item-active' : ''}`} role="menuitem">
                       <HeartPulse className="nav-icon" aria-hidden="true" />
                       {t('nav.health')}
                     </Link>
-                    <Link to="/notifications" className="nav-dropdown-item" role="menuitem">
+                    <Link to="/notifications" className={`nav-dropdown-item${pathname === '/notifications' ? ' nav-dropdown-item-active' : ''}`} role="menuitem">
                       <Bell className="nav-icon" aria-hidden="true" />
                       {t('nav.notifications')}
                       {unreadCount > 0 && <span className="nav-mobile-badge">{unreadCount}</span>}
@@ -126,19 +127,19 @@ export function Header() {
           {session ? (
             <>
               <div className="nav-desktop">
-                <Link to="/dashboard" className="nav-link">
+                <Link to="/dashboard" className={`nav-link${pathname === '/dashboard' ? ' nav-link-active' : ''}`}>
                   <LayoutDashboard className="nav-icon" aria-hidden="true" />
                   {t('nav.dashboard')}
                 </Link>
-                <Link to="/connections" className="nav-link">
+                <Link to="/connections" className={`nav-link${pathname === '/connections' ? ' nav-link-active' : ''}`}>
                   <Users className="nav-icon" aria-hidden="true" />
                   {t('nav.connections')}
                 </Link>
-                <Link to="/health" className="nav-link">
+                <Link to="/health" className={`nav-link${pathname === '/health' ? ' nav-link-active' : ''}`}>
                   <HeartPulse className="nav-icon" aria-hidden="true" />
                   {t('nav.health')}
                 </Link>
-                <Link to="/notifications" className="nav-link">
+                <Link to="/notifications" className={`nav-link${pathname === '/notifications' ? ' nav-link-active' : ''}`}>
                   <span className="nav-bell" aria-hidden="true">
                     <Bell className="nav-icon" />
                     {unreadCount > 0 && (
