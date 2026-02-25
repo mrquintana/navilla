@@ -1,0 +1,146 @@
+{
+  "dashboard": {
+    "title": "Navilla — JVM & System",
+    "tags": ["navilla", "jvm", "system"],
+    "timezone": "browser",
+    "refresh": "30s",
+    "time": { "from": "now-1h", "to": "now" },
+    "panels": [
+      {
+        "title": "Heap Memory Used",
+        "type": "timeseries",
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+        "fieldConfig": {
+          "defaults": { "unit": "bytes", "color": { "mode": "palette-classic" } }
+        },
+        "targets": [
+          {
+            "expr": "jvm_memory_used_bytes{area=\"heap\", application=\"navilla-backend\"}",
+            "legendFormat": "{{id}}"
+          }
+        ]
+      },
+      {
+        "title": "Heap Memory Max",
+        "type": "timeseries",
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+        "fieldConfig": {
+          "defaults": { "unit": "bytes", "color": { "mode": "palette-classic" } }
+        },
+        "targets": [
+          {
+            "expr": "jvm_memory_max_bytes{area=\"heap\", application=\"navilla-backend\"}",
+            "legendFormat": "{{id}}"
+          }
+        ]
+      },
+      {
+        "title": "Heap Usage %",
+        "type": "gauge",
+        "gridPos": { "h": 8, "w": 6, "x": 0, "y": 8 },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percentunit",
+            "min": 0, "max": 1,
+            "thresholds": {
+              "steps": [
+                { "color": "green", "value": null },
+                { "color": "yellow", "value": 0.7 },
+                { "color": "red", "value": 0.9 }
+              ]
+            }
+          }
+        },
+        "targets": [
+          {
+            "expr": "sum(jvm_memory_used_bytes{area=\"heap\", application=\"navilla-backend\"}) / sum(jvm_memory_max_bytes{area=\"heap\", application=\"navilla-backend\"})",
+            "legendFormat": "Heap %"
+          }
+        ]
+      },
+      {
+        "title": "Non-Heap Memory Used",
+        "type": "timeseries",
+        "gridPos": { "h": 8, "w": 6, "x": 6, "y": 8 },
+        "fieldConfig": {
+          "defaults": { "unit": "bytes", "color": { "mode": "palette-classic" } }
+        },
+        "targets": [
+          {
+            "expr": "jvm_memory_used_bytes{area=\"nonheap\", application=\"navilla-backend\"}",
+            "legendFormat": "{{id}}"
+          }
+        ]
+      },
+      {
+        "title": "GC Pause Duration",
+        "type": "timeseries",
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+        "fieldConfig": {
+          "defaults": { "unit": "s", "color": { "mode": "palette-classic" } }
+        },
+        "targets": [
+          {
+            "expr": "rate(jvm_gc_pause_seconds_sum{application=\"navilla-backend\"}[5m])",
+            "legendFormat": "{{action}} — {{cause}}"
+          }
+        ]
+      },
+      {
+        "title": "Live Threads",
+        "type": "timeseries",
+        "gridPos": { "h": 8, "w": 8, "x": 0, "y": 16 },
+        "fieldConfig": {
+          "defaults": { "color": { "mode": "palette-classic" } }
+        },
+        "targets": [
+          {
+            "expr": "jvm_threads_live_threads{application=\"navilla-backend\"}",
+            "legendFormat": "Live"
+          },
+          {
+            "expr": "jvm_threads_daemon_threads{application=\"navilla-backend\"}",
+            "legendFormat": "Daemon"
+          },
+          {
+            "expr": "jvm_threads_peak_threads{application=\"navilla-backend\"}",
+            "legendFormat": "Peak"
+          }
+        ]
+      },
+      {
+        "title": "CPU Usage",
+        "type": "timeseries",
+        "gridPos": { "h": 8, "w": 8, "x": 8, "y": 16 },
+        "fieldConfig": {
+          "defaults": { "unit": "percentunit", "min": 0, "max": 1, "color": { "mode": "palette-classic" } }
+        },
+        "targets": [
+          {
+            "expr": "process_cpu_usage{application=\"navilla-backend\"}",
+            "legendFormat": "Process CPU"
+          },
+          {
+            "expr": "system_cpu_usage{application=\"navilla-backend\"}",
+            "legendFormat": "System CPU"
+          }
+        ]
+      },
+      {
+        "title": "Classes Loaded",
+        "type": "stat",
+        "gridPos": { "h": 8, "w": 8, "x": 16, "y": 16 },
+        "fieldConfig": {
+          "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "steps": [{ "color": "blue", "value": null }] } }
+        },
+        "targets": [
+          {
+            "expr": "jvm_classes_loaded_classes{application=\"navilla-backend\"}",
+            "legendFormat": "Loaded"
+          }
+        ]
+      }
+    ]
+  },
+  "overwrite": true
+}
