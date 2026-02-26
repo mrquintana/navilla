@@ -710,6 +710,10 @@ select.input {
   margin-top: 3rem;
 }
 
+section.hero + section {
+  margin-top: 2.5rem;
+}
+
 /* Landing section headings use display font for editorial warmth */
 .landing-section h2 {
   font-family: var(--font-display);
@@ -718,7 +722,7 @@ select.input {
 }
 
 .landing-panel {
-  background: #ffffff;
+  background: var(--color-background);
   border: 1px solid rgba(99, 102, 241, 0.1);
   border-radius: 1rem;
   padding: 2.1rem;
