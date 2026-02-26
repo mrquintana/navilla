@@ -468,7 +468,20 @@ select.input {
   70% { opacity: 0.88; transform: scale(0.97); }
 }
 
+@keyframes hero-reveal {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .hero-copy > * {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
   .constellation-layer-back,
   .constellation-layer-mid,
   .constellation-layer-front,
@@ -550,6 +563,18 @@ select.input {
   z-index: -1;
   pointer-events: none;
 }
+
+.hero-copy > * {
+  opacity: 0;
+  transform: translateY(8px);
+  animation: hero-reveal 580ms ease-out forwards;
+}
+
+.hero-copy > :nth-child(1) { animation-delay: 80ms; }
+.hero-copy > :nth-child(2) { animation-delay: 150ms; }
+.hero-copy > :nth-child(3) { animation-delay: 230ms; }
+.hero-copy > :nth-child(4) { animation-delay: 320ms; }
+.hero-copy > :nth-child(5) { animation-delay: 410ms; }
 
 /* Full-bleed constellation — atmospheric background filling entire hero */
 .hero-constellation {
@@ -658,8 +683,8 @@ select.input {
 @media (max-width: 768px) {
   .hero > .container {
     min-height: auto;
-    padding-top: 2rem;
-    padding-bottom: 3rem;
+    padding-top: 1.35rem;
+    padding-bottom: 2.2rem;
   }
 
   .hero-copy {
@@ -679,6 +704,16 @@ select.input {
 
   .hero-description {
     max-width: 100%;
+    margin-bottom: 1.8rem;
+    line-height: 1.64;
+  }
+
+  .hero-title {
+    margin-bottom: 0.7rem;
+  }
+
+  .hero-subtitle {
+    margin-bottom: 1rem;
   }
 }
 
@@ -968,6 +1003,12 @@ section.hero + section {
   color: var(--color-primary-light);
   background: rgba(99, 102, 241, 0.06);
   border: 1px solid rgba(99, 102, 241, 0.14);
+}
+
+.landing-section .feature-icon svg {
+  width: 15px;
+  height: 15px;
+  stroke-width: 1.8;
 }
 
 .feature-card h3 {

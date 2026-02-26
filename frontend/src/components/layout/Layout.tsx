@@ -7,12 +7,13 @@ import { DEV_MODE } from '../../lib/devMode';
 import { api, API_URL } from '../../lib/api';
 import { env } from '../../lib/env';
 import { useAuthOptional } from '../../contexts/AuthContext';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 export function Layout() {
   const { t } = useTranslation();
   const session = useAuthOptional()?.session ?? null;
   const location = useLocation();
+  const mainRef = useRef<HTMLElement | null>(null);
   const isLanding = !session && location.pathname === '/';
   const healthQuery = useQuery({
     queryKey: ['health'],
@@ -34,6 +35,11 @@ export function Layout() {
     }
   }, [healthQuery.status]);
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    mainRef.current?.focus({ preventScroll: true });
+  }, [location.pathname, location.search]);
+
   const showOutage = healthQuery.failureCount >= 2;
 
   return (
@@ -54,7 +60,7 @@ export function Layout() {
           )}
         </div>
       )}
-      <main className={`pb-12 flex-1${isLanding ? '' : ' pt-6'}`}>
+      <main ref={mainRef} tabIndex={-1} className={`pb-12 flex-1${isLanding ? '' : ' pt-6'}`}>
         {showOutage ? (
           <div className="container py-8 space-y-4">
             <div className="card card-elevated text-center space-y-3">
