@@ -946,6 +946,7 @@ select.input {
   top: 0;
   z-index: 100;
   backdrop-filter: blur(2px);
+  transition: background 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
 }
 
 /* Transparent navbar variant — landing page hero overlay */
@@ -953,7 +954,6 @@ select.input {
   background: transparent;
   box-shadow: none;
   border-bottom-color: transparent;
-  transition: background 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
 }
 
 .navbar--transparent .navbar-logo-text {

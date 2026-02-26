@@ -32,7 +32,7 @@ vi.mock('react-i18next', () => ({
 
 function renderHeader() {
   return render(
-    <MemoryRouter>
+    <MemoryRouter initialEntries={['/dashboard']}>
       <Header />
     </MemoryRouter>
   );
