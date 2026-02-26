@@ -196,6 +196,8 @@
     "statusNegative": "Negativo",
     "statusUnknown": "Desconocido",
     "testDate": "Fecha de prueba",
+    "testDateBeforeDob": "La fecha no puede ser anterior a tu fecha de nacimiento.",
+    "testDateInFuture": "La fecha no puede ser en el futuro.",
     "noTestDate": "Sin fecha",
     "cleared": "Resuelto",
     "clearedOn": "Resuelto el",

@@ -197,6 +197,8 @@
     "statusNegative": "Negative",
     "statusUnknown": "Unknown",
     "testDate": "Test Date",
+    "testDateBeforeDob": "Test date cannot be before your date of birth.",
+    "testDateInFuture": "Test date cannot be in the future.",
     "noTestDate": "No test date",
     "cleared": "Cleared",
     "clearedOn": "Cleared on",

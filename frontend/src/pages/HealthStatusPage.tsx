@@ -3,6 +3,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { api, type HealthStatusRequest, type HealthStatus } from '../lib/api';
 import { useAuth } from '../hooks/useAuth';
+import { useUser } from '../hooks/useUser';
 import { queryClient } from '../queryClient';
 import { DEV_MODE } from '../lib/devMode';
 import { getConditionInfo } from '../lib/conditionInfo';
@@ -26,6 +27,10 @@ export function HealthStatusPage() {
   const { t, i18n } = useTranslation();
   const { session } = useAuth();
   const token = session?.access_token ?? '';
+  const { data: userProfile } = useUser();
+
+  const dobMin = userProfile?.dateOfBirth ?? undefined;
+  const todayMax = new Date().toISOString().split('T')[0];
   const [pendingHealthId, setPendingHealthId] = useState<string | null>(null);
   const [pendingHealthAction, setPendingHealthAction] = useState<'clear' | 'activate' | 'delete' | null>(null);
 
@@ -396,10 +401,18 @@ export function HealthStatusPage() {
               className="space-y-4"
               onSubmit={(e) => {
                 e.preventDefault();
-                const cleaned: HealthStatusRequest = {
-                  ...form,
-                  testDate: form.testDate?.trim() || undefined,
-                };
+                const testDate = form.testDate?.trim() || undefined;
+                if (testDate) {
+                  if (dobMin && testDate < dobMin) {
+                    setError(t('health.testDateBeforeDob'));
+                    return;
+                  }
+                  if (testDate > todayMax) {
+                    setError(t('health.testDateInFuture'));
+                    return;
+                  }
+                }
+                const cleaned: HealthStatusRequest = { ...form, testDate };
                 setForm(cleaned);
                 reportMutation.mutate(cleaned);
               }}
@@ -440,6 +453,8 @@ export function HealthStatusPage() {
                     type="date"
                     className="input"
                     value={form.testDate ?? ''}
+                    min={dobMin}
+                    max={todayMax}
                     onChange={(e) => setForm({ ...form, testDate: e.target.value })}
                   />
                 </div>
