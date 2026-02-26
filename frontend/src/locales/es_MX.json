@@ -466,7 +466,7 @@
     "colStatus": "Estado",
     "windowExplainer": "Ventana = días mínimos después de la exposición para un resultado confiable. Los resultados antes de esta ventana pueden no detectar una infección activa.",
     "statusTestable": "Puede hacerse la prueba",
-    "statusWait": "Lista el {{date}}",
+    "statusWait": "Espera hasta el {{date}}",
     "statusNoTest": "Sin prueba estándar",
     "emptyState": "Selecciona una fecha arriba para ver tu cronograma de pruebas.",
     "clinicCtaTitle": "¿Listo para hacerte la prueba?",

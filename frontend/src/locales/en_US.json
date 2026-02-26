@@ -467,7 +467,7 @@
     "colStatus": "Status",
     "windowExplainer": "Window = earliest days after exposure for a reliable test. Results before this window may miss an active infection.",
     "statusTestable": "Testable now",
-    "statusWait": "Ready {{date}}",
+    "statusWait": "Wait until {{date}}",
     "statusNoTest": "No standard test",
     "emptyState": "Select a date above to see your testing timeline.",
     "clinicCtaTitle": "Ready to get tested?",
