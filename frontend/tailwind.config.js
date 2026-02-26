@@ -7,16 +7,16 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: '#FFFFFF',
-        foreground: '#1A1A1A',
-        muted: '#666666',
-        border: '#E5E5E5',
-        accent: '#333333',
-        success: '#2D5A3D',
-        warning: '#8B7355',
+        background: '#fafaf9',
+        foreground: '#1c1917',
+        muted: '#78716c',
+        border: '#d6d3d1',
+        accent: '#4f46e5',
+        success: '#16a34a',
+        warning: '#e3a008',
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['Plus Jakarta Sans', 'system-ui', '-apple-system', 'sans-serif'],
         mono: ['JetBrains Mono', 'monospace'],
       },
     },
