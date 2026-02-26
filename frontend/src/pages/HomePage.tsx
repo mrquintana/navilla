@@ -10,8 +10,6 @@ import {
   LockKeyhole,
   ArrowRight,
   CircleHelp,
-  Calculator,
-  BookOpen,
 } from 'lucide-react';
 import { ConstellationGraphic } from '../components/landing/ConstellationGraphic';
 
