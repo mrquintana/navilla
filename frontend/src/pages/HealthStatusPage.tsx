@@ -73,7 +73,7 @@ export function HealthStatusPage() {
       setIsFormOpen(false);
       queryClient.invalidateQueries({ queryKey: ['health'] });
     },
-    onError: (err: any) => {
+    onError: (err: Error) => {
       setError(err.message || t('common.error'));
       setMessage(null);
     },

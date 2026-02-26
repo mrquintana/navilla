@@ -7,19 +7,17 @@ import { DEV_MODE } from '../../lib/devMode';
 import { api } from '../../lib/api';
 import { API_URL } from '../../lib/api';
 import { useAuthOptional } from '../../contexts/AuthContext';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 export function Layout() {
   const { t } = useTranslation();
   const session = useAuthOptional()?.session ?? null;
   const location = useLocation();
   const isLanding = !session && location.pathname === '/';
-  const [healthFailures, setHealthFailures] = useState(0);
   const healthQuery = useQuery({
     queryKey: ['health'],
     queryFn: async () => {
       if (import.meta.env.DEV) {
-        // eslint-disable-next-line no-console
         console.debug('[healthcheck] queryFn');
       }
       return api.system.check();
@@ -31,23 +29,12 @@ export function Layout() {
   });
 
   useEffect(() => {
-    if (healthQuery.isSuccess) {
-      setHealthFailures(0);
-      return;
-    }
-    if (healthQuery.isError) {
-      setHealthFailures((count) => Math.min(count + 1, 3));
-    }
-  }, [healthQuery.isError, healthQuery.isSuccess]);
-
-  useEffect(() => {
     if (import.meta.env.DEV) {
-      // eslint-disable-next-line no-console
       console.debug('[healthcheck] status', healthQuery.status);
     }
   }, [healthQuery.status]);
 
-  const showOutage = healthFailures >= 2;
+  const showOutage = healthQuery.failureCount >= 2;
 
   return (
     <div className={`min-h-screen bg-background flex flex-col${isLanding ? ' landing-surface' : ' app-surface'}`}>

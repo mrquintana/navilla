@@ -153,7 +153,6 @@ export const api = {
       }
       const baseUrl = getApiBaseUrl();
       if (import.meta.env.DEV) {
-        // eslint-disable-next-line no-console
         console.debug('[healthcheck] url', `${baseUrl}/api/health`);
       }
       const controller = new AbortController();
@@ -164,7 +163,6 @@ export const api = {
           signal: controller.signal,
         });
         if (import.meta.env.DEV) {
-          // eslint-disable-next-line no-console
           console.debug('[healthcheck] response', response.status);
         }
         if (!response.ok) {
@@ -173,7 +171,6 @@ export const api = {
         return response.json();
       } catch (error) {
         if (import.meta.env.DEV) {
-          // eslint-disable-next-line no-console
           console.debug('[healthcheck] error', error);
         }
         throw error;

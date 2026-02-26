@@ -6,20 +6,15 @@ import { api } from '../lib/api';
 import { Link } from 'react-router-dom';
 import { DEV_MODE } from '../lib/devMode';
 import { HelpCircle, ExternalLink, Mail, MapPin, Shield, Calendar, Pencil } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { getConditionInfo } from '../lib/conditionInfo';
 import { PageSkeleton, SkeletonBlock } from '../components/ui/LoadingShell';
 
 export function DashboardPage() {
   const { t, i18n } = useTranslation();
-  const [showSnapshotNotice, setShowSnapshotNotice] = useState(true);
-
-  useEffect(() => {
-    const dismissed = localStorage.getItem('navilla_hide_snapshot_notice') === 'true';
-    if (dismissed) {
-      setShowSnapshotNotice(false);
-    }
-  }, []);
+  const [showSnapshotNotice, setShowSnapshotNotice] = useState(
+    () => localStorage.getItem('navilla_hide_snapshot_notice') !== 'true'
+  );
   const [showExposureHelp, setShowExposureHelp] = useState(false);
   const { user, session, isLoading: authLoading } = useAuth();
   const { data: profile, isLoading, error } = useUser();

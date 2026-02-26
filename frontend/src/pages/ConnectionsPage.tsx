@@ -184,7 +184,7 @@ export function ConnectionsPage() {
     },
   });
 
-  const pendingIncoming = pendingIncomingQuery.data ?? [];
+  const pendingIncoming = useMemo(() => pendingIncomingQuery.data ?? [], [pendingIncomingQuery.data]);
   const pendingIncomingPageSize = 10;
   const pendingIncomingTotalPages = Math.max(
     1,
@@ -221,7 +221,7 @@ export function ConnectionsPage() {
     }
   };
 
-  const confirmedConnections = confirmedQuery.data ?? [];
+  const confirmedConnections = useMemo(() => confirmedQuery.data ?? [], [confirmedQuery.data]);
   const filteredConfirmed = useMemo(() => {
     const query = confirmedSearch.trim().toLowerCase();
     if (!query) {
@@ -253,11 +253,10 @@ export function ConnectionsPage() {
       setIdentifier('');
       queryClient.invalidateQueries({ queryKey: ['connections'] });
     },
-    onError: (err: any) => {
+    onError: (err: Error) => {
       if (err instanceof ApiError && err.status === 409) {
-        const details = Array.isArray((err.data as any)?.details)
-          ? ((err.data as any).details as string[])
-          : [];
+        const data = err.data as { details?: string[] } | null | undefined;
+        const details = Array.isArray(data?.details) ? data.details : [];
         const existingConnectionId = details
           .find((detail) => detail.startsWith('existingConnectionId:'))
           ?.split(':')[1];

@@ -30,19 +30,15 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [session, setSession] = useState<Session | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [session, setSession] = useState<Session | null>(() => {
+    if (!E2E_MODE) return null;
+    const email = localStorage.getItem('navilla.e2e.email');
+    return email ? buildE2eSession(email) : null;
+  });
+  const [isLoading, setIsLoading] = useState(!E2E_MODE);
 
   useEffect(() => {
-    if (E2E_MODE) {
-      const email = localStorage.getItem('navilla.e2e.email');
-      if (email) {
-        const e2eSession = buildE2eSession(email);
-        setSession(e2eSession);
-      }
-      setIsLoading(false);
-      return undefined;
-    }
+    if (E2E_MODE) return undefined;
 
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);

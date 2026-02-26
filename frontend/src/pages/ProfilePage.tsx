@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -101,7 +101,7 @@ export function ProfilePage() {
     });
   };
 
-  const resetFormFromProfile = () => {
+  const resetFormFromProfile = useCallback(() => {
     if (!profile) {
       return;
     }
@@ -120,11 +120,11 @@ export function ProfilePage() {
       avatarKey: undefined,
       avatarThumbKey: undefined,
     });
-  };
+  }, [profile]);
 
   useEffect(() => {
     resetFormFromProfile();
-  }, [profile]);
+  }, [resetFormFromProfile]);
 
   const avatarUrl = useMemo(() => profile?.avatarUrl || profile?.avatarThumbUrl, [profile]);
 
@@ -137,11 +137,10 @@ export function ProfilePage() {
       setIsEditing(false);
       queryClient.invalidateQueries({ queryKey: ['user', 'me'] });
     },
-    onError: (err: any) => {
-      const message = err?.message || t('common.error');
-      const details = err instanceof ApiError && Array.isArray((err.data as any)?.details)
-        ? (err.data as any).details as string[]
-        : [];
+    onError: (err: Error) => {
+      const message = err.message || t('common.error');
+      const data = err instanceof ApiError ? (err.data as { details?: string[] } | null | undefined) : null;
+      const details = Array.isArray(data?.details) ? data.details : [];
       setError(message);
       setErrorDetails(details);
       setMessage(null);
@@ -155,8 +154,8 @@ export function ProfilePage() {
       await signOut();
       navigate('/');
     },
-    onError: (err: any) => {
-      setDeleteError(err?.message || t('common.error'));
+    onError: (err: Error) => {
+      setDeleteError(err.message || t('common.error'));
     },
   });
 
@@ -205,8 +204,8 @@ export function ProfilePage() {
         avatarKey,
         avatarThumbKey: thumbKey,
       });
-    } catch (err: any) {
-      setError(err.message || t('common.error'));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t('common.error'));
       setMessage(null);
     } finally {
       setUploading(false);
