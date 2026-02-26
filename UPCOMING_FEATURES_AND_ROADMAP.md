@@ -1556,16 +1556,28 @@ Features below are organized by the userbase milestone needed to justify buildin
 
 #### Progress Snapshot (February 26, 2026)
 
-- **Week 2 status:** In progress.
-- **Completed / pulled forward polish work:**
-  - Landing page content and IA simplified for scanability (short cards + links to detail pages).
-  - Footer-linked informational pages refreshed for roadmap alignment (`How It Works`, `Privacy`, `Privacy Policy`, `Terms`, `Help`, `About`, `Security`).
-  - Site-wide cookie notice banner added (essential-cookies transparency pattern).
-  - Header UX upgraded to consistent glass states (landing dark state + warm app chrome).
-- **Remaining for Weeks 2-3 core scope:**
-  - Validate/complete first 5 STI guides with citations/disclaimers consistency pass.
-  - Build symptom guide flow.
-  - Build clinic finder (initial curated dataset + UX).
+- **Week 2 status:** ✅ Complete.
+- **Week 3 content status:** STI guide content complete (pulled forward). UX flows pending.
+- **Completed this session (Week 2 Layer 0 Polish):**
+  - renderMarkdown micro-renderer utility (zero-dependency, converts `- bullets` / `**bold**` → React elements)
+  - `tagline` + `facts` (type/curable/vaccine) fields added to all 10 STI entries
+  - Fact chips component (`FactChips`) — Bacterial/Viral/Parasitic + Curable/Lifelong + Vaccine
+  - Guide index cards enriched: tagline + 3 fact chips + window period footer
+  - Guide detail page: QuickStatsBlock (chips + window + CTA), unique per-section icons, renderMarkdown body text
+  - Calculator: per-row progress bar (daysWaited / minDays, indigo=waiting, green=testable)
+  - All 5 Week 3 guide objects written (HPV, Hep B, Hep C, Trichomoniasis, Mycoplasma) — content pulled forward from Week 3
+  - Existing 5 guide sections reformatted with markdown bullets/bold
+  - Locale keys for all chip labels (en_US + es_MX)
+- **Completed in earlier sessions:**
+  - Landing page content and IA simplified for scanability.
+  - Footer-linked informational pages refreshed (`How It Works`, `Privacy`, `Privacy Policy`, `Terms`, `Help`, `About`, `Security`).
+  - Site-wide cookie notice banner added.
+  - Header UX upgraded to consistent glass states (landing dark + warm app chrome).
+  - Window period calculator (date input → results table).
+  - First 5 STI guides (chlamydia, gonorrhea, syphilis, HIV, herpes) with citations.
+- **Remaining for Week 3:**
+  - Symptom guide flow (structured symptom selection → results).
+  - CDMX clinic finder (manually curated 20–30 clinics, CENSIDA/Condesa data).
 
 ### Phase 2: Layer 1 — Personal Tracker (Weeks 5-9)
 
