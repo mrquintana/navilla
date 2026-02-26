@@ -60,6 +60,10 @@ Definition of done is not met if any gate above is missing.
 - [x] React 19 native meta tags on all public pages (no react-helmet-async needed).
 - [x] Layer 0 SSR prerender infrastructure (`scripts/prerender.ts`, `npm run build:full`).
 - [x] All frontend lint errors resolved (12 errors → 0).
+- [x] Public landing copy refresh: concise sections + drill-down links to detailed pages.
+- [x] Footer public-content audit/update (About, How It Works, Privacy, Terms, Help, Security, Privacy Policy).
+- [x] Site-wide cookie notice banner + updated cookie policy transparency text.
+- [x] Header visual system upgrade (landing dark-glass state, warm glass app chrome, smoother transition).
 
 ### Week 1 Status — Foundation ✅ COMPLETE
 
@@ -69,10 +73,11 @@ Definition of done is not met if any gate above is missing.
 
 ### Next: Week 2 — Layer 0, Phase 1
 
-- [ ] Window period calculator (interactive, no account needed).
-- [ ] First 5 STI guides (chlamydia, gonorrhea, syphilis, HIV, herpes).
-- [ ] Basic page layout with disclaimers and source citations.
-- [ ] Add completed pages to `scripts/prerender.ts` ROUTES array.
+- [x] Window period calculator (interactive, no account needed).
+- [ ] First 5 STI guides (chlamydia, gonorrhea, syphilis, HIV, herpes) — validate status + source citations completeness.
+- [ ] Basic page layout with disclaimers and source citations — continue consistency pass.
+- [ ] Add/verify completed Layer 0 pages in `scripts/prerender.ts` ROUTES array.
+- [ ] Start Week 3 items: symptom guide + clinic finder scaffold.
 
 ---
 

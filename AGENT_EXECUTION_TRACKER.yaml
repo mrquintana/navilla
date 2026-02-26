@@ -31,7 +31,7 @@ weekly_plan:
 
   - week: 2
     title: "Layer 0 Phase 1 — Window period calculator + first 5 STI guides"
-    status: pending
+    status: in_progress
 
   - week: 3
     title: "Layer 0 Phase 2 — Remaining guides + symptom guide + clinic finder"
@@ -121,3 +121,7 @@ done_history:
       - "Confirmed React 19 native meta tags already on all public pages."
       - "AGENT_EXECUTION_PLAYBOOK.md rewritten to align with layer-based roadmap."
       - "AGENT_EXECUTION_TRACKER.yaml updated to match 20-week roadmap."
+      - "Landing page content strategy refreshed: concise cards + drill-down links to detailed pages."
+      - "Footer-linked content pages aligned with roadmap messaging (About, How It Works, Privacy, Terms, Help, Security, Privacy Policy)."
+      - "Added site-wide cookie notice banner and updated cookie policy wording for transparency."
+      - "Header UX refactored to a glass system with landing/app state transitions and warmer scrolled chrome."
