@@ -9,6 +9,10 @@ vi.mock('react-i18next', () => ({
   }),
 }));
 
+vi.mock('../contexts/AuthContext', () => ({
+  useAuthOptional: () => ({ session: null }),
+}));
+
 function renderWithSlug(slug: string) {
   return render(
     <MemoryRouter initialEntries={[`/guide/${slug}`]}>

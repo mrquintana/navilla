@@ -2,6 +2,7 @@ import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { BookOpen, Clock, ChevronRight, ArrowRight, Activity } from 'lucide-react';
 import { STI_DATA, type Lang } from '../lib/stiContent';
+import { useAuthOptional } from '../contexts/AuthContext';
 
 interface Props {
   /** Passed by the prerender script instead of useParams for SSR compatibility */
@@ -22,6 +23,7 @@ export function GuideDetailPage({ forcedSlug }: Props) {
   const params = useParams<{ slug: string }>();
   const slug = forcedSlug ?? params.slug ?? '';
   const lang: Lang = i18n.language?.startsWith('es') ? 'es' : 'en';
+  const session = useAuthOptional()?.session ?? null;
 
   const sti = STI_DATA[slug];
 
@@ -153,23 +155,25 @@ export function GuideDetailPage({ forcedSlug }: Props) {
             </div>
           )}
 
-          {/* Sign-up CTA */}
-          <div className="guide-cta">
-            <h3>
-              {lang === 'es'
-                ? 'Lleva un registro de tus pruebas'
-                : 'Track your testing history'}
-            </h3>
-            <p>
-              {lang === 'es'
-                ? 'Con Navilla puedes registrar tus resultados y ver señales de riesgo en tu red — de forma privada.'
-                : 'With Navilla you can log your results and see risk signals in your network — privately.'}
-            </p>
-            <Link to="/signup" className="btn">
-              {lang === 'es' ? 'Crear cuenta gratis' : 'Create free account'}
-              <ArrowRight className="w-4 h-4 ml-1" aria-hidden="true" />
-            </Link>
-          </div>
+          {/* Sign-up CTA — only shown to unauthenticated visitors */}
+          {!session && (
+            <div className="guide-cta">
+              <h3>
+                {lang === 'es'
+                  ? 'Lleva un registro de tus pruebas'
+                  : 'Track your testing history'}
+              </h3>
+              <p>
+                {lang === 'es'
+                  ? 'Con Navilla puedes registrar tus resultados y ver señales de riesgo en tu red — de forma privada.'
+                  : 'With Navilla you can log your results and see risk signals in your network — privately.'}
+              </p>
+              <Link to="/signup" className="btn">
+                {lang === 'es' ? 'Crear cuenta gratis' : 'Create free account'}
+                <ArrowRight className="w-4 h-4 ml-1" aria-hidden="true" />
+              </Link>
+            </div>
+          )}
         </div>
       </div>
     </>
