@@ -2604,6 +2604,11 @@ section.hero + section {
   margin: 0 0 0.625rem;
 }
 
+.guide-card-footer {
+  margin-top: auto;
+  padding-top: 0.5rem;
+}
+
 /* Guide section body — rendered markdown */
 .guide-section-body ul {
   margin: 0.5rem 0 0.5rem 0;

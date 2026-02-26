@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { BookOpen, ChevronRight, FlaskConical } from 'lucide-react';
 import { STI_DATA, STI_ORDER, type Lang } from '../lib/stiContent';
+import { FactChips } from '../components/layer0/FactChips';
 
 export function GuidesIndexPage() {
   const { t, i18n } = useTranslation();
@@ -129,28 +130,28 @@ function GuideCardContent({ sti, lang, hasGuide, isNoTest }: GuideCardContentPro
   return (
     <>
       <h2 className="guide-card-title">{sti.title[lang]}</h2>
-      {!isNoTest && (
-        <p className="guide-card-window">
-          {lang === 'es' ? 'Ventana: ' : 'Window: '}
-          {sti.windowPeriod.minDays}–{sti.windowPeriod.maxDays}{' '}
-          {lang === 'es' ? 'días' : 'days'}
-        </p>
-      )}
-      <div className="guide-card-tags">
-        {hasGuide ? (
-          <span className="guide-tag guide-tag--available">
-            {lang === 'es' ? 'Disponible' : 'Available'}
-          </span>
-        ) : (
-          <span className="guide-tag guide-tag--coming-soon">
-            {lang === 'es' ? 'Próximamente' : 'Coming soon'}
-          </span>
+      <p className="guide-card-tagline">{sti.tagline[lang]}</p>
+      <FactChips facts={sti.facts} />
+      <div className="guide-card-footer">
+        {!isNoTest && (
+          <p className="guide-card-window">
+            {lang === 'es' ? 'Ventana: ' : 'Window: '}
+            {sti.windowPeriod.minDays}–{sti.windowPeriod.maxDays}{' '}
+            {lang === 'es' ? 'días' : 'days'}
+          </p>
         )}
-        {isNoTest && (
-          <span className="guide-tag guide-tag--no-test">
-            {lang === 'es' ? 'Sin prueba rutinaria' : 'No routine test'}
-          </span>
-        )}
+        <div className="guide-card-tags">
+          {!hasGuide && (
+            <span className="guide-tag guide-tag--coming-soon">
+              {lang === 'es' ? 'Próximamente' : 'Coming soon'}
+            </span>
+          )}
+          {isNoTest && (
+            <span className="guide-tag guide-tag--no-test">
+              {lang === 'es' ? 'Sin prueba rutinaria' : 'No routine test'}
+            </span>
+          )}
+        </div>
       </div>
     </>
   );
