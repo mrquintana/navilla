@@ -1,8 +1,9 @@
 metadata:
   project: navilla
   plan_document: AGENT_EXECUTION_PLAYBOOK.md
+  roadmap_document: UPCOMING_FEATURES_AND_ROADMAP.md
   owner: agents
-  last_updated: "2026-02-25"
+  last_updated: "2026-02-26"
   status_scale:
     - pending
     - in_progress
@@ -12,154 +13,96 @@ metadata:
 global_gates:
   tests_required: true
   docs_update_required_if_applicable: true
-  readme_update_required_if_applicable: true
-  footer_pages_review_required_if_promise_changes: true
+  locale_files_required_for_ui_text: true
   quality_commands:
     - "npm run type-check"
     - "npm test"
     - "npm run build"
 
-workstreams:
-  WS-A:
-    name: Exposure Relevance and Risk Context
-    status: pending
-    objective: "Make exposure output time-relevant and interpretable."
-    milestones:
-      - id: WS-A-1
-        title: "Recency bucket schema and API output"
-        status: pending
-      - id: WS-A-2
-        title: "Dashboard and Health recency UI"
-        status: pending
-      - id: WS-A-3
-        title: "How-it-works/disclosure updates for recency"
-        status: pending
-
-  WS-B:
-    name: Verification Confidence Layers
-    status: pending
-    objective: "Implement self/provider/lab confidence tiers."
-    milestones:
-      - id: WS-B-1
-        title: "Provider role and permission model"
-        status: pending
-      - id: WS-B-2
-        title: "Provider verification request workflow"
-        status: pending
-      - id: WS-B-3
-        title: "Audit log and verification badge rendering"
-        status: pending
-      - id: WS-B-4
-        title: "Lab integration adapter interface"
-        status: pending
-
-  WS-C:
-    name: Connection Lifecycle Clarity
-    status: in_progress
-    objective: "Ensure state-consistent and understandable connection flows."
-    milestones:
-      - id: WS-C-1
-        title: "Notification action/state reconciliation"
-        status: completed
-      - id: WS-C-2
-        title: "Deep-link focus + resolved-state messaging"
-        status: completed
-      - id: WS-C-3
-        title: "Connection renewal/reconfirmation flow"
-        status: pending
-
-  WS-D:
-    name: Privacy Clarity and Controls
-    status: pending
-    objective: "Make privacy model understandable and enforceable."
-    milestones:
-      - id: WS-D-1
-        title: "Privacy Center page v1"
-        status: pending
-      - id: WS-D-2
-        title: "Profile privacy settings behavior audit"
-        status: pending
-      - id: WS-D-3
-        title: "Footer-linked content consistency pass"
-        status: pending
-
-  WS-E:
-    name: Notifications and Activation
-    status: in_progress
-    objective: "Increase useful action-driven engagement."
-    milestones:
-      - id: WS-E-1
-        title: "Notifications UX v1 (filters/groups/actions/preview)"
-        status: completed
-      - id: WS-E-2
-        title: "Notification preferences (category/channel/frequency)"
-        status: pending
-      - id: WS-E-3
-        title: "Onboarding activation checklist integration"
-        status: pending
-
 weekly_plan:
   - week: 1
-    title: Product/Architecture Lock
-    status: pending
+    title: "Foundation — Cleanup, SEO infrastructure, playbook alignment"
+    status: completed
+    deliverables:
+      - "Lint errors fixed (12 errors → 0, 9 warnings → 0)"
+      - "React 19 native meta tags confirmed on all public pages"
+      - "Layer 0 SSR prerender script (scripts/prerender.ts, npm run build:full)"
+      - "AGENT_EXECUTION_PLAYBOOK.md aligned with layer-based roadmap"
+
   - week: 2
-    title: Data and API Foundations
-    status: pending
-  - week: 3
-    title: Exposure Recency Backend
-    status: pending
-  - week: 4
-    title: Exposure Recency UI
-    status: pending
-  - week: 5
-    title: Connection Lifecycle v2
-    status: pending
-  - week: 6
-    title: Privacy Center v1
-    status: pending
-  - week: 7
-    title: Provider Accounts v1
-    status: pending
-  - week: 8
-    title: Provider Verification Flow
-    status: pending
-  - week: 9
-    title: Anti-Abuse and Operations
-    status: pending
-  - week: 10
-    title: Hardening and Regression Lock
-    status: pending
-  - week: 11
-    title: Pilot with Small Providers
-    status: pending
-  - week: 12
-    title: Launch Readiness + Lab Integration Prep
+    title: "Layer 0 Phase 1 — Window period calculator + first 5 STI guides"
     status: pending
 
-footer_pages_audit:
-  - path: "/how-it-works"
+  - week: 3
+    title: "Layer 0 Phase 2 — Remaining guides + symptom guide + clinic finder"
     status: pending
-  - path: "/privacy"
+
+  - week: 4
+    title: "Layer 0 Phase 3 — SEO, cost estimator, bilingual polish, deploy"
     status: pending
-  - path: "/security"
+
+  - week: 5
+    title: "Layer 1 Phase 1 — Encounter journal (backend + frontend + encryption)"
     status: pending
-  - path: "/about"
+
+  - week: 6
+    title: "Layer 1 Phase 2 — Testing history tracker"
     status: pending
-  - path: "/contact"
+
+  - week: 7
+    title: "Layer 1 Phase 3 — Smart reminders + medication/PrEP tracking"
     status: pending
-  - path: "/careers"
+
+  - week: 8
+    title: "Layer 1 Phase 4 — Personal insights + doctor visit prep"
     status: pending
-  - path: "/terms"
+
+  - week: 9
+    title: "Layer 1 Phase 5 — PWA + Layer 1 polish + E2E"
     status: pending
-  - path: "/privacy-policy"
+
+  - week: 10
+    title: "Layer 2 Phase 1 — Shareable connection links + reciprocity opt-in"
     status: pending
-  - path: "/cookie-policy"
+
+  - week: 11
+    title: "Layer 2 Phase 2 — Exposure recency buckets (WS-A)"
     status: pending
-  - path: "/help"
+
+  - week: 12
+    title: "Layer 2 Phase 3 — Vault + app lock + notification privacy"
     status: pending
-  - path: "/status"
+
+  - week: 13
+    title: "Layer 2 Phase 4 — Data retention + connection staleness"
     status: pending
-  - path: "/accessibility"
+
+  - week: 14
+    title: "Layer 2 Phase 5 — Network health stats + Layer 2 polish"
+    status: pending
+
+  - week: 15
+    title: "Layer 3 + content verification — Anonymous notifications"
+    status: pending
+
+  - week: 16
+    title: "Launch prep — Final testing, security audit, social setup"
+    status: pending
+
+  - week: 17
+    title: "Soft launch — LGBTQ+ CDMX"
+    status: pending
+
+  - week: 18
+    title: "Iterate on real user feedback"
+    status: pending
+
+  - week: 19
+    title: "Content marketing + community"
+    status: pending
+
+  - week: 20
+    title: "Growth assessment + next phase planning"
     status: pending
 
 done_history:
@@ -170,3 +113,11 @@ done_history:
       - "High-value frontend UT coverage established."
       - "Notifications UX v1 delivered."
       - "Notification-to-connection state reconciliation and deep-link fix."
+
+  - date: "2026-02-26"
+    items:
+      - "Week 1 complete: all frontend lint errors resolved (12 errors → 0)."
+      - "Layer 0 SSR prerender infrastructure set up (scripts/prerender.ts)."
+      - "Confirmed React 19 native meta tags already on all public pages."
+      - "AGENT_EXECUTION_PLAYBOOK.md rewritten to align with layer-based roadmap."
+      - "AGENT_EXECUTION_TRACKER.yaml updated to match 20-week roadmap."
