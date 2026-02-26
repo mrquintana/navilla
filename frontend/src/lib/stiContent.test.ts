@@ -1,8 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { STI_DATA, STI_ORDER } from './stiContent';
 
-const WEEK2_GUIDES = ['chlamydia', 'gonorrhea', 'syphilis', 'hiv', 'herpes'];
-const WEEK3_PENDING = ['hpv', 'hepatitis_b', 'hepatitis_c', 'trichomoniasis', 'mycoplasma_genitalium'];
+const ALL_GUIDES = [...STI_ORDER];
 
 describe('STI_DATA', () => {
   it('contains all 10 conditions', () => {
@@ -86,14 +85,13 @@ describe('STI_DATA', () => {
     });
   });
 
-  describe('Week 2 guide content', () => {
-    WEEK2_GUIDES.forEach((slug) => {
+  describe('all 10 conditions have complete guide content', () => {
+    ALL_GUIDES.forEach((slug) => {
       it(`${slug} has complete guide content`, () => {
         const { guide } = STI_DATA[slug];
         expect(guide).toBeDefined();
         if (!guide) return;
 
-        // All six sections present in both languages
         const sections = ['what', 'transmission', 'symptoms', 'testing', 'treatment', 'prevention'] as const;
         sections.forEach((section) => {
           expect(typeof guide[section].en).toBe('string');
@@ -102,21 +100,11 @@ describe('STI_DATA', () => {
           expect(guide[section].es.length).toBeGreaterThan(20);
         });
 
-        // Sources array non-empty with label + url
         expect(guide.sources.length).toBeGreaterThan(0);
         guide.sources.forEach((source) => {
           expect(typeof source.label).toBe('string');
-          expect(typeof source.url).toBe('string');
           expect(source.url).toMatch(/^https?:\/\//);
         });
-      });
-    });
-  });
-
-  describe('Week 3 conditions have no guide yet', () => {
-    WEEK3_PENDING.forEach((slug) => {
-      it(`${slug} guide is undefined`, () => {
-        expect(STI_DATA[slug].guide).toBeUndefined();
       });
     });
   });

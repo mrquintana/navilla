@@ -88,22 +88,21 @@ describe('GuideDetailPage — HIV', () => {
   });
 });
 
-describe('GuideDetailPage — coming soon (HPV)', () => {
-  it('shows coming soon state for HPV', () => {
+describe('GuideDetailPage — HPV (full guide)', () => {
+  it('renders HPV guide title', () => {
     renderWithSlug('hpv');
-    expect(screen.getByTestId('guide-coming-soon')).toBeInTheDocument();
-    expect(screen.getByText(/coming soon/i)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'HPV', level: 1 })).toBeInTheDocument();
   });
 
-  it('does not show guide section content for HPV', () => {
+  it('renders all 6 guide sections for HPV', () => {
     renderWithSlug('hpv');
-    expect(screen.queryByText('What is it?')).not.toBeInTheDocument();
+    expect(screen.getByText('What is it?')).toBeInTheDocument();
+    expect(screen.getByText('Prevention')).toBeInTheDocument();
   });
 
-  it('shows link to calculator in coming soon state', () => {
+  it('does not show coming soon state for HPV', () => {
     renderWithSlug('hpv');
-    const link = screen.getByRole('link', { name: /go to calculator/i });
-    expect(link).toBeInTheDocument();
+    expect(screen.queryByTestId('guide-coming-soon')).not.toBeInTheDocument();
   });
 });
 
