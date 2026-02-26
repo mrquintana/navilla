@@ -36,8 +36,18 @@ export interface GuideSection {
 export interface STIContent {
   slug: string;
   title: { en: string; es: string };
+  /** One plain-language sentence for cards and detail hero */
+  tagline: { en: string; es: string };
+  /** Quick facts rendered as chips */
+  facts: {
+    type: 'bacterial' | 'viral' | 'parasitic';
+    /** true = antibiotics/antivirals resolve infection; false = lifelong management */
+    curable: boolean;
+    /** widely recommended vaccine exists */
+    vaccine: boolean;
+  };
   windowPeriod: WindowPeriod;
-  /** Full guide content. undefined = coming in Week 3 */
+  /** Full guide content. undefined = coming soon */
   guide?: GuideSection;
 }
 
@@ -45,6 +55,11 @@ export const STI_DATA: Record<string, STIContent> = {
   chlamydia: {
     slug: 'chlamydia',
     title: { en: 'Chlamydia', es: 'Clamidia' },
+    tagline: {
+      en: 'The most common bacterial STI — usually silent, always curable.',
+      es: 'La ITS bacteriana más común — generalmente sin síntomas, siempre curable.',
+    },
+    facts: { type: 'bacterial', curable: true, vaccine: false },
     windowPeriod: {
       minDays: 5,
       maxDays: 14,
@@ -89,6 +104,11 @@ export const STI_DATA: Record<string, STIContent> = {
   gonorrhea: {
     slug: 'gonorrhea',
     title: { en: 'Gonorrhea', es: 'Gonorrea' },
+    tagline: {
+      en: 'A bacterial STI with rising antibiotic resistance — short testing window.',
+      es: 'Una ITS bacteriana con resistencia creciente a antibióticos — ventana de prueba corta.',
+    },
+    facts: { type: 'bacterial', curable: true, vaccine: false },
     windowPeriod: {
       minDays: 1,
       maxDays: 14,
@@ -133,6 +153,11 @@ export const STI_DATA: Record<string, STIContent> = {
   syphilis: {
     slug: 'syphilis',
     title: { en: 'Syphilis', es: 'Sífilis' },
+    tagline: {
+      en: 'A staged bacterial infection — fully curable if caught early.',
+      es: 'Una infección bacteriana por etapas — completamente curable si se detecta a tiempo.',
+    },
+    facts: { type: 'bacterial', curable: true, vaccine: false },
     windowPeriod: {
       minDays: 21,
       maxDays: 90,
@@ -177,6 +202,11 @@ export const STI_DATA: Record<string, STIContent> = {
   hiv: {
     slug: 'hiv',
     title: { en: 'HIV', es: 'VIH' },
+    tagline: {
+      en: 'A virus managed with daily treatment — undetectable means untransmittable.',
+      es: 'Un virus controlado con tratamiento diario — indetectable significa intransmisible.',
+    },
+    facts: { type: 'viral', curable: false, vaccine: false },
     windowPeriod: {
       minDays: 18,
       maxDays: 45,
@@ -221,6 +251,11 @@ export const STI_DATA: Record<string, STIContent> = {
   herpes: {
     slug: 'herpes',
     title: { en: 'Herpes (HSV)', es: 'Herpes (VHS)' },
+    tagline: {
+      en: 'A lifelong but manageable virus — most people have mild or no symptoms.',
+      es: 'Un virus de por vida pero manejable — la mayoría tiene síntomas leves o ninguno.',
+    },
+    facts: { type: 'viral', curable: false, vaccine: false },
     windowPeriod: {
       minDays: 12,
       maxDays: 84,
@@ -265,6 +300,11 @@ export const STI_DATA: Record<string, STIContent> = {
   hpv: {
     slug: 'hpv',
     title: { en: 'HPV', es: 'VPH' },
+    tagline: {
+      en: 'The most common STI — vaccine-preventable, most infections clear on their own.',
+      es: 'La ITS más común — prevenible con vacuna, la mayoría de las infecciones desaparecen solas.',
+    },
+    facts: { type: 'viral', curable: false, vaccine: true },
     windowPeriod: {
       minDays: 0,
       maxDays: 0,
@@ -279,6 +319,11 @@ export const STI_DATA: Record<string, STIContent> = {
   hepatitis_b: {
     slug: 'hepatitis_b',
     title: { en: 'Hepatitis B', es: 'Hepatitis B' },
+    tagline: {
+      en: 'A vaccine-preventable liver infection — manageable with antivirals if chronic.',
+      es: 'Una infección hepática prevenible con vacuna — manejable con antivirales si es crónica.',
+    },
+    facts: { type: 'viral', curable: false, vaccine: true },
     windowPeriod: {
       minDays: 30,
       maxDays: 60,
@@ -292,6 +337,11 @@ export const STI_DATA: Record<string, STIContent> = {
   hepatitis_c: {
     slug: 'hepatitis_c',
     title: { en: 'Hepatitis C', es: 'Hepatitis C' },
+    tagline: {
+      en: 'No vaccine exists — but now curable in over 95% of cases with modern treatment.',
+      es: 'No existe vacuna — pero ahora curable en más del 95% de los casos con tratamiento moderno.',
+    },
+    facts: { type: 'viral', curable: true, vaccine: false },
     windowPeriod: {
       minDays: 56,
       maxDays: 77,
@@ -305,6 +355,11 @@ export const STI_DATA: Record<string, STIContent> = {
   trichomoniasis: {
     slug: 'trichomoniasis',
     title: { en: 'Trichomoniasis', es: 'Tricomoniasis' },
+    tagline: {
+      en: 'The most common curable STI worldwide — treated with a single antibiotic dose.',
+      es: 'La ITS curable más común del mundo — tratada con una sola dosis de antibiótico.',
+    },
+    facts: { type: 'parasitic', curable: true, vaccine: false },
     windowPeriod: {
       minDays: 5,
       maxDays: 28,
@@ -318,6 +373,11 @@ export const STI_DATA: Record<string, STIContent> = {
   mycoplasma_genitalium: {
     slug: 'mycoplasma_genitalium',
     title: { en: 'Mycoplasma genitalium', es: 'Mycoplasma genitalium' },
+    tagline: {
+      en: 'An underdiagnosed bacterial STI — not in routine panels, ask for it specifically.',
+      es: 'Una ITS bacteriana subdiagnosticada — no está en los paneles rutinarios, pídela específicamente.',
+    },
+    facts: { type: 'bacterial', curable: true, vaccine: false },
     windowPeriod: {
       minDays: 14,
       maxDays: 21,
