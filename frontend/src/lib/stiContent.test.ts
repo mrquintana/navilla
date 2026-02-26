@@ -37,6 +37,39 @@ describe('STI_DATA', () => {
     });
   });
 
+  describe('tagline and facts on every condition', () => {
+    STI_ORDER.forEach((slug) => {
+      it(`${slug} has tagline.en, tagline.es, and valid facts`, () => {
+        const sti = STI_DATA[slug];
+
+        // tagline
+        expect(typeof sti.tagline.en).toBe('string');
+        expect(sti.tagline.en.length).toBeGreaterThan(10);
+        expect(typeof sti.tagline.es).toBe('string');
+        expect(sti.tagline.es.length).toBeGreaterThan(10);
+
+        // facts.type
+        expect(['bacterial', 'viral', 'parasitic']).toContain(sti.facts.type);
+
+        // facts.curable and facts.vaccine are booleans
+        expect(typeof sti.facts.curable).toBe('boolean');
+        expect(typeof sti.facts.vaccine).toBe('boolean');
+      });
+    });
+
+    it('conditions with a vaccine are HPV and Hepatitis B', () => {
+      const withVaccine = STI_ORDER.filter((s) => STI_DATA[s].facts.vaccine);
+      expect(withVaccine).toContain('hpv');
+      expect(withVaccine).toContain('hepatitis_b');
+      expect(withVaccine).toHaveLength(2);
+    });
+
+    it('trichomoniasis is the only parasitic condition', () => {
+      const parasitic = STI_ORDER.filter((s) => STI_DATA[s].facts.type === 'parasitic');
+      expect(parasitic).toEqual(['trichomoniasis']);
+    });
+  });
+
   describe('window period data validity', () => {
     const testable = STI_ORDER.filter((s) => !STI_DATA[s].windowPeriod.noStandardTest);
 
