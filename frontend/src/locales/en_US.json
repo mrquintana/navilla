@@ -488,5 +488,15 @@
     "subtitle": "Get in touch with the Navilla team.",
     "body": "Have a question, feedback, or just want to say hello? Send us an email and we'll get back to you.",
     "responseTime": "We typically respond within 1–2 business days."
+  },
+  "guide": {
+    "factBacterial": "Bacterial",
+    "factViral": "Viral",
+    "factParasitic": "Parasitic",
+    "factCurable": "Curable",
+    "factLifelong": "Lifelong",
+    "factVaccine": "Vaccine available",
+    "factWindowDays": "days",
+    "quickStatsCta": "Calculate my dates"
   }
 }

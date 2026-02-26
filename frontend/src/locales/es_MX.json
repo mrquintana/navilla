@@ -487,5 +487,15 @@
     "subtitle": "Ponte en contacto con el equipo de Navilla.",
     "body": "¿Tienes una pregunta, comentario o simplemente quieres saludar? Envíanos un correo y te responderemos.",
     "responseTime": "Normalmente respondemos en 1–2 días hábiles."
+  },
+  "guide": {
+    "factBacterial": "Bacteriana",
+    "factViral": "Viral",
+    "factParasitic": "Parasitaria",
+    "factCurable": "Curable",
+    "factLifelong": "De por vida",
+    "factVaccine": "Vacuna disponible",
+    "factWindowDays": "días",
+    "quickStatsCta": "Calcular mis fechas"
   }
 }
