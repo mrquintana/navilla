@@ -404,6 +404,7 @@
   },
   "footer": {
     "product": "Producto",
+    "tools": "Herramientas",
     "company": "Compañía",
     "legal": "Legal",
     "support": "Soporte",
@@ -411,6 +412,8 @@
       "howItWorks": "Cómo funciona",
       "privacy": "Privacidad",
       "security": "Seguridad",
+      "calculator": "Calculadora de Período de Ventana",
+      "guides": "Guías de ITS",
       "about": "Acerca de",
       "contact": "Contacto",
       "careers": "Carreras",
@@ -422,6 +425,29 @@
       "accessibility": "Accesibilidad"
     },
     "copyright": "© 2026 Navilla. Todos los derechos reservados."
+  },
+  "calculator": {
+    "kicker": "Herramientas de Pruebas",
+    "title": "Calculadora de Período de Ventana",
+    "subtitle": "Ingresa la fecha de tu encuentro para ver cuándo cada ITS se puede detectar de forma confiable.",
+    "encounterDateLabel": "¿Cuándo fue el encuentro?",
+    "dateHint": "Selecciona una fecha en el pasado para calcular tu ventana de pruebas.",
+    "futureDateError": "Por favor selecciona una fecha que ya haya pasado.",
+    "disclaimer": "Esta herramienta es solo para fines informativos y no sustituye el consejo médico. Consulta a un profesional de salud para orientación personalizada.",
+    "resultsTitle": "Disponibilidad de pruebas",
+    "daysAgo": "días atrás",
+    "colCondition": "Condición",
+    "colWindow": "Ventana",
+    "colStatus": "Estado",
+    "windowExplainer": "Ventana = días mínimos después de la exposición para un resultado confiable. Los resultados antes de esta ventana pueden no detectar una infección activa.",
+    "statusTestable": "Puede hacerse la prueba",
+    "statusWait": "Lista el {{date}}",
+    "statusNoTest": "Sin prueba estándar",
+    "emptyState": "Selecciona una fecha arriba para ver tu cronograma de pruebas.",
+    "clinicCtaTitle": "¿Listo para hacerte la prueba?",
+    "clinicCtaBody": "Encuentra una clínica de ITS o centro de pruebas cerca de ti.",
+    "findClinicCta": "Encuentra una clínica cerca",
+    "sourcesLabel": "Fuentes"
   },
   "contact": {
     "pageTitle": "Contacto — Navilla",

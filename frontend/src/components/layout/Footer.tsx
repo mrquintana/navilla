@@ -18,6 +18,13 @@ export function Footer() {
             </ul>
           </div>
           <div>
+            <h4 className="footer-title">{t('footer.tools', 'Tools')}</h4>
+            <ul className="footer-list">
+              <li><Link to="/calculator">{t('footer.links.calculator', 'Window Period Calculator')}</Link></li>
+              <li><Link to="/guides">{t('footer.links.guides', 'STI Guides')}</Link></li>
+            </ul>
+          </div>
+          <div>
             <h4 className="footer-title">{t('footer.company')}</h4>
             <ul className="footer-list">
               <li><Link to="/about">{t('footer.links.about')}</Link></li>

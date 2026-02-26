@@ -13,7 +13,7 @@ interface StatusResult {
   readyDate: Date;
 }
 
-function getStatus(encounterDate: Date, today: Date, minDays: number, maxDays: number, noStandardTest?: boolean): StatusResult {
+function getStatus(encounterDate: Date, today: Date, minDays: number, _maxDays: number, noStandardTest?: boolean): StatusResult {
   const daysWaited = Math.floor((today.getTime() - encounterDate.getTime()) / (1000 * 60 * 60 * 24));
   const daysUntilMin = Math.max(0, minDays - daysWaited);
   const readyDate = new Date(encounterDate);
@@ -47,7 +47,7 @@ function todayString(): string {
 
 export function WindowPeriodCalculatorPage() {
   const { t, i18n } = useTranslation();
-  const lang: Lang = i18n.language.startsWith('es') ? 'es' : 'en';
+  const lang: Lang = i18n.language?.startsWith('es') ? 'es' : 'en';
 
   const [encounterDateStr, setEncounterDateStr] = useState('');
   const today = new Date();
@@ -184,7 +184,7 @@ export function WindowPeriodCalculatorPage() {
                         </span>
 
                         <span role="cell" className="calculator-cell-status">
-                          <StatusBadge result={result} encounterDate={encounterDate} lang={lang} t={t} />
+                          <StatusBadge result={result} lang={lang} t={t} />
                         </span>
                       </div>
                     );
@@ -266,12 +266,11 @@ export function WindowPeriodCalculatorPage() {
 
 interface StatusBadgeProps {
   result: StatusResult;
-  encounterDate: Date;
   lang: Lang;
   t: (key: string, fallback: string, opts?: Record<string, unknown>) => string;
 }
 
-function StatusBadge({ result, encounterDate: _encounterDate, lang, t }: StatusBadgeProps) {
+function StatusBadge({ result, lang, t }: StatusBadgeProps) {
   if (result.status === 'no-standard-test') {
     return (
       <span className="status-badge status-badge--no-test">

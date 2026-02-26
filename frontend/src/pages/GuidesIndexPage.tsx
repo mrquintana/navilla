@@ -5,7 +5,7 @@ import { STI_DATA, STI_ORDER, type Lang } from '../lib/stiContent';
 
 export function GuidesIndexPage() {
   const { t, i18n } = useTranslation();
-  const lang: Lang = i18n.language.startsWith('es') ? 'es' : 'en';
+  const lang: Lang = i18n.language?.startsWith('es') ? 'es' : 'en';
 
   return (
     <>

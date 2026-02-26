@@ -26,6 +26,9 @@ import { StatusPage } from './pages/StatusPage';
 import { AccessibilityPage } from './pages/AccessibilityPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 import { ErrorPage } from './pages/ErrorPage';
+import { WindowPeriodCalculatorPage } from './pages/WindowPeriodCalculatorPage';
+import { GuidesIndexPage } from './pages/GuidesIndexPage';
+import { GuideDetailPage } from './pages/GuideDetailPage';
 
 export const router = createBrowserRouter([
   {
@@ -77,6 +80,9 @@ export const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
+      { path: 'calculator', element: <WindowPeriodCalculatorPage /> },
+      { path: 'guides', element: <GuidesIndexPage /> },
+      { path: 'guide/:slug', element: <GuideDetailPage /> },
       { path: 'how-it-works', element: <HowItWorksPage /> },
       { path: 'about', element: <AboutPage /> },
       { path: 'contact', element: <ContactPage /> },

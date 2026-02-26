@@ -21,7 +21,7 @@ export function GuideDetailPage({ forcedSlug }: Props) {
   const { t, i18n } = useTranslation();
   const params = useParams<{ slug: string }>();
   const slug = forcedSlug ?? params.slug ?? '';
-  const lang: Lang = i18n.language.startsWith('es') ? 'es' : 'en';
+  const lang: Lang = i18n.language?.startsWith('es') ? 'es' : 'en';
 
   const sti = STI_DATA[slug];
 

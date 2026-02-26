@@ -405,6 +405,7 @@
   },
   "footer": {
     "product": "Product",
+    "tools": "Tools",
     "company": "Company",
     "legal": "Legal",
     "support": "Support",
@@ -412,6 +413,8 @@
       "howItWorks": "How it works",
       "privacy": "Privacy",
       "security": "Security",
+      "calculator": "Window Period Calculator",
+      "guides": "STI Guides",
       "about": "About",
       "contact": "Contact",
       "careers": "Careers",
@@ -423,6 +426,29 @@
       "accessibility": "Accessibility"
     },
     "copyright": "© 2026 Navilla. All rights reserved."
+  },
+  "calculator": {
+    "kicker": "Testing Tools",
+    "title": "Window Period Calculator",
+    "subtitle": "Enter your encounter date to see when each STI becomes reliably testable.",
+    "encounterDateLabel": "When did the encounter happen?",
+    "dateHint": "Select a date in the past to calculate your testing window.",
+    "futureDateError": "Please select a date that has already passed.",
+    "disclaimer": "This tool is for informational purposes only and is not a substitute for medical advice. Consult a healthcare provider for personalized guidance.",
+    "resultsTitle": "Testing readiness",
+    "daysAgo": "days ago",
+    "colCondition": "Condition",
+    "colWindow": "Window",
+    "colStatus": "Status",
+    "windowExplainer": "Window = earliest days after exposure for a reliable test. Results before this window may miss an active infection.",
+    "statusTestable": "Testable now",
+    "statusWait": "Ready {{date}}",
+    "statusNoTest": "No standard test",
+    "emptyState": "Select a date above to see your testing timeline.",
+    "clinicCtaTitle": "Ready to get tested?",
+    "clinicCtaBody": "Find an STI clinic or testing center near you.",
+    "findClinicCta": "Find a clinic near you",
+    "sourcesLabel": "Sources"
   },
   "contact": {
     "pageTitle": "Contact — Navilla",

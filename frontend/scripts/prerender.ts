@@ -24,6 +24,9 @@ import { fileURLToPath } from 'node:url';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { StaticRouter } from 'react-router-dom';
+import { WindowPeriodCalculatorPage } from '../src/pages/WindowPeriodCalculatorPage';
+import { GuidesIndexPage } from '../src/pages/GuidesIndexPage';
+import { GuideDetailPage } from '../src/pages/GuideDetailPage';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const distDir = resolve(__dirname, '../dist');
@@ -50,7 +53,50 @@ interface RouteConfig {
  * { path: '/guide/chlamydia', Component: STIGuidePage, title: 'Chlamydia Guide | Navilla', description: '...' },
  * { path: '/clinics', Component: ClinicFinderPage, title: 'Find STI Clinics | Navilla', description: '...' },
  */
-const ROUTES: RouteConfig[] = [];
+const ROUTES: RouteConfig[] = [
+  {
+    path: '/calculator',
+    Component: WindowPeriodCalculatorPage,
+    title: 'Window Period Calculator — Navilla',
+    description: 'Calculate when you can get tested for STIs after an exposure. Interactive tool based on CDC and WHO guidelines.',
+  },
+  {
+    path: '/guides',
+    Component: GuidesIndexPage,
+    title: 'STI Guides — Symptoms, Testing & Treatment | Navilla',
+    description: 'Clear, non-judgmental STI guides covering symptoms, testing, treatment, and prevention. Based on CDC and WHO data.',
+  },
+  {
+    path: '/guide/chlamydia',
+    Component: () => createElement(GuideDetailPage, { forcedSlug: 'chlamydia' }),
+    title: 'Chlamydia Guide — Symptoms, Testing & Treatment | Navilla',
+    description: 'Everything about chlamydia: transmission, symptoms, NAAT testing, antibiotic treatment, and prevention. Based on CDC guidelines.',
+  },
+  {
+    path: '/guide/gonorrhea',
+    Component: () => createElement(GuideDetailPage, { forcedSlug: 'gonorrhea' }),
+    title: 'Gonorrhea Guide — Symptoms, Testing & Treatment | Navilla',
+    description: 'Complete guide to gonorrhea: transmission, symptoms, NAAT testing, ceftriaxone treatment, and antibiotic resistance.',
+  },
+  {
+    path: '/guide/syphilis',
+    Component: () => createElement(GuideDetailPage, { forcedSlug: 'syphilis' }),
+    title: 'Syphilis Guide — Stages, Testing & Treatment | Navilla',
+    description: 'Complete guide to syphilis: primary, secondary, latent and tertiary stages, blood test window period, and penicillin treatment.',
+  },
+  {
+    path: '/guide/hiv',
+    Component: () => createElement(GuideDetailPage, { forcedSlug: 'hiv' }),
+    title: 'HIV Guide — Testing, Treatment & Prevention | Navilla',
+    description: 'Complete guide to HIV: transmission, Ag/Ab testing window period, antiretroviral therapy (ART), PrEP, and U=U.',
+  },
+  {
+    path: '/guide/herpes',
+    Component: () => createElement(GuideDetailPage, { forcedSlug: 'herpes' }),
+    title: 'Herpes (HSV) Guide — Testing, Treatment & Prevention | Navilla',
+    description: 'Complete guide to herpes simplex: HSV-1 vs HSV-2, blood test limitations, antiviral treatment, and daily suppressive therapy.',
+  },
+];
 
 async function prerender() {
   if (ROUTES.length === 0) {
