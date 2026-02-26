@@ -409,6 +409,30 @@ select.input {
   color: #1e40af;
 }
 
+/* ConstellationGraphic — breathing glow animation */
+.constellation-pulse {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: constellation-breathe 3.5s ease-in-out infinite;
+}
+
+.constellation-pulse-delay {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: constellation-breathe 3.5s ease-in-out 1.2s infinite;
+}
+
+.constellation-pulse-delay-2 {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: constellation-breathe 3.5s ease-in-out 2.4s infinite;
+}
+
+@keyframes constellation-breathe {
+  0%, 100% { transform: scale(1); opacity: 0.07; }
+  50% { transform: scale(1.5); opacity: 0.13; }
+}
+
 /* Hero section - Infima style */
 .hero {
   padding: 6rem 1rem;
