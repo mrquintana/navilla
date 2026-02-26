@@ -339,7 +339,15 @@
     "valueTwoTitle": "Accionable, no alarmante",
     "valueTwoBody": "Resúmenes claros y tranquilos para decidir tus siguientes pasos a tu ritmo.",
     "valueThreeTitle": "Diseñado para confianza",
-    "valueThreeBody": "Sin identidades públicas ni grafo social — solo la información que necesitas."
+    "valueThreeBody": "Sin identidades públicas ni grafo social — solo la información que necesitas.",
+    "heroCta": "Comienza — es gratis",
+    "heroSignInHint": "¿Ya tienes cuenta?",
+    "ctaEyebrow": "Gratis. Privado. Sin juicios.",
+    "ctaHeading": "Tu salud merece mejores herramientas.",
+    "ctaBody": "Lleva un registro de tus pruebas, anota encuentros y ve señales de riesgo anónimas en tu red — sin que nadie sepa tu nombre.",
+    "ctaButton": "Crea tu cuenta gratis",
+    "ctaFinePrint": "Sin tarjeta de crédito. Elimina cuando quieras.",
+    "ctaStatLabel": "nombres compartidos. Jamás."
   },
   "howItWorks": {
     "title": "Cómo Funciona",

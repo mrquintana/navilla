@@ -340,7 +340,15 @@
     "valueTwoTitle": "Actionable, not alarming",
     "valueTwoBody": "Clear, calm summaries help you decide next steps at your own pace.",
     "valueThreeTitle": "Designed for trust",
-    "valueThreeBody": "No public identities, no social graph — just the information you need."
+    "valueThreeBody": "No public identities, no social graph — just the information you need.",
+    "heroCta": "Get started — it's free",
+    "heroSignInHint": "Already have an account?",
+    "ctaEyebrow": "Free. Private. No judgment.",
+    "ctaHeading": "Your health deserves better tools.",
+    "ctaBody": "Track your testing history, log encounters, and see anonymized risk signals from your network — all without anyone knowing your name.",
+    "ctaButton": "Create your free account",
+    "ctaFinePrint": "No credit card. Delete any time.",
+    "ctaStatLabel": "names shared. Ever."
   },
   "howItWorks": {
     "title": "How It Works",
