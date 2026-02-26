@@ -7,6 +7,7 @@ export function ConstellationGraphic({ className }: ConstellationGraphicProps) {
     <svg
       className={className}
       viewBox="0 0 420 420"
+      preserveAspectRatio="xMidYMid slice"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"

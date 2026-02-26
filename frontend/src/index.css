@@ -418,34 +418,32 @@ select.input {
 }
 
 .hero > .container {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 4rem;
-  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   min-height: 88vh;
   padding-top: 3rem;
   padding-bottom: 4rem;
   position: relative;
-  z-index: 1;
+  z-index: 2;
 }
 
 .hero-copy {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  max-width: 560px;
 }
 
-.hero-visual {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
+/* Full-bleed constellation — atmospheric background filling entire hero */
 .hero-constellation {
+  position: absolute;
+  inset: 0;
   width: 100%;
-  max-width: 420px;
-  height: auto;
-  opacity: 0.9;
+  height: 100%;
+  opacity: 0.18;
+  pointer-events: none;
+  z-index: 1;
 }
 
 .hero-eyebrow {
@@ -540,11 +538,9 @@ select.input {
 
 @media (max-width: 768px) {
   .hero > .container {
-    grid-template-columns: 1fr;
     min-height: auto;
     padding-top: 2rem;
     padding-bottom: 3rem;
-    gap: 2.5rem;
   }
 
   .hero-copy {
@@ -558,10 +554,6 @@ select.input {
 
   .hero-description {
     max-width: 100%;
-  }
-
-  .hero-constellation {
-    max-width: 280px;
   }
 }
 

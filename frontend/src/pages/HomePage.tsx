@@ -21,8 +21,9 @@ export function HomePage() {
       <meta property="og:title" content="Navilla — Know your exposure risk, protect your privacy" />
       <meta property="og:description" content="Navilla shows you anonymized health exposure signals from your trusted network. Numbers, not names. Your privacy is our priority." />
 
-      {/* Hero — warm ivory, two-column editorial */}
+      {/* Hero — dark indigo with full-bleed constellation background */}
       <section className="hero">
+        <ConstellationGraphic className="hero-constellation" />
         <div className="container">
           <div className="hero-copy">
             <p className="hero-eyebrow">{t('landing.heroEyebrow')}</p>
@@ -41,10 +42,6 @@ export function HomePage() {
                 </Link>
               </p>
             </div>
-          </div>
-
-          <div className="hero-visual">
-            <ConstellationGraphic className="hero-constellation" />
           </div>
         </div>
       </section>
