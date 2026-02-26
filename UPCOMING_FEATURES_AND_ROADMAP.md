@@ -259,6 +259,18 @@ These pages are the top of the funnel. Target keywords:
 - Open Graph tags for social sharing
 - Sitemap.xml and robots.txt properly configured
 
+**Language routing — current vs future:**
+
+Currently: language is detected from browser `Accept-Language` header and stored in localStorage. English is prerendered (what Google indexes). Spanish is served client-side. `hreflang` alternate tags point to the same URL for both languages — valid, but means Google indexes one version.
+
+**Future (path-prefix routing):** For full bilingual SEO — separate Spanish rankings in Mexico — migrate to `/es/` path prefix (e.g., `/es/guide/clamidia`). This allows Google to independently rank Spanish-language content for Mexican search queries like "periodo de ventana VIH" or "síntomas de clamidia". Requires:
+- React Router path prefix for all Layer 0 routes
+- Spanish prerender for `/es/*` routes
+- Updated `hreflang` canonical pairs (`/guide/chlamydia` ↔ `/es/guide/clamidia`)
+- Spanish-language slugs (SEO value: "clamidia" outranks "chlamydia" in Mexico)
+
+**Recommended timing:** After Layer 0 deploys and gets indexed (post-Week 4). Implement as a dedicated SEO sprint in Phase 2 (Week 6 or 7) once there is real search traffic data to justify the investment. Track in GitHub issue #[see issue].
+
 ---
 
 ### Rendering Strategy for Layer 0 Pages
@@ -1540,7 +1552,7 @@ Features below are organized by the userbase milestone needed to justify buildin
 |------|-------|-------------|
 | 2 | Window period calculator + first 5 STI guides | Interactive calculator (date input → results table). AI-draft 5 STI guides (chlamydia, gonorrhea, syphilis, HIV, herpes). Basic page layout with disclaimers and source citations |
 | 3 | Remaining content + symptom guide + clinic finder | 5 more STI guides (HPV, Hep B, Hep C, trichomoniasis, mycoplasma). Symptom guide (structured selection → results). CDMX clinic finder with CENSIDA/Condesa data (manually curated, 20-30 clinics) |
-| 4 | SEO + cost estimator + polish | Cost estimator with Mexico pricing. Open Graph tags, structured data, sitemap. Bilingual content (en_US primary, es_MX alongside). Conversion CTAs on every page. Deploy Layer 0 |
+| 4 | SEO + cost estimator + polish | Cost estimator with Mexico pricing. Open Graph tags, structured data, sitemap. Bilingual content (en_US primary, es_MX alongside). Conversion CTAs on every page. Deploy Layer 0. Note: full path-prefix i18n routing (`/es/*`) is a Phase 2 task — see SEO section |
 
 ### Phase 2: Layer 1 — Personal Tracker (Weeks 5-9)
 
