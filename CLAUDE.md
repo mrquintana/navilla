@@ -109,6 +109,14 @@ gh issue create --title "Title" --body "Description"
 - Always read `UPCOMING_FEATURES_AND_ROADMAP.md` at session start to understand current priorities
 - When the user says "Build [feature]" or "Start Week X", find the relevant section in the roadmap
 
+### Be a Proactive Partner (Non-negotiable)
+- **Don't just fix what the user reports** — when fixing a bug on one page, check ALL similar pages for the same issue. If you fix the login page, check signup, forgot-password, and reset-password too
+- **Anticipate problems** — if a CSS change could affect 10 pages, verify all 10 before committing. Don't wait for the user to discover breakage
+- **Guide the user** — the user is not a graphic designer. If something looks off or a design decision will cause problems, say so BEFORE implementing. Don't blindly follow orders
+- **Audit broadly before changing narrowly** — before touching any visual element, understand how it's used across the entire site. A color change in :root affects every page. A class rename might break 15 components
+- **Report what you verified** — after every change, tell the user which pages/components you checked and confirmed working. "I verified login, signup, forgot-password, and reset-password all render correctly" is the standard, not "I fixed LoginPage.tsx"
+- **Contribute design opinions** — if the user asks for a change that would create inconsistency or look bad, push back with a better suggestion. The goal is a great product, not obedience
+
 ### Session Pattern
 1. Read the roadmap to understand scope and requirements
 2. Enter plan mode — propose implementation approach for user approval
