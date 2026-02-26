@@ -1554,6 +1554,19 @@ Features below are organized by the userbase milestone needed to justify buildin
 | 3 | Remaining content + symptom guide + clinic finder | 5 more STI guides (HPV, Hep B, Hep C, trichomoniasis, mycoplasma). Symptom guide (structured selection → results). CDMX clinic finder with CENSIDA/Condesa data (manually curated, 20-30 clinics) |
 | 4 | SEO + cost estimator + polish | Cost estimator with Mexico pricing. Open Graph tags, structured data, sitemap. Bilingual content (en_US primary, es_MX alongside). Conversion CTAs on every page. Deploy Layer 0. Note: full path-prefix i18n routing (`/es/*`) is a Phase 2 task — see SEO section |
 
+#### Progress Snapshot (February 26, 2026)
+
+- **Week 2 status:** In progress.
+- **Completed / pulled forward polish work:**
+  - Landing page content and IA simplified for scanability (short cards + links to detail pages).
+  - Footer-linked informational pages refreshed for roadmap alignment (`How It Works`, `Privacy`, `Privacy Policy`, `Terms`, `Help`, `About`, `Security`).
+  - Site-wide cookie notice banner added (essential-cookies transparency pattern).
+  - Header UX upgraded to consistent glass states (landing dark state + warm app chrome).
+- **Remaining for Weeks 2-3 core scope:**
+  - Validate/complete first 5 STI guides with citations/disclaimers consistency pass.
+  - Build symptom guide flow.
+  - Build clinic finder (initial curated dataset + UX).
+
 ### Phase 2: Layer 1 — Personal Tracker (Weeks 5-9)
 
 | Week | Focus | Deliverables |
