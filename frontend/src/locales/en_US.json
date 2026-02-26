@@ -53,6 +53,7 @@
     "displayName": "Display Name",
     "dateOfBirth": "Date of Birth",
     "mustBe18": "You must be 18 or older",
+    "dobAndroidTip": "Android tip: tap the year to jump quickly.",
     "sex": "Sex",
     "sexMale": "Male",
     "sexFemale": "Female",

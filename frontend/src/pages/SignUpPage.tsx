@@ -11,6 +11,7 @@ export function SignUpPage() {
   const { t } = useTranslation();
   const { session, signUp } = useAuth();
   const navigate = useNavigate();
+  const isAndroid = typeof navigator !== 'undefined' && /Android/i.test(navigator.userAgent);
 
   // Form state
   const [email, setEmail] = useState('');
@@ -306,6 +307,9 @@ export function SignUpPage() {
                 max={maxDateStr}
               />
               <p className="text-xs text-muted mt-1">{t('auth.mustBe18')}</p>
+              {isAndroid && (
+                <p className="text-xs text-muted mt-1">{t('auth.dobAndroidTip')}</p>
+              )}
             </div>
 
             <div className="mb-4">

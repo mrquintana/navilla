@@ -53,6 +53,7 @@
     "displayName": "Nombre para Mostrar",
     "dateOfBirth": "Fecha de Nacimiento",
     "mustBe18": "Debes tener 18 años o más",
+    "dobAndroidTip": "Tip Android: toca el año para saltar rápido.",
     "sex": "Sexo",
     "sexMale": "Masculino",
     "sexFemale": "Femenino",
