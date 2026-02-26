@@ -22,7 +22,7 @@ export function Header() {
 
   useEffect(() => {
     if (!isLanding) return;
-    const onScroll = () => setScrolledOnLanding(window.scrollY > 48);
+    const onScroll = () => setScrolledOnLanding(window.scrollY > 124);
     onScroll(); // set initial state
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => {
