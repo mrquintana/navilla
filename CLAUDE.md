@@ -144,3 +144,36 @@ All frontend code must be structured for future portability to React Native:
 - **Mobile-first**: Design for phone screens first, desktop is secondary (most users will use PWA)
 - **Non-judgmental**: No shame-inducing language, colors, or patterns. Neutral data presentation
 - **Bilingual from day one**: Every string in both en_US and es_MX
+
+### Design System (Enforced — do not deviate)
+
+**Brand typography:**
+- **"Navilla" the brand name**: Always rendered in Fraunces (`--font-display`) — header logo, hero, marketing headings. The ONE exception: when "Navilla" appears inside a body-text sentence, it stays in the body font
+- **Display headings** (h1, h2 on marketing/landing pages): Fraunces
+- **Everything else** (nav labels, body text, buttons, forms, inputs): Plus Jakarta Sans
+- **Never introduce a third font** without explicit product owner approval
+
+**Color palette — Indigo + Warm Stone:**
+- **Primary**: `#4f46e5` (indigo-600) — buttons, interactive elements, brand accent
+- **Primary light**: `#6366f1` (indigo-500) — links, decorative accents, eyebrows
+- **Primary dark**: `#4338ca` (indigo-700) — hover states, pressed buttons
+- **Primary darkest**: `#312e81` (indigo-900) — dark section backgrounds (hero, CTA)
+- **Surfaces**: Warm stone neutrals (`#fafaf9` background, `#f5f5f4` secondary, `#1c1917` foreground)
+- **Borders**: Warm stone (`#d6d3d1` border, `#e7e5e4` border-light)
+- **Semantic colors stay fixed**: success green `#16a34a`, warning amber `#e3a008`, error red `#dc3545`
+
+**Why indigo (for stakeholders):**
+> Blue signals trust — every bank and hospital uses it. But pure blue signals *institution*. Indigo keeps the trust while adding warmth and personality. It says: we're serious about your health AND we have taste. Combined with warm stone neutrals, it positions Navilla as a premium consumer product — closer to Headspace than to a government health portal.
+
+**Color consistency rules:**
+- NEVER introduce colors outside the palette without checking the design system first
+- ALL interactive elements (buttons, links, focus rings, active states) use the indigo primary palette
+- ALL neutral surfaces (backgrounds, cards, borders) use the warm stone palette
+- Dark sections (hero, CTA, footer) use `--color-foreground` → `--color-primary-darkest` gradients
+- If something "looks off" against the rest of the site, it's probably using an off-palette color — fix it, don't add a new one
+
+**Landing page rhythm:**
+- DARK hero (indigo gradient) → LIGHT content sections (warm white) → DARK CTA → DARK footer
+- Header: transparent with white text on dark hero, warm off-white (#fafaf9) on app pages
+
+**Favicon:** Indigo circle with white serif "N" (Georgia fallback for Fraunces in SVG)
