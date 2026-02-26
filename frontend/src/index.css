@@ -2453,3 +2453,179 @@ section.hero + section {
     grid-template-columns: 1fr;
   }
 }
+
+/* ============================================================
+   Layer 0 — Fact Chips
+   ============================================================ */
+
+.fact-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+.fact-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.2rem 0.625rem;
+  border-radius: 99px;
+  white-space: nowrap;
+}
+
+/* Type chips */
+.fact-chip--bacterial {
+  background: rgba(59, 130, 246, 0.1);
+  color: #1d4ed8;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.fact-chip--viral {
+  background: rgba(139, 92, 246, 0.1);
+  color: #6d28d9;
+  border: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+.fact-chip--parasitic {
+  background: rgba(245, 158, 11, 0.1);
+  color: #b45309;
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+/* Curable / Lifelong */
+.fact-chip--curable {
+  background: rgba(22, 163, 74, 0.1);
+  color: #15803d;
+  border: 1px solid rgba(22, 163, 74, 0.2);
+}
+
+.fact-chip--lifelong {
+  background: var(--color-background-secondary);
+  color: var(--color-muted);
+  border: 1px solid var(--color-border);
+}
+
+/* Vaccine */
+.fact-chip--vaccine {
+  background: rgba(20, 184, 166, 0.1);
+  color: #0f766e;
+  border: 1px solid rgba(20, 184, 166, 0.2);
+}
+
+/* ============================================================
+   Layer 0 — Guide Quick Stats Block (replaces WindowPeriodCallout)
+   ============================================================ */
+
+.guide-quick-stats {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  background: var(--color-background);
+  border: 1.5px solid var(--color-border-light);
+  border-radius: 0.875rem;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+}
+
+.guide-quick-stats-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.guide-quick-stats-window {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.8125rem;
+  color: var(--color-foreground-secondary);
+}
+
+.guide-quick-stats-window-value {
+  font-weight: 700;
+  color: var(--color-foreground);
+}
+
+.guide-quick-stats-no-test {
+  font-size: 0.8125rem;
+  color: var(--color-muted);
+  font-style: italic;
+}
+
+/* ============================================================
+   Layer 0 — Calculator Progress Bar
+   ============================================================ */
+
+.calculator-progress-wrap {
+  margin-top: 0.375rem;
+}
+
+.calculator-progress-label {
+  font-size: 0.7rem;
+  color: var(--color-muted);
+  margin-bottom: 0.25rem;
+  display: block;
+}
+
+.calculator-progress-bar {
+  height: 4px;
+  background: var(--color-border-light);
+  border-radius: 99px;
+  overflow: hidden;
+  width: 100%;
+  max-width: 160px;
+}
+
+.calculator-progress-fill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width 0.3s ease;
+}
+
+.calculator-progress-fill--wait {
+  background: var(--color-primary);
+  opacity: 0.6;
+}
+
+.calculator-progress-fill--testable {
+  background: var(--color-success);
+}
+
+/* Guide card tagline */
+.guide-card-tagline {
+  font-size: 0.8125rem;
+  color: var(--color-foreground-secondary);
+  line-height: 1.45;
+  margin: 0 0 0.625rem;
+}
+
+/* Guide section body — rendered markdown */
+.guide-section-body ul {
+  margin: 0.5rem 0 0.5rem 0;
+  padding-left: 1.25rem;
+}
+
+.guide-section-body li {
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  color: var(--color-foreground-secondary);
+  margin-bottom: 0.25rem;
+}
+
+.guide-section-body p {
+  margin: 0 0 0.5rem;
+}
+
+.guide-section-body p:last-child {
+  margin-bottom: 0;
+}
+
+.guide-section-body strong {
+  color: var(--color-foreground);
+  font-weight: 600;
+}
