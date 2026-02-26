@@ -5,7 +5,8 @@
 - **No Co-Authored-By signature** - Do not add "Co-Authored-By: Claude" lines to commits
 - **Commit frequently** - After completing 3-5 related changes or every 15-20 minutes of work, commit and push
 - **Don't accumulate changes** - Large uncommitted changesets are risky. Commit early and often
-- **Push after commit** - Always push to remote after committing to keep AWS environment up-to-date
+- **Push after commit** - Always push to remote after committing to keep Railway environment up-to-date
+- **Commit package-lock.json** - Whenever `npm install` runs (adding/removing packages), always stage and commit `package-lock.json` alongside `package.json`. Railway uses `npm ci` which fails if they are out of sync
 
 ## Post-Implementation Checklist
 
