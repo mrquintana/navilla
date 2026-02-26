@@ -11,11 +11,11 @@ export function SecurityPage() {
       sections={[
         {
           heading: 'Transport security',
-          body: 'All communication between your device and Navilla is encrypted using HTTPS/TLS. The navilla.app domain enforces HTTPS at the registry level — browsers will refuse any unencrypted connection.',
+          body: 'Communication between your device and Navilla is encrypted in transit using HTTPS/TLS. We aim to enforce secure transport across all environments.',
         },
         {
           heading: 'Authentication',
-          body: 'Authentication uses industry-standard JWT-based session management. Passwords are never stored in plain text. Sessions expire and require re-authentication.',
+          body: 'Authentication uses token-based session management. Passwords are never stored in plain text. Sessions expire and require re-authentication.',
         },
         {
           heading: 'Data storage',
@@ -30,7 +30,7 @@ export function SecurityPage() {
         },
         {
           heading: 'Email security',
-          body: 'Transactional emails are sent with full DKIM, SPF, and DMARC authentication on the navilla.app domain. This prevents spoofing and ensures that emails from no-reply@navilla.app are genuinely from us.',
+          body: 'Transactional email is configured with modern domain authentication controls (SPF, DKIM, DMARC) to reduce spoofing risk.',
         },
         {
           heading: 'What we do not do',

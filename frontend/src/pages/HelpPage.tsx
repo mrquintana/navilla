@@ -7,15 +7,24 @@ export function HelpPage() {
       seoDescription="Answers to common questions about Navilla — how it works, privacy, connections, and your data."
       canonical="https://www.navilla.app/help"
       title="Help Center"
-      subtitle="Answers to common questions."
+      subtitle="FAQ and practical answers."
       sections={[
         {
           heading: 'What is Navilla?',
-          body: 'Navilla is a private health exposure network. It tells you what health conditions are circulating in your trusted circle without revealing who has what. You see exposure signals — counts and levels — not names or individual statuses.',
+          body: 'Navilla is a private sexual health companion. It combines educational tools with anonymized network exposure context to help you make informed decisions.',
         },
         {
-          heading: 'Who can see my health status?',
-          body: 'Nobody sees your individual health status directly. When you log a status, it is combined with the statuses of others in the network to produce an anonymized aggregate signal. Your name is never associated with any health condition shown to other users.',
+          heading: 'Who can see my exact health status?',
+          body: 'Other users do not get a named view of your individual status. Exposure is shown as aggregate context (counts, degree, timing) rather than identity-linked records.',
+        },
+        {
+          heading: 'What does self-reported vs provider-verified vs lab-verified mean?',
+          body: [
+            'Self-reported: entered directly by the user.',
+            'Provider-verified: confirmed by a registered clinical provider in the platform workflow.',
+            'Lab-verified: confirmed through a lab integration or verification process.',
+          ],
+          note: 'Most statuses are currently self-reported. Verification tiers are a roadmap feature and will be clearly labeled when available.',
         },
         {
           heading: 'How do I connect with someone?',
@@ -23,7 +32,11 @@ export function HelpPage() {
         },
         {
           heading: 'How many connections do I need?',
-          body: 'Exposure signals become meaningful once you have a few confirmed connections. With very few connections, a single status update can dominate the signal, which reduces the anonymization. We recommend connecting with at least 3–5 people you genuinely trust.',
+          body: 'With very few connections, a single update can dominate the signal and weaken privacy. Exposure output is gated by minimum thresholds to reduce re-identification risk.',
+        },
+        {
+          heading: 'Does timing matter?',
+          body: 'Yes. Timing is critical in sexual health context. Exposure interpretation should consider recency, test windows, and whether reports are current or old.',
         },
         {
           heading: 'How do I update my health status?',
@@ -35,7 +48,7 @@ export function HelpPage() {
         },
         {
           heading: 'Is Navilla a medical service?',
-          body: 'No. Navilla provides informational exposure signals based on self-reported data from your network. It is not a diagnostic tool and should not replace professional medical advice. Use it as one input among many.',
+          body: 'No. Navilla is informational. It is not a diagnosis, treatment, or emergency medical service. Use it as one signal and consult a qualified professional for medical decisions.',
         },
         {
           heading: 'Who is Navilla for?',

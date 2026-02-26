@@ -17,8 +17,8 @@ export function TermsPage() {
         {
           heading: 'What Navilla is',
           body: [
-            'Navilla is a private health exposure network. It provides anonymized exposure signals based on the health statuses reported by people in your trusted network.',
-            'Navilla is an informational tool only. It is not a medical service, diagnostic tool, or substitute for professional medical advice. Nothing on Navilla should be interpreted as medical advice.',
+            'Navilla is a private sexual health platform that provides educational content and anonymized network exposure context.',
+            'Navilla is informational only. It is not a medical provider, diagnostic tool, emergency service, or substitute for professional medical advice.',
           ],
         },
         {
@@ -34,9 +34,13 @@ export function TermsPage() {
         {
           heading: 'Accuracy and limitations',
           body: [
-            'Navilla\'s exposure signals are only as accurate as the data reported by your network. If users do not report their health status, or report it inaccurately, the signals will not reflect reality.',
-            'A low or zero exposure signal does not mean you have not been exposed. Use Navilla as one input among many, not as a definitive health indicator.',
+            'Exposure context is only as accurate as underlying reports and network coverage. Missing, delayed, or inaccurate user reports can affect outputs.',
+            'A low or zero signal does not prove no exposure. A higher signal does not diagnose infection. Use Navilla as one input among many and seek professional care when needed.',
           ],
+        },
+        {
+          heading: 'Health content scope',
+          body: 'Educational content is based on public health sources and plain-language summaries. It is provided for general information and must not be used as a diagnosis or treatment plan.',
         },
         {
           heading: 'External links',

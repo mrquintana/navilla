@@ -12,40 +12,51 @@ export function PrivacyPolicyPage() {
       sections={[
         {
           heading: 'Data we collect',
-          body: 'We collect only what is necessary to operate the platform:',
+          body: 'We collect data needed to operate the platform safely and provide requested features:',
           list: [
-            'Email address — for account creation and transactional email',
-            'Username — the name you choose to display to your connections',
-            'Health status updates — the statuses you voluntarily log (positive, negative, etc.)',
-            'Connection relationships — who you have confirmed as a trusted connection',
+            'Account data: email address and username',
+            'Age-gating/profile data: date of birth, sex, and optional profile fields (such as full name, country, location)',
+            'Health data you provide: status updates and related timestamps',
+            'Network data: connection requests, confirmed connections, and their lifecycle events',
+            'Operational security data: authentication/session events and abuse-prevention logs',
           ],
-          note: 'We do not collect your real name, phone number, date of birth, or location.',
+          note: 'We do not require government ID or your legal name to use Navilla.',
         },
         {
           heading: 'How we use your data',
           list: [
             'To authenticate your account and maintain your session',
-            'To calculate and display anonymized exposure signals to your connections',
-            'To send transactional emails (account confirmation, password reset, notifications)',
-            'To allow you to manage your connections and health status',
+            'To enforce age restrictions and platform safety requirements',
+            'To calculate and display aggregated exposure context to eligible connections',
+            'To send transactional emails (account confirmation, password reset, product-critical notifications)',
+            'To allow you to manage profile, connections, and health status',
+            'To monitor abuse, secure the platform, and diagnose reliability issues',
           ],
         },
         {
           heading: 'What we never do',
           list: [
             'We do not sell your data to any third party',
-            'We do not use your data for advertising',
-            'We do not share your individual health status with any third party',
-            'We do not use third-party analytics or tracking tools',
+            'We do not use your data for ad targeting',
+            'We do not expose your individual health status as a named public record',
+            'We do not run third-party cross-site tracking scripts for advertising',
           ],
         },
         {
-          heading: 'Third-party services',
-          body: 'We use a small number of trusted infrastructure providers to operate the platform. These cover authentication, database hosting, email delivery, and application hosting. We do not share more data than necessary with any of them, and each operates under their own data processing agreements and security standards.',
+          heading: 'Aggregation and privacy protections',
+          body: 'Exposure context is generated from confirmed network data using aggregation rules and delayed snapshots. The product is designed to avoid exposing direct identity-path details in user-facing exposure responses.',
+        },
+        {
+          heading: 'Verification labels',
+          body: 'Most statuses are currently self-reported. If provider/lab verification features are enabled in the future, verification type will be displayed as a label to indicate confidence level. Additional consent requirements may apply for those features.',
+        },
+        {
+          heading: 'Service providers',
+          body: 'We use a limited set of vendors for infrastructure operations (such as auth, database, email delivery, and hosting). Each provider receives only the data needed to perform its service under applicable contractual safeguards.',
         },
         {
           heading: 'Data retention',
-          body: 'Your data is retained for as long as your account is active. If you delete your account, your data is permanently deleted within 30 days. Anonymized, non-attributable aggregate data may be retained for service improvement purposes.',
+          body: 'Account data is retained while your account is active. After account deletion, personal data is deleted within 30 days, except where temporary retention is required for legal/security obligations. Non-attributable aggregate statistics may be retained for service reliability and product improvement.',
         },
         {
           heading: 'Your rights',
@@ -61,7 +72,7 @@ export function PrivacyPolicyPage() {
         },
         {
           heading: 'Cookies',
-          body: 'We use session cookies only for authentication. See our Cookie Policy for details.',
+          body: 'We use essential cookies required for authentication and session continuity. See Cookie Policy for details.',
         },
         {
           heading: 'Contact',

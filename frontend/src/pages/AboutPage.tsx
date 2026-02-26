@@ -12,26 +12,40 @@ export function AboutPage() {
         {
           heading: 'The problem',
           body: [
-            'When someone in your network gets sick, you often find out too late — or not at all. People share health information selectively, privately, and sometimes not at all, because the social cost of disclosure feels too high.',
-            'The result is that the people around you are making health decisions without the information they need. You might have changed your behavior, taken a test, or stayed home. You just didn\'t know.',
+            'Sexual health decisions are often made with incomplete, delayed, or confusing information. People need practical guidance, but they also need privacy.',
+            'Most tools force a bad tradeoff: either share too much personal data, or get almost no useful context.',
           ],
         },
         {
-          heading: 'What Navilla does',
+          heading: 'What Navilla is',
           body: [
-            'Navilla is a private health exposure network. It tells you what\'s circulating in your trusted circle — anonymized, aggregated, and without exposing anyone\'s identity.',
-            'You see numbers, not names. You know your exposure level without knowing who is sick. The people in your network never appear by name, health condition, or any personally identifiable detail.',
+            'Navilla is a private sexual health companion. It combines educational tools with privacy-first network context so people can decide what to do next with less guesswork.',
+            'The core principle is unchanged: numbers, not names.',
           ],
         },
         {
-          heading: 'How it works',
-          body: 'Users connect with people they know and trust. When someone in that network logs a positive health status, Navilla updates the exposure signal for everyone connected to them. No names are shared. No statuses are attributed. Only the aggregate risk signal is visible.',
+          heading: 'What exists today',
+          list: [
+            'Public STI guides and a window-period calculator',
+            'Private account with profile, connections, and health status management',
+            'Aggregated network exposure context with privacy safeguards',
+            'Bilingual experience (English/Spanish)',
+          ],
+        },
+        {
+          heading: 'What we are building next',
+          list: [
+            'Stronger timing context and recency handling in exposure interpretation',
+            'Clearer confidence labels, including future verification tiers',
+            'Improved privacy controls and retention options',
+            'Better clinic/testing pathways and educational depth',
+          ],
         },
         {
           heading: 'Who it\'s for',
           body: [
-            'Navilla is designed for adults who want to make informed health decisions without compromising their own privacy or anyone else\'s.',
-            'The primary audience is people aged 18–35 who are socially active, health-conscious, and already thinking about the people around them.',
+            'Navilla is for adults (18+) who want to make informed sexual health decisions without exposing themselves or others.',
+            'It is designed for people who value both discretion and actionable information.',
           ],
           note: 'Navilla is an 18+ platform. Health data on minors introduces significant legal complexity that we are not equipped to handle responsibly. We enforce this limit at registration.',
         },
@@ -46,7 +60,7 @@ export function AboutPage() {
         },
         {
           heading: 'Get in touch',
-          body: 'We\'re a small team and we read every message. If you have a question, a concern, or feedback about the product, write to us at contact@navilla.app.',
+          body: 'Questions, concerns, partnerships, or product feedback: contact@navilla.app.',
         },
       ]}
     />

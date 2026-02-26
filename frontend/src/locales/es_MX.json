@@ -321,7 +321,7 @@
   },
   "privacy": {
     "tagline": "Números, no nombres",
-    "description": "Tu privacidad es nuestra prioridad. Nunca compartimos información personal - solo estadísticas anónimas."
+    "description": "Herramientas privadas y señales anónimas para tomar mejores decisiones de salud sexual sin exponer datos personales."
   },
   "landing": {
     "kicker": "Privado por diseño",
@@ -331,31 +331,41 @@
     "stepLabel1": "Paso 1",
     "stepLabel2": "Paso 2",
     "stepLabel3": "Paso 3",
-    "stepOneTitle": "Construye tu red de confianza",
-    "stepOneBody": "Conecta en privado con usuarios o correo. Solo conexiones confirmadas forman tu red.",
-    "stepTwoTitle": "Comparte tu estado en tus términos",
-    "stepTwoBody": "Registra resultados positivos o negativos sin exponer identidades. Tú controlas lo visible.",
-    "stepThreeTitle": "Ve señales de riesgo, no personas",
-    "stepThreeBody": "Navilla muestra niveles de exposición y conteos por condición — nunca nombres.",
+    "stepOneTitle": "Empieza con herramientas privadas",
+    "stepOneBody": "Usa guías y la calculadora de periodo de ventana primero. Puedes obtener valor sin crear red.",
+    "stepTwoTitle": "Registra tu estado y decisiones",
+    "stepTwoBody": "Guarda actualizaciones para ti en una cuenta privada. Nada es público por defecto.",
+    "stepThreeTitle": "Agrega conexiones cuando quieras",
+    "stepThreeBody": "Ve contexto de exposición anónima con tiempo y grado, no nombres ni rastro de identidad.",
     "valueTitle": "Por qué se siente diferente",
-    "valueOneTitle": "Privacidad primero",
-    "valueOneBody": "Priorizamos información anonimizada para que puedas actuar sin exponer detalles personales.",
-    "valueTwoTitle": "Accionable, no alarmante",
-    "valueTwoBody": "Resúmenes claros y tranquilos para decidir tus siguientes pasos a tu ritmo.",
-    "valueThreeTitle": "Diseñado para confianza",
-    "valueThreeBody": "Sin identidades públicas ni grafo social — solo la información que necesitas.",
+    "valueOneTitle": "Privacidad por arquitectura",
+    "valueOneBody": "Reglas de agregación, actualización con retraso y cálculo en servidor reducen riesgo de reidentificación.",
+    "valueTwoTitle": "Contexto, no pánico",
+    "valueTwoBody": "El tiempo y la recencia son parte de la señal para que reportes antiguos no parezcan eventos urgentes.",
+    "valueThreeTitle": "El consentimiento es base",
+    "valueThreeBody": "Tú controlas visibilidad, ciclo de conexiones y retención de datos conforme evoluciona la plataforma.",
+    "faqTitle": "Preguntas que la gente hace primero",
+    "faqQ1": "¿Alguien puede ver mi estado exacto de ITS?",
+    "faqA1": "No. Navilla está diseñado para mostrar señales agregadas de exposición, no estados individuales con nombre.",
+    "faqQ2": "¿Qué significa \"auto reportado\"?",
+    "faqA2": "Significa que el usuario ingresó su estado. Las etiquetas de verificación están planificadas para más confianza.",
+    "faqQ3": "¿El tiempo importa en la exposición?",
+    "faqA3": "Sí. Las señales incluyen recencia para que un reporte de hace años no se vea como evento actual.",
+    "faqQ4": "¿Puedo usar Navilla sin compartir con otros?",
+    "faqA4": "Sí. Puedes usar herramientas públicas y funciones privadas antes de agregar conexiones.",
+    "faqMore": "Ver todas las preguntas",
     "heroCta": "Comienza — es gratis",
     "heroSignInHint": "¿Ya tienes cuenta?",
     "ctaEyebrow": "Gratis. Privado. Sin juicios.",
     "ctaHeading": "Tu salud merece mejores herramientas.",
-    "ctaBody": "Lleva un registro de tus pruebas, anota encuentros y ve señales de riesgo anónimas en tu red — sin que nadie sepa tu nombre.",
+    "ctaBody": "Usa herramientas prácticas, lleva tu propia línea de salud y agrega contexto de red solo cuando tú decidas.",
     "ctaButton": "Crea tu cuenta gratis",
     "ctaFinePrint": "Sin tarjeta de crédito. Elimina cuando quieras.",
     "ctaStatLabel": "nombres compartidos. Jamás."
   },
   "howItWorks": {
     "title": "Cómo Funciona",
-    "subtitle": "Una explicación clara de cómo Navilla protege tu privacidad y calcula la exposición.",
+    "subtitle": "Una explicación clara de cómo Navilla protege tu privacidad y convierte datos de red en contexto útil de salud.",
     "showYou": {
       "title": "Lo que te mostramos",
       "intro": "Cuando alguien en tu red reporta un estado de salud positivo, verás:",
@@ -374,8 +384,8 @@
     },
     "dataSource": {
       "title": "De dónde vienen los datos",
-      "body1": "Todos los datos de salud son auto reportados por los usuarios. Navilla no verifica resultados con laboratorios o clínicas. Las personas pueden reportar de forma inexacta, olvidar actualizar, o no reportar.",
-      "body2": "Los datos de exposición se actualizan cada pocos días — no en tiempo real. Este retraso protege la privacidad evitando que agregues una conexión y veas inmediatamente si reportó algo."
+      "body1": "Hoy, la mayoría de los datos son auto reportados por usuarios. Esto implica posibles retrasos o incompletitud. Las etiquetas de verificación (verificado por proveedor, verificado por laboratorio) están planificadas para dar más contexto de confianza cuando existan integraciones.",
+      "body2": "La exposición se actualiza en snapshots con retraso, no en tiempo real. Esto evita que alguien agregue una conexión e infiera de inmediato el estado privado de otra persona."
     },
     "connections": {
       "title": "Cómo funcionan las conexiones",
@@ -385,7 +395,7 @@
     },
     "exposure": {
       "title": "Cómo se calcula la exposición",
-      "body1": "Construimos un grafo de conexiones confirmadas, recorremos desde ti hacia afuera, y buscamos reportes positivos. Los resultados se agrupan por condición mostrando conteos y grado más cercano.",
+      "body1": "Construimos un grafo de conexiones confirmadas, lo recorremos en servidor desde tu nodo y agrupamos reportes positivos por condición. Ves conteos, grado más cercano y contexto temporal.",
       "body2": "Si tienes menos de 3 conexiones, no mostramos datos de exposición. Con solo 1 o 2 conexiones, una alerta podría revelar el estado de una persona específica. El mínimo de 3 conexiones protege la privacidad de todos."
     },
     "accuracy": {
@@ -395,7 +405,7 @@
       "item2": "La exposición no reemplaza el consejo médico — úsala como señal para considerar hacerte pruebas",
       "item3": "Los datos son auto reportados y pueden ser inexactos, tardíos o incompletos",
       "item4": "El grafo solo incluye usuarios de Navilla — tu exposición real puede ser diferente",
-      "item5": "Los datos pueden tener hasta varios días de antigüedad"
+      "item5": "La recencia importa — reportes antiguos deben interpretarse distinto a reportes recientes"
     },
     "whatYouCanDo": {
       "title": "Lo que puedes hacer",
@@ -432,7 +442,7 @@
       "terms": "Términos",
       "policy": "Política de privacidad",
       "cookies": "Política de cookies",
-      "help": "Centro de ayuda",
+      "help": "FAQ y ayuda",
       "status": "Estado",
       "accessibility": "Accesibilidad"
     },

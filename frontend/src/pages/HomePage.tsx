@@ -1,7 +1,16 @@
 import { Link, Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuthOptional } from '../contexts/AuthContext';
-import { Network, ShieldCheck, UserPlus, UserRoundCheck, Activity, LockKeyhole, ArrowRight } from 'lucide-react';
+import {
+  Network,
+  ShieldCheck,
+  UserPlus,
+  UserRoundCheck,
+  Activity,
+  LockKeyhole,
+  ArrowRight,
+  CircleHelp,
+} from 'lucide-react';
 import { ConstellationGraphic } from '../components/landing/ConstellationGraphic';
 
 export function HomePage() {
@@ -14,12 +23,12 @@ export function HomePage() {
 
   return (
     <>
-      <title>Navilla — Know your exposure risk, protect your privacy</title>
-      <meta name="description" content="Navilla shows you anonymized health exposure signals from your trusted network. Numbers, not names. Your privacy is our priority." />
+      <title>Navilla — Your private sexual health companion</title>
+      <meta name="description" content="Navilla helps you make better sexual health decisions with private tools, clear timing guidance, and anonymized network signals." />
       <link rel="canonical" href="https://www.navilla.app/" />
       <meta property="og:url" content="https://www.navilla.app/" />
-      <meta property="og:title" content="Navilla — Know your exposure risk, protect your privacy" />
-      <meta property="og:description" content="Navilla shows you anonymized health exposure signals from your trusted network. Numbers, not names. Your privacy is our priority." />
+      <meta property="og:title" content="Navilla — Your private sexual health companion" />
+      <meta property="og:description" content="Private tools, timing guidance, and anonymized exposure signals designed for trust and informed decisions." />
 
       {/* Hero — dark indigo with full-bleed constellation background */}
       <section className="hero">
@@ -117,6 +126,31 @@ export function HomePage() {
               <h3>{t('landing.valueThreeTitle')}</h3>
               <p>{t('landing.valueThreeBody')}</p>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ preview */}
+      <section className="container landing-section">
+        <div className="landing-panel landing-panel--values">
+          <h2 className="text-center mb-6">{t('landing.faqTitle', 'Questions people ask first')}</h2>
+          <div className="landing-grid landing-grid--values">
+            {[1, 2, 3, 4].map((item) => (
+              <div key={item} className="feature-card feature-card--value">
+                <div className="feature-card-head feature-card-head--icon-only">
+                  <span className="feature-icon" aria-hidden="true">
+                    <CircleHelp className="w-4 h-4" />
+                  </span>
+                </div>
+                <h3>{t(`landing.faqQ${item}`)}</h3>
+                <p>{t(`landing.faqA${item}`)}</p>
+              </div>
+            ))}
+          </div>
+          <div className="text-center mt-6">
+            <Link to="/help" className="btn btn-secondary">
+              {t('landing.faqMore', 'Read all FAQs')}
+            </Link>
           </div>
         </div>
       </section>

@@ -42,7 +42,7 @@ export function HowItWorksPage() {
   return (
     <div className="container py-10 space-y-6 max-w-3xl">
       <title>How Navilla Works — Privacy-First Health Exposure Network</title>
-      <meta name="description" content="Learn how Navilla protects your identity while keeping you informed about health exposure risks in your trusted network. Numbers, not names." />
+      <meta name="description" content="Learn how Navilla protects privacy while giving sexual health context through tools and anonymized network exposure signals." />
       <link rel="canonical" href="https://www.navilla.app/how-it-works" />
       <div>
         <h1 className="text-3xl font-bold mb-2">{t('howItWorks.title')}</h1>

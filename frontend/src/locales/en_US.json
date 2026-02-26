@@ -322,7 +322,7 @@
   },
   "privacy": {
     "tagline": "Numbers, not names",
-    "description": "Your privacy is our priority. We never share personal information - only anonymized statistics."
+    "description": "Private tools and anonymized signals so you can make better sexual health decisions without exposing personal details."
   },
   "landing": {
     "kicker": "Private by design",
@@ -332,31 +332,41 @@
     "stepLabel1": "Step 1",
     "stepLabel2": "Step 2",
     "stepLabel3": "Step 3",
-    "stepOneTitle": "Build your trusted network",
-    "stepOneBody": "Connect privately using usernames or email. Only confirmed connections shape your network graph.",
-    "stepTwoTitle": "Share health status on your terms",
-    "stepTwoBody": "Log positive or negative results without exposing identities. You control what is visible.",
-    "stepThreeTitle": "See risk signals, not people",
-    "stepThreeBody": "Navilla shows exposure levels and counts by condition — never names.",
+    "stepOneTitle": "Start with private health tools",
+    "stepOneBody": "Use guides and the window-period calculator first. You can get value before building a network.",
+    "stepTwoTitle": "Track your status and decisions",
+    "stepTwoBody": "Log updates for yourself in a private account. Nothing is public by default.",
+    "stepThreeTitle": "Add trusted connections when ready",
+    "stepThreeBody": "See anonymized exposure context with timing and degree, not names or identity trails.",
     "valueTitle": "Why it feels different",
-    "valueOneTitle": "Privacy-first by default",
-    "valueOneBody": "We prioritize anonymized insights so you can act without exposing personal details.",
-    "valueTwoTitle": "Actionable, not alarming",
-    "valueTwoBody": "Clear, calm summaries help you decide next steps at your own pace.",
-    "valueThreeTitle": "Designed for trust",
-    "valueThreeBody": "No public identities, no social graph — just the information you need.",
+    "valueOneTitle": "Privacy by architecture",
+    "valueOneBody": "Aggregation rules, delayed refreshes, and server-side calculations reduce re-identification risk.",
+    "valueTwoTitle": "Context over panic",
+    "valueTwoBody": "Timing and recency are part of the signal so outdated reports don't look like urgent events.",
+    "valueThreeTitle": "Consent is the default",
+    "valueThreeBody": "You control visibility, connection lifecycle, and data retention as the platform evolves.",
+    "faqTitle": "Questions people ask first",
+    "faqQ1": "Can someone see my exact STI status?",
+    "faqA1": "No. Navilla is built to show aggregate exposure signals, not named individual statuses.",
+    "faqQ2": "What does 'self-reported' mean?",
+    "faqA2": "It means the user entered the status themselves. Verification labels are planned to add confidence context.",
+    "faqQ3": "Does timing matter in exposure data?",
+    "faqA3": "Yes. Signals include recency context so a report from years ago is not shown like a current event.",
+    "faqQ4": "Can I use Navilla without sharing with others?",
+    "faqA4": "Yes. You can use public tools and your private account features before adding connections.",
+    "faqMore": "Read all FAQs",
     "heroCta": "Get started — it's free",
     "heroSignInHint": "Already have an account?",
     "ctaEyebrow": "Free. Private. No judgment.",
     "ctaHeading": "Your health deserves better tools.",
-    "ctaBody": "Track your testing history, log encounters, and see anonymized risk signals from your network — all without anyone knowing your name.",
+    "ctaBody": "Use practical tools, track your own health timeline, and add network context only when you choose.",
     "ctaButton": "Create your free account",
     "ctaFinePrint": "No credit card. Delete any time.",
     "ctaStatLabel": "names shared. Ever."
   },
   "howItWorks": {
     "title": "How It Works",
-    "subtitle": "A plain-language overview of how Navilla protects your privacy and calculates exposure.",
+    "subtitle": "A plain-language overview of how Navilla protects privacy and turns network data into useful health context.",
     "showYou": {
       "title": "What we show you",
       "intro": "When someone in your network reports a positive health status, you'll see:",
@@ -375,8 +385,8 @@
     },
     "dataSource": {
       "title": "Where data comes from",
-      "body1": "All health status data is self-reported by users. Navilla does not verify results with labs or clinics. People may report inaccurately, forget to update, or not report at all.",
-      "body2": "Exposure data refreshes every few days — not in real time. This delay protects privacy by preventing you from adding a connection and immediately seeing if they reported something."
+      "body1": "Today, most health status data is self-reported by users. This means reports can be delayed or incomplete. Verification labels (provider-verified, lab-verified) are planned to add confidence context as integrations roll out.",
+      "body2": "Exposure data refreshes in delayed snapshots instead of real time. This prevents people from adding a connection and immediately inferring that person's private status."
     },
     "connections": {
       "title": "How connections work",
@@ -386,7 +396,7 @@
     },
     "exposure": {
       "title": "How exposure is calculated",
-      "body1": "We build a graph of confirmed connections, traverse outward from you, and check for positive health reports. Results are grouped by condition showing counts and closest degree.",
+      "body1": "We build a graph of confirmed connections, traverse outward from you on the server, and group positive reports by condition. You see counts, nearest degree, and timing context.",
       "body2": "If you have fewer than 3 connections, we don't show exposure data at all. With only 1 or 2 connections, an alert could reveal a specific person's status. The 3-connection minimum protects everyone's privacy."
     },
     "accuracy": {
@@ -396,7 +406,7 @@
       "item2": "Exposure does not replace medical advice — use it as a signal to consider testing",
       "item3": "Data is self-reported and may be inaccurate, delayed, or incomplete",
       "item4": "The graph only includes Navilla users — your real-world exposure may differ",
-      "item5": "Snapshots may be up to several days old"
+      "item5": "Recency matters — older reports should be interpreted differently from recent reports"
     },
     "whatYouCanDo": {
       "title": "What you can do",
@@ -433,7 +443,7 @@
       "terms": "Terms",
       "policy": "Privacy policy",
       "cookies": "Cookie policy",
-      "help": "Help center",
+      "help": "FAQ & help",
       "status": "Status",
       "accessibility": "Accessibility"
     },
