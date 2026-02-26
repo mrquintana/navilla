@@ -16,7 +16,7 @@ import {
 import { ConstellationGraphic } from '../components/landing/ConstellationGraphic';
 
 export function HomePage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const session = useAuthOptional()?.session ?? null;
 
   if (session) {
@@ -148,10 +148,13 @@ export function HomePage() {
           <h2 className="text-center mb-6">{t('landing.exploreTitle', 'Explore before you sign up')}</h2>
           <div className="landing-grid landing-grid--explore">
             <Link to="/calculator" className="feature-card feature-card--explore">
-              <div className="feature-card-head feature-card-head--icon-only">
-                <span className="feature-icon" aria-hidden="true">
-                  <Calculator className="w-4 h-4" />
-                </span>
+              <div className="explore-card-preview" aria-hidden="true">
+                <img
+                  src={i18n.language === 'es_MX' ? '/images/preview-calculator-es.png' : '/images/preview-calculator-en.png'}
+                  alt=""
+                  className="explore-card-thumbnail"
+                  loading="lazy"
+                />
               </div>
               <h3>{t('landing.exploreCalculatorTitle', 'When should I test?')}</h3>
               <p>{t('landing.exploreCalculatorBody', 'Enter a date and see exactly when each test becomes reliable.')}</p>
@@ -161,10 +164,13 @@ export function HomePage() {
               </span>
             </Link>
             <Link to="/guides" className="feature-card feature-card--explore">
-              <div className="feature-card-head feature-card-head--icon-only">
-                <span className="feature-icon" aria-hidden="true">
-                  <BookOpen className="w-4 h-4" />
-                </span>
+              <div className="explore-card-preview" aria-hidden="true">
+                <img
+                  src={i18n.language === 'es_MX' ? '/images/preview-guides-es.png' : '/images/preview-guides-en.png'}
+                  alt=""
+                  className="explore-card-thumbnail"
+                  loading="lazy"
+                />
               </div>
               <h3>{t('landing.exploreGuidesTitle', 'Learn about STIs')}</h3>
               <p>{t('landing.exploreGuidesBody', 'Clear guides on 10 conditions — symptoms, testing, treatment.')}</p>
