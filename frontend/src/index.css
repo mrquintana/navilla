@@ -1062,14 +1062,12 @@ section.hero + section {
   height: 100%;
   object-fit: cover;
   object-position: top center;
-  filter: blur(1.5px);
-  opacity: 0.85;
-  transition: filter 0.3s ease, opacity 0.3s ease;
+  opacity: 0.9;
+  transition: opacity 0.3s ease;
 }
 
 .feature-card--explore:hover .explore-card-thumbnail {
-  filter: blur(0.5px);
-  opacity: 0.95;
+  opacity: 1;
 }
 
 .feature-card-cta {

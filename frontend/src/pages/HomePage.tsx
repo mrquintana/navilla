@@ -14,7 +14,7 @@ import {
 import { ConstellationGraphic } from '../components/landing/ConstellationGraphic';
 
 export function HomePage() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const session = useAuthOptional()?.session ?? null;
 
   if (session) {
@@ -148,7 +148,7 @@ export function HomePage() {
             <Link to="/calculator" className="feature-card feature-card--explore">
               <div className="explore-card-preview" aria-hidden="true">
                 <img
-                  src={i18n.language === 'es_MX' ? '/images/preview-calculator-es.png' : '/images/preview-calculator-en.png'}
+                  src="/images/preview-calculator.png"
                   alt=""
                   className="explore-card-thumbnail"
                   loading="lazy"
@@ -164,7 +164,7 @@ export function HomePage() {
             <Link to="/guides" className="feature-card feature-card--explore">
               <div className="explore-card-preview" aria-hidden="true">
                 <img
-                  src={i18n.language === 'es_MX' ? '/images/preview-guides-es.png' : '/images/preview-guides-en.png'}
+                  src="/images/preview-guides.png"
                   alt=""
                   className="explore-card-thumbnail"
                   loading="lazy"
