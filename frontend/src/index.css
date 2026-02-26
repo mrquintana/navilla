@@ -20,6 +20,13 @@
   --color-border: #d0d7de;
   --color-border-light: #e8ebef;
 
+  /* Landing page design tokens */
+  --color-landing-bg: #f7f3ee;
+  --color-landing-accent: #6366f1;
+  --color-landing-accent-dark: #4f46e5;
+  --color-landing-text: #1a1612;
+  --font-display: 'Fraunces', Georgia, serif;
+
   /* Semantic colors */
   --color-success: #16a34a;
   --color-warning: #e3a008;
