@@ -12,8 +12,8 @@ export function ConstellationGraphic({ className }: ConstellationGraphicProps) {
       aria-hidden="true"
       role="presentation"
     >
-      {/* Connection lines */}
-      <g stroke="#6366f1" strokeWidth="1.5" strokeLinecap="round" opacity="0.25">
+      {/* Connection lines — light so they glow on dark plum background */}
+      <g stroke="rgba(255,255,255,0.28)" strokeWidth="1.5" strokeLinecap="round">
         <line x1="90" y1="210" x2="170" y2="130" />
         <line x1="90" y1="210" x2="180" y2="290" />
         <line x1="170" y1="130" x2="270" y2="150" />
@@ -32,28 +32,28 @@ export function ConstellationGraphic({ className }: ConstellationGraphicProps) {
       </g>
 
       {/* Animated glow rings on primary nodes */}
-      <circle cx="210" cy="210" r="22" fill="#6366f1" opacity="0.07" className="constellation-pulse" />
-      <circle cx="90" cy="210" r="14" fill="#818cf8" opacity="0.06" className="constellation-pulse-delay" />
-      <circle cx="340" cy="190" r="14" fill="#818cf8" opacity="0.05" className="constellation-pulse-delay-2" />
+      <circle cx="210" cy="210" r="22" fill="rgba(255,255,255,0.08)" className="constellation-pulse" />
+      <circle cx="90" cy="210" r="14" fill="rgba(255,255,255,0.06)" className="constellation-pulse-delay" />
+      <circle cx="340" cy="190" r="14" fill="rgba(255,255,255,0.05)" className="constellation-pulse-delay-2" />
 
       {/* Primary hub node */}
-      <circle cx="210" cy="210" r="9" fill="#6366f1" />
+      <circle cx="210" cy="210" r="9" fill="#ffffff" />
 
       {/* Secondary nodes */}
-      <circle cx="90" cy="210" r="6.5" fill="#818cf8" />
-      <circle cx="170" cy="130" r="5.5" fill="#a5b4fc" />
-      <circle cx="180" cy="290" r="5.5" fill="#a5b4fc" />
-      <circle cx="270" cy="150" r="7" fill="#818cf8" />
-      <circle cx="295" cy="310" r="5" fill="#a5b4fc" />
-      <circle cx="340" cy="190" r="6" fill="#a5b4fc" />
+      <circle cx="90" cy="210" r="6.5" fill="#e0e7ff" />
+      <circle cx="170" cy="130" r="5.5" fill="#c7d2fe" />
+      <circle cx="180" cy="290" r="5.5" fill="#c7d2fe" />
+      <circle cx="270" cy="150" r="7" fill="#e0e7ff" />
+      <circle cx="295" cy="310" r="5" fill="#c7d2fe" />
+      <circle cx="340" cy="190" r="6" fill="#c7d2fe" />
 
       {/* Tertiary nodes */}
-      <circle cx="130" cy="105" r="4" fill="#c7d2fe" />
-      <circle cx="355" cy="108" r="3.5" fill="#c7d2fe" />
-      <circle cx="360" cy="350" r="3.5" fill="#c7d2fe" />
-      <circle cx="55" cy="150" r="3" fill="#e0e7ff" />
-      <circle cx="60" cy="320" r="2.5" fill="#e0e7ff" />
-      <circle cx="380" cy="270" r="2.5" fill="#e0e7ff" />
+      <circle cx="130" cy="105" r="4" fill="rgba(255,255,255,0.55)" />
+      <circle cx="355" cy="108" r="3.5" fill="rgba(255,255,255,0.45)" />
+      <circle cx="360" cy="350" r="3.5" fill="rgba(255,255,255,0.45)" />
+      <circle cx="55" cy="150" r="3" fill="rgba(255,255,255,0.3)" />
+      <circle cx="60" cy="320" r="2.5" fill="rgba(255,255,255,0.3)" />
+      <circle cx="380" cy="270" r="2.5" fill="rgba(255,255,255,0.3)" />
     </svg>
   );
 }

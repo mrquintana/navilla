@@ -423,7 +423,7 @@ select.input {
 
 /* Hero section — warm editorial two-column layout */
 .hero {
-  background: var(--color-landing-bg);
+  background: linear-gradient(108deg, #f7f3ee 0%, #ede8e0 44%, #2d1b69 78%, #180f3d 100%);
   text-align: left;
   overflow: hidden;
   position: relative;
