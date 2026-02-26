@@ -697,3 +697,53 @@ rm -f scripts/.seed-state.json
 ### Exposure Display Notes
 - **"Exposure Overview" vs "In Your Network"**: Same data source (`exposureQuery.data?.exposures`), different display limits. Dashboard shows top 3, Health page shows 6 (expandable with "Show all").
 - **Status labels**: `active` (clearedAt is null) vs `resolved` (clearedAt set). Timeframe: `recent` (≤30 days) vs `older` (>30 days). Four possible combos: "Active - Recent", "Active - Older", "Resolved - Recent", "Resolved - Older".
+
+---
+
+## Session Notes (2026-02-26 — Week 2 Layer 0 Polish)
+
+### Accomplished
+Complete Week 2 Layer 0 polish across all STI guide and calculator pages:
+
+**New files:**
+- `frontend/src/lib/renderMarkdown.tsx` — Zero-dependency micro-renderer: `- bullets` → `<ul><li>`, `**bold**` → `<strong>`, plain text → `<p>`
+- `frontend/src/lib/renderMarkdown.test.tsx` — 8 unit tests
+- `frontend/src/components/layer0/FactChips.tsx` — Shared chip component: type (bacterial/viral/parasitic) + curable/lifelong + vaccine chips
+- `docs/plans/2026-02-26-week2-layer0-polish-design.md` — Design doc (Approach B chosen)
+- `docs/plans/2026-02-26-week2-layer0-polish.md` — 12-task implementation plan
+
+**Data model additions (`stiContent.ts`):**
+- `tagline: {en, es}` — One-liner on every guide card and detail hero
+- `facts: {type, curable, vaccine}` — Type union + two booleans for chip display
+- 5 new full guide objects: HPV, Hepatitis B, Hepatitis C, Trichomoniasis, Mycoplasma genitalium
+- All 10 guide section texts reformatted with markdown bullets/bold for scannability
+
+**UI changes:**
+- Guide index cards: tagline + 3 fact chips (type/curable/vaccine) + window period footer
+- Guide detail page: QuickStatsBlock (FactChips + window period + CTA) replaces WindowPeriodCallout; unique icon per section; renderMarkdown for body text
+- Calculator: per-row progress bar showing `daysWaited / minDays` ratio with color states (indigo=waiting, green=testable)
+
+**Locale:** `en_US.json` + `es_MX.json` updated with `guide.*` keys
+
+### Test Results
+- 106/107 tests passing (1 pre-existing Header.test.tsx failure unrelated to this work)
+- TypeScript: clean
+
+### Key Commits (in order)
+1. `d3bc20e` feat: add renderMarkdown micro-renderer utility
+2. `84a792e` fix: guard whitespace-only strings in renderMarkdown
+3. `a30d1ec` feat: add tagline and facts fields to all 10 STI entries
+4. `45f40f4` test: add coverage for STI tagline and facts fields
+5. `29b614b` feat: add Week 3 guide content + reformat existing guide sections
+6. `4192686` test: update stiContent and GuideDetailPage tests for Week 3 content
+7. `4524b7f` feat: add guide fact chip locale keys
+8. `82beddb` feat: add shared FactChips component
+9. `15655b5` feat: add CSS for fact chips, Quick Stats block, progress bar, markdown body
+10. `6654376` feat: add tagline and fact chips to guide index cards
+11. `0909a73` feat: add Quick Stats block, unique section icons, renderMarkdown to guide detail
+12. `5f94265` feat: add per-row progress bar to calculator results
+
+### Next Steps
+- [ ] Week 2 done — move to Week 3: Symptom guide flow + clinic finder
+- [ ] Pre-existing Header.test.tsx failure needs investigation (navbar--transparent class)
+- [ ] Pre-existing lint error in CookieNoticeBanner.tsx (react-hooks/set-state-in-effect)
