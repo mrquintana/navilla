@@ -1,8 +1,20 @@
 import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { BookOpen, Clock, ChevronRight, ArrowRight, Activity } from 'lucide-react';
+import {
+  BookOpen,
+  Clock,
+  ChevronRight,
+  ArrowRight,
+  ArrowUpDown,
+  Thermometer,
+  FlaskConical,
+  Pill,
+  ShieldCheck,
+} from 'lucide-react';
 import { STI_DATA, type Lang } from '../lib/stiContent';
 import { useAuthOptional } from '../contexts/AuthContext';
+import { FactChips } from '../components/layer0/FactChips';
+import { renderMarkdown } from '../lib/renderMarkdown';
 
 interface Props {
   /** Passed by the prerender script instead of useParams for SSR compatibility */
@@ -10,12 +22,12 @@ interface Props {
 }
 
 const GUIDE_SECTIONS = [
-  { key: 'what' as const, labelEn: 'What is it?', labelEs: '¿Qué es?' },
-  { key: 'transmission' as const, labelEn: 'How it spreads', labelEs: 'Cómo se transmite' },
-  { key: 'symptoms' as const, labelEn: 'Symptoms', labelEs: 'Síntomas' },
-  { key: 'testing' as const, labelEn: 'Testing', labelEs: 'Pruebas' },
-  { key: 'treatment' as const, labelEn: 'Treatment', labelEs: 'Tratamiento' },
-  { key: 'prevention' as const, labelEn: 'Prevention', labelEs: 'Prevención' },
+  { key: 'what' as const,         labelEn: 'What is it?',    labelEs: '¿Qué es?',          icon: <BookOpen className="w-3.5 h-3.5" aria-hidden="true" /> },
+  { key: 'transmission' as const, labelEn: 'How it spreads', labelEs: 'Cómo se transmite', icon: <ArrowUpDown className="w-3.5 h-3.5" aria-hidden="true" /> },
+  { key: 'symptoms' as const,     labelEn: 'Symptoms',       labelEs: 'Síntomas',          icon: <Thermometer className="w-3.5 h-3.5" aria-hidden="true" /> },
+  { key: 'testing' as const,      labelEn: 'Testing',        labelEs: 'Pruebas',           icon: <FlaskConical className="w-3.5 h-3.5" aria-hidden="true" /> },
+  { key: 'treatment' as const,    labelEn: 'Treatment',      labelEs: 'Tratamiento',       icon: <Pill className="w-3.5 h-3.5" aria-hidden="true" /> },
+  { key: 'prevention' as const,   labelEn: 'Prevention',     labelEs: 'Prevención',        icon: <ShieldCheck className="w-3.5 h-3.5" aria-hidden="true" /> },
 ] as const;
 
 export function GuideDetailPage({ forcedSlug }: Props) {
@@ -95,31 +107,29 @@ export function GuideDetailPage({ forcedSlug }: Props) {
                 {lang === 'es' ? 'Guía de salud' : 'Health Guide'}
               </div>
               <h1 className="guide-title">{title}</h1>
-              <p className="guide-subtitle">
-                {lang === 'es'
-                  ? `Qué debes saber sobre ${title}: síntomas, pruebas, tratamiento y prevención.`
-                  : `What you need to know about ${title}: symptoms, testing, treatment, and prevention.`}
-              </p>
+              <p className="guide-subtitle">{sti.tagline[lang]}</p>
             </div>
           </div>
         </section>
 
         {/* Body */}
         <div className="container guide-body">
-          {/* Window period callout */}
-          <WindowPeriodCallout slug={slug} windowPeriod={windowPeriod} lang={lang} t={t} />
+          {/* Quick stats block */}
+          <QuickStatsBlock slug={slug} windowPeriod={windowPeriod} facts={sti.facts} lang={lang} />
 
           {/* Guide content — or coming soon */}
           {guide ? (
             <>
               <div className="guide-section-grid" role="main">
-                {GUIDE_SECTIONS.map(({ key, labelEn, labelEs }) => (
+                {GUIDE_SECTIONS.map(({ key, labelEn, labelEs, icon }) => (
                   <article key={key} className="guide-section" aria-labelledby={`section-${key}`}>
                     <h2 id={`section-${key}`} className="guide-section-title">
-                      <SectionIcon sectionKey={key} />
+                      {icon}
                       {lang === 'es' ? labelEs : labelEn}
                     </h2>
-                    <p className="guide-section-body">{guide[key][lang]}</p>
+                    <div className="guide-section-body">
+                      {renderMarkdown(guide[key][lang])}
+                    </div>
                   </article>
                 ))}
               </div>
@@ -181,65 +191,47 @@ export function GuideDetailPage({ forcedSlug }: Props) {
 }
 
 // ---------------------------------------------------------------------------
-// WindowPeriodCallout
+// QuickStatsBlock
 // ---------------------------------------------------------------------------
 
-interface WPCalloutProps {
+interface QuickStatsProps {
   slug: string;
   windowPeriod: import('../lib/stiContent').WindowPeriod;
+  facts: import('../lib/stiContent').STIContent['facts'];
   lang: Lang;
-  t: (key: string, fallback: string) => string;
 }
 
-function WindowPeriodCallout({ slug, windowPeriod, lang, t }: WPCalloutProps) {
+function QuickStatsBlock({ slug, windowPeriod, facts, lang }: QuickStatsProps) {
+  const { t } = useTranslation();
   return (
-    <div className="guide-window-callout" style={{ marginBottom: '1.5rem' }}>
-      <div className="guide-window-callout-left">
-        <div className="guide-window-callout-icon">
-          <Clock className="w-5 h-5" aria-hidden="true" />
-        </div>
-        <div>
-          <div className="guide-window-callout-label">
-            {lang === 'es' ? 'Período de ventana' : 'Window period'}
-          </div>
+    <div className="guide-quick-stats">
+      <div className="guide-quick-stats-left">
+        <FactChips facts={facts} />
+        <div className="guide-quick-stats-window">
+          <Clock className="w-3.5 h-3.5" aria-hidden="true" />
           {windowPeriod.noStandardTest ? (
-            <p className="guide-window-no-test">{windowPeriod.note[lang]}</p>
+            <span className="guide-quick-stats-no-test">{windowPeriod.note[lang]}</span>
           ) : (
             <>
-              <div className="guide-window-callout-value">
-                {windowPeriod.minDays}–{windowPeriod.maxDays}{' '}
-                {lang === 'es' ? 'días' : 'days'}
-              </div>
-              <div className="guide-window-callout-note">{windowPeriod.note[lang]}</div>
+              <span className="guide-window-callout-label">
+                {lang === 'es' ? 'Período de ventana:' : 'Window period:'}
+              </span>
+              <span className="guide-quick-stats-window-value">
+                {windowPeriod.minDays}–{windowPeriod.maxDays} {lang === 'es' ? 'días' : 'days'}
+              </span>
             </>
           )}
         </div>
       </div>
       <Link
-        to={`/calculator`}
+        to="/calculator"
         className="btn btn-secondary"
         aria-label={t('calculator.title', 'Window Period Calculator')}
         state={{ slug }}
       >
-        <Activity className="w-4 h-4 mr-1" aria-hidden="true" />
+        <FlaskConical className="w-4 h-4 mr-1" aria-hidden="true" />
         {lang === 'es' ? 'Calcular mis fechas' : 'Calculate my dates'}
       </Link>
     </div>
   );
-}
-
-// ---------------------------------------------------------------------------
-// Section icons
-// ---------------------------------------------------------------------------
-
-function SectionIcon({ sectionKey }: { sectionKey: typeof GUIDE_SECTIONS[number]['key'] }) {
-  const icons: Record<typeof GUIDE_SECTIONS[number]['key'], React.ReactNode> = {
-    what: <BookOpen className="w-3.5 h-3.5" aria-hidden="true" />,
-    transmission: <Activity className="w-3.5 h-3.5" aria-hidden="true" />,
-    symptoms: <Activity className="w-3.5 h-3.5" aria-hidden="true" />,
-    testing: <Activity className="w-3.5 h-3.5" aria-hidden="true" />,
-    treatment: <Activity className="w-3.5 h-3.5" aria-hidden="true" />,
-    prevention: <Activity className="w-3.5 h-3.5" aria-hidden="true" />,
-  };
-  return <>{icons[sectionKey]}</>;
 }
