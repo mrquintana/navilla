@@ -5,13 +5,14 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 import en_US from './locales/en_US.json';
 import es_MX from './locales/es_MX.json';
 import { detectLanguage } from './lib/geolocation';
+import { env } from './lib/env';
 
 const resources = {
   en_US: { translation: en_US },
   es_MX: { translation: es_MX },
 };
 
-const isDev = import.meta.env.DEV;
+const isDev = env.DEV;
 const languageStorageKey = 'navilla_language';
 
 const getDevLanguage = () => {

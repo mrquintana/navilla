@@ -4,8 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { Header } from './Header';
 import { Footer } from './Footer';
 import { DEV_MODE } from '../../lib/devMode';
-import { api } from '../../lib/api';
-import { API_URL } from '../../lib/api';
+import { api, API_URL } from '../../lib/api';
+import { env } from '../../lib/env';
 import { useAuthOptional } from '../../contexts/AuthContext';
 import { useEffect } from 'react';
 
@@ -17,7 +17,7 @@ export function Layout() {
   const healthQuery = useQuery({
     queryKey: ['health'],
     queryFn: async () => {
-      if (import.meta.env.DEV) {
+      if (env.DEV) {
         console.debug('[healthcheck] queryFn');
       }
       return api.system.check();
@@ -29,7 +29,7 @@ export function Layout() {
   });
 
   useEffect(() => {
-    if (import.meta.env.DEV) {
+    if (env.DEV) {
       console.debug('[healthcheck] status', healthQuery.status);
     }
   }, [healthQuery.status]);

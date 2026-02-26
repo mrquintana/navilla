@@ -17,17 +17,18 @@ export function Header() {
   const { data: profile } = useUser();
   const { pathname } = useLocation();
   const isLanding = pathname === '/';
-  const [scrolled, setScrolled] = useState(false);
+  const [scrolledOnLanding, setScrolledOnLanding] = useState(false);
+  const scrolled = isLanding ? scrolledOnLanding : false;
 
   useEffect(() => {
-    if (!isLanding) {
-      setScrolled(false);
-      return;
-    }
-    const onScroll = () => setScrolled(window.scrollY > 48);
+    if (!isLanding) return;
+    const onScroll = () => setScrolledOnLanding(window.scrollY > 48);
     onScroll(); // set initial state
     window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      setScrolledOnLanding(false);
+    };
   }, [isLanding]);
 
   const { data: notifications } = useQuery({

@@ -3,18 +3,19 @@
  */
 
 import { E2E_MODE, getE2eUserFromToken, type E2eUser } from './e2eMocks';
+import { env } from './env';
 
-const RAW_API_URL = import.meta.env.VITE_API_URL ?? '';
+const RAW_API_URL = env.get('VITE_API_URL') ?? '';
 const NORMALIZED_API_URL = RAW_API_URL.replace(/\/+$/, '');
 const DEFAULT_DEV_API_URL = 'http://localhost:8080';
 
-export const API_URL = NORMALIZED_API_URL || (import.meta.env.DEV ? DEFAULT_DEV_API_URL : '');
+export const API_URL = NORMALIZED_API_URL || (env.DEV ? DEFAULT_DEV_API_URL : '');
 
 function getApiBaseUrl(): string {
   if (API_URL) {
     return API_URL;
   }
-  if (import.meta.env.DEV) {
+  if (env.DEV) {
     return DEFAULT_DEV_API_URL;
   }
   throw new Error('API URL is not configured. Set VITE_API_URL.');
@@ -152,7 +153,7 @@ export const api = {
         return { status: 'ok' };
       }
       const baseUrl = getApiBaseUrl();
-      if (import.meta.env.DEV) {
+      if (env.DEV) {
         console.debug('[healthcheck] url', `${baseUrl}/api/health`);
       }
       const controller = new AbortController();
@@ -162,7 +163,7 @@ export const api = {
           method: 'GET',
           signal: controller.signal,
         });
-        if (import.meta.env.DEV) {
+        if (env.DEV) {
           console.debug('[healthcheck] response', response.status);
         }
         if (!response.ok) {
@@ -170,7 +171,7 @@ export const api = {
         }
         return response.json();
       } catch (error) {
-        if (import.meta.env.DEV) {
+        if (env.DEV) {
           console.debug('[healthcheck] error', error);
         }
         throw error;

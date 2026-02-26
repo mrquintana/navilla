@@ -2,6 +2,7 @@ import { Link, Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuthOptional } from '../contexts/AuthContext';
 import { Network, ShieldCheck, UserPlus, UserRoundCheck, Activity, LockKeyhole, ArrowRight } from 'lucide-react';
+import { ConstellationGraphic } from '../components/landing/ConstellationGraphic';
 
 export function HomePage() {
   const { t } = useTranslation();
@@ -20,23 +21,30 @@ export function HomePage() {
       <meta property="og:title" content="Navilla — Know your exposure risk, protect your privacy" />
       <meta property="og:description" content="Navilla shows you anonymized health exposure signals from your trusted network. Numbers, not names. Your privacy is our priority." />
 
-      {/* Hero */}
+      {/* Hero — warm ivory, two-column editorial */}
       <section className="hero">
         <div className="container">
-          <h1 className="hero-title">{t('common.appName')}</h1>
-          <p className="hero-subtitle">{t('privacy.tagline')}</p>
-          <p className="hero-description">{t('privacy.description')}</p>
+          <div className="hero-copy">
+            <p className="hero-eyebrow">Sexual health, reimagined</p>
+            <h1 className="hero-title">{t('common.appName')}</h1>
+            <p className="hero-subtitle">{t('privacy.tagline')}</p>
+            <p className="hero-description">{t('privacy.description')}</p>
 
-          <div className="hero-cta-group">
-            <Link to="/signup" className="btn btn-primary btn-lg">
-              {t('landing.heroCta', 'Get started — it\'s free')}
-            </Link>
-            <p className="hero-signin-hint">
-              {t('landing.heroSignInHint', 'Already have an account?')}{' '}
-              <Link to="/login" className="hero-signin-link">
-                {t('auth.signIn')}
+            <div className="hero-cta-group">
+              <Link to="/signup" className="btn btn-primary btn-lg">
+                {t('landing.heroCta', 'Get started — it\'s free')}
               </Link>
-            </p>
+              <p className="hero-signin-hint">
+                {t('landing.heroSignInHint', 'Already have an account?')}{' '}
+                <Link to="/login" className="hero-signin-link">
+                  {t('auth.signIn')}
+                </Link>
+              </p>
+            </div>
+          </div>
+
+          <div className="hero-visual">
+            <ConstellationGraphic className="hero-constellation" />
           </div>
         </div>
       </section>
@@ -80,7 +88,7 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* Value props */}
+      {/* Why it feels different */}
       <section className="container landing-section">
         <div className="landing-panel landing-panel--values">
           <h2 className="text-center mb-6">{t('landing.valueTitle')}</h2>

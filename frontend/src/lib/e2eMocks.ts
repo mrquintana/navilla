@@ -1,4 +1,5 @@
-export const E2E_MODE = import.meta.env.VITE_E2E_MODE === 'true';
+import { env } from './env';
+export const E2E_MODE = env.get('VITE_E2E_MODE') === 'true';
 
 export interface E2eUser {
   id: string;
