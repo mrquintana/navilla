@@ -84,7 +84,7 @@ export function Header() {
       <div className="container flex justify-between items-center h-full">
         {/* Logo - Bold and substantial */}
         <Link to="/" className="flex items-center gap-2 hover:no-underline">
-          <span className="text-2xl font-extrabold tracking-tight text-primary navbar-logo-text">
+          <span className="navbar-logo-text">
             {t('common.appName')}
           </span>
         </Link>
