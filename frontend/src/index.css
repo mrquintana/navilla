@@ -1,30 +1,25 @@
 @import "tailwindcss";
 
-/* Navilla Design System - Inspired by Docusaurus/Infima */
+/* Navilla Design System — Indigo + Warm Stone */
 :root {
-  /* Primary blue palette (Docusaurus style) */
-  --color-primary: #2563eb;
-  --color-primary-dark: #1d4ed8;
-  --color-primary-darker: #1e40af;
-  --color-primary-darkest: #1e3a8a;
-  --color-primary-light: #3b82f6;
-  --color-primary-lighter: #60a5fa;
-  --color-primary-lightest: #93c5fd;
+  /* Primary indigo palette */
+  --color-primary: #4f46e5;
+  --color-primary-dark: #4338ca;
+  --color-primary-darker: #3730a3;
+  --color-primary-darkest: #312e81;
+  --color-primary-light: #6366f1;
+  --color-primary-lighter: #818cf8;
+  --color-primary-lightest: #a5b4fc;
 
-  /* Neutral palette */
-  --color-background: #ffffff;
-  --color-background-secondary: #f6f8fa;
-  --color-foreground: #1c1e21;
-  --color-foreground-secondary: #606770;
-  --color-muted: #6e7681;
-  --color-border: #d0d7de;
-  --color-border-light: #e8ebef;
+  /* Neutral palette — warm stone */
+  --color-background: #fafaf9;
+  --color-background-secondary: #f5f5f4;
+  --color-foreground: #1c1917;
+  --color-foreground-secondary: #57534e;
+  --color-muted: #78716c;
+  --color-border: #d6d3d1;
+  --color-border-light: #e7e5e4;
 
-  /* Landing page design tokens */
-  --color-landing-bg: #f7f3ee;
-  --color-landing-accent: #6366f1;
-  --color-landing-accent-dark: #4f46e5;
-  --color-landing-text: #1a1612;
   --font-display: 'Fraunces', Georgia, serif;
 
   /* Semantic colors */
@@ -53,22 +48,22 @@ body {
   background:
     repeating-radial-gradient(
       circle at 16% 20%,
-      rgba(59, 130, 246, 0.038) 0 1px,
+      rgba(99, 102, 241, 0.038) 0 1px,
       transparent 1px 20px
     ),
     repeating-radial-gradient(
       circle at 84% 14%,
-      rgba(37, 99, 235, 0.03) 0 0.9px,
+      rgba(79, 70, 229, 0.03) 0 0.9px,
       transparent 0.9px 18px
     ),
     repeating-conic-gradient(
       from 0deg at 50% 46%,
-      rgba(147, 197, 253, 0.026) 0deg 7deg,
+      rgba(165, 180, 252, 0.026) 0deg 7deg,
       transparent 8deg 20deg
     ),
-    radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.07), transparent 45%),
-    radial-gradient(circle at 80% 0%, rgba(37, 99, 235, 0.055), transparent 40%),
-    linear-gradient(180deg, #f8fafc 0%, #e8f0fe 45%, #eef2ff 100%);
+    radial-gradient(circle at 20% 20%, rgba(99, 102, 241, 0.07), transparent 45%),
+    radial-gradient(circle at 80% 0%, rgba(79, 70, 229, 0.055), transparent 40%),
+    linear-gradient(180deg, #fafaf9 0%, #f5f5f4 45%, #f5f5f4 100%);
   background-size: 460px 460px, 380px 380px, 560px 560px, auto, auto, auto;
   background-position: 0 0, 34px 10px, 0 0, 0 0, 0 0, 0 0;
 }
@@ -77,69 +72,69 @@ body {
   background:
     repeating-radial-gradient(
       circle at 14% 18%,
-      rgba(59, 130, 246, 0.028) 0 0.9px,
+      rgba(99, 102, 241, 0.028) 0 0.9px,
       transparent 0.9px 18px
     ),
     repeating-radial-gradient(
       circle at 86% 14%,
-      rgba(37, 99, 235, 0.024) 0 0.8px,
+      rgba(79, 70, 229, 0.024) 0 0.8px,
       transparent 0.8px 16px
     ),
     repeating-conic-gradient(
       from 0deg at 50% 48%,
-      rgba(147, 197, 253, 0.021) 0deg 7deg,
+      rgba(165, 180, 252, 0.021) 0deg 7deg,
       transparent 8deg 20deg
     ),
-    radial-gradient(circle at 15% 15%, rgba(59, 130, 246, 0.04), transparent 50%),
-    radial-gradient(circle at 85% 0%, rgba(37, 99, 235, 0.03), transparent 45%),
-    linear-gradient(180deg, #fbfcff 0%, #f5f8ff 45%, #ffffff 100%);
+    radial-gradient(circle at 15% 15%, rgba(99, 102, 241, 0.04), transparent 50%),
+    radial-gradient(circle at 85% 0%, rgba(79, 70, 229, 0.03), transparent 45%),
+    linear-gradient(180deg, #fafaf9 0%, #f5f5f4 45%, #ffffff 100%);
   background-size: 520px 520px, 400px 400px, 620px 620px, auto, auto, auto;
   background-position: 0 0, 42px 10px, 0 0, 0 0, 0 0, 0 0;
 }
 
 /* Background patterns */
 .bg-pattern {
-  background-color: #f8fafc;
+  background-color: #fafaf9;
   background-image:
-    radial-gradient(at 40% 20%, rgba(37, 99, 235, 0.08) 0px, transparent 50%),
-    radial-gradient(at 80% 0%, rgba(59, 130, 246, 0.06) 0px, transparent 50%),
-    radial-gradient(at 0% 50%, rgba(37, 99, 235, 0.04) 0px, transparent 50%),
-    radial-gradient(at 80% 50%, rgba(96, 165, 250, 0.05) 0px, transparent 50%),
-    radial-gradient(at 0% 100%, rgba(37, 99, 235, 0.06) 0px, transparent 50%);
+    radial-gradient(at 40% 20%, rgba(79, 70, 229, 0.08) 0px, transparent 50%),
+    radial-gradient(at 80% 0%, rgba(99, 102, 241, 0.06) 0px, transparent 50%),
+    radial-gradient(at 0% 50%, rgba(79, 70, 229, 0.04) 0px, transparent 50%),
+    radial-gradient(at 80% 50%, rgba(129, 140, 248, 0.05) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, rgba(79, 70, 229, 0.06) 0px, transparent 50%);
 }
 
 .bg-auth-fractal {
-  background-color: #f7fbff;
+  background-color: #fafaf9;
   background-image:
     repeating-radial-gradient(
       circle at 14% 18%,
-      rgba(59, 130, 246, 0.026) 0 0.8px,
+      rgba(99, 102, 241, 0.026) 0 0.8px,
       transparent 0.8px 20px
     ),
     repeating-radial-gradient(
       circle at 82% 16%,
-      rgba(37, 99, 235, 0.022) 0 0.7px,
+      rgba(79, 70, 229, 0.022) 0 0.7px,
       transparent 0.7px 18px
     ),
     repeating-conic-gradient(
       from 0deg at 50% 48%,
-      rgba(147, 197, 253, 0.018) 0deg 7deg,
+      rgba(165, 180, 252, 0.018) 0deg 7deg,
       transparent 8deg 20deg
     ),
-    linear-gradient(180deg, #f8fbff 0%, #edf4ff 52%, #f6f9ff 100%);
+    linear-gradient(180deg, #fafaf9 0%, #f5f5f4 52%, #fafaf9 100%);
   background-size: 620px 620px, 480px 480px, 720px 720px, auto;
   background-position: 0 0, 36px 8px, 0 0, 0 0;
 }
 
 .bg-gradient-subtle {
-  background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 50%, #f1f5f9 100%);
+  background: linear-gradient(135deg, #fafaf9 0%, #f5f5f4 50%, #f5f5f4 100%);
 }
 
 .bg-mesh {
-  background-color: #f8fafc;
+  background-color: #fafaf9;
   background-image:
-    linear-gradient(rgba(37, 99, 235, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(37, 99, 235, 0.03) 1px, transparent 1px);
+    linear-gradient(rgba(79, 70, 229, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(79, 70, 229, 0.03) 1px, transparent 1px);
   background-size: 40px 40px;
 }
 
@@ -196,7 +191,7 @@ a:hover {
 
 .btn-primary:hover {
   background-color: var(--color-primary-dark);
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
 }
 
 .btn-primary:disabled {
@@ -212,7 +207,7 @@ a:hover {
 }
 
 .btn-secondary:hover {
-  background-color: rgba(37, 99, 235, 0.1);
+  background-color: rgba(79, 70, 229, 0.1);
   color: var(--color-primary-dark);
 }
 
@@ -265,7 +260,7 @@ a:hover {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(37, 99, 235, 0.02));
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(79, 70, 229, 0.02));
   pointer-events: none;
 }
 
@@ -282,7 +277,7 @@ a:hover {
   line-height: 1.5;
   color: var(--color-foreground);
   background-color: rgba(255, 255, 255, 0.9);
-  background-image: linear-gradient(135deg, rgba(59, 130, 246, 0.06), rgba(37, 99, 235, 0.01));
+  background-image: linear-gradient(135deg, rgba(99, 102, 241, 0.06), rgba(79, 70, 229, 0.01));
   background-blend-mode: soft-light;
   border: 1px solid var(--color-border);
   border-radius: 0.375rem;
@@ -309,7 +304,7 @@ a:hover {
 .input:focus {
   outline: none;
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
 }
 
 .input::placeholder {
@@ -326,7 +321,7 @@ a:hover {
 }
 
 select.input {
-  background-image: linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(37, 99, 235, 0.02));
+  background-image: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(79, 70, 229, 0.02));
   background-blend-mode: soft-light;
 }
 
@@ -334,7 +329,7 @@ select.input {
   border: 1px solid var(--color-border-light);
   border-radius: 0.75rem;
   padding: 0.85rem 1rem;
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(37, 99, 235, 0.015));
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(79, 70, 229, 0.015));
 }
 
 .connection-item--compact {
@@ -345,20 +340,20 @@ select.input {
   border: 1px solid var(--color-border-light);
   border-radius: 0.75rem;
   padding: 0.75rem 0.85rem;
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.04), rgba(37, 99, 235, 0.01));
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.04), rgba(79, 70, 229, 0.01));
 }
 
 .exposure-item {
   border: 1px solid var(--color-border-light);
   border-radius: 0.75rem;
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.06), rgba(37, 99, 235, 0.015));
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.06), rgba(79, 70, 229, 0.015));
   padding: 0.75rem 0.85rem;
 }
 
 .health-row-card {
   border: 1px solid var(--color-border-light);
   border-radius: 0.75rem;
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.06), rgba(37, 99, 235, 0.015));
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.06), rgba(79, 70, 229, 0.015));
   padding: 0.85rem 1rem;
 }
 
@@ -394,7 +389,7 @@ select.input {
 .alert-info {
   background-color: #eff6ff;
   border: 1px solid #bfdbfe;
-  color: #1e40af;
+  color: #3730a3;
 }
 
 /* ConstellationGraphic — breathing glow animation */
@@ -468,7 +463,7 @@ select.input {
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--color-landing-accent);
+  color: var(--color-primary-light);
   margin: 0 0 1.25rem;
 }
 
@@ -477,7 +472,7 @@ select.input {
   font-size: clamp(2.75rem, 5vw, 4.25rem);
   font-weight: 700;
   font-optical-sizing: auto;
-  color: var(--color-landing-text);
+  color: var(--color-foreground);
   letter-spacing: -0.025em;
   line-height: 1.05;
   margin: 0 0 1rem;
@@ -488,7 +483,7 @@ select.input {
   font-size: clamp(1.125rem, 2vw, 1.375rem);
   font-weight: 400;
   font-style: italic;
-  color: var(--color-landing-accent);
+  color: var(--color-primary-light);
   margin: 0 0 1.5rem;
   line-height: 1.4;
 }
@@ -531,7 +526,7 @@ select.input {
 }
 
 .hero-signin-link {
-  color: var(--color-landing-accent);
+  color: var(--color-primary-light);
   font-weight: 600;
   text-decoration: none;
   transition: opacity 0.15s;
@@ -578,7 +573,7 @@ select.input {
   grid-template-columns: 1fr auto;
   gap: 3rem;
   align-items: center;
-  background: linear-gradient(135deg, var(--color-foreground) 0%, #1e3a8a 100%);
+  background: linear-gradient(135deg, var(--color-foreground) 0%, #312e81 100%);
   border-radius: 1.25rem;
   padding: 3rem 3rem 3rem 3.5rem;
   color: white;
@@ -608,7 +603,7 @@ select.input {
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: rgba(147, 197, 253, 0.9);
+  color: rgba(165, 180, 252, 0.9);
   margin: 0 0 0.875rem;
 }
 
@@ -778,7 +773,7 @@ select.input {
   overflow: hidden;
   padding: 1.15rem 1.2rem 1.2rem;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 251, 255, 0.94));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(250, 250, 249, 0.94));
   border: 1px solid rgba(15, 23, 42, 0.08);
   border-radius: 0.9rem;
   box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
@@ -821,7 +816,7 @@ select.input {
 }
 
 .landing-section .feature-kicker {
-  color: var(--color-landing-accent);
+  color: var(--color-primary-light);
 }
 
 .feature-icon {
@@ -834,7 +829,7 @@ select.input {
 }
 
 .landing-section .feature-icon {
-  color: var(--color-landing-accent);
+  color: var(--color-primary-light);
   background: rgba(99, 102, 241, 0.06);
   border: 1px solid rgba(99, 102, 241, 0.14);
 }
@@ -864,7 +859,7 @@ select.input {
   width: 56px;
   height: 56px;
   border-radius: 16px;
-  background: rgba(59, 130, 246, 0.15);
+  background: rgba(99, 102, 241, 0.15);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -954,15 +949,15 @@ select.input {
   background:
     repeating-radial-gradient(
       circle at 10% 25%,
-      rgba(37, 99, 235, 0.02) 0 0.8px,
+      rgba(79, 70, 229, 0.02) 0 0.8px,
       transparent 0.8px 16px
     ),
     repeating-radial-gradient(
       circle at 88% 18%,
-      rgba(59, 130, 246, 0.018) 0 0.8px,
+      rgba(99, 102, 241, 0.018) 0 0.8px,
       transparent 0.8px 15px
     ),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(246, 250, 255, 0.93));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(250, 250, 249, 0.93));
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   height: 60px;
   position: sticky;
@@ -980,7 +975,7 @@ select.input {
 }
 
 .navbar--transparent .navbar-logo-text {
-  color: var(--color-landing-text);
+  color: var(--color-foreground);
 }
 
 .navbar--transparent .nav-link {
@@ -988,7 +983,7 @@ select.input {
 }
 
 .navbar--transparent .nav-link:hover {
-  color: var(--color-landing-accent);
+  color: var(--color-primary-light);
   background-color: rgba(99, 102, 241, 0.08);
 }
 
@@ -1014,12 +1009,12 @@ select.input {
 
 .nav-link:hover {
   color: var(--color-primary);
-  background-color: rgba(37, 99, 235, 0.08);
+  background-color: rgba(79, 70, 229, 0.08);
 }
 
 .nav-link-active {
   color: var(--color-primary);
-  background-color: rgba(37, 99, 235, 0.1);
+  background-color: rgba(79, 70, 229, 0.1);
 }
 
 .nav-icon {
@@ -1072,7 +1067,7 @@ select.input {
   width: 10px;
   height: 10px;
   border-radius: 9999px;
-  background-color: rgba(37, 99, 235, 0.6);
+  background-color: rgba(79, 70, 229, 0.6);
 }
 
 .nav-username {
@@ -1171,13 +1166,13 @@ select.input {
 }
 
 .nav-dropdown-item:hover {
-  background-color: rgba(37, 99, 235, 0.08);
+  background-color: rgba(79, 70, 229, 0.08);
   color: var(--color-primary);
 }
 
 .nav-dropdown-item-active {
   color: var(--color-primary);
-  background-color: rgba(37, 99, 235, 0.1);
+  background-color: rgba(79, 70, 229, 0.1);
 }
 
 .nav-notifications-dropdown {
@@ -1206,8 +1201,8 @@ select.input {
 }
 
 .nav-notification-item-unread {
-  border-color: rgba(37, 99, 235, 0.25);
-  background-color: rgba(37, 99, 235, 0.04);
+  border-color: rgba(79, 70, 229, 0.25);
+  background-color: rgba(79, 70, 229, 0.04);
 }
 
 .notification-toolbar {
@@ -1232,13 +1227,13 @@ select.input {
 }
 
 .notification-filter-btn:hover {
-  border-color: rgba(37, 99, 235, 0.35);
+  border-color: rgba(79, 70, 229, 0.35);
   color: var(--color-primary);
 }
 
 .notification-filter-btn-active {
   border-color: transparent;
-  background: rgba(37, 99, 235, 0.12);
+  background: rgba(79, 70, 229, 0.12);
   color: var(--color-primary);
 }
 
@@ -1253,8 +1248,8 @@ select.input {
 }
 
 .notification-row-unread {
-  border-color: rgba(37, 99, 235, 0.28);
-  background-color: rgba(37, 99, 235, 0.04);
+  border-color: rgba(79, 70, 229, 0.28);
+  background-color: rgba(79, 70, 229, 0.04);
 }
 
 .notification-row-icon {
@@ -1265,7 +1260,7 @@ select.input {
   align-items: center;
   justify-content: center;
   color: var(--color-primary);
-  background: rgba(37, 99, 235, 0.12);
+  background: rgba(79, 70, 229, 0.12);
 }
 
 .notification-row-content {
@@ -1289,13 +1284,13 @@ select.input {
 
 /* Footer */
 .footer {
-  background-color: #1f2937;
-  color: #e5e7eb;
+  background-color: #1c1917;
+  color: #e7e5e4;
   padding: 3rem 1rem 2.5rem;
 }
 
 .footer a {
-  color: #cbd5f5;
+  color: #c7d2fe;
 }
 
 .footer a:hover {
@@ -1337,7 +1332,7 @@ select.input {
 
 .footer-tagline {
   font-weight: 600;
-  color: #93c5fd;
+  color: #a5b4fc;
 }
 
 /* Container */
@@ -1374,7 +1369,7 @@ select.input {
 
 .badge-info {
   background-color: #eff6ff;
-  color: #1d4ed8;
+  color: #4338ca;
 }
 
 /* Divider */
@@ -1414,7 +1409,7 @@ select.input {
 .spinner {
   width: 18px;
   height: 18px;
-  border: 2px solid rgba(37, 99, 235, 0.2);
+  border: 2px solid rgba(79, 70, 229, 0.2);
   border-top-color: var(--color-primary);
   border-radius: 9999px;
   animation: spin 0.7s linear infinite;
@@ -1577,7 +1572,7 @@ select.input {
 
 .calculator-date-input:focus {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
 }
 
 .calculator-date-hint {
@@ -1626,7 +1621,7 @@ select.input {
   font-size: 0.75rem;
   font-weight: 600;
   color: var(--color-primary);
-  background: rgba(37, 99, 235, 0.08);
+  background: rgba(79, 70, 229, 0.08);
   padding: 0.25rem 0.625rem;
   border-radius: 99px;
 }
@@ -1758,8 +1753,8 @@ select.input {
 
 /* Clinic CTA */
 .calculator-clinic-cta {
-  background: linear-gradient(135deg, rgba(37, 99, 235, 0.06), rgba(59, 130, 246, 0.04));
-  border: 1.5px solid rgba(37, 99, 235, 0.16);
+  background: linear-gradient(135deg, rgba(79, 70, 229, 0.06), rgba(99, 102, 241, 0.04));
+  border: 1.5px solid rgba(79, 70, 229, 0.16);
   border-radius: 0.875rem;
   padding: 1.5rem;
   margin-bottom: 1.5rem;
@@ -1921,8 +1916,8 @@ select.input {
 
 /* Window period callout */
 .guide-window-callout {
-  background: linear-gradient(135deg, rgba(37, 99, 235, 0.07), rgba(59, 130, 246, 0.04));
-  border: 1.5px solid rgba(37, 99, 235, 0.16);
+  background: linear-gradient(135deg, rgba(79, 70, 229, 0.07), rgba(99, 102, 241, 0.04));
+  border: 1.5px solid rgba(79, 70, 229, 0.16);
   border-radius: 0.875rem;
   padding: 1.25rem 1.5rem;
   display: flex;
@@ -1941,7 +1936,7 @@ select.input {
 .guide-window-callout-icon {
   width: 2.5rem;
   height: 2.5rem;
-  background: rgba(37, 99, 235, 0.1);
+  background: rgba(79, 70, 229, 0.1);
   border-radius: 0.5rem;
   display: flex;
   align-items: center;
@@ -2070,7 +2065,7 @@ select.input {
 
 /* Sign-up CTA */
 .guide-cta {
-  background: linear-gradient(135deg, var(--color-foreground) 0%, #1e3a8a 100%);
+  background: linear-gradient(135deg, var(--color-foreground) 0%, #312e81 100%);
   border-radius: 1rem;
   padding: 2rem;
   color: white;
@@ -2164,7 +2159,7 @@ select.input {
 
 .guide-card:hover {
   border-color: var(--color-primary);
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.1);
   transform: translateY(-1px);
 }
 
