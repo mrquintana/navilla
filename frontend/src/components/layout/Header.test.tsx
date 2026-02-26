@@ -108,3 +108,29 @@ describe('Header', () => {
     expect(container.querySelector('.nav-mobile-badge')).toBeNull();
   });
 });
+
+describe('Header — transparent landing variant', () => {
+  beforeEach(() => {
+    useAuthOptionalMock.mockReturnValue({ session: null, signOut: vi.fn() });
+    useUserMock.mockReturnValue({ data: undefined });
+    useQueryMock.mockReturnValue({ data: undefined });
+  });
+
+  it('has navbar--transparent class on landing page when not scrolled', () => {
+    const { container } = render(
+      <MemoryRouter initialEntries={['/']}>
+        <Header />
+      </MemoryRouter>
+    );
+    expect(container.querySelector('header')?.classList.contains('navbar--transparent')).toBe(true);
+  });
+
+  it('does NOT have navbar--transparent class on non-landing pages', () => {
+    const { container } = render(
+      <MemoryRouter initialEntries={['/guides']}>
+        <Header />
+      </MemoryRouter>
+    );
+    expect(container.querySelector('header')?.classList.contains('navbar--transparent')).toBe(false);
+  });
+});

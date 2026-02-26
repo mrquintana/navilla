@@ -16,6 +16,20 @@ export function Header() {
   const token = session?.access_token ?? '';
   const { data: profile } = useUser();
   const { pathname } = useLocation();
+  const isLanding = pathname === '/';
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    if (!isLanding) {
+      setScrolled(false);
+      return;
+    }
+    const onScroll = () => setScrolled(window.scrollY > 48);
+    onScroll(); // set initial state
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [isLanding]);
+
   const { data: notifications } = useQuery({
     queryKey: ['notifications'],
     queryFn: () => api.notifications.list(token),
@@ -65,11 +79,11 @@ export function Header() {
   }, []);
 
   return (
-    <header className="navbar border-b border-border-light">
+    <header className={`navbar${isLanding && !scrolled ? ' navbar--transparent' : ' border-b border-border-light'}`}>
       <div className="container flex justify-between items-center h-full">
         {/* Logo - Bold and substantial */}
         <Link to="/" className="flex items-center gap-2 hover:no-underline">
-          <span className="text-2xl font-extrabold tracking-tight text-primary">
+          <span className="text-2xl font-extrabold tracking-tight text-primary navbar-logo-text">
             {t('common.appName')}
           </span>
         </Link>
