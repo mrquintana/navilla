@@ -215,7 +215,7 @@ export function ProfilePage() {
   return (
     <div className="container py-8 space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-        <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden">
+        <div className="w-12 h-12 rounded-full bg-stone-100 flex items-center justify-center overflow-hidden">
           {avatarUrl ? (
             <img src={avatarUrl} alt={t('profile.avatarAlt')} className="w-full h-full object-cover" />
           ) : (
@@ -231,7 +231,7 @@ export function ProfilePage() {
       <div className="card card-elevated">
         <h3 className="font-semibold mb-4">{t('profile.avatar')}</h3>
         <div className="flex items-center gap-4">
-          <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden">
+          <div className="w-20 h-20 rounded-full bg-stone-100 flex items-center justify-center overflow-hidden">
             {avatarUrl ? (
               <img src={avatarUrl} alt={t('profile.avatarAlt')} className="w-full h-full object-cover" />
             ) : (

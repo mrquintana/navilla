@@ -67,11 +67,11 @@ function ConnectionList({
             return (
               <div
                 key={connection.id}
-                className={`connection-item ${compact ? 'connection-item--compact space-y-2' : 'space-y-3'}${focusedConnectionId === connection.id ? ' ring-2 ring-indigo-300' : ''}`}
+                className={`connection-item ${compact ? 'connection-item--compact space-y-2' : 'space-y-3'}${focusedConnectionId === connection.id ? ' ring-2 ring-primary/30' : ''}`}
               >
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
-                    <div className={`${compact ? 'w-9 h-9' : 'w-10 h-10'} rounded-full bg-gray-100 flex items-center justify-center overflow-hidden`}>
+                    <div className={`${compact ? 'w-9 h-9' : 'w-10 h-10'} rounded-full bg-stone-100 flex items-center justify-center overflow-hidden`}>
                       {connection.partnerAvatarThumbUrl ? (
                         <img
                           src={connection.partnerAvatarThumbUrl}

@@ -184,8 +184,8 @@ export function SignUpPage() {
 
       {/* Progress indicator */}
       <div className="flex gap-2 mb-6">
-        <div className={`h-1 flex-1 rounded ${step >= 1 ? 'bg-primary' : 'bg-gray-200'}`} />
-        <div className={`h-1 flex-1 rounded ${step >= 2 ? 'bg-primary' : 'bg-gray-200'}`} />
+        <div className={`h-1 flex-1 rounded ${step >= 1 ? 'bg-primary' : 'bg-stone-200'}`} />
+        <div className={`h-1 flex-1 rounded ${step >= 2 ? 'bg-primary' : 'bg-stone-200'}`} />
       </div>
 
       <form onSubmit={step === 1 ? (e) => { e.preventDefault(); handleNextStep(); } : handleSubmit}>
