@@ -10,6 +10,8 @@ import {
   LockKeyhole,
   ArrowRight,
   CircleHelp,
+  Calculator,
+  BookOpen,
 } from 'lucide-react';
 import { ConstellationGraphic } from '../components/landing/ConstellationGraphic';
 
@@ -140,12 +142,47 @@ export function HomePage() {
         </div>
       </section>
 
+      {/* Explore — Layer 0 tools */}
+      <section className="container landing-section landing-section--explore">
+        <div className="landing-panel landing-panel--values">
+          <h2 className="text-center mb-6">{t('landing.exploreTitle', 'Explore before you sign up')}</h2>
+          <div className="landing-grid landing-grid--explore">
+            <Link to="/calculator" className="feature-card feature-card--explore">
+              <div className="feature-card-head feature-card-head--icon-only">
+                <span className="feature-icon" aria-hidden="true">
+                  <Calculator className="w-4 h-4" />
+                </span>
+              </div>
+              <h3>{t('landing.exploreCalculatorTitle', 'When should I test?')}</h3>
+              <p>{t('landing.exploreCalculatorBody', 'Enter a date and see exactly when each test becomes reliable.')}</p>
+              <span className="feature-card-cta">
+                {t('landing.exploreCalculatorCta', 'Open calculator')}
+                <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
+              </span>
+            </Link>
+            <Link to="/guides" className="feature-card feature-card--explore">
+              <div className="feature-card-head feature-card-head--icon-only">
+                <span className="feature-icon" aria-hidden="true">
+                  <BookOpen className="w-4 h-4" />
+                </span>
+              </div>
+              <h3>{t('landing.exploreGuidesTitle', 'Learn about STIs')}</h3>
+              <p>{t('landing.exploreGuidesBody', 'Clear guides on 10 conditions — symptoms, testing, treatment.')}</p>
+              <span className="feature-card-cta">
+                {t('landing.exploreGuidesCta', 'Browse guides')}
+                <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
+              </span>
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* FAQ preview */}
       <section className="container landing-section">
         <div className="landing-panel landing-panel--values">
           <h2 className="text-center mb-6">{t('landing.faqTitle', 'Questions people ask first')}</h2>
           <div className="landing-grid landing-grid--values">
-            {[1, 2, 3, 4].map((item) => (
+            {[1, 2, 3].map((item) => (
               <div key={item} className="feature-card feature-card--value">
                 <div className="feature-card-head feature-card-head--icon-only">
                   <span className="feature-icon" aria-hidden="true">

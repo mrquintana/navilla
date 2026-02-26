@@ -1023,6 +1023,42 @@ section.hero + section {
   line-height: 1.55;
 }
 
+/* Explore tools section — 2-column grid */
+.landing-grid--explore {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(2, 1fr);
+}
+
+@media (max-width: 580px) {
+  .landing-grid--explore {
+    grid-template-columns: 1fr;
+  }
+}
+
+.feature-card--explore {
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.feature-card--explore:hover .feature-card-cta {
+  color: var(--color-primary);
+}
+
+.feature-card-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin-top: auto;
+  padding-top: 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-primary-light);
+  transition: color 0.2s ease;
+}
 
 .profile-card-header {
   display: grid;
