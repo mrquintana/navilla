@@ -91,6 +91,11 @@ export function HomePage() {
               <p>{t('landing.stepThreeBody')}</p>
             </div>
           </div>
+          <div className="text-center mt-6">
+            <Link to="/how-it-works" className="btn btn-secondary">
+              {t('landing.howMore', 'How it works in detail')}
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -126,6 +131,11 @@ export function HomePage() {
               <h3>{t('landing.valueThreeTitle')}</h3>
               <p>{t('landing.valueThreeBody')}</p>
             </div>
+          </div>
+          <div className="text-center mt-6">
+            <Link to="/privacy" className="btn btn-secondary">
+              {t('landing.valueMore', 'Privacy details')}
+            </Link>
           </div>
         </div>
       </section>
