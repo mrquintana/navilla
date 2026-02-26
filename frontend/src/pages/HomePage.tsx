@@ -47,7 +47,7 @@ export function HomePage() {
       </section>
 
       {/* How it works */}
-      <section className="container py-12 landing-section">
+      <section className="container py-12 landing-section landing-section--steps">
         <div className="landing-panel landing-panel--steps">
           <h2 className="text-center mb-6">{t('landing.howTitle')}</h2>
           <div className="landing-grid landing-grid--steps">
@@ -86,7 +86,7 @@ export function HomePage() {
       </section>
 
       {/* Why it feels different */}
-      <section className="container landing-section">
+      <section className="container landing-section landing-section--values">
         <div className="landing-panel landing-panel--values">
           <h2 className="text-center mb-6">{t('landing.valueTitle')}</h2>
           <div className="landing-grid landing-grid--values">

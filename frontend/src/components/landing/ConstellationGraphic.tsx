@@ -13,10 +13,17 @@ export function ConstellationGraphic({ className }: ConstellationGraphicProps) {
       aria-hidden="true"
       role="presentation"
     >
+      <defs>
+        <linearGradient id="constellation-line-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="rgba(255,255,255,0.16)" />
+          <stop offset="50%" stopColor="rgba(255,255,255,0.28)" />
+          <stop offset="100%" stopColor="rgba(255,255,255,0.12)" />
+        </linearGradient>
+      </defs>
       {/* ─── Connection lines ─── */}
 
       {/* Primary hub connections (thicker) */}
-      <g stroke="rgba(255,255,255,0.2)" strokeWidth="1.5" strokeLinecap="round">
+      <g className="constellation-layer-mid constellation-lines-active" stroke="url(#constellation-line-gradient)" strokeWidth="1.5" strokeLinecap="round">
         <line x1="210" y1="205" x2="145" y2="165" />
         <line x1="210" y1="205" x2="270" y2="155" />
         <line x1="210" y1="205" x2="280" y2="240" />
@@ -27,7 +34,7 @@ export function ConstellationGraphic({ className }: ConstellationGraphicProps) {
       </g>
 
       {/* Central cluster connections */}
-      <g stroke="rgba(255,255,255,0.2)" strokeWidth="1" strokeLinecap="round">
+      <g className="constellation-layer-mid" stroke="rgba(255,255,255,0.2)" strokeWidth="1" strokeLinecap="round">
         <line x1="145" y1="165" x2="155" y2="225" />
         <line x1="145" y1="165" x2="190" y2="148" />
         <line x1="155" y1="225" x2="175" y2="270" />
@@ -41,7 +48,7 @@ export function ConstellationGraphic({ className }: ConstellationGraphicProps) {
       </g>
 
       {/* Upper-left cluster */}
-      <g stroke="rgba(255,255,255,0.2)" strokeWidth="1" strokeLinecap="round">
+      <g className="constellation-layer-back" stroke="rgba(255,255,255,0.2)" strokeWidth="1" strokeLinecap="round">
         <line x1="95" y1="115" x2="120" y2="85" />
         <line x1="95" y1="115" x2="70" y2="140" />
         <line x1="95" y1="115" x2="130" y2="140" />
@@ -56,7 +63,7 @@ export function ConstellationGraphic({ className }: ConstellationGraphicProps) {
       </g>
 
       {/* Lower-right cluster */}
-      <g stroke="rgba(255,255,255,0.2)" strokeWidth="1" strokeLinecap="round">
+      <g className="constellation-layer-front" stroke="rgba(255,255,255,0.2)" strokeWidth="1" strokeLinecap="round">
         <line x1="320" y1="305" x2="350" y2="280" />
         <line x1="320" y1="305" x2="290" y2="330" />
         <line x1="320" y1="305" x2="355" y2="330" />
@@ -70,7 +77,7 @@ export function ConstellationGraphic({ className }: ConstellationGraphicProps) {
       </g>
 
       {/* Bridge lines between clusters */}
-      <g stroke="rgba(255,255,255,0.2)" strokeWidth="1" strokeLinecap="round">
+      <g className="constellation-layer-mid constellation-lines-active" stroke="rgba(255,255,255,0.2)" strokeWidth="1" strokeLinecap="round">
         <line x1="270" y1="155" x2="310" y2="120" />
         <line x1="310" y1="120" x2="350" y2="100" />
         <line x1="310" y1="120" x2="340" y2="155" />
@@ -83,7 +90,7 @@ export function ConstellationGraphic({ className }: ConstellationGraphicProps) {
       </g>
 
       {/* Peripheral whisker lines */}
-      <g stroke="rgba(255,255,255,0.12)" strokeWidth="1" strokeLinecap="round">
+      <g className="constellation-layer-back" stroke="rgba(255,255,255,0.12)" strokeWidth="1" strokeLinecap="round">
         <line x1="350" y1="100" x2="385" y2="75" />
         <line x1="370" y1="255" x2="400" y2="260" />
         <line x1="40" y1="165" x2="30" y2="200" />
@@ -99,22 +106,22 @@ export function ConstellationGraphic({ className }: ConstellationGraphicProps) {
       <circle cx="320" cy="305" r="16" fill="rgba(255,255,255,0.05)" className="constellation-pulse-delay-2" />
 
       {/* ─── Primary hub node ─── */}
-      <circle cx="210" cy="205" r="10" fill="#ffffff" />
+      <circle cx="210" cy="205" r="10" fill="#ffffff" className="constellation-star-strong" />
 
       {/* ─── Secondary hub nodes ─── */}
-      <circle cx="95" cy="115" r="7" fill="#e0e7ff" />
-      <circle cx="270" cy="155" r="6.5" fill="#e0e7ff" />
+      <circle cx="95" cy="115" r="7" fill="#e0e7ff" className="constellation-star-strong constellation-star-delay" />
+      <circle cx="270" cy="155" r="6.5" fill="#e0e7ff" className="constellation-star-strong constellation-star-delay-2" />
       <circle cx="155" cy="225" r="6.5" fill="#e0e7ff" />
-      <circle cx="320" cy="305" r="7" fill="#e0e7ff" />
+      <circle cx="320" cy="305" r="7" fill="#e0e7ff" className="constellation-star-strong constellation-star-delay" />
       <circle cx="280" cy="240" r="6" fill="#ddd6fe" />
       <circle cx="175" cy="270" r="6" fill="#ddd6fe" />
 
       {/* ─── Mid-range nodes ─── */}
       <circle cx="145" cy="165" r="5" fill="#c7d2fe" />
-      <circle cx="240" cy="165" r="4.5" fill="#c7d2fe" />
+      <circle cx="240" cy="165" r="4.5" fill="#c7d2fe" className="constellation-star-delay-2" />
       <circle cx="230" cy="260" r="4.5" fill="#c7d2fe" />
       <circle cx="190" cy="148" r="4" fill="#c7d2fe" />
-      <circle cx="310" cy="120" r="4.5" fill="#c7d2fe" />
+      <circle cx="310" cy="120" r="4.5" fill="#c7d2fe" className="constellation-star-delay" />
       <circle cx="350" cy="280" r="4" fill="#c7d2fe" />
       <circle cx="290" cy="330" r="4" fill="#c7d2fe" />
       <circle cx="130" cy="140" r="4" fill="rgba(255,255,255,0.6)" />
@@ -127,11 +134,11 @@ export function ConstellationGraphic({ className }: ConstellationGraphicProps) {
       <circle cx="155" cy="95" r="3.5" fill="rgba(255,255,255,0.5)" />
 
       {/* ─── Peripheral nodes ─── */}
-      <circle cx="70" cy="140" r="3" fill="rgba(255,255,255,0.35)" />
+      <circle cx="70" cy="140" r="3" fill="rgba(255,255,255,0.35)" className="constellation-star-delay" />
       <circle cx="40" cy="165" r="2.5" fill="rgba(255,255,255,0.25)" />
       <circle cx="30" cy="200" r="2" fill="rgba(255,255,255,0.2)" />
       <circle cx="75" cy="60" r="2.5" fill="rgba(255,255,255,0.25)" />
-      <circle cx="350" cy="100" r="3" fill="rgba(255,255,255,0.35)" />
+      <circle cx="350" cy="100" r="3" fill="rgba(255,255,255,0.35)" className="constellation-star-delay-2" />
       <circle cx="385" cy="75" r="2" fill="rgba(255,255,255,0.2)" />
       <circle cx="370" cy="255" r="2.5" fill="rgba(255,255,255,0.25)" />
       <circle cx="400" cy="260" r="2" fill="rgba(255,255,255,0.2)" />
