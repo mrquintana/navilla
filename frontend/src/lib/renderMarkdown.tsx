@@ -9,7 +9,7 @@ import React from 'react';
  *   Blank lines → flush pending list, act as paragraph separator
  */
 export function renderMarkdown(text: string): React.ReactNode {
-  if (!text) return null;
+  if (!text.trim()) return null;
 
   const lines = text.split('\n');
   const elements: React.ReactNode[] = [];
