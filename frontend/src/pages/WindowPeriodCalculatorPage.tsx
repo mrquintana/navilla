@@ -170,6 +170,29 @@ export function WindowPeriodCalculatorPage() {
                           <Link to={`/guide/${slug}`} className="calculator-condition-link">
                             {sti.title[lang]}
                           </Link>
+                          {result.status !== 'no-standard-test' && (
+                            <div className="calculator-progress-wrap">
+                              <span className="calculator-progress-label">
+                                {result.daysWaited} / {windowPeriod.minDays}{' '}
+                                {lang === 'es' ? 'días' : 'days'}
+                              </span>
+                              <div
+                                className="calculator-progress-bar"
+                                role="progressbar"
+                                aria-valuenow={result.daysWaited}
+                                aria-valuemin={0}
+                                aria-valuemax={windowPeriod.minDays}
+                                aria-label={`${sti.title[lang]} testing window progress`}
+                              >
+                                <div
+                                  className={`calculator-progress-fill calculator-progress-fill--${result.status}`}
+                                  style={{
+                                    width: `${Math.min(100, (result.daysWaited / windowPeriod.minDays) * 100)}%`,
+                                  }}
+                                />
+                              </div>
+                            </div>
+                          )}
                         </span>
 
                         <span role="cell" className="calculator-cell-window">
