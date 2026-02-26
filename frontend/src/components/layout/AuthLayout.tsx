@@ -1,6 +1,7 @@
 import { Outlet, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Footer } from './Footer';
+import { CookieNoticeBanner } from '../privacy/CookieNoticeBanner';
 
 export function AuthLayout() {
   const { t } = useTranslation();
@@ -18,6 +19,7 @@ export function AuthLayout() {
         </div>
       </main>
       <Footer />
+      <CookieNoticeBanner />
     </div>
   );
 }

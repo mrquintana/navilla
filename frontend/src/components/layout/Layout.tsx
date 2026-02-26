@@ -8,6 +8,7 @@ import { api, API_URL } from '../../lib/api';
 import { env } from '../../lib/env';
 import { useAuthOptional } from '../../contexts/AuthContext';
 import { useEffect, useRef } from 'react';
+import { CookieNoticeBanner } from '../privacy/CookieNoticeBanner';
 
 export function Layout() {
   const { t } = useTranslation();
@@ -85,6 +86,7 @@ export function Layout() {
         )}
       </main>
       <Footer />
+      <CookieNoticeBanner />
     </div>
   );
 }

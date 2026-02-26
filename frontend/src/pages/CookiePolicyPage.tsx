@@ -32,7 +32,7 @@ export function CookiePolicyPage() {
         },
         {
           heading: 'Managing cookies',
-          body: 'You can clear cookies at any time through your browser settings. Clearing your session cookie will log you out of Navilla. Since we only use essential cookies, a cookie consent banner is not required under most privacy frameworks.',
+          body: 'You can clear cookies at any time through your browser settings. Clearing your session cookie will log you out of Navilla. We show a lightweight cookie notice for transparency, even though we currently use essential cookies only.',
         },
         {
           heading: 'Questions',

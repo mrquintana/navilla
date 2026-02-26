@@ -79,8 +79,12 @@ export function Header() {
     return () => document.removeEventListener('mousedown', handleClick);
   }, []);
 
+  const navbarStateClass = isLanding
+    ? (scrolled ? 'navbar--landing-scrolled' : 'navbar--landing-top')
+    : 'navbar--app';
+
   return (
-    <header className={`navbar${isLanding && !scrolled ? ' navbar--transparent' : ' border-b border-border-light'}`}>
+    <header className={`navbar ${navbarStateClass}`}>
       <div className="container flex justify-between items-center h-full">
         {/* Logo - Bold and substantial */}
         <Link to="/" className="flex items-center gap-2 hover:no-underline">

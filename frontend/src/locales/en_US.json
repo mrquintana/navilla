@@ -472,6 +472,12 @@
     "findClinicCta": "Find a clinic near you",
     "sourcesLabel": "Sources"
   },
+  "cookieNotice": {
+    "ariaLabel": "Cookie notice",
+    "body": "We use essential cookies for login and security. We do not use advertising or tracking cookies.",
+    "link": "Learn more",
+    "ack": "Got it"
+  },
   "contact": {
     "pageTitle": "Contact — Navilla",
     "metaDescription": "Get in touch with the Navilla team. We'd love to hear from you.",

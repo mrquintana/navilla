@@ -1123,33 +1123,57 @@ section.hero + section {
 
 /* Navbar - Infima style */
 .navbar {
-  background: #f5f5f4;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  background: rgba(250, 250, 249, 0.82);
+  backdrop-filter: saturate(145%) blur(10px);
+  -webkit-backdrop-filter: saturate(145%) blur(10px);
+  border-bottom: 1px solid rgba(214, 211, 209, 0.55);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
   height: 60px;
   position: sticky;
   top: 0;
   z-index: 100;
-  transition: background 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  transition:
+    background-color 0.26s ease,
+    border-color 0.26s ease,
+    box-shadow 0.26s ease,
+    backdrop-filter 0.26s ease;
 }
 
-/* Transparent navbar variant — landing page hero overlay */
-.navbar--transparent {
-  background: transparent;
+/* Landing top: dark glass over hero for stronger integration */
+.navbar--landing-top {
+  background: rgba(15, 23, 42, 0.34);
+  border-bottom-color: rgba(255, 255, 255, 0.14);
   box-shadow: none;
-  border-bottom-color: transparent;
+  backdrop-filter: saturate(130%) blur(7px);
+  -webkit-backdrop-filter: saturate(130%) blur(7px);
 }
 
-.navbar--transparent .navbar-logo-text {
+.navbar--landing-top .navbar-logo-text {
   color: #ffffff;
 }
 
-.navbar--transparent .nav-link {
+.navbar--landing-top .nav-link {
   color: rgba(255, 255, 255, 0.85);
 }
 
-.navbar--transparent .nav-link:hover {
+.navbar--landing-top .nav-link:hover {
   color: #ffffff;
   background-color: rgba(255, 255, 255, 0.1);
+}
+
+.navbar--landing-top .nav-link-active {
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.16);
+}
+
+/* Landing after scroll and all app pages share warm glass chrome */
+.navbar--landing-scrolled,
+.navbar--app {
+  background: rgba(250, 250, 249, 0.82);
+  border-bottom-color: rgba(214, 211, 209, 0.56);
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.07);
+  backdrop-filter: saturate(145%) blur(10px);
+  -webkit-backdrop-filter: saturate(145%) blur(10px);
 }
 
 .navbar-logo-text {
@@ -1506,6 +1530,46 @@ section.hero + section {
 .footer-tagline {
   font-weight: 600;
   color: #a5b4fc;
+}
+
+.cookie-notice {
+  position: fixed;
+  left: 1rem;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 140;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.85rem;
+  background: rgba(28, 25, 23, 0.96);
+  border: 1px solid rgba(199, 210, 254, 0.24);
+  border-radius: 0.85rem;
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.3);
+  padding: 0.75rem 0.9rem;
+}
+
+.cookie-notice-text {
+  margin: 0;
+  color: #e7e5e4;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.cookie-notice-link {
+  color: #c7d2fe;
+  text-decoration: underline;
+}
+
+.cookie-notice-link:hover {
+  color: #ffffff;
+}
+
+@media (max-width: 640px) {
+  .cookie-notice {
+    flex-direction: column;
+    align-items: stretch;
+  }
 }
 
 /* Container */
