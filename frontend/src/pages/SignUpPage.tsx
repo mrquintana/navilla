@@ -156,7 +156,7 @@ export function SignUpPage() {
     return (
       <div className="card card-elevated text-center" style={{ maxWidth: '400px', margin: '0 auto' }}>
         <div className="mb-4">
-          <svg className="mx-auto" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2">
+          <svg className="mx-auto" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" strokeWidth="2">
             <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
             <polyline points="22 4 12 14.01 9 11.01" />
           </svg>

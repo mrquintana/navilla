@@ -67,7 +67,7 @@ function ConnectionList({
             return (
               <div
                 key={connection.id}
-                className={`connection-item ${compact ? 'connection-item--compact space-y-2' : 'space-y-3'}${focusedConnectionId === connection.id ? ' ring-2 ring-blue-300' : ''}`}
+                className={`connection-item ${compact ? 'connection-item--compact space-y-2' : 'space-y-3'}${focusedConnectionId === connection.id ? ' ring-2 ring-indigo-300' : ''}`}
               >
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-3">

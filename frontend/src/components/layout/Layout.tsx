@@ -45,7 +45,7 @@ export function Layout() {
         </div>
       )}
       {DEV_MODE && (
-        <div className="bg-blue-600 text-white text-center text-xs font-semibold py-2">
+        <div className="bg-indigo-600 text-white text-center text-xs font-semibold py-2">
           API URL: {API_URL || 'not set'} · Health: {API_URL ? `${API_URL}/api/health` : 'not set'} · Status: {healthQuery.status}
           {healthQuery.isError && (
             <span className="ml-2">
@@ -54,7 +54,7 @@ export function Layout() {
           )}
         </div>
       )}
-      <main className="pt-6 pb-12 flex-1">
+      <main className={`pb-12 flex-1${isLanding ? '' : ' pt-6'}`}>
         {showOutage ? (
           <div className="container py-8 space-y-4">
             <div className="card card-elevated text-center space-y-3">
