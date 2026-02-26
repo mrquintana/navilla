@@ -236,18 +236,6 @@ a:hover {
 }
 
 @media (max-width: 640px) {
-  .hero-title {
-    font-size: 2.4rem;
-  }
-
-  .hero-subtitle {
-    font-size: 1.2rem;
-  }
-
-  .hero-description {
-    font-size: 1rem;
-  }
-
   .card {
     padding: 1.1rem;
   }
@@ -797,7 +785,7 @@ select.input {
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.feature-card::before {
+.landing-section .feature-card::before {
   content: '';
   position: absolute;
   left: 0;
@@ -808,7 +796,7 @@ select.input {
   border-radius: 1rem 1rem 0 0;
 }
 
-.feature-card:hover {
+.landing-section .feature-card:hover {
   border-color: rgba(99, 102, 241, 0.22);
   box-shadow: 0 10px 24px rgba(15, 23, 42, 0.1);
 }
@@ -830,6 +818,9 @@ select.input {
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
+}
+
+.landing-section .feature-kicker {
   color: var(--color-landing-accent);
 }
 
@@ -840,6 +831,9 @@ select.input {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+}
+
+.landing-section .feature-icon {
   color: var(--color-landing-accent);
   background: rgba(99, 102, 241, 0.06);
   border: 1px solid rgba(99, 102, 241, 0.14);
