@@ -25,7 +25,7 @@ export function HomePage() {
       <section className="hero">
         <div className="container">
           <div className="hero-copy">
-            <p className="hero-eyebrow">Sexual health, reimagined</p>
+            <p className="hero-eyebrow">{t('landing.heroEyebrow')}</p>
             <h1 className="hero-title">{t('common.appName')}</h1>
             <p className="hero-subtitle">{t('privacy.tagline')}</p>
             <p className="hero-description">{t('privacy.description')}</p>
@@ -56,7 +56,7 @@ export function HomePage() {
           <div className="landing-grid landing-grid--steps">
             <div className="feature-card feature-card--step">
               <div className="feature-card-head">
-                <span className="feature-kicker">Step 1</span>
+                <span className="feature-kicker">{t('landing.stepLabel1')}</span>
                 <span className="feature-icon" aria-hidden="true">
                   <UserPlus className="w-4 h-4" />
                 </span>
@@ -66,7 +66,7 @@ export function HomePage() {
             </div>
             <div className="feature-card feature-card--step">
               <div className="feature-card-head">
-                <span className="feature-kicker">Step 2</span>
+                <span className="feature-kicker">{t('landing.stepLabel2')}</span>
                 <span className="feature-icon" aria-hidden="true">
                   <UserRoundCheck className="w-4 h-4" />
                 </span>
@@ -76,7 +76,7 @@ export function HomePage() {
             </div>
             <div className="feature-card feature-card--step">
               <div className="feature-card-head">
-                <span className="feature-kicker">Step 3</span>
+                <span className="feature-kicker">{t('landing.stepLabel3')}</span>
                 <span className="feature-icon" aria-hidden="true">
                   <Network className="w-4 h-4" />
                 </span>

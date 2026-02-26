@@ -326,8 +326,12 @@
   },
   "landing": {
     "kicker": "Private by design",
+    "heroEyebrow": "Sexual health, reimagined",
     "heroNote": "Built for discretion, clarity, and control.",
     "howTitle": "How Navilla works",
+    "stepLabel1": "Step 1",
+    "stepLabel2": "Step 2",
+    "stepLabel3": "Step 3",
     "stepOneTitle": "Build your trusted network",
     "stepOneBody": "Connect privately using usernames or email. Only confirmed connections shape your network graph.",
     "stepTwoTitle": "Share health status on your terms",

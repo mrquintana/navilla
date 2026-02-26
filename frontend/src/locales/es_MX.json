@@ -325,8 +325,12 @@
   },
   "landing": {
     "kicker": "Privado por diseño",
+    "heroEyebrow": "Salud sexual, reinventada",
     "heroNote": "Construido para discreción, claridad y control.",
     "howTitle": "Cómo funciona Navilla",
+    "stepLabel1": "Paso 1",
+    "stepLabel2": "Paso 2",
+    "stepLabel3": "Paso 3",
     "stepOneTitle": "Construye tu red de confianza",
     "stepOneBody": "Conecta en privado con usuarios o correo. Solo conexiones confirmadas forman tu red.",
     "stepTwoTitle": "Comparte tu estado en tus términos",
