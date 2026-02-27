@@ -122,7 +122,7 @@ describe('Header — transparent landing variant', () => {
         <Header />
       </MemoryRouter>
     );
-    expect(container.querySelector('header')?.classList.contains('navbar--transparent')).toBe(true);
+    expect(container.querySelector('header')?.classList.contains('navbar--landing-top')).toBe(true);
   });
 
   it('does NOT have navbar--transparent class on non-landing pages', () => {
