@@ -50,7 +50,60 @@ export interface STIContent {
   windowPeriod: WindowPeriod;
   /** Full guide content. undefined = coming soon */
   guide?: GuideSection;
+  /** Cost tier per provider type (Mexico) */
+  costTiers?: Record<string, CostTier>;
 }
+
+export type CostTier = 'free' | '$' | '$$' | '$$$' | 'n/a';
+
+export interface ProviderTier {
+  key: string;
+  label: { en: string; es: string };
+  description: { en: string; es: string };
+}
+
+export const PROVIDER_TIERS: ProviderTier[] = [
+  {
+    key: 'capasits',
+    label: { en: 'CAPASITS / SAI', es: 'CAPASITS / SAI' },
+    description: {
+      en: 'Government sexual health clinics. Free testing and treatment. Walk-in or by appointment.',
+      es: 'Clínicas gubernamentales de salud sexual. Pruebas y tratamiento gratuitos. Sin cita o con cita.',
+    },
+  },
+  {
+    key: 'imss',
+    label: { en: 'IMSS / ISSSTE', es: 'IMSS / ISSSTE' },
+    description: {
+      en: 'Social security hospitals. Free with coverage. Requires enrollment.',
+      es: 'Hospitales de seguridad social. Gratis con cobertura. Requiere afiliación.',
+    },
+  },
+  {
+    key: 'private_lab',
+    label: { en: 'Private Lab', es: 'Laboratorio Privado' },
+    description: {
+      en: 'Chopo, Olab, Salud Digna. Walk-in, fast results. Moderate cost.',
+      es: 'Chopo, Olab, Salud Digna. Sin cita, resultados rápidos. Costo moderado.',
+    },
+  },
+  {
+    key: 'private_clinic',
+    label: { en: 'Private Clinic', es: 'Clínica Privada' },
+    description: {
+      en: 'Private medical practices. Consultation + testing. Higher cost.',
+      es: 'Consultorios médicos privados. Consulta + pruebas. Costo más alto.',
+    },
+  },
+  {
+    key: 'specialist',
+    label: { en: 'Specialist', es: 'Especialista' },
+    description: {
+      en: 'Infectious disease or dermatology specialist. Highest cost.',
+      es: 'Especialista en infectología o dermatología. Costo más alto.',
+    },
+  },
+];
 
 // ---------------------------------------------------------------------------
 // SYMPTOM LABELS — bilingual display text for each symptom key
@@ -141,6 +194,7 @@ export const STI_DATA: Record<string, STIContent> = {
         { label: 'CENSIDA — ITS', url: 'https://www.gob.mx/censida' },
       ],
     },
+    costTiers: { capasits: 'free', imss: 'free', private_lab: '$', private_clinic: '$$', specialist: '$$$' },
   },
 
   gonorrhea: {
@@ -191,6 +245,7 @@ export const STI_DATA: Record<string, STIContent> = {
         { label: 'CENSIDA — ITS', url: 'https://www.gob.mx/censida' },
       ],
     },
+    costTiers: { capasits: 'free', imss: 'free', private_lab: '$', private_clinic: '$$', specialist: '$$$' },
   },
 
   syphilis: {
@@ -241,6 +296,7 @@ export const STI_DATA: Record<string, STIContent> = {
         { label: 'CENSIDA — ITS', url: 'https://www.gob.mx/censida' },
       ],
     },
+    costTiers: { capasits: 'free', imss: 'free', private_lab: '$', private_clinic: '$$', specialist: '$$$' },
   },
 
   hiv: {
@@ -291,6 +347,7 @@ export const STI_DATA: Record<string, STIContent> = {
         { label: 'CENSIDA — VIH/SIDA', url: 'https://www.gob.mx/censida' },
       ],
     },
+    costTiers: { capasits: 'free', imss: 'free', private_lab: '$', private_clinic: '$$', specialist: '$$$' },
   },
 
   herpes: {
@@ -341,6 +398,7 @@ export const STI_DATA: Record<string, STIContent> = {
         { label: 'CENSIDA — ITS', url: 'https://www.gob.mx/censida' },
       ],
     },
+    costTiers: { capasits: 'free', imss: 'free', private_lab: '$', private_clinic: '$$', specialist: '$$$' },
   },
 
   hpv: {
@@ -392,6 +450,7 @@ export const STI_DATA: Record<string, STIContent> = {
         { label: 'CENSIDA — ITS', url: 'https://www.gob.mx/censida' },
       ],
     },
+    costTiers: { capasits: 'free', imss: 'free', private_lab: '$', private_clinic: '$$', specialist: '$$$' },
   },
 
   hepatitis_b: {
@@ -442,6 +501,7 @@ export const STI_DATA: Record<string, STIContent> = {
         { label: 'CENSIDA — ITS', url: 'https://www.gob.mx/censida' },
       ],
     },
+    costTiers: { capasits: 'free', imss: 'free', private_lab: '$', private_clinic: '$$', specialist: '$$$' },
   },
 
   hepatitis_c: {
@@ -492,6 +552,7 @@ export const STI_DATA: Record<string, STIContent> = {
         { label: 'CENSIDA — ITS', url: 'https://www.gob.mx/censida' },
       ],
     },
+    costTiers: { capasits: 'free', imss: 'free', private_lab: '$', private_clinic: '$$', specialist: '$$$' },
   },
 
   trichomoniasis: {
@@ -542,6 +603,7 @@ export const STI_DATA: Record<string, STIContent> = {
         { label: 'CENSIDA — ITS', url: 'https://www.gob.mx/censida' },
       ],
     },
+    costTiers: { capasits: 'free', imss: 'free', private_lab: '$', private_clinic: '$$', specialist: '$$$' },
   },
 
   mycoplasma_genitalium: {
@@ -592,6 +654,7 @@ export const STI_DATA: Record<string, STIContent> = {
         { label: 'CENSIDA — ITS', url: 'https://www.gob.mx/censida' },
       ],
     },
+    costTiers: { capasits: 'free', imss: 'free', private_lab: '$$', private_clinic: '$$', specialist: '$$$' },
   },
 };
 
