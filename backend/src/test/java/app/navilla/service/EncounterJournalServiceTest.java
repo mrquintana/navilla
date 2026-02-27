@@ -42,6 +42,7 @@ import app.navilla.dto.UpdateJournalEntryRequest;
 import app.navilla.entity.EncounterJournal;
 import app.navilla.entity.JournalFieldTemplate;
 import app.navilla.exception.ResourceNotFoundException;
+import app.navilla.metrics.JournalMetrics;
 import app.navilla.repository.EncounterJournalRepository;
 import app.navilla.repository.JournalFieldTemplateRepository;
 import app.navilla.security.EncryptionService;
@@ -77,6 +78,9 @@ class EncounterJournalServiceTest {
 
   @Mock
   private ObjectMapper objectMapper;
+
+  @Mock
+  private JournalMetrics journalMetrics;
 
   @Mock
   private Jwt jwt;

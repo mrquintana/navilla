@@ -34,6 +34,7 @@ import app.navilla.dto.UpdateJournalEntryRequest;
 import app.navilla.entity.EncounterJournal;
 import app.navilla.entity.JournalFieldTemplate;
 import app.navilla.exception.ResourceNotFoundException;
+import app.navilla.metrics.JournalMetrics;
 import app.navilla.repository.EncounterJournalRepository;
 import app.navilla.repository.JournalFieldTemplateRepository;
 import app.navilla.security.EncryptionService;
@@ -65,6 +66,7 @@ public class EncounterJournalService {
   private final JournalFieldTemplateRepository templateRepository;
   private final EncryptionService encryptionService;
   private final ObjectMapper objectMapper;
+  private final JournalMetrics journalMetrics;
 
   /**
    * Lists journal entries for the authenticated user.
@@ -117,6 +119,7 @@ public class EncounterJournalService {
 
     EncounterJournal saved = journalRepository.save(entry);
     log.info("Journal entry created for user");
+    journalMetrics.recordEntryCreated();
     return toResponse(saved);
   }
 
@@ -151,6 +154,7 @@ public class EncounterJournalService {
 
     EncounterJournal saved = journalRepository.save(entry);
     log.info("Journal entry updated: {}", id);
+    journalMetrics.recordEntryUpdated();
     return toResponse(saved);
   }
 
@@ -174,6 +178,7 @@ public class EncounterJournalService {
 
     journalRepository.delete(entry);
     log.info("Journal entry deleted: {}", id);
+    journalMetrics.recordEntryDeleted();
   }
 
   /**
@@ -253,6 +258,7 @@ public class EncounterJournalService {
 
     templateRepository.saveAll(templates);
     log.info("Saved {} journal templates for user", templates.size());
+    journalMetrics.recordTemplatesSaved(templates.size());
     return getTemplates(jwt);
   }
 

@@ -78,6 +78,20 @@ public final class NavillaMetrics {
     public static final String EXPOSURE_INSUFFICIENT_CONNECTIONS =
         "navilla.exposure.insufficient.connections";
 
+    // ── Journal ──────────────────────────────────────────────────────────────
+
+    /** Journal entry created. */
+    public static final String JOURNAL_ENTRY_CREATED = "navilla.journal.entry.created";
+
+    /** Journal entry updated. */
+    public static final String JOURNAL_ENTRY_UPDATED = "navilla.journal.entry.updated";
+
+    /** Journal entry deleted. */
+    public static final String JOURNAL_ENTRY_DELETED = "navilla.journal.entry.deleted";
+
+    /** Custom field templates saved. */
+    public static final String JOURNAL_TEMPLATES_SAVED = "navilla.journal.templates.saved";
+
     // ── Notifications ────────────────────────────────────────────────────────
 
     /** Notification created. */
