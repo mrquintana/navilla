@@ -27,6 +27,7 @@ import { StaticRouter } from 'react-router-dom';
 import { WindowPeriodCalculatorPage } from '../src/pages/WindowPeriodCalculatorPage';
 import { GuidesIndexPage } from '../src/pages/GuidesIndexPage';
 import { GuideDetailPage } from '../src/pages/GuideDetailPage';
+import { TestingCostPage } from '../src/pages/TestingCostPage';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const distDir = resolve(__dirname, '../dist');
@@ -96,6 +97,42 @@ const ROUTES: RouteConfig[] = [
     title: 'Herpes (HSV) Guide — Testing, Treatment & Prevention | Navilla',
     description: 'Complete guide to herpes simplex: HSV-1 vs HSV-2, blood test limitations, antiviral treatment, and daily suppressive therapy.',
   },
+  {
+    path: '/guide/hpv',
+    Component: () => createElement(GuideDetailPage, { forcedSlug: 'hpv' }),
+    title: 'HPV Guide — What You Need to Know | Navilla',
+    description: 'Guide to HPV: types, cancer risk, Gardasil vaccine, screening (Pap/HPV test), and prevention.',
+  },
+  {
+    path: '/guide/hepatitis_b',
+    Component: () => createElement(GuideDetailPage, { forcedSlug: 'hepatitis_b' }),
+    title: 'Hepatitis B Guide — Testing, Vaccination & Treatment | Navilla',
+    description: 'Complete guide to hepatitis B: transmission, HBsAg testing, vaccine, and antiviral treatment.',
+  },
+  {
+    path: '/guide/hepatitis_c',
+    Component: () => createElement(GuideDetailPage, { forcedSlug: 'hepatitis_c' }),
+    title: 'Hepatitis C Guide — Testing & Cure | Navilla',
+    description: 'Complete guide to hepatitis C: transmission, antibody testing, DAA cure, and prevention.',
+  },
+  {
+    path: '/guide/trichomoniasis',
+    Component: () => createElement(GuideDetailPage, { forcedSlug: 'trichomoniasis' }),
+    title: 'Trichomoniasis Guide — Symptoms, Testing & Treatment | Navilla',
+    description: 'Guide to trichomoniasis: symptoms, NAAT testing, metronidazole treatment, and prevention.',
+  },
+  {
+    path: '/guide/mycoplasma_genitalium',
+    Component: () => createElement(GuideDetailPage, { forcedSlug: 'mycoplasma_genitalium' }),
+    title: 'Mycoplasma Genitalium Guide — Testing & Treatment | Navilla',
+    description: 'Guide to Mycoplasma genitalium: symptoms, NAAT testing, resistance-guided therapy.',
+  },
+  {
+    path: '/testing-cost',
+    Component: TestingCostPage,
+    title: 'STI Testing Costs in Mexico — Navilla',
+    description: 'Compare STI testing costs across provider types in Mexico: CAPASITS, IMSS, private labs, clinics, and specialists.',
+  },
 ];
 
 async function prerender() {
@@ -115,6 +152,11 @@ async function prerender() {
     const html = template
       .replace(/<title>[^<]*<\/title>/, `<title>${title}</title>`)
       .replace(/<meta name="description"[^>]*>/, `<meta name="description" content="${description}" />`)
+      .replace(/<meta property="og:title"[^>]*>/, `<meta property="og:title" content="${title}" />`)
+      .replace(/<meta property="og:description"[^>]*>/, `<meta property="og:description" content="${description}" />`)
+      .replace(/<meta property="og:url"[^>]*>/, `<meta property="og:url" content="https://www.navilla.app${path}" />`)
+      .replace(/<meta name="twitter:title"[^>]*>/, `<meta name="twitter:title" content="${title}" />`)
+      .replace(/<meta name="twitter:description"[^>]*>/, `<meta name="twitter:description" content="${description}" />`)
       .replace('<div id="root"></div>', `<div id="root">${body}</div>`);
 
     const outDir = resolve(distDir, path.replace(/^\//, ''));
