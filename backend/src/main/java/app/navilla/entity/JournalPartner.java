@@ -16,7 +16,6 @@
 
 package app.navilla.entity;
 
-import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
@@ -35,13 +34,13 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
-@Table(name = "encounter_journal")
+@Table(name = "journal_partners")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class EncounterJournal {
+public class JournalPartner {
 
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
@@ -50,23 +49,14 @@ public class EncounterJournal {
   @Column(name = "user_hash", nullable = false, length = 64)
   private String userHash;
 
-  @Column(name = "encounter_date", nullable = false)
-  private LocalDate encounterDate;
-
-  @Column(name = "partner_alias_encrypted")
-  private byte[] partnerAliasEncrypted;
+  @Column(name = "alias_encrypted", nullable = false)
+  private byte[] aliasEncrypted;
 
   @Column(name = "connection_id")
   private UUID connectionId;
 
   @Column(name = "notes_encrypted")
   private byte[] notesEncrypted;
-
-  @Column(name = "custom_fields_encrypted")
-  private byte[] customFieldsEncrypted;
-
-  @Column(name = "partner_id")
-  private UUID partnerId;
 
   @CreationTimestamp
   @Column(name = "created_at", nullable = false, updatable = false)

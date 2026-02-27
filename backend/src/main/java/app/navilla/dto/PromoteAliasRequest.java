@@ -16,24 +16,14 @@
 
 package app.navilla.dto;
 
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.UUID;
+import jakarta.validation.constraints.NotBlank;
 
 /**
- * Response DTO for a journal entry.
+ * Request DTO for promoting a freeform alias into a journal partner.
+ *
+ * @param alias the alias to promote
  */
-public record JournalEntryResponse(
-    UUID id,
-    LocalDate encounterDate,
-    String partnerAlias,
-    UUID connectionId,
-    String connectionDisplayName,
-    String notes,
-    List<CustomFieldDto> customFields,
-    UUID partnerId,
-    Long partnerEncounterCount,
-    OffsetDateTime createdAt,
-    OffsetDateTime updatedAt
+public record PromoteAliasRequest(
+    @NotBlank(message = "{journal.partner.error.aliasRequired}")
+    String alias
 ) {}

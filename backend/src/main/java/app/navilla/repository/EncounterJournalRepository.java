@@ -49,4 +49,24 @@ public interface EncounterJournalRepository extends JpaRepository<EncounterJourn
       @Param("year") int year);
 
   long countByUserHash(String userHash);
+
+  List<EncounterJournal> findByUserHashAndPartnerIdOrderByEncounterDateDesc(
+      String userHash, UUID partnerId);
+
+  long countByPartnerIdAndUserHash(UUID partnerId, String userHash);
+
+  @Query("SELECT MIN(e.encounterDate) FROM EncounterJournal e "
+      + "WHERE e.partnerId = :partnerId AND e.userHash = :userHash")
+  LocalDate findFirstEncounterDate(
+      @Param("partnerId") UUID partnerId, @Param("userHash") String userHash);
+
+  @Query("SELECT MAX(e.encounterDate) FROM EncounterJournal e "
+      + "WHERE e.partnerId = :partnerId AND e.userHash = :userHash")
+  LocalDate findMostRecentEncounterDate(
+      @Param("partnerId") UUID partnerId, @Param("userHash") String userHash);
+
+  List<EncounterJournal> findByPartnerIdAndUserHash(UUID partnerId, String userHash);
+
+  List<EncounterJournal> findByUserHashAndPartnerIdIsNullOrderByEncounterDateDesc(
+      String userHash);
 }

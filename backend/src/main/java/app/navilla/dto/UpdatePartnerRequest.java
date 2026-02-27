@@ -16,38 +16,26 @@
 
 package app.navilla.dto;
 
-import java.time.LocalDate;
-import java.util.List;
 import java.util.UUID;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 /**
- * Request DTO for updating an existing journal entry.
+ * Request DTO for updating an existing journal partner.
  *
- * @param encounterDate the date of the encounter
- * @param partnerAlias optional alias for the partner
- * @param connectionId optional connection ID
- * @param notes optional notes
- * @param customFields optional custom fields (max 3)
+ * @param alias optional updated alias
+ * @param connectionId optional connection ID to link
+ * @param notes optional updated notes
+ * @param unlinkConnection if true, remove the connection link
  */
-public record UpdateJournalEntryRequest(
-    @NotNull(message = "{journal.error.dateRequired}")
-    LocalDate encounterDate,
-
+public record UpdatePartnerRequest(
     @Size(max = 200, message = "{journal.error.aliasTooLong}")
-    String partnerAlias,
+    String alias,
 
     UUID connectionId,
 
     @Size(max = 5000, message = "{journal.error.notesTooLong}")
     String notes,
 
-    @Valid
-    @Size(max = 3, message = "{journal.error.tooManyCustomFields}")
-    List<CustomFieldDto> customFields,
-
-    UUID partnerId
+    boolean unlinkConnection
 ) {}

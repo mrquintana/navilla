@@ -56,4 +56,24 @@ public class JournalMetrics {
   public void recordTemplatesSaved(int count) {
     registry.counter(Names.JOURNAL_TEMPLATES_SAVED, "count", String.valueOf(count)).increment();
   }
+
+  /** Records a new journal partner being created. */
+  public void recordPartnerCreated() {
+    registry.counter(Names.JOURNAL_PARTNER_CREATED).increment();
+  }
+
+  /** Records a journal partner being updated. */
+  public void recordPartnerUpdated() {
+    registry.counter(Names.JOURNAL_PARTNER_UPDATED).increment();
+  }
+
+  /** Records a journal partner being deleted. */
+  public void recordPartnerDeleted() {
+    registry.counter(Names.JOURNAL_PARTNER_DELETED).increment();
+  }
+
+  /** Records a freeform alias being promoted to a journal partner. */
+  public void recordPartnerPromoted() {
+    registry.counter(Names.JOURNAL_PARTNER_PROMOTED).increment();
+  }
 }

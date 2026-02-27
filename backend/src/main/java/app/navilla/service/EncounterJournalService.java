@@ -91,7 +91,8 @@ public class EncounterJournalService {
           .findByUserHashOrderByEncounterDateDesc(userHash);
     }
 
-    return entries.stream().map(this::toResponse).toList();
+    return entries.stream()
+        .map(e -> toResponse(e, userHash)).toList();
   }
 
   /**
@@ -115,12 +116,13 @@ public class EncounterJournalService {
         .notesEncrypted(encryptOptional(request.notes()))
         .customFieldsEncrypted(
             encryptCustomFields(request.customFields()))
+        .partnerId(request.partnerId())
         .build();
 
     EncounterJournal saved = journalRepository.save(entry);
     log.info("Journal entry created for user");
     journalMetrics.recordEntryCreated();
-    return toResponse(saved);
+    return toResponse(saved, userHash);
   }
 
   /**
@@ -151,11 +153,12 @@ public class EncounterJournalService {
     entry.setNotesEncrypted(encryptOptional(request.notes()));
     entry.setCustomFieldsEncrypted(
         encryptCustomFields(request.customFields()));
+    entry.setPartnerId(request.partnerId());
 
     EncounterJournal saved = journalRepository.save(entry);
     log.info("Journal entry updated: {}", id);
     journalMetrics.recordEntryUpdated();
-    return toResponse(saved);
+    return toResponse(saved, userHash);
   }
 
   /**
@@ -306,7 +309,13 @@ public class EncounterJournalService {
   }
 
   private JournalEntryResponse toResponse(
-      EncounterJournal entry) {
+      EncounterJournal entry, String userHash) {
+    Long partnerEncounterCount = null;
+    if (entry.getPartnerId() != null) {
+      partnerEncounterCount = journalRepository
+          .countByPartnerIdAndUserHash(entry.getPartnerId(), userHash);
+    }
+
     return new JournalEntryResponse(
         entry.getId(),
         entry.getEncounterDate(),
@@ -321,6 +330,8 @@ public class EncounterJournalService {
                 entry.getNotesEncrypted())
             : null,
         decryptCustomFields(entry.getCustomFieldsEncrypted()),
+        entry.getPartnerId(),
+        partnerEncounterCount,
         entry.getCreatedAt(),
         entry.getUpdatedAt()
     );

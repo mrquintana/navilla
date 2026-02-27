@@ -14,26 +14,19 @@
  * limitations under the License.
  */
 
-package app.navilla.dto;
+package app.navilla.repository;
 
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * Response DTO for a journal entry.
- */
-public record JournalEntryResponse(
-    UUID id,
-    LocalDate encounterDate,
-    String partnerAlias,
-    UUID connectionId,
-    String connectionDisplayName,
-    String notes,
-    List<CustomFieldDto> customFields,
-    UUID partnerId,
-    Long partnerEncounterCount,
-    OffsetDateTime createdAt,
-    OffsetDateTime updatedAt
-) {}
+import app.navilla.entity.JournalPartner;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface JournalPartnerRepository extends JpaRepository<JournalPartner, UUID> {
+
+  List<JournalPartner> findByUserHashOrderByUpdatedAtDesc(String userHash);
+
+  void deleteByUserHash(String userHash);
+}

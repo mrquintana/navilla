@@ -92,6 +92,18 @@ public final class NavillaMetrics {
     /** Custom field templates saved. */
     public static final String JOURNAL_TEMPLATES_SAVED = "navilla.journal.templates.saved";
 
+    /** Journal partner created. */
+    public static final String JOURNAL_PARTNER_CREATED = "navilla.journal.partner.created";
+
+    /** Journal partner updated. */
+    public static final String JOURNAL_PARTNER_UPDATED = "navilla.journal.partner.updated";
+
+    /** Journal partner deleted. */
+    public static final String JOURNAL_PARTNER_DELETED = "navilla.journal.partner.deleted";
+
+    /** Freeform alias promoted to journal partner. */
+    public static final String JOURNAL_PARTNER_PROMOTED = "navilla.journal.partner.promoted";
+
     // ── Notifications ────────────────────────────────────────────────────────
 
     /** Notification created. */

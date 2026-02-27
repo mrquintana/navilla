@@ -18,22 +18,20 @@ package app.navilla.dto;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
-import java.util.List;
 import java.util.UUID;
 
 /**
- * Response DTO for a journal entry.
+ * Response DTO for a journal partner (detail view).
  */
-public record JournalEntryResponse(
+public record PartnerDetailResponse(
     UUID id,
-    LocalDate encounterDate,
-    String partnerAlias,
+    String alias,
     UUID connectionId,
     String connectionDisplayName,
     String notes,
-    List<CustomFieldDto> customFields,
-    UUID partnerId,
-    Long partnerEncounterCount,
+    long encounterCount,
+    LocalDate firstEncounterDate,
+    LocalDate mostRecentEncounterDate,
     OffsetDateTime createdAt,
     OffsetDateTime updatedAt
 ) {}

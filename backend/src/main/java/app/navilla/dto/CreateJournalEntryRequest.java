@@ -47,5 +47,7 @@ public record CreateJournalEntryRequest(
 
     @Valid
     @Size(max = 3, message = "{journal.error.tooManyCustomFields}")
-    List<CustomFieldDto> customFields
+    List<CustomFieldDto> customFields,
+
+    UUID partnerId
 ) {}
