@@ -745,8 +745,21 @@ Complete Week 4 Layer 0: SEO infrastructure, cost estimator, conversion CTAs, de
 - feat: update sitemap with all 22 Layer 0 URLs
 - fix: add missing guide slugs + testing-cost to prerender, inject OG tags
 
+**Late-session redesign — /testing-cost:**
+After initial implementation, user feedback: "right now it just says go to a public service is cheap, go to a private clinic is more expensive — what value are we adding?" Researched real MXN prices from Chopo, Salud Digna, Marie Stopes, CAPASITS, Clínica Condesa, AHF Mexico. Completely rewrote `TestingCostPage.tsx` with:
+- Three sections: Free (CAPASITS/SAI, Clínica Condesa, AHF Mexico), Affordable (Marie Stopes $369 rapid ITS pack, Salud Digna with real prices per test), Comprehensive (Chopo PCR panels $476–$5,054)
+- Card layout replaces table — each provider is a card with colored left-border accent
+- Every price has a `sourceUrl` + `sourceLabel` link and a `verifiedDate` badge ("Verified Feb 2026")
+- Old tier matrix CSS (~205 lines) replaced with card-based CSS system
+- Tests updated (148 passing)
+- Committed: `feat: redesign /testing-cost with real sourced MXN pricing`
+
+### Test Results (final)
+- 148 tests passing across 17 test files (all green)
+
 ### Next Steps
 - Week 5: Layer 1 — Personal tracker (test log, reminder system)
+- Add `/testing-cost` to nav or footer (currently only reachable via direct URL or cross-tool links from `/calculator` and `/guides`)
 
 ---
 
