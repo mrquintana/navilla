@@ -1582,7 +1582,7 @@ Features below are organized by the userbase milestone needed to justify buildin
 - **Won't Do (descoped):**
   - ~~Standalone symptom guide~~ — replaced by symptom filter on guides index.
   - ~~CDMX clinic finder~~ — Google Maps already solves this better. Future: revisit if we partner with labs (Chopo, Salud Digna) to offer discount codes + verified result upload. Labs would gain a referral channel; users get integrated verified results.
-- **Week 4 is next** — see Week 4 deliverables above (SEO, cost estimator, polish, deploy Layer 0).
+- **Week 4 status:** ✅ Complete.
 
 #### Authoritative STI Content Sources
 

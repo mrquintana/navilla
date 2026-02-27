@@ -700,31 +700,53 @@ rm -f scripts/.seed-state.json
 
 ---
 
-## Session Notes (2026-02-26 — Week 4 In Progress)
+## Session Notes (2026-02-26 — Week 4 Complete)
 
-### Accomplished so far (Tasks 1–3 of 11)
-- ✅ Task 1: Added `CostTier`, `ProviderKey`, `PROVIDER_TIERS` to `stiContent.ts`. Added `costTiers` to all 10 STI entries. Added cost tier tests to `stiContent.test.ts`. Fixed pre-existing `CookieNoticeBanner` lint error.
-- ✅ Task 2: TestingCostPage tests written (red → green)
-- ✅ Task 3: `TestingCostPage` implemented at `/testing-cost` with desktop table + mobile cards + provider footnotes + CSS. Route added to `router.tsx`.
+### Accomplished
+Complete Week 4 Layer 0: SEO infrastructure, cost estimator, conversion CTAs, deploy.
 
-### Remaining (Tasks 4–11)
-- Task 4: Add locale keys for cost estimator (`cost.*` keys to en_US.json + es_MX.json)
-- Task 5: Create shared `<SignUpCTA />` component + tests
-- Task 6: Wire SignUpCTA + cross-tool links into all Layer 0 pages
-- Task 7: Add JSON-LD structured data helpers + inject per-page
-- Task 8: OG image (SVG → PNG 1200x630) + meta tags in index.html + og:type=article on guides
-- Task 9: Update sitemap.xml with all 13 Layer 0 URLs
-- Task 10: Fix prerender script (5 missing guides + testing-cost + OG tag injection)
-- Task 11: Final verification + merge develop→main + deploy to Railway
+**New files:**
+- `frontend/src/pages/TestingCostPage.tsx` — STI testing cost estimator at `/testing-cost`. Desktop table + mobile cards. Provider tiers: CAPASITS, IMSS, private lab, private clinic, specialist.
+- `frontend/src/components/layer0/SignUpCTA.tsx` — Shared auth-gated CTA component. Reuses `.guide-cta` CSS.
+- `frontend/src/lib/structuredData.ts` — JSON-LD schema builders (MedicalWebPage, WebApplication, CollectionPage, WebPage).
+- `frontend/public/images/og-default.svg` — 1200x630 brand image for social sharing.
 
-### Implementation plan location
-`docs/plans/2026-02-26-week4-seo-cost-polish.md`
+**Data model additions (stiContent.ts):**
+- `CostTier` type, `ProviderKey` union, `ProviderTier` interface, `PROVIDER_TIERS` constant
+- `costTiers` field added to all 10 STI entries
 
-### Key commits this session
-- `cbf20af` feat: add cost tier data and provider tiers to stiContent
-- `0aafda7` fix: tighten CostTier ordering and ProviderKey type, add cost tier tests
-- `f63d83a` test: add TestingCostPage tests (red)
-- `ecb453d` feat: add TestingCostPage with provider tier cost table
+**SEO changes:**
+- JSON-LD structured data injected on all 4 Layer 0 pages
+- `og:image`, `twitter:image`, `twitter:card=summary_large_image` added to `index.html`
+- `og:type=article` override on all guide detail pages
+- `sitemap.xml` updated: 9 → 22 URLs (all Layer 0 tools + 10 guides)
+- Prerender script: 7 → 13 routes; OG tags now injected per-page
+
+**Conversion CTAs:**
+- `<SignUpCTA />` added to Calculator, Guides Index, Cost Estimator pages
+- `GuideDetailPage` refactored to use shared `<SignUpCTA />`
+- Cross-tool navigation links: Calculator ↔ Cost, Guides ↔ Cost
+
+**Locale:**
+- `cost.*` keys added to `en_US.json` + `es_MX.json`
+
+### Test Results
+- 145 tests passing across 17 test files (vitest run — all green)
+
+### Key Commits (in order)
+- feat: add cost tier data and provider tiers to stiContent
+- fix: tighten CostTier ordering and ProviderKey type, add cost tier tests
+- feat: add TestingCostPage with provider tier cost table
+- feat: add cost estimator locale keys (en_US + es_MX)
+- feat: add shared SignUpCTA component for Layer 0 pages
+- feat: add SignUpCTA and cross-tool links to all Layer 0 pages
+- feat: add JSON-LD structured data to all Layer 0 pages
+- feat: add OG image SVG and social meta tags
+- feat: update sitemap with all 22 Layer 0 URLs
+- fix: add missing guide slugs + testing-cost to prerender, inject OG tags
+
+### Next Steps
+- Week 5: Layer 1 — Personal tracker (test log, reminder system)
 
 ---
 
