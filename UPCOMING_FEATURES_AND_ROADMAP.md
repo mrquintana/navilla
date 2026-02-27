@@ -1557,29 +1557,32 @@ Features below are organized by the userbase milestone needed to justify buildin
 #### Progress Snapshot (February 26, 2026)
 
 - **Week 2 status:** ✅ Complete.
-- **Week 3 content status:** STI guide content complete (pulled forward). UX flows pending.
-- **Completed this session (Week 2 Layer 0 Polish):**
+- **Week 3 status:** ✅ Complete.
+- **Completed this session (Week 3 — Symptom Filter):**
+  - `SYMPTOM_LABELS` — 10 bilingual symptom keys added to `stiContent.ts` (single source of truth, self-documenting with maintainability guide)
+  - `symptoms[]` arrays added to all 10 STI entries (data sourced from CDC/WHO clinical guidelines)
+  - `useSymptomFilter` hook — 3 pure exported functions (`computeMatchCounts`, `computeVisibleSlugs`, `computeAvailableSymptoms`) + thin React hook wrapper; fully unit-tested (12 tests)
+  - Guides index filter bar: selected chips (removable), smart `[+ Add symptom]` dropdown (hides symptoms that can't reveal new cards), `Clear all`
+  - Cards filter by OR match, sort by match count descending, per-card matched symptom chips
+  - Full bilingual support (EN/ES throughout)
+  - Pre-existing `Header.test.tsx` failure fixed (`navbar--transparent` → `navbar--landing-top` after glass header refactor)
+- **Completed in earlier sessions:**
   - renderMarkdown micro-renderer utility (zero-dependency, converts `- bullets` / `**bold**` → React elements)
   - `tagline` + `facts` (type/curable/vaccine) fields added to all 10 STI entries
   - Fact chips component (`FactChips`) — Bacterial/Viral/Parasitic + Curable/Lifelong + Vaccine
   - Guide index cards enriched: tagline + 3 fact chips + window period footer
   - Guide detail page: QuickStatsBlock (chips + window + CTA), unique per-section icons, renderMarkdown body text
   - Calculator: per-row progress bar (daysWaited / minDays, indigo=waiting, green=testable)
-  - All 5 Week 3 guide objects written (HPV, Hep B, Hep C, Trichomoniasis, Mycoplasma) — content pulled forward from Week 3
-  - Existing 5 guide sections reformatted with markdown bullets/bold
-  - Locale keys for all chip labels (en_US + es_MX)
-- **Completed in earlier sessions:**
+  - All 10 STI guide objects written with full content (chlamydia, gonorrhea, syphilis, HIV, herpes, HPV, Hep B, Hep C, Trichomoniasis, Mycoplasma)
   - Landing page content and IA simplified for scanability.
   - Footer-linked informational pages refreshed (`How It Works`, `Privacy`, `Privacy Policy`, `Terms`, `Help`, `About`, `Security`).
   - Site-wide cookie notice banner added.
   - Header UX upgraded to consistent glass states (landing dark + warm app chrome).
   - Window period calculator (date input → results table).
-  - First 5 STI guides (chlamydia, gonorrhea, syphilis, HIV, herpes) with citations.
 - **Won't Do (descoped):**
-  - ~~Standalone symptom guide~~ — replaced by symptom filter on guides index (see below).
+  - ~~Standalone symptom guide~~ — replaced by symptom filter on guides index.
   - ~~CDMX clinic finder~~ — Google Maps already solves this better. Future: revisit if we partner with labs (Chopo, Salud Digna) to offer discount codes + verified result upload. Labs would gain a referral channel; users get integrated verified results.
-- **Remaining for Week 3:**
-  - Symptom filter on guides index page (OR filter, match count sort, per-card matched chips).
+- **Remaining before Week 4:**
   - Validate all symptom-to-STI mappings against authoritative sources before public launch (see Content Sources below).
 
 #### Authoritative STI Content Sources
