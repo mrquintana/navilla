@@ -88,6 +88,7 @@ export function GuideDetailPage({ forcedSlug }: Props) {
       <link rel="canonical" href={`https://www.navilla.app/guide/${slug}`} />
       <link rel="alternate" hrefLang="en" href={`https://www.navilla.app/guide/${slug}`} />
       <link rel="alternate" hrefLang="es" href={`https://www.navilla.app/guide/${slug}`} />
+      <meta property="og:type" content="article" />
       <script type="application/ld+json">
         {JSON.stringify(buildMedicalWebPageLD({
           name: metaTitle,
