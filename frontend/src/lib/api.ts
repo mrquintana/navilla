@@ -114,6 +114,10 @@ function mockApiRequest<T>(
     return Promise.resolve([] as T);
   }
 
+  if (endpoint.startsWith('/api/journal/templates')) return Promise.resolve({ labels: [] } as T);
+  if (endpoint.startsWith('/api/journal/summary')) return Promise.resolve({ year: 2026, monthlyCounts: {}, yearTotal: 0 } as T);
+  if (endpoint === '/api/journal' && (!options || options.method === undefined || options.method === 'GET')) return Promise.resolve([] as T);
+
   return Promise.reject(new ApiError(`Unhandled E2E endpoint: ${endpoint}`, 500));
 }
 
@@ -141,6 +145,50 @@ export class ApiError extends Error {
     this.status = status;
     this.data = data;
   }
+}
+
+// Journal types
+export interface CustomField {
+  label: string;
+  value: string;
+}
+
+export interface JournalEntry {
+  id: string;
+  encounterDate: string;
+  partnerAlias: string | null;
+  connectionId: string | null;
+  connectionDisplayName: string | null;
+  notes: string | null;
+  customFields: CustomField[] | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateJournalEntryRequest {
+  encounterDate: string;
+  partnerAlias?: string;
+  connectionId?: string;
+  notes?: string;
+  customFields?: CustomField[];
+}
+
+export interface UpdateJournalEntryRequest {
+  encounterDate: string;
+  partnerAlias?: string;
+  connectionId?: string;
+  notes?: string;
+  customFields?: CustomField[];
+}
+
+export interface JournalSummary {
+  year: number;
+  monthlyCounts: Record<string, number>;
+  yearTotal: number;
+}
+
+export interface JournalTemplates {
+  labels: string[];
 }
 
 /**
@@ -260,6 +308,24 @@ export const api = {
       apiRequest<ExposureSnapshot>('/api/exposures/recompute', token, {
         method: 'POST',
       }),
+  },
+  journal: {
+    list: (token: string, month?: string) =>
+      apiRequest<JournalEntry[]>(month ? `/api/journal?month=${month}` : '/api/journal', token),
+    create: (token: string, data: CreateJournalEntryRequest) =>
+      apiRequest<JournalEntry>('/api/journal', token, { method: 'POST', body: data }),
+    update: (token: string, id: string, data: UpdateJournalEntryRequest) =>
+      apiRequest<JournalEntry>(`/api/journal/${id}`, token, { method: 'PUT', body: data }),
+    delete: (token: string, id: string) =>
+      apiRequest<void>(`/api/journal/${id}`, token, { method: 'DELETE' }),
+    summary: (token: string, year: number) =>
+      apiRequest<JournalSummary>(`/api/journal/summary?year=${year}`, token),
+    templates: {
+      get: (token: string) =>
+        apiRequest<JournalTemplates>('/api/journal/templates', token),
+      save: (token: string, labels: string[]) =>
+        apiRequest<JournalTemplates>('/api/journal/templates', token, { method: 'PUT', body: { labels } }),
+    },
   },
 };
 
