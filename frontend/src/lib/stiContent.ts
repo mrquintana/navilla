@@ -46,10 +46,51 @@ export interface STIContent {
     /** widely recommended vaccine exists */
     vaccine: boolean;
   };
+  symptoms: string[];
   windowPeriod: WindowPeriod;
   /** Full guide content. undefined = coming soon */
   guide?: GuideSection;
 }
+
+// ---------------------------------------------------------------------------
+// SYMPTOM LABELS — bilingual display text for each symptom key
+//
+// HOW TO MAINTAIN THIS:
+//
+//   Add a new symptom globally:
+//     1. Add one entry to SYMPTOM_LABELS below (pick a snake_case key)
+//     2. Add that key to the `symptoms` array of whichever STIs apply
+//     3. Done — the filter picks it up automatically
+//
+//   Remove a symptom from one STI only:
+//     1. Delete the key from that STI's `symptoms` array below
+//     2. Nothing else to touch
+//
+//   Add a brand new STI:
+//     1. Add an entry to STI_DATA with `symptoms: [...]` using existing keys
+//        (if it needs a new symptom key, add that to SYMPTOM_LABELS first)
+//     2. Add the slug to STI_ORDER
+//
+//   Rename a symptom key:
+//     1. Update the key in SYMPTOM_LABELS
+//     2. Find-replace that key string across all `symptoms` arrays in STI_DATA
+//
+// DATA SOURCE: Derived from CDC/WHO clinical guidelines.
+// ⚠️  MUST be verified against authoritative sources before public launch.
+//     See UPCOMING_FEATURES_AND_ROADMAP.md → "Authoritative STI Content Sources"
+// ---------------------------------------------------------------------------
+export const SYMPTOM_LABELS: Record<string, { en: string; es: string }> = {
+  burning_urination:   { en: 'Burning when urinating',       es: 'Ardor al orinar' },
+  unusual_discharge:   { en: 'Unusual discharge',             es: 'Secreción inusual' },
+  sores_or_ulcers:     { en: 'Sores or ulcers',               es: 'Llagas o úlceras' },
+  rash:                { en: 'Rash or skin changes',          es: 'Sarpullido o cambios en la piel' },
+  itching:             { en: 'Itching or irritation',         es: 'Comezón o irritación' },
+  swollen_lymph_nodes: { en: 'Swollen lymph nodes',           es: 'Ganglios inflamados' },
+  pelvic_pain:         { en: 'Pelvic or abdominal pain',      es: 'Dolor pélvico o abdominal' },
+  pain_during_sex:     { en: 'Pain during sex',               es: 'Dolor durante el sexo' },
+  warts_or_bumps:      { en: 'Warts or bumps',                es: 'Verrugas o bultos' },
+  flu_like_symptoms:   { en: 'Flu-like symptoms',             es: 'Síntomas gripales' },
+};
 
 export const STI_DATA: Record<string, STIContent> = {
   chlamydia: {
@@ -60,6 +101,7 @@ export const STI_DATA: Record<string, STIContent> = {
       es: 'La ITS bacteriana más común — generalmente sin síntomas, siempre curable.',
     },
     facts: { type: 'bacterial', curable: true, vaccine: false },
+    symptoms: ['burning_urination', 'unusual_discharge', 'pelvic_pain', 'pain_during_sex'],
     windowPeriod: {
       minDays: 5,
       maxDays: 14,
@@ -109,6 +151,7 @@ export const STI_DATA: Record<string, STIContent> = {
       es: 'Una ITS bacteriana con resistencia creciente a antibióticos — ventana de prueba corta.',
     },
     facts: { type: 'bacterial', curable: true, vaccine: false },
+    symptoms: ['burning_urination', 'unusual_discharge', 'pelvic_pain', 'pain_during_sex'],
     windowPeriod: {
       minDays: 1,
       maxDays: 14,
@@ -158,6 +201,7 @@ export const STI_DATA: Record<string, STIContent> = {
       es: 'Una infección bacteriana por etapas — completamente curable si se detecta a tiempo.',
     },
     facts: { type: 'bacterial', curable: true, vaccine: false },
+    symptoms: ['sores_or_ulcers', 'rash', 'swollen_lymph_nodes', 'flu_like_symptoms'],
     windowPeriod: {
       minDays: 21,
       maxDays: 90,
@@ -207,6 +251,7 @@ export const STI_DATA: Record<string, STIContent> = {
       es: 'Un virus controlado con tratamiento diario — indetectable significa intransmisible.',
     },
     facts: { type: 'viral', curable: false, vaccine: false },
+    symptoms: ['flu_like_symptoms', 'rash', 'swollen_lymph_nodes'],
     windowPeriod: {
       minDays: 18,
       maxDays: 45,
@@ -256,6 +301,7 @@ export const STI_DATA: Record<string, STIContent> = {
       es: 'Un virus de por vida pero manejable — la mayoría tiene síntomas leves o ninguno.',
     },
     facts: { type: 'viral', curable: false, vaccine: false },
+    symptoms: ['sores_or_ulcers', 'itching', 'pain_during_sex', 'flu_like_symptoms'],
     windowPeriod: {
       minDays: 12,
       maxDays: 84,
@@ -305,6 +351,7 @@ export const STI_DATA: Record<string, STIContent> = {
       es: 'La ITS más común — prevenible con vacuna, la mayoría de las infecciones desaparecen solas.',
     },
     facts: { type: 'viral', curable: false, vaccine: true },
+    symptoms: ['warts_or_bumps'],
     windowPeriod: {
       minDays: 0,
       maxDays: 0,
@@ -355,6 +402,7 @@ export const STI_DATA: Record<string, STIContent> = {
       es: 'Una infección hepática prevenible con vacuna — manejable con antivirales si es crónica.',
     },
     facts: { type: 'viral', curable: false, vaccine: true },
+    symptoms: ['flu_like_symptoms'],
     windowPeriod: {
       minDays: 30,
       maxDays: 60,
@@ -404,6 +452,7 @@ export const STI_DATA: Record<string, STIContent> = {
       es: 'No existe vacuna — pero ahora curable en más del 95% de los casos con tratamiento moderno.',
     },
     facts: { type: 'viral', curable: true, vaccine: false },
+    symptoms: ['flu_like_symptoms'],
     windowPeriod: {
       minDays: 56,
       maxDays: 77,
@@ -453,6 +502,7 @@ export const STI_DATA: Record<string, STIContent> = {
       es: 'La ITS curable más común del mundo — tratada con una sola dosis de antibiótico.',
     },
     facts: { type: 'parasitic', curable: true, vaccine: false },
+    symptoms: ['burning_urination', 'unusual_discharge', 'itching', 'pain_during_sex'],
     windowPeriod: {
       minDays: 5,
       maxDays: 28,
@@ -502,6 +552,7 @@ export const STI_DATA: Record<string, STIContent> = {
       es: 'Una ITS bacteriana subdiagnosticada — no está en los paneles rutinarios, pídela específicamente.',
     },
     facts: { type: 'bacterial', curable: true, vaccine: false },
+    symptoms: ['burning_urination', 'unusual_discharge', 'pelvic_pain', 'pain_during_sex'],
     windowPeriod: {
       minDays: 14,
       maxDays: 21,

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { STI_DATA, STI_ORDER } from './stiContent';
+import { STI_DATA, STI_ORDER, SYMPTOM_LABELS } from './stiContent';
 
 const ALL_GUIDES = [...STI_ORDER];
 
@@ -82,6 +82,27 @@ describe('STI_DATA', () => {
 
     it('HPV is flagged noStandardTest', () => {
       expect(STI_DATA.hpv.windowPeriod.noStandardTest).toBe(true);
+    });
+  });
+
+  describe('symptom data integrity', () => {
+    it('SYMPTOM_LABELS is defined and non-empty', () => {
+      expect(Object.keys(SYMPTOM_LABELS).length).toBeGreaterThan(0);
+    });
+
+    it('every condition has a symptoms array', () => {
+      STI_ORDER.forEach((slug) => {
+        expect(Array.isArray(STI_DATA[slug].symptoms)).toBe(true);
+      });
+    });
+
+    it('every symptom key used in STI_DATA exists in SYMPTOM_LABELS', () => {
+      const validKeys = new Set(Object.keys(SYMPTOM_LABELS));
+      STI_ORDER.forEach((slug) => {
+        STI_DATA[slug].symptoms.forEach((key) => {
+          expect(validKeys.has(key), `Unknown symptom key "${key}" on ${slug}`).toBe(true);
+        });
+      });
     });
   });
 
