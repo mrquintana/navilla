@@ -29,6 +29,7 @@ import { ErrorPage } from './pages/ErrorPage';
 import { WindowPeriodCalculatorPage } from './pages/WindowPeriodCalculatorPage';
 import { GuidesIndexPage } from './pages/GuidesIndexPage';
 import { GuideDetailPage } from './pages/GuideDetailPage';
+import { TestingCostPage } from './pages/TestingCostPage';
 
 export const router = createBrowserRouter([
   {
@@ -83,6 +84,7 @@ export const router = createBrowserRouter([
       { path: 'calculator', element: <WindowPeriodCalculatorPage /> },
       { path: 'guides', element: <GuidesIndexPage /> },
       { path: 'guide/:slug', element: <GuideDetailPage /> },
+      { path: 'testing-cost', element: <TestingCostPage /> },
       { path: 'how-it-works', element: <HowItWorksPage /> },
       { path: 'about', element: <AboutPage /> },
       { path: 'contact', element: <ContactPage /> },
