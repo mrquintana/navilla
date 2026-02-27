@@ -25,6 +25,7 @@ import { HelpPage } from './pages/HelpPage';
 import { StatusPage } from './pages/StatusPage';
 import { AccessibilityPage } from './pages/AccessibilityPage';
 import { JournalPage } from './pages/JournalPage';
+import { PartnerDetailPage } from './pages/PartnerDetailPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 import { ErrorPage } from './pages/ErrorPage';
 import { WindowPeriodCalculatorPage } from './pages/WindowPeriodCalculatorPage';
@@ -55,6 +56,14 @@ export const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <JournalPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'journal/partner/:id',
+        element: (
+          <ProtectedRoute>
+            <PartnerDetailPage />
           </ProtectedRoute>
         ),
       },

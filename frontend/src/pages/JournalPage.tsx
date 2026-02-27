@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Lock, Plus, List, Calendar, ChevronLeft, ChevronRight, AlertTriangle } from 'lucide-react';
+import { Lock, Plus, List, Calendar, Users, ChevronLeft, ChevronRight, AlertTriangle } from 'lucide-react';
 import { useJournalEntries, useJournalSummary, useDeleteJournalEntry } from '../hooks/useJournal';
 import type { JournalEntry } from '../lib/api';
 import { JournalTimeline } from '../components/journal/JournalTimeline';
@@ -8,9 +8,10 @@ import { JournalCalendar } from '../components/journal/JournalCalendar';
 import { JournalEntryCard } from '../components/journal/JournalEntryCard';
 import { JournalEmptyState } from '../components/journal/JournalEmptyState';
 import { JournalEntryModal } from '../components/journal/JournalEntryModal';
+import { JournalPartnersTab } from '../components/journal/JournalPartnersTab';
 import { PageSkeleton, SkeletonBlock, SkeletonRows } from '../components/ui/LoadingShell';
 
-type ViewMode = 'timeline' | 'calendar';
+type ViewMode = 'timeline' | 'calendar' | 'partners';
 
 /** Format Date to "YYYY-MM" */
 function toMonthKey(date: Date): string {
@@ -66,7 +67,7 @@ export function JournalPage() {
 
   const handleViewModeChange = useCallback((mode: ViewMode) => {
     setViewMode(mode);
-    if (mode === 'timeline') {
+    if (mode === 'timeline' || mode === 'partners') {
       setSelectedDate(null);
     }
   }, []);
@@ -172,10 +173,22 @@ export function JournalPage() {
             {t('journal.calendar')}
           </span>
         </button>
+        <button
+          type="button"
+          className={`btn btn-sm ${viewMode === 'partners' ? 'btn-primary' : 'btn-secondary'}`}
+          onClick={() => handleViewModeChange('partners')}
+        >
+          <span className="inline-flex items-center gap-1.5">
+            <Users className="nav-icon" aria-hidden="true" />
+            {t('journal.partnersTab')}
+          </span>
+        </button>
       </div>
 
       {/* Content */}
-      {entryList.length === 0 ? (
+      {viewMode === 'partners' ? (
+        <JournalPartnersTab />
+      ) : entryList.length === 0 ? (
         <JournalEmptyState onAdd={handleAdd} />
       ) : viewMode === 'timeline' ? (
         <JournalTimeline

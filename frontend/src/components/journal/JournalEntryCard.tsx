@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
-import { Pencil, Trash2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Pencil, Trash2, Bookmark } from 'lucide-react';
 import type { JournalEntry } from '../../lib/api';
 
 interface JournalEntryCardProps {
@@ -11,6 +12,7 @@ interface JournalEntryCardProps {
 
 export function JournalEntryCard({ entry, onEdit, onDelete, isDeleting }: JournalEntryCardProps) {
   const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
   const locale = i18n.language.replace('_', '-');
 
   const encounterDate = new Date(entry.encounterDate + 'T00:00:00');
@@ -48,13 +50,28 @@ export function JournalEntryCard({ entry, onEdit, onDelete, isDeleting }: Journa
 
           {/* Content */}
           <div className="min-w-0">
-            <p className="text-sm font-medium text-foreground truncate">
+            <p className="text-sm font-medium text-foreground truncate flex items-center gap-1">
               {partner || (
                 <span className="text-muted italic">
                   {t('journal.anonymous')}
                 </span>
               )}
+              {entry.partnerId && (
+                <Bookmark className="w-3 h-3 text-primary opacity-50 shrink-0" aria-hidden="true" />
+              )}
             </p>
+            {entry.partnerId && entry.partnerEncounterCount && entry.partnerEncounterCount > 1 && (
+              <button
+                type="button"
+                className="text-xs text-primary hover:underline cursor-pointer mt-0.5"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate(`/journal/partner/${entry.partnerId}`);
+                }}
+              >
+                {t('journal.encountersWith', { count: entry.partnerEncounterCount })}
+              </button>
+            )}
             {notesPreview && (
               <p className="text-xs text-muted mt-0.5 line-clamp-2">
                 {notesPreview}
