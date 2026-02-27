@@ -700,6 +700,34 @@ rm -f scripts/.seed-state.json
 
 ---
 
+## Session Notes (2026-02-26 — Week 4 In Progress)
+
+### Accomplished so far (Tasks 1–3 of 11)
+- ✅ Task 1: Added `CostTier`, `ProviderKey`, `PROVIDER_TIERS` to `stiContent.ts`. Added `costTiers` to all 10 STI entries. Added cost tier tests to `stiContent.test.ts`. Fixed pre-existing `CookieNoticeBanner` lint error.
+- ✅ Task 2: TestingCostPage tests written (red → green)
+- ✅ Task 3: `TestingCostPage` implemented at `/testing-cost` with desktop table + mobile cards + provider footnotes + CSS. Route added to `router.tsx`.
+
+### Remaining (Tasks 4–11)
+- Task 4: Add locale keys for cost estimator (`cost.*` keys to en_US.json + es_MX.json)
+- Task 5: Create shared `<SignUpCTA />` component + tests
+- Task 6: Wire SignUpCTA + cross-tool links into all Layer 0 pages
+- Task 7: Add JSON-LD structured data helpers + inject per-page
+- Task 8: OG image (SVG → PNG 1200x630) + meta tags in index.html + og:type=article on guides
+- Task 9: Update sitemap.xml with all 13 Layer 0 URLs
+- Task 10: Fix prerender script (5 missing guides + testing-cost + OG tag injection)
+- Task 11: Final verification + merge develop→main + deploy to Railway
+
+### Implementation plan location
+`docs/plans/2026-02-26-week4-seo-cost-polish.md`
+
+### Key commits this session
+- `cbf20af` feat: add cost tier data and provider tiers to stiContent
+- `0aafda7` fix: tighten CostTier ordering and ProviderKey type, add cost tier tests
+- `f63d83a` test: add TestingCostPage tests (red)
+- `ecb453d` feat: add TestingCostPage with provider tier cost table
+
+---
+
 ## Session Notes (2026-02-26 — Week 2 Layer 0 Polish)
 
 ### Accomplished
