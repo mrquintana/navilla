@@ -1551,7 +1551,7 @@ Features below are organized by the userbase milestone needed to justify buildin
 | Week | Focus | Deliverables |
 |------|-------|-------------|
 | 2 | Window period calculator + first 5 STI guides | Interactive calculator (date input → results table). AI-draft 5 STI guides (chlamydia, gonorrhea, syphilis, HIV, herpes). Basic page layout with disclaimers and source citations |
-| 3 | Remaining content + symptom guide + clinic finder | 5 more STI guides (HPV, Hep B, Hep C, trichomoniasis, mycoplasma). Symptom guide (structured selection → results). CDMX clinic finder with CENSIDA/Condesa data (manually curated, 20-30 clinics) |
+| 3 | Remaining content + symptom filter on guides | 5 more STI guides (HPV, Hep B, Hep C, trichomoniasis, mycoplasma). Symptom filter on guides index: select symptoms as chips, cards filter by OR match, sorted by match count, per-card matched symptom chips. |
 | 4 | SEO + cost estimator + polish | Cost estimator with Mexico pricing. Open Graph tags, structured data, sitemap. Bilingual content (en_US primary, es_MX alongside). Conversion CTAs on every page. Deploy Layer 0. Note: full path-prefix i18n routing (`/es/*`) is a Phase 2 task — see SEO section |
 
 #### Progress Snapshot (February 26, 2026)
@@ -1575,9 +1575,34 @@ Features below are organized by the userbase milestone needed to justify buildin
   - Header UX upgraded to consistent glass states (landing dark + warm app chrome).
   - Window period calculator (date input → results table).
   - First 5 STI guides (chlamydia, gonorrhea, syphilis, HIV, herpes) with citations.
+- **Won't Do (descoped):**
+  - ~~Standalone symptom guide~~ — replaced by symptom filter on guides index (see below).
+  - ~~CDMX clinic finder~~ — Google Maps already solves this better. Future: revisit if we partner with labs (Chopo, Salud Digna) to offer discount codes + verified result upload. Labs would gain a referral channel; users get integrated verified results.
 - **Remaining for Week 3:**
-  - Symptom guide flow (structured symptom selection → results).
-  - CDMX clinic finder (manually curated 20–30 clinics, CENSIDA/Condesa data).
+  - Symptom filter on guides index page (OR filter, match count sort, per-card matched chips).
+  - Validate all symptom-to-STI mappings against authoritative sources before public launch (see Content Sources below).
+
+#### Authoritative STI Content Sources
+
+All factual content (symptoms, testing windows, treatment) must be verified against these sources before public launch. Future: schedule a periodic crawl/refresh pipeline.
+
+**English**
+- [CDC STIs](https://www.cdc.gov/sti/) — US government, per-condition fact sheets, most comprehensive
+- [WHO STIs](https://www.who.int/news-room/fact-sheets/detail/sexually-transmitted-infections-(stis)) — International, global epidemiology
+- [MedlinePlus](https://medlineplus.gov) — NIH consumer health, plain language
+- [Mayo Clinic](https://www.mayoclinic.org) — Clinical detail, symptom-level accuracy
+- [NHS](https://www.nhs.uk) — UK government, excellent plain-language guides
+- [Planned Parenthood](https://www.plannedparenthood.org) — Sexual health specific, bilingual
+- [Office on Women's Health](https://womenshealth.gov) — Bilingual fact sheets
+
+**Spanish / Mexico**
+- [CENSIDA](https://www.gob.mx/censida) — Mexico's primary HIV/STI authority
+- [Secretaría de Salud](https://www.gob.mx/salud) — National health ministry
+- [IMSS](https://www.imss.gob.mx) — Largest insurer, clinical guidelines
+- [OPS/PAHO](https://www.paho.org) — Pan-American WHO, structured data
+- [UNFPA México](https://mexico.unfpa.org) — Reproductive rights focus
+- [AHF México](https://ahfmexico.org.mx) — Free testing, practical local info
+- [MedlinePlus en Español](https://medlineplus.gov/spanish/) — NIH quality in Spanish
 
 ### Phase 2: Layer 1 — Personal Tracker (Weeks 5-9)
 
