@@ -7,9 +7,25 @@ import {
   type UpdateJournalEntryRequest,
   type JournalSummary,
   type JournalTemplates,
+  type JournalPartner,
+  type JournalPartnerDetail,
+  type CreatePartnerRequest,
+  type UpdatePartnerRequest,
+  type PromoteAliasRequest,
 } from '../lib/api';
 
-export type { JournalEntry, CreateJournalEntryRequest, UpdateJournalEntryRequest, JournalSummary, JournalTemplates };
+export type {
+  JournalEntry,
+  CreateJournalEntryRequest,
+  UpdateJournalEntryRequest,
+  JournalSummary,
+  JournalTemplates,
+  JournalPartner,
+  JournalPartnerDetail,
+  CreatePartnerRequest,
+  UpdatePartnerRequest,
+  PromoteAliasRequest,
+};
 
 export function useJournalEntries(month?: string) {
   const { session } = useAuth();
@@ -84,6 +100,94 @@ export function useSaveJournalTemplates() {
       api.journal.templates.save(session!.access_token, labels),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['journal', 'templates'] });
+    },
+  });
+}
+
+export function useJournalPartners() {
+  const { session } = useAuth();
+  return useQuery({
+    queryKey: ['journal', 'partners'],
+    queryFn: () => api.journal.partners.list(session!.access_token),
+    enabled: !!session?.access_token,
+    staleTime: 2 * 60 * 1000,
+  });
+}
+
+export function useJournalPartner(id: string) {
+  const { session } = useAuth();
+  return useQuery({
+    queryKey: ['journal', 'partner', id],
+    queryFn: () => api.journal.partners.get(session!.access_token, id),
+    enabled: !!session?.access_token && !!id,
+    staleTime: 2 * 60 * 1000,
+  });
+}
+
+export function useJournalPartnerEntries(partnerId: string) {
+  const { session } = useAuth();
+  return useQuery({
+    queryKey: ['journal', 'partner', partnerId, 'entries'],
+    queryFn: () => api.journal.partners.entries(session!.access_token, partnerId),
+    enabled: !!session?.access_token && !!partnerId,
+    staleTime: 2 * 60 * 1000,
+  });
+}
+
+export function useRecentAliases() {
+  const { session } = useAuth();
+  return useQuery({
+    queryKey: ['journal', 'recent-aliases'],
+    queryFn: () => api.journal.recentAliases(session!.access_token),
+    enabled: !!session?.access_token,
+    staleTime: 2 * 60 * 1000,
+  });
+}
+
+export function useCreatePartner() {
+  const { session } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: CreatePartnerRequest) =>
+      api.journal.partners.create(session!.access_token, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['journal'] });
+    },
+  });
+}
+
+export function useUpdatePartner() {
+  const { session } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: UpdatePartnerRequest }) =>
+      api.journal.partners.update(session!.access_token, id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['journal'] });
+    },
+  });
+}
+
+export function useDeletePartner() {
+  const { session } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, deleteEntries }: { id: string; deleteEntries: boolean }) =>
+      api.journal.partners.delete(session!.access_token, id, deleteEntries),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['journal'] });
+    },
+  });
+}
+
+export function usePromoteAlias() {
+  const { session } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: PromoteAliasRequest) =>
+      api.journal.partners.promote(session!.access_token, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['journal'] });
     },
   });
 }

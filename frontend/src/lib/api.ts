@@ -159,6 +159,8 @@ export interface JournalEntry {
   partnerAlias: string | null;
   connectionId: string | null;
   connectionDisplayName: string | null;
+  partnerId: string | null;
+  partnerEncounterCount: number | null;
   notes: string | null;
   customFields: CustomField[] | null;
   createdAt: string;
@@ -169,6 +171,7 @@ export interface CreateJournalEntryRequest {
   encounterDate: string;
   partnerAlias?: string;
   connectionId?: string;
+  partnerId?: string;
   notes?: string;
   customFields?: CustomField[];
 }
@@ -177,6 +180,7 @@ export interface UpdateJournalEntryRequest {
   encounterDate: string;
   partnerAlias?: string;
   connectionId?: string;
+  partnerId?: string;
   notes?: string;
   customFields?: CustomField[];
 }
@@ -189,6 +193,39 @@ export interface JournalSummary {
 
 export interface JournalTemplates {
   labels: string[];
+}
+
+export interface JournalPartner {
+  id: string;
+  alias: string;
+  connectionId: string | null;
+  connectionDisplayName: string | null;
+  encounterCount: number;
+  firstEncounterDate: string | null;
+  mostRecentEncounterDate: string | null;
+}
+
+export interface JournalPartnerDetail extends JournalPartner {
+  notes: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreatePartnerRequest {
+  alias: string;
+  connectionId?: string;
+  notes?: string;
+}
+
+export interface UpdatePartnerRequest {
+  alias?: string;
+  connectionId?: string;
+  notes?: string;
+  unlinkConnection?: boolean;
+}
+
+export interface PromoteAliasRequest {
+  alias: string;
 }
 
 /**
@@ -326,6 +363,24 @@ export const api = {
       save: (token: string, labels: string[]) =>
         apiRequest<JournalTemplates>('/api/journal/templates', token, { method: 'PUT', body: { labels } }),
     },
+    partners: {
+      list: (token: string) =>
+        apiRequest<JournalPartner[]>('/api/journal/partners', token),
+      create: (token: string, data: CreatePartnerRequest) =>
+        apiRequest<JournalPartner>('/api/journal/partners', token, { method: 'POST', body: data }),
+      get: (token: string, id: string) =>
+        apiRequest<JournalPartnerDetail>(`/api/journal/partners/${id}`, token),
+      update: (token: string, id: string, data: UpdatePartnerRequest) =>
+        apiRequest<JournalPartner>(`/api/journal/partners/${id}`, token, { method: 'PUT', body: data }),
+      delete: (token: string, id: string, deleteEntries = false) =>
+        apiRequest<void>(`/api/journal/partners/${id}?deleteEntries=${deleteEntries}`, token, { method: 'DELETE' }),
+      entries: (token: string, id: string) =>
+        apiRequest<JournalEntry[]>(`/api/journal/partners/${id}/entries`, token),
+      promote: (token: string, data: PromoteAliasRequest) =>
+        apiRequest<JournalPartner>('/api/journal/partners/promote', token, { method: 'POST', body: data }),
+    },
+    recentAliases: (token: string) =>
+      apiRequest<string[]>('/api/journal/recent-aliases', token),
   },
 };
 
