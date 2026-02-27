@@ -26,6 +26,7 @@ import app.navilla.dto.JournalTemplateResponse;
 import app.navilla.dto.JournalTemplatesRequest;
 import app.navilla.dto.UpdateJournalEntryRequest;
 import app.navilla.service.EncounterJournalService;
+import app.navilla.service.JournalPartnerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -57,6 +58,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class EncounterJournalController {
 
   private final EncounterJournalService journalService;
+  private final JournalPartnerService partnerService;
 
   /**
    * Lists journal entries for the authenticated user.
@@ -155,5 +157,17 @@ public class EncounterJournalController {
       @AuthenticationPrincipal Jwt jwt,
       @RequestParam(defaultValue = "2026") int year) {
     return ResponseEntity.ok(journalService.getSummary(jwt, year));
+  }
+
+  /**
+   * Returns recent distinct aliases from entries without a partner.
+   *
+   * @param jwt the JWT token containing user info
+   * @return up to 8 recent distinct aliases
+   */
+  @GetMapping("/recent-aliases")
+  public ResponseEntity<List<String>> listRecentAliases(
+      @AuthenticationPrincipal Jwt jwt) {
+    return ResponseEntity.ok(partnerService.listRecentAliases(jwt));
   }
 }
