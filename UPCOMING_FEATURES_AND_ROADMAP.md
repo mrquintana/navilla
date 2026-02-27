@@ -1582,8 +1582,7 @@ Features below are organized by the userbase milestone needed to justify buildin
 - **Won't Do (descoped):**
   - ~~Standalone symptom guide~~ — replaced by symptom filter on guides index.
   - ~~CDMX clinic finder~~ — Google Maps already solves this better. Future: revisit if we partner with labs (Chopo, Salud Digna) to offer discount codes + verified result upload. Labs would gain a referral channel; users get integrated verified results.
-- **Remaining before Week 4:**
-  - Validate all symptom-to-STI mappings against authoritative sources before public launch (see Content Sources below).
+- **Week 4 is next** — see Week 4 deliverables above (SEO, cost estimator, polish, deploy Layer 0).
 
 #### Authoritative STI Content Sources
 
@@ -1631,7 +1630,7 @@ All factual content (symptoms, testing windows, treatment) must be verified agai
 
 | Week | Focus | Deliverables |
 |------|-------|-------------|
-| 15 | Anonymous notifications + content verification | Backend: anonymous_notifications table, link generation/serving. Frontend: notification generation screen, public landing page. Verify all Layer 0 content against official sources for accuracy |
+| 15 | Anonymous notifications + content verification | Backend: anonymous_notifications table, link generation/serving. Frontend: notification generation screen, public landing page. Verify all Layer 0 content against official sources for accuracy — including symptom-to-STI mappings (SYMPTOM_LABELS + symptoms[] arrays in stiContent.ts) |
 | 16 | Launch prep | Final testing pass (unit + E2E). Performance optimization. Content accuracy fixes. Security audit (OWASP top 10 check). Reddit community created. Social media accounts set up |
 
 ### Phase 5: Soft Launch + Growth (Weeks 17-20)
