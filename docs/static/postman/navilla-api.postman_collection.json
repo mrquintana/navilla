@@ -28,6 +28,12 @@
       "value": "testuser@example.com",
       "type": "string",
       "description": "Email for connection request testing"
+    },
+    {
+      "key": "journalEntryId",
+      "value": "",
+      "type": "string",
+      "description": "Journal entry ID for update/delete operations"
     }
   ],
   "auth": {
@@ -745,6 +751,354 @@
               "path": ["api", "notifications"]
             },
             "description": "Get notifications for the authenticated user"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Journal",
+      "description": "Encounter journal endpoints for managing private journal entries with encrypted data",
+      "item": [
+        {
+          "name": "List Journal Entries",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is an array', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('Each entry has required fields', function() {",
+                  "    const json = pm.response.json();",
+                  "    json.forEach(function(entry) {",
+                  "        pm.expect(entry).to.have.property('id');",
+                  "        pm.expect(entry).to.have.property('encounterDate');",
+                  "        pm.expect(entry).to.have.property('createdAt');",
+                  "    });",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/journal",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "journal"]
+            },
+            "description": "Get all journal entries for the authenticated user. Returns entries sorted by encounter date descending."
+          }
+        },
+        {
+          "name": "List Journal Entries by Month",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is an array', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('All entries are within requested month', function() {",
+                  "    const json = pm.response.json();",
+                  "    json.forEach(function(entry) {",
+                  "        pm.expect(entry.encounterDate).to.match(/^2026-03/);",
+                  "    });",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/journal?month=2026-03",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "journal"],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "2026-03",
+                  "description": "Filter entries by month (YYYY-MM format)"
+                }
+              ]
+            },
+            "description": "Get journal entries filtered by a specific month. Use YYYY-MM format for the month parameter."
+          }
+        },
+        {
+          "name": "Create Journal Entry",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function() {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response has entry ID', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('id');",
+                  "    pm.expect(json.id).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);",
+                  "});",
+                  "",
+                  "pm.test('Response has encounter date and alias', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('encounterDate');",
+                  "    pm.expect(json.encounterDate).to.equal('2026-03-15');",
+                  "    pm.expect(json).to.have.property('partnerAlias');",
+                  "    pm.expect(json.partnerAlias).to.equal('Alex');",
+                  "});",
+                  "",
+                  "pm.test('Response has custom fields', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('customFields');",
+                  "    pm.expect(json.customFields).to.be.an('array');",
+                  "    pm.expect(json.customFields).to.have.lengthOf(2);",
+                  "});",
+                  "",
+                  "// Store entry ID for subsequent requests",
+                  "if (pm.response.code === 201) {",
+                  "    const json = pm.response.json();",
+                  "    pm.collectionVariables.set('journalEntryId', json.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"encounterDate\": \"2026-03-15\",\n  \"partnerAlias\": \"Alex\",\n  \"notes\": \"A nice evening in Roma Norte\",\n  \"customFields\": [\n    {\"label\": \"Location\", \"value\": \"Roma Norte\"},\n    {\"label\": \"Mood\", \"value\": \"Great\"}\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/journal",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "journal"]
+            },
+            "description": "Create a new journal entry. All sensitive fields (partnerAlias, notes, customFields) are encrypted server-side with AES-256-GCM. Maximum 3 custom fields per entry."
+          }
+        },
+        {
+          "name": "Update Journal Entry",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has updated fields', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('id');",
+                  "    pm.expect(json).to.have.property('encounterDate');",
+                  "    pm.expect(json.partnerAlias).to.equal('Alex');",
+                  "});",
+                  "",
+                  "pm.test('Custom fields were updated', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.customFields).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"encounterDate\": \"2026-03-15\",\n  \"partnerAlias\": \"Alex\",\n  \"notes\": \"A nice evening in Roma Norte\",\n  \"customFields\": [\n    {\"label\": \"Location\", \"value\": \"Roma Norte\"},\n    {\"label\": \"Mood\", \"value\": \"Great\"}\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/journal/{{journalEntryId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "journal", "{{journalEntryId}}"]
+            },
+            "description": "Update an existing journal entry. Only the entry owner can update. All sensitive fields re-encrypted on save."
+          }
+        },
+        {
+          "name": "Delete Journal Entry",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 204', function() {",
+                  "    pm.response.to.have.status(204);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/journal/{{journalEntryId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "journal", "{{journalEntryId}}"]
+            },
+            "description": "Delete a journal entry. Only the entry owner can delete. This is a hard delete — the entry and its encrypted data are permanently removed."
+          }
+        },
+        {
+          "name": "Get Custom Field Templates",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has labels array', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('labels');",
+                  "    pm.expect(json.labels).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/journal/templates",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "journal", "templates"]
+            },
+            "description": "Get the user's saved custom field label templates. These are reusable labels that appear as suggestions when creating new journal entries."
+          }
+        },
+        {
+          "name": "Save Custom Field Templates",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has saved labels', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('labels');",
+                  "    pm.expect(json.labels).to.be.an('array');",
+                  "    pm.expect(json.labels).to.include('Location');",
+                  "    pm.expect(json.labels).to.include('Mood');",
+                  "    pm.expect(json.labels).to.include('Protection');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"labels\": [\"Location\", \"Mood\", \"Protection\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/journal/templates",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "journal", "templates"]
+            },
+            "description": "Save or update the user's custom field label templates. These labels are suggested when creating new entries. Maximum 10 labels."
+          }
+        },
+        {
+          "name": "Get Journal Summary",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has summary fields', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('totalEntries');",
+                  "    pm.expect(json).to.have.property('monthlyBreakdown');",
+                  "    pm.expect(json.totalEntries).to.be.a('number');",
+                  "    pm.expect(json.totalEntries).to.be.at.least(0);",
+                  "});",
+                  "",
+                  "pm.test('Monthly breakdown is an array', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.monthlyBreakdown).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/journal/summary?year=2026",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "journal", "summary"],
+              "query": [
+                {
+                  "key": "year",
+                  "value": "2026",
+                  "description": "Year to get summary for (YYYY format)"
+                }
+              ]
+            },
+            "description": "Get a summary of journal entries for a given year, including total count and monthly breakdown."
           }
         }
       ]

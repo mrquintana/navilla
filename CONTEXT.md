@@ -618,13 +618,13 @@ For a quick start and a list of development commands, please refer to the main `
 
 ## Next Steps
 
-All MVP features are implemented and verified. Remaining open work tracked in GitHub Issues:
+Week 5 (Encounter Journal) complete. Moving to Week 6 next.
 
 | Priority | Item | GitHub Issue | Notes |
 |----------|------|-------------|-------|
+| **Next** | Week 6: Testing history tracker | — | Test records, per-condition history, document upload |
 | High | Backend Spanish translations | #8 | Frontend done, backend messages_es_MX.properties still English |
 | High | SendGrid SMTP for password reset | #14 | Infrastructure config — not code |
-| Medium | Frontend unit tests (Vitest) | #12 | No unit test framework set up yet |
 | Medium | User guide documentation | #19 | Screenshots + walkthrough for end users |
 
 Run `gh issue list` for the full list.
@@ -697,6 +697,53 @@ rm -f scripts/.seed-state.json
 ### Exposure Display Notes
 - **"Exposure Overview" vs "In Your Network"**: Same data source (`exposureQuery.data?.exposures`), different display limits. Dashboard shows top 3, Health page shows 6 (expandable with "Show all").
 - **Status labels**: `active` (clearedAt is null) vs `resolved` (clearedAt set). Timeframe: `recent` (≤30 days) vs `older` (>30 days). Four possible combos: "Active - Recent", "Active - Older", "Resolved - Recent", "Resolved - Older".
+
+---
+
+## Session Notes (2026-02-27 — Week 5: Encounter Journal)
+
+### Accomplished
+Complete Week 5 Layer 1: Encounter journal — first personal tracker feature.
+
+**Database:**
+- Migration `008_encounter_journal.sql`: two new tables (`encounter_journal`, `journal_field_templates`)
+- All sensitive text fields encrypted as BYTEA (AES-256-GCM)
+- Custom fields stored as encrypted JSON blob (max 3 per entry)
+- Optional FK to connections table for linking entries to network contacts
+
+**Backend (Java 25 + Spring Boot 4):**
+- `EncounterJournal` + `JournalFieldTemplate` JPA entities
+- `EncounterJournalRepository` with month filtering and monthly summary queries
+- 7 DTOs (request/response records with Jakarta validation)
+- `EncounterJournalService` with full CRUD, encryption, ownership checks, custom field JSON serialization
+- `EncounterJournalController` — 8 REST endpoints at `/api/journal`
+- `JournalMetrics` — Micrometer counters for create/update/delete/templates-saved
+- Backend i18n messages (messages.properties + messages_es_MX.properties)
+- 14 service unit tests + 8 controller integration tests (all passing)
+
+**Frontend (React 19 + TypeScript):**
+- `api.journal.*` API client group with types + E2E mocks
+- 7 React Query hooks in `useJournal.ts`
+- `JournalPage.tsx` — main page with timeline/calendar toggle, summary bar, encrypted badge
+- `JournalTimeline.tsx` — chronological list grouped by month
+- `JournalEntryCard.tsx` — entry card with date, alias, notes preview, custom field badge
+- `JournalEmptyState.tsx` — warm empty state with privacy messaging
+- `JournalEntryModal.tsx` — create/edit form with custom fields, connection linking, save-for-future templates
+- `JournalCalendar.tsx` — monthly grid with entry dot indicators, day selection
+- Protected route at `/journal`, nav link with BookOpen icon
+- 33 frontend component tests (all passing)
+- Full i18n (en_US + es_MX) for all journal strings
+
+**Tests:** 80 backend + 181 frontend = 261 total tests, all passing
+
+### Key Decisions
+- Server-side AES-256-GCM encryption (compatible with future client-side E2E upgrade)
+- Custom fields as encrypted JSON blob (not EAV) — simpler, no query benefit since data is encrypted
+- Optional connection FK — entries can exist independently of the network
+- Calendar view uses native Date API (no date library dependency)
+
+### Next Steps
+- Week 6: Testing history tracker (test records, per-condition history, document upload)
 
 ---
 
