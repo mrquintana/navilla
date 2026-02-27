@@ -6,9 +6,10 @@ interface JournalEntryCardProps {
   entry: JournalEntry;
   onEdit: (entry: JournalEntry) => void;
   onDelete: (id: string) => void;
+  isDeleting?: boolean;
 }
 
-export function JournalEntryCard({ entry, onEdit, onDelete }: JournalEntryCardProps) {
+export function JournalEntryCard({ entry, onEdit, onDelete, isDeleting }: JournalEntryCardProps) {
   const { t, i18n } = useTranslation();
   const locale = i18n.language.replace('_', '-');
 
@@ -30,16 +31,16 @@ export function JournalEntryCard({ entry, onEdit, onDelete }: JournalEntryCardPr
       : entry.notes
     : null;
 
-  const customFieldCount = entry.customFields?.length ?? 0;
+  const customFields = entry.customFields ?? [];
 
   return (
-    <div className="journal-entry-card">
+    <div className={`journal-entry-card${isDeleting ? ' journal-entry-card--deleting' : ''}`}>
       {/* Mobile: stacked layout. Desktop: row layout */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-4 min-w-0">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:gap-4 min-w-0">
           {/* Date */}
           <span
-            className="text-sm font-semibold text-primary whitespace-nowrap"
+            className="text-sm font-semibold text-primary whitespace-nowrap pt-0.5"
             title={fullDate}
           >
             {formattedDate}
@@ -59,34 +60,45 @@ export function JournalEntryCard({ entry, onEdit, onDelete }: JournalEntryCardPr
                 {notesPreview}
               </p>
             )}
-            {customFieldCount > 0 && (
-              <span className="badge badge-info text-[11px] mt-1">
-                {t('journal.customFieldCount', { count: customFieldCount })}
-              </span>
+            {customFields.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mt-1.5">
+                {customFields.map((cf, i) => (
+                  <span key={i} className="journal-custom-field-chip">
+                    <span className="journal-custom-field-label">{cf.label}</span>
+                    <span className="journal-custom-field-value">{cf.value}</span>
+                  </span>
+                ))}
+              </div>
             )}
           </div>
         </div>
 
         {/* Actions */}
         <div className="flex items-center gap-2 shrink-0">
-          <button
-            type="button"
-            className="btn btn-secondary btn-sm"
-            onClick={() => onEdit(entry)}
-            title={t('common.edit')}
-            aria-label={t('common.edit')}
-          >
-            <Pencil className="nav-icon" aria-hidden="true" />
-          </button>
-          <button
-            type="button"
-            className="btn btn-secondary btn-sm"
-            onClick={() => onDelete(entry.id)}
-            title={t('common.delete')}
-            aria-label={t('common.delete')}
-          >
-            <Trash2 className="nav-icon" aria-hidden="true" />
-          </button>
+          {isDeleting ? (
+            <span className="spinner" aria-label={t('common.loading')} />
+          ) : (
+            <>
+              <button
+                type="button"
+                className="btn btn-secondary btn-sm"
+                onClick={() => onEdit(entry)}
+                title={t('common.edit')}
+                aria-label={t('common.edit')}
+              >
+                <Pencil className="nav-icon" aria-hidden="true" />
+              </button>
+              <button
+                type="button"
+                className="btn btn-secondary btn-sm"
+                onClick={() => onDelete(entry.id)}
+                title={t('common.delete')}
+                aria-label={t('common.delete')}
+              >
+                <Trash2 className="nav-icon" aria-hidden="true" />
+              </button>
+            </>
+          )}
         </div>
       </div>
     </div>

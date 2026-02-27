@@ -110,7 +110,7 @@ describe('JournalEntryCard', () => {
     expect(screen.getByText(shortNotes)).toBeInTheDocument();
   });
 
-  it('shows custom field count badge', () => {
+  it('shows custom field label-value chips', () => {
     render(
       <JournalEntryCard
         entry={makeEntry({
@@ -124,10 +124,13 @@ describe('JournalEntryCard', () => {
       />
     );
 
-    expect(screen.getByText('journal.customFieldCount:2')).toBeInTheDocument();
+    expect(screen.getByText('Location')).toBeInTheDocument();
+    expect(screen.getByText('Roma Norte')).toBeInTheDocument();
+    expect(screen.getByText('Mood')).toBeInTheDocument();
+    expect(screen.getByText('Good')).toBeInTheDocument();
   });
 
-  it('does not show custom field badge when no custom fields', () => {
+  it('does not show custom field chips when no custom fields', () => {
     render(
       <JournalEntryCard
         entry={makeEntry({ customFields: null })}

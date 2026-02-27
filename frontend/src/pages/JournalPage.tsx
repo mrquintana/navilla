@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Lock, Plus, List, Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Lock, Plus, List, Calendar, ChevronLeft, ChevronRight, AlertTriangle } from 'lucide-react';
 import { useJournalEntries, useJournalSummary, useDeleteJournalEntry } from '../hooks/useJournal';
 import type { JournalEntry } from '../lib/api';
 import { JournalTimeline } from '../components/journal/JournalTimeline';
@@ -31,6 +31,7 @@ export function JournalPage() {
   const [calendarMonth, setCalendarMonth] = useState<Date>(
     new Date(now.getFullYear(), now.getMonth(), 1)
   );
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const { data: entries, isLoading: entriesLoading } = useJournalEntries();
   const { data: summary } = useJournalSummary(currentYear);
@@ -48,10 +49,19 @@ export function JournalPage() {
     setIsModalOpen(true);
   };
 
-  const handleDelete = (id: string) => {
-    if (window.confirm(t('journal.deleteConfirm'))) {
-      deleteMutation.mutate(id);
-    }
+  const handleDeleteRequest = (id: string) => {
+    setDeletingId(id);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (!deletingId) return;
+    deleteMutation.mutate(deletingId, {
+      onSettled: () => setDeletingId(null),
+    });
+  };
+
+  const handleDeleteCancel = () => {
+    setDeletingId(null);
   };
 
   const handleViewModeChange = useCallback((mode: ViewMode) => {
@@ -171,7 +181,8 @@ export function JournalPage() {
         <JournalTimeline
           entries={entryList}
           onEdit={handleEdit}
-          onDelete={handleDelete}
+          onDelete={handleDeleteRequest}
+          deletingId={deleteMutation.isPending ? deletingId : null}
         />
       ) : (
         <div className="space-y-6">
@@ -222,7 +233,8 @@ export function JournalPage() {
                     key={entry.id}
                     entry={entry}
                     onEdit={handleEdit}
-                    onDelete={handleDelete}
+                    onDelete={handleDeleteRequest}
+                    isDeleting={deleteMutation.isPending && deletingId === entry.id}
                   />
                 ))
               )}
@@ -249,6 +261,49 @@ export function JournalPage() {
         }}
         entry={editingEntry}
       />
+
+      {/* Delete confirmation modal */}
+      {deletingId && !deleteMutation.isPending && (
+        <div
+          className="modal-backdrop"
+          role="dialog"
+          aria-modal="true"
+          onClick={(e) => { if (e.target === e.currentTarget) handleDeleteCancel(); }}
+        >
+          <div className="modal" style={{ maxWidth: '380px' }}>
+            <div className="flex items-start gap-3 mb-4">
+              <span className="flex items-center justify-center w-10 h-10 rounded-full bg-red-50 shrink-0">
+                <AlertTriangle className="w-5 h-5 text-red-500" aria-hidden="true" />
+              </span>
+              <div>
+                <h3 className="font-semibold text-foreground">
+                  {t('journal.deleteTitle')}
+                </h3>
+                <p className="text-sm text-muted mt-1">
+                  {t('journal.deleteConfirm')}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center justify-end gap-2">
+              <button
+                type="button"
+                className="btn btn-secondary btn-sm"
+                onClick={handleDeleteCancel}
+              >
+                {t('common.cancel')}
+              </button>
+              <button
+                type="button"
+                className="btn btn-sm"
+                style={{ background: '#dc3545', color: '#fff', borderColor: '#dc3545' }}
+                onClick={handleDeleteConfirm}
+              >
+                {t('common.delete')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
