@@ -482,6 +482,18 @@
     "findClinicCta": "Find a clinic near you",
     "sourcesLabel": "Sources"
   },
+  "cost": {
+    "kicker": "Testing Costs",
+    "title": "STI Testing Costs in Mexico",
+    "subtitle": "Approximate cost tiers by provider type. Actual prices vary by location and test.",
+    "disclaimer": "Costs are approximate and may vary. Contact providers directly for current pricing.",
+    "free": "Free",
+    "na": "N/A",
+    "footnotesTitle": "Provider Types",
+    "sourcesLabel": "Pricing data from publicly available clinic information, 2025–2026.",
+    "crossLinkTitle": "Know when to test? See what it costs",
+    "crossLinkBody": "Compare testing costs across provider types in Mexico."
+  },
   "cookieNotice": {
     "ariaLabel": "Cookie notice",
     "body": "We use essential cookies for login and security. We do not use advertising or tracking cookies.",

@@ -481,6 +481,18 @@
     "findClinicCta": "Encuentra una clínica cerca",
     "sourcesLabel": "Fuentes"
   },
+  "cost": {
+    "kicker": "Costos de Pruebas",
+    "title": "Costos de Pruebas de ITS en México",
+    "subtitle": "Rangos aproximados de costos por tipo de proveedor. Los precios reales varían por ubicación y prueba.",
+    "disclaimer": "Los costos son aproximados y pueden variar. Contacta directamente a los proveedores para precios actuales.",
+    "free": "Gratis",
+    "na": "N/A",
+    "footnotesTitle": "Tipos de Proveedores",
+    "sourcesLabel": "Datos de precios de información pública de clínicas, 2025–2026.",
+    "crossLinkTitle": "¿Sabes cuándo hacerte la prueba? Conoce los costos",
+    "crossLinkBody": "Compara los costos de pruebas por tipo de proveedor en México."
+  },
   "cookieNotice": {
     "ariaLabel": "Aviso de cookies",
     "body": "Usamos cookies esenciales para inicio de sesión y seguridad. No usamos cookies de publicidad ni de rastreo.",
