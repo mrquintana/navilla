@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ChevronLeft, Link2, Pencil, Trash2, AlertTriangle } from 'lucide-react';
 import {
@@ -7,8 +7,11 @@ import {
   useJournalPartnerEntries,
   useUpdatePartner,
   useDeletePartner,
+  useDeleteJournalEntry,
 } from '../hooks/useJournal';
+import type { JournalEntry } from '../lib/api';
 import { JournalTimeline } from '../components/journal/JournalTimeline';
+import { JournalEntryModal } from '../components/journal/JournalEntryModal';
 import { PageSkeleton, SkeletonBlock, SkeletonRows } from '../components/ui/LoadingShell';
 
 type DeleteMode = 'soft' | 'destructive' | null;
@@ -19,10 +22,11 @@ export function PartnerDetailPage() {
   const { t, i18n } = useTranslation();
   const locale = i18n.language.replace('_', '-');
 
-  const { data: partner, isLoading: partnerLoading } = useJournalPartner(id!);
-  const { data: entries, isLoading: entriesLoading } = useJournalPartnerEntries(id!);
+  const { data: partner, isLoading: partnerLoading } = useJournalPartner(id ?? '');
+  const { data: entries, isLoading: entriesLoading } = useJournalPartnerEntries(id ?? '');
   const updateMutation = useUpdatePartner();
   const deleteMutation = useDeletePartner();
+  const deleteEntryMutation = useDeleteJournalEntry();
 
   // Local overrides — null means "use server value"
   const [localNotes, setLocalNotes] = useState<string | null>(null);
@@ -31,6 +35,15 @@ export function PartnerDetailPage() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteMode, setDeleteMode] = useState<DeleteMode>(null);
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
+
+  // Entry edit/delete state
+  const [editingEntry, setEditingEntry] = useState<JournalEntry | null>(null);
+  const [isEntryModalOpen, setIsEntryModalOpen] = useState(false);
+  const [deletingEntryId, setDeletingEntryId] = useState<string | null>(null);
+
+  if (!id) {
+    return <Navigate to="/journal" replace />;
+  }
 
   // Derive notes: local override if user has edited, otherwise server data
   const notes = localNotes ?? partner?.notes ?? '';
@@ -126,13 +139,25 @@ export function PartnerDetailPage() {
   const confirmWord = t('journal.deletePartnerConfirmWord');
   const canConfirmDestructive = deleteConfirmText === confirmWord;
 
-  // Handlers for entries within timeline — navigate back to journal for these actions
-  const handleEditEntry = () => {
-    navigate('/journal');
+  // Handlers for entries within timeline
+  const handleEditEntry = (entry: JournalEntry) => {
+    setEditingEntry(entry);
+    setIsEntryModalOpen(true);
   };
 
-  const handleDeleteEntry = () => {
-    navigate('/journal');
+  const handleDeleteEntryRequest = (entryId: string) => {
+    setDeletingEntryId(entryId);
+  };
+
+  const handleDeleteEntryConfirm = () => {
+    if (!deletingEntryId) return;
+    deleteEntryMutation.mutate(deletingEntryId, {
+      onSettled: () => setDeletingEntryId(null),
+    });
+  };
+
+  const handleDeleteEntryCancel = () => {
+    setDeletingEntryId(null);
   };
 
   return (
@@ -280,7 +305,8 @@ export function PartnerDetailPage() {
           <JournalTimeline
             entries={entryList}
             onEdit={handleEditEntry}
-            onDelete={handleDeleteEntry}
+            onDelete={handleDeleteEntryRequest}
+            deletingId={deleteEntryMutation.isPending ? deletingEntryId : null}
           />
         </div>
       )}
@@ -291,8 +317,16 @@ export function PartnerDetailPage() {
           className="modal-backdrop"
           role="dialog"
           aria-modal="true"
+          aria-labelledby="delete-partner-title"
           onClick={(e) => {
             if (e.target === e.currentTarget) {
+              setShowDeleteModal(false);
+              setDeleteMode(null);
+              setDeleteConfirmText('');
+            }
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') {
               setShowDeleteModal(false);
               setDeleteMode(null);
               setDeleteConfirmText('');
@@ -305,7 +339,7 @@ export function PartnerDetailPage() {
                 <AlertTriangle className="w-5 h-5 text-red-500" aria-hidden="true" />
               </span>
               <div>
-                <h3 className="font-semibold text-foreground">
+                <h3 id="delete-partner-title" className="font-semibold text-foreground">
                   {t('journal.deletePartnerTitle')}
                 </h3>
               </div>
@@ -404,6 +438,59 @@ export function PartnerDetailPage() {
                 ) : (
                   t('journal.deletePartner')
                 )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Entry edit modal */}
+      <JournalEntryModal
+        isOpen={isEntryModalOpen}
+        onClose={() => {
+          setIsEntryModalOpen(false);
+          setEditingEntry(null);
+        }}
+        entry={editingEntry}
+      />
+
+      {/* Entry delete confirmation modal */}
+      {deletingEntryId && !deleteEntryMutation.isPending && (
+        <div
+          className="modal-backdrop"
+          role="dialog"
+          aria-modal="true"
+          onClick={(e) => { if (e.target === e.currentTarget) handleDeleteEntryCancel(); }}
+        >
+          <div className="modal" style={{ maxWidth: '380px' }}>
+            <div className="flex items-start gap-3 mb-4">
+              <span className="flex items-center justify-center w-10 h-10 rounded-full bg-red-50 shrink-0">
+                <AlertTriangle className="w-5 h-5 text-red-500" aria-hidden="true" />
+              </span>
+              <div>
+                <h3 className="font-semibold text-foreground">
+                  {t('journal.deleteTitle')}
+                </h3>
+                <p className="text-sm text-muted mt-1">
+                  {t('journal.deleteConfirm')}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center justify-end gap-2">
+              <button
+                type="button"
+                className="btn btn-secondary btn-sm"
+                onClick={handleDeleteEntryCancel}
+              >
+                {t('common.cancel')}
+              </button>
+              <button
+                type="button"
+                className="btn btn-sm"
+                style={{ background: '#dc3545', color: '#fff', borderColor: '#dc3545' }}
+                onClick={handleDeleteEntryConfirm}
+              >
+                {t('common.delete')}
               </button>
             </div>
           </div>

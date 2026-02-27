@@ -46,6 +46,10 @@ vi.mock('react-i18next', () => ({
   }),
 }));
 
+vi.mock('react-router-dom', () => ({
+  useNavigate: () => vi.fn(),
+}));
+
 describe('JournalPage', () => {
   const defaultDeleteMutation = {
     mutate: vi.fn(),
@@ -121,6 +125,8 @@ describe('JournalPage', () => {
         partnerAlias: 'Alex',
         connectionId: null,
         connectionDisplayName: null,
+        partnerId: null,
+        partnerEncounterCount: null,
         notes: 'A nice evening.',
         customFields: null,
         createdAt: '2026-03-15T10:00:00Z',
@@ -132,6 +138,8 @@ describe('JournalPage', () => {
         partnerAlias: 'Jordan',
         connectionId: null,
         connectionDisplayName: null,
+        partnerId: null,
+        partnerEncounterCount: null,
         notes: null,
         customFields: null,
         createdAt: '2026-03-10T10:00:00Z',
@@ -157,6 +165,8 @@ describe('JournalPage', () => {
       partnerAlias: 'Alex',
       connectionId: null,
       connectionDisplayName: null,
+      partnerId: null,
+      partnerEncounterCount: null,
       notes: null,
       customFields: null,
       createdAt: '2026-02-15T10:00:00Z',

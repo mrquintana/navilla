@@ -12,6 +12,11 @@ vi.mock('react-i18next', () => ({
   }),
 }));
 
+const mockNavigate = vi.fn();
+vi.mock('react-router-dom', () => ({
+  useNavigate: () => mockNavigate,
+}));
+
 function makeEntry(overrides: Partial<JournalEntry> = {}): JournalEntry {
   return {
     id: '1',
@@ -19,6 +24,8 @@ function makeEntry(overrides: Partial<JournalEntry> = {}): JournalEntry {
     partnerAlias: 'Alex',
     connectionId: null,
     connectionDisplayName: null,
+    partnerId: null,
+    partnerEncounterCount: null,
     notes: null,
     customFields: null,
     createdAt: '2026-03-15T10:00:00Z',
@@ -34,6 +41,7 @@ describe('JournalEntryCard', () => {
   beforeEach(() => {
     onEdit.mockReset();
     onDelete.mockReset();
+    mockNavigate.mockReset();
   });
 
   it('renders entry date', () => {
