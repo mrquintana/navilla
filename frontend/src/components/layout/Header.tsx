@@ -2,7 +2,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuthOptional } from '../../contexts/AuthContext';
 import { useUser } from '../../hooks/useUser';
-import { Bell, ChevronDown, HeartPulse, LayoutDashboard, LogOut, Menu, UserCircle2, Users } from 'lucide-react';
+import { Bell, BookOpen, ChevronDown, HeartPulse, LayoutDashboard, LogOut, Menu, UserCircle2, Users } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { api, type NotificationItem } from '../../lib/api';
@@ -114,6 +114,10 @@ export function Header() {
                       <LayoutDashboard className="nav-icon" aria-hidden="true" />
                       {t('nav.dashboard')}
                     </Link>
+                    <Link to="/journal" className={`nav-dropdown-item${pathname === '/journal' ? ' nav-dropdown-item-active' : ''}`} role="menuitem" onClick={() => setMobileMenuOpen(false)}>
+                      <BookOpen className="nav-icon" aria-hidden="true" />
+                      {t('nav.journal')}
+                    </Link>
                     <Link to="/connections" className={`nav-dropdown-item${pathname === '/connections' ? ' nav-dropdown-item-active' : ''}`} role="menuitem">
                       <Users className="nav-icon" aria-hidden="true" />
                       {t('nav.connections')}
@@ -165,6 +169,10 @@ export function Header() {
                 <Link to="/dashboard" className={`nav-link${pathname === '/dashboard' ? ' nav-link-active' : ''}`}>
                   <LayoutDashboard className="nav-icon" aria-hidden="true" />
                   {t('nav.dashboard')}
+                </Link>
+                <Link to="/journal" className={`nav-link${pathname === '/journal' ? ' nav-link-active' : ''}`}>
+                  <BookOpen className="nav-icon" aria-hidden="true" />
+                  {t('nav.journal')}
                 </Link>
                 <Link to="/connections" className={`nav-link${pathname === '/connections' ? ' nav-link-active' : ''}`}>
                   <Users className="nav-icon" aria-hidden="true" />

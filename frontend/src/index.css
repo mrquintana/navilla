@@ -340,6 +340,55 @@ select.input {
   padding: 0.85rem 1rem;
 }
 
+/* Journal */
+.journal-entry-card {
+  border: 1px solid var(--color-border-light);
+  border-radius: 0.75rem;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(79, 70, 229, 0.012));
+  padding: 0.85rem 1rem;
+  transition: box-shadow 0.15s ease;
+}
+
+.journal-entry-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.journal-month-header {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-muted);
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.journal-encrypted-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  background-color: #eef2ff;
+  color: var(--color-primary);
+}
+
+.journal-summary-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--color-foreground-secondary);
+  background-color: var(--color-background-secondary);
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-border-light);
+}
+
 /* Label styles */
 .label {
   display: block;
