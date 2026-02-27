@@ -1,13 +1,15 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
-import { X, Plus } from 'lucide-react';
+import { X, Plus, Bookmark } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import {
   useCreateJournalEntry,
   useUpdateJournalEntry,
   useJournalTemplates,
   useSaveJournalTemplates,
+  useJournalPartners,
+  useRecentAliases,
 } from '../../hooks/useJournal';
 import { api } from '../../lib/api';
 import type { JournalEntry, CustomField, Connection } from '../../lib/api';
@@ -16,6 +18,7 @@ interface JournalEntryModalProps {
   isOpen: boolean;
   onClose: () => void;
   entry: JournalEntry | null; // null = create mode, defined = edit mode
+  onPromote?: (alias: string, matchCount: number) => void;
 }
 
 interface CustomFieldState {
@@ -24,7 +27,16 @@ interface CustomFieldState {
   saveForFuture: boolean;
 }
 
+/** Union type for partner chips — either a saved partner or a recent alias */
+interface PartnerSuggestion {
+  type: 'partner' | 'alias';
+  id: string | null; // partner id for saved partners, null for aliases
+  alias: string;
+  connectionId: string | null;
+}
+
 const MAX_CUSTOM_FIELDS = 3;
+const MAX_CHIPS = 8;
 
 function todayISO(): string {
   return new Date().toISOString().split('T')[0];
@@ -48,7 +60,7 @@ function buildInitialCustomFields(
   }));
 }
 
-export function JournalEntryModal({ isOpen, onClose, entry }: JournalEntryModalProps) {
+export function JournalEntryModal({ isOpen, onClose, entry, onPromote }: JournalEntryModalProps) {
   const { session } = useAuth();
   const { data: templates } = useJournalTemplates();
 
@@ -73,6 +85,7 @@ export function JournalEntryModal({ isOpen, onClose, entry }: JournalEntryModalP
       onClose={onClose}
       savedLabels={savedLabels}
       connections={connectionsQuery.data ?? []}
+      onPromote={onPromote}
     />
   );
 }
@@ -82,6 +95,7 @@ interface JournalEntryFormProps {
   onClose: () => void;
   savedLabels: string[];
   connections: Connection[];
+  onPromote?: (alias: string, matchCount: number) => void;
 }
 
 function JournalEntryForm({
@@ -89,6 +103,7 @@ function JournalEntryForm({
   onClose,
   savedLabels,
   connections,
+  onPromote,
 }: JournalEntryFormProps) {
   const { t } = useTranslation();
 
@@ -97,6 +112,10 @@ function JournalEntryForm({
   const updateMutation = useUpdateJournalEntry();
   const templatesMutation = useSaveJournalTemplates();
 
+  // Partner data
+  const { data: partners } = useJournalPartners();
+  const { data: recentAliases } = useRecentAliases();
+
   const isEditMode = entry !== null;
   const isPending = createMutation.isPending || updateMutation.isPending;
 
@@ -104,11 +123,66 @@ function JournalEntryForm({
   const [formDate, setFormDate] = useState(entry?.encounterDate ?? todayISO());
   const [formAlias, setFormAlias] = useState(entry?.partnerAlias ?? '');
   const [formConnectionId, setFormConnectionId] = useState<string>(entry?.connectionId ?? '');
+  const [formPartnerId, setFormPartnerId] = useState<string | null>(entry?.partnerId ?? null);
   const [formNotes, setFormNotes] = useState(entry?.notes ?? '');
   const [customFields, setCustomFields] = useState<CustomFieldState[]>(
     () => buildInitialCustomFields(entry, savedLabels)
   );
   const [error, setError] = useState<string | null>(null);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
+
+  const aliasInputRef = useRef<HTMLInputElement>(null);
+  const suggestionsRef = useRef<HTMLDivElement>(null);
+
+  // Build the combined suggestion list (saved partners + recent aliases, deduplicated)
+  const allSuggestions = useMemo((): PartnerSuggestion[] => {
+    const suggestions: PartnerSuggestion[] = [];
+    const seenAliases = new Set<string>();
+
+    // Saved partners first
+    for (const p of partners ?? []) {
+      const lower = p.alias.toLowerCase();
+      if (!seenAliases.has(lower)) {
+        seenAliases.add(lower);
+        suggestions.push({
+          type: 'partner',
+          id: p.id,
+          alias: p.alias,
+          connectionId: p.connectionId,
+        });
+      }
+    }
+
+    // Then recent aliases (excluding those already covered by saved partners)
+    for (const alias of recentAliases ?? []) {
+      const lower = alias.toLowerCase();
+      if (!seenAliases.has(lower)) {
+        seenAliases.add(lower);
+        suggestions.push({
+          type: 'alias',
+          id: null,
+          alias,
+          connectionId: null,
+        });
+      }
+    }
+
+    return suggestions;
+  }, [partners, recentAliases]);
+
+  // Top 8 for chips
+  const chipSuggestions = useMemo(
+    () => allSuggestions.slice(0, MAX_CHIPS),
+    [allSuggestions]
+  );
+
+  // Filtered suggestions for autocomplete dropdown
+  const filteredSuggestions = useMemo(() => {
+    if (!formAlias.trim()) return [];
+    const query = formAlias.toLowerCase();
+    return allSuggestions.filter((s) => s.alias.toLowerCase().includes(query));
+  }, [allSuggestions, formAlias]);
 
   // Close on Escape key
   const handleKeyDown = useCallback(
@@ -125,11 +199,55 @@ function JournalEntryForm({
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [handleKeyDown]);
 
+  // Close suggestions when clicking outside
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (
+        suggestionsRef.current &&
+        !suggestionsRef.current.contains(e.target as Node) &&
+        aliasInputRef.current &&
+        !aliasInputRef.current.contains(e.target as Node)
+      ) {
+        setShowSuggestions(false);
+        setIsTyping(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   // Backdrop click handler
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) {
       onClose();
     }
+  };
+
+  // Partner selection handler (from chip or autocomplete)
+  const selectPartner = (suggestion: PartnerSuggestion) => {
+    setFormAlias(suggestion.alias);
+    if (suggestion.type === 'partner' && suggestion.id) {
+      setFormPartnerId(suggestion.id);
+      // Connection lives on the partner — set it and hide the dropdown
+      if (suggestion.connectionId) {
+        setFormConnectionId(suggestion.connectionId);
+      } else {
+        setFormConnectionId('');
+      }
+    } else {
+      setFormPartnerId(null);
+    }
+    setShowSuggestions(false);
+    setIsTyping(false);
+  };
+
+  // Clear partner selection
+  const clearPartner = () => {
+    setFormPartnerId(null);
+    setFormAlias('');
+    setFormConnectionId('');
+    setIsTyping(false);
+    aliasInputRef.current?.focus();
   };
 
   // Custom fields handlers
@@ -164,10 +282,13 @@ function JournalEntryForm({
       .filter((cf) => cf.label.trim() && cf.value.trim())
       .map((cf) => ({ label: cf.label.trim(), value: cf.value.trim() }));
 
+    const alias = formAlias.trim() || undefined;
+
     const data = {
       encounterDate: formDate,
-      partnerAlias: formAlias.trim() || undefined,
+      partnerAlias: alias,
       connectionId: formConnectionId || undefined,
+      partnerId: formPartnerId || undefined,
       notes: formNotes.trim() || undefined,
       customFields: filteredCustomFields.length > 0 ? filteredCustomFields : undefined,
     };
@@ -192,11 +313,23 @@ function JournalEntryForm({
         await templatesMutation.mutateAsync(combined);
       }
 
+      // Check for promotion prompt (only on create, only if no partner was selected)
+      if (!isEditMode && !formPartnerId && alias && onPromote) {
+        onPromote(alias, 0); // matchCount will be computed by JournalPage
+      }
+
       onClose();
     } catch {
       setError(t('journal.saveFailed'));
     }
   };
+
+  // Should we show the autocomplete dropdown?
+  const shouldShowDropdown =
+    showSuggestions &&
+    isTyping &&
+    !formPartnerId &&
+    filteredSuggestions.length > 0;
 
   return (
     <div
@@ -238,41 +371,143 @@ function JournalEntryForm({
             />
           </div>
 
-          {/* Partner alias */}
+          {/* Partner alias with picker */}
           <div>
             <label className="label" htmlFor="journal-alias">
               {t('journal.partnerAlias')}
             </label>
-            <input
-              id="journal-alias"
-              type="text"
-              className="input"
-              value={formAlias}
-              placeholder={t('journal.partnerAliasPlaceholder')}
-              maxLength={200}
-              onChange={(e) => setFormAlias(e.target.value)}
-            />
+
+            {/* Recent partner chips */}
+            {chipSuggestions.length > 0 && (
+              <div className="mb-2">
+                <span className="text-xs text-muted mb-1 block">
+                  {t('journal.recentPartners')}
+                </span>
+                <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-1 px-1">
+                  {chipSuggestions.map((suggestion) => {
+                    const isActive =
+                      (suggestion.type === 'partner' && formPartnerId === suggestion.id) ||
+                      (suggestion.type === 'alias' &&
+                        !formPartnerId &&
+                        formAlias.toLowerCase() === suggestion.alias.toLowerCase());
+
+                    return (
+                      <button
+                        key={suggestion.id ?? suggestion.alias}
+                        type="button"
+                        className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
+                          isActive
+                            ? 'bg-indigo-100 text-indigo-700 border border-indigo-300'
+                            : 'bg-indigo-50 text-stone-700 border border-stone-200 hover:border-indigo-200 hover:bg-indigo-50/80'
+                        }`}
+                        onClick={() => selectPartner(suggestion)}
+                      >
+                        {suggestion.type === 'partner' && (
+                          <Bookmark className="w-3 h-3 flex-shrink-0" aria-hidden="true" />
+                        )}
+                        {suggestion.alias}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Alias input with clear button and autocomplete */}
+            <div className="relative">
+              <div className="flex items-center gap-2">
+                <div className="relative flex-1">
+                  <input
+                    ref={aliasInputRef}
+                    id="journal-alias"
+                    type="text"
+                    className="input w-full"
+                    value={formAlias}
+                    placeholder={t('journal.partnerAliasPlaceholder')}
+                    maxLength={200}
+                    onChange={(e) => {
+                      setFormAlias(e.target.value);
+                      setFormPartnerId(null);
+                      setIsTyping(true);
+                      setShowSuggestions(true);
+                    }}
+                    onFocus={() => {
+                      if (formAlias.trim() && !formPartnerId) {
+                        setShowSuggestions(true);
+                        setIsTyping(true);
+                      }
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && shouldShowDropdown) {
+                        e.preventDefault();
+                        setShowSuggestions(false);
+                        setIsTyping(false);
+                      }
+                    }}
+                    autoComplete="off"
+                  />
+                </div>
+                {/* Clear button when a partner is selected */}
+                {formPartnerId && (
+                  <button
+                    type="button"
+                    className="btn btn-secondary btn-sm flex-shrink-0 p-1.5"
+                    onClick={clearPartner}
+                    aria-label={t('journal.removeField')}
+                  >
+                    <X className="w-4 h-4" aria-hidden="true" />
+                  </button>
+                )}
+              </div>
+
+              {/* Autocomplete dropdown */}
+              {shouldShowDropdown && (
+                <div
+                  ref={suggestionsRef}
+                  className="absolute z-10 left-0 right-0 mt-1 bg-white border border-stone-200 rounded-lg shadow-lg max-h-48 overflow-y-auto"
+                >
+                  {filteredSuggestions.map((suggestion) => (
+                    <button
+                      key={suggestion.id ?? `alias-${suggestion.alias}`}
+                      type="button"
+                      className="w-full text-left px-3 py-2 text-sm hover:bg-indigo-50 flex items-center gap-2 transition-colors"
+                      onMouseDown={(e) => {
+                        e.preventDefault(); // Prevent blur before click
+                        selectPartner(suggestion);
+                      }}
+                    >
+                      {suggestion.type === 'partner' && (
+                        <Bookmark className="w-3 h-3 text-indigo-500 flex-shrink-0" aria-hidden="true" />
+                      )}
+                      <span>{suggestion.alias}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
-          {/* Link to connection */}
-          <div>
-            <label className="label" htmlFor="journal-connection">
-              {t('journal.linkConnection')}
-            </label>
-            <select
-              id="journal-connection"
-              className="input"
-              value={formConnectionId}
-              onChange={(e) => setFormConnectionId(e.target.value)}
-            >
-              <option value="">{t('journal.noConnection')}</option>
-              {connections.map((conn) => (
-                <option key={conn.id} value={conn.id}>
-                  {conn.partnerDisplayName ?? conn.partnerUsername ?? conn.id}
-                </option>
-              ))}
-            </select>
-          </div>
+          {/* Link to connection — hidden when a saved partner is selected */}
+          {!formPartnerId && (
+            <div>
+              <label className="label" htmlFor="journal-connection">
+                {t('journal.linkConnection')}
+              </label>
+              <select
+                id="journal-connection"
+                className="input"
+                value={formConnectionId}
+                onChange={(e) => setFormConnectionId(e.target.value)}
+              >
+                <option value="">{t('journal.noConnection')}</option>
+                {connections.map((conn) => (
+                  <option key={conn.id} value={conn.id}>
+                    {conn.partnerDisplayName ?? conn.partnerUsername ?? conn.id}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           {/* Notes */}
           <div>

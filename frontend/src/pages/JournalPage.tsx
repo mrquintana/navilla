@@ -1,7 +1,7 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Lock, Plus, List, Calendar, Users, ChevronLeft, ChevronRight, AlertTriangle } from 'lucide-react';
-import { useJournalEntries, useJournalSummary, useDeleteJournalEntry } from '../hooks/useJournal';
+import { Lock, Plus, List, Calendar, Users, ChevronLeft, ChevronRight, AlertTriangle, X } from 'lucide-react';
+import { useJournalEntries, useJournalSummary, useDeleteJournalEntry, usePromoteAlias } from '../hooks/useJournal';
 import type { JournalEntry } from '../lib/api';
 import { JournalTimeline } from '../components/journal/JournalTimeline';
 import { JournalCalendar } from '../components/journal/JournalCalendar';
@@ -19,6 +19,11 @@ function toMonthKey(date: Date): string {
   return `${date.getFullYear()}-${m < 10 ? '0' : ''}${m}`;
 }
 
+interface PromoteState {
+  alias: string;
+  count: number;
+}
+
 export function JournalPage() {
   const { t, i18n } = useTranslation();
   const locale = i18n.language.replace('_', '-');
@@ -34,9 +39,14 @@ export function JournalPage() {
   );
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
+  // Promotion toast state
+  const [promoteState, setPromoteState] = useState<PromoteState | null>(null);
+  const dismissedAliasesRef = useRef<Set<string>>(new Set());
+
   const { data: entries, isLoading: entriesLoading } = useJournalEntries();
   const { data: summary } = useJournalSummary(currentYear);
   const deleteMutation = useDeleteJournalEntry();
+  const promoteMutation = usePromoteAlias();
 
   const isInitialLoading = entriesLoading && !entries;
 
@@ -86,6 +96,44 @@ export function JournalPage() {
     setSelectedDate(null);
   }, []);
 
+  // Promotion callback — called by JournalEntryModal after successful save
+  const handlePromote = useCallback(
+    (alias: string) => {
+      // Skip if already dismissed this session
+      if (dismissedAliasesRef.current.has(alias.toLowerCase())) return;
+
+      // Count entries with same alias (case-insensitive), including the one just saved
+      // The query cache may not have refreshed yet, so we count from current entries + 1
+      const currentEntries = entries ?? [];
+      const matchCount =
+        currentEntries.filter(
+          (e) => e.partnerAlias?.toLowerCase() === alias.toLowerCase() && !e.partnerId
+        ).length + 1; // +1 for the entry that was just created
+
+      if (matchCount >= 3) {
+        setPromoteState({ alias, count: matchCount });
+      }
+    },
+    [entries]
+  );
+
+  const handlePromoteConfirm = async () => {
+    if (!promoteState) return;
+    try {
+      await promoteMutation.mutateAsync({ alias: promoteState.alias });
+    } finally {
+      dismissedAliasesRef.current.add(promoteState.alias.toLowerCase());
+      setPromoteState(null);
+    }
+  };
+
+  const handlePromoteDismiss = () => {
+    if (promoteState) {
+      dismissedAliasesRef.current.add(promoteState.alias.toLowerCase());
+    }
+    setPromoteState(null);
+  };
+
   // Entries filtered to the current calendar month
   const calendarMonthKey = toMonthKey(calendarMonth);
   const calendarEntries = useMemo(() => {
@@ -125,6 +173,51 @@ export function JournalPage() {
 
   return (
     <div className="container py-8 space-y-6">
+      {/* Promotion toast */}
+      {promoteState && (
+        <div className="flex items-center gap-3 p-3 bg-indigo-50 border border-indigo-200 rounded-lg">
+          <p className="text-sm text-indigo-800 flex-1">
+            {t('journal.promotePrompt', {
+              count: promoteState.count,
+              alias: promoteState.alias,
+            })}
+          </p>
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <button
+              type="button"
+              className="btn btn-primary btn-sm"
+              onClick={handlePromoteConfirm}
+              disabled={promoteMutation.isPending}
+            >
+              {promoteMutation.isPending ? (
+                <span className="inline-flex items-center gap-1.5">
+                  <span className="spinner" aria-hidden="true" />
+                  {t('common.loading')}
+                </span>
+              ) : (
+                t('journal.promoteYes')
+              )}
+            </button>
+            <button
+              type="button"
+              className="btn btn-secondary btn-sm"
+              onClick={handlePromoteDismiss}
+              disabled={promoteMutation.isPending}
+            >
+              {t('journal.promoteNotNow')}
+            </button>
+            <button
+              type="button"
+              className="p-1 text-stone-400 hover:text-stone-600 transition-colors"
+              onClick={handlePromoteDismiss}
+              aria-label={t('common.close')}
+            >
+              <X className="w-4 h-4" aria-hidden="true" />
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Page header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -273,6 +366,7 @@ export function JournalPage() {
           setEditingEntry(null);
         }}
         entry={editingEntry}
+        onPromote={handlePromote}
       />
 
       {/* Delete confirmation modal */}
