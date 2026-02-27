@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { JournalEntry } from '../../lib/api';
 import { JournalEntryCard } from './JournalEntryCard';
 
@@ -13,6 +14,9 @@ interface JournalTimelineProps {
  * Entries are expected to already be sorted newest-first from the API.
  */
 export function JournalTimeline({ entries, onEdit, onDelete }: JournalTimelineProps) {
+  const { i18n } = useTranslation();
+  const locale = i18n.language.replace('_', '-');
+
   const grouped = useMemo(() => {
     const groups: { key: string; label: string; entries: JournalEntry[] }[] = [];
     const groupMap = new Map<string, JournalEntry[]>();
@@ -30,7 +34,7 @@ export function JournalTimeline({ entries, onEdit, onDelete }: JournalTimelinePr
     for (const [key, groupEntries] of groupMap) {
       const [year, month] = key.split('-');
       const date = new Date(Number(year), Number(month) - 1, 1);
-      const label = date.toLocaleDateString(undefined, {
+      const label = date.toLocaleDateString(locale, {
         month: 'long',
         year: 'numeric',
       });
@@ -38,7 +42,7 @@ export function JournalTimeline({ entries, onEdit, onDelete }: JournalTimelinePr
     }
 
     return groups;
-  }, [entries]);
+  }, [entries, locale]);
 
   return (
     <div className="space-y-8">

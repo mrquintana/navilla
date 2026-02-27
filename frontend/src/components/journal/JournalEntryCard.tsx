@@ -9,14 +9,15 @@ interface JournalEntryCardProps {
 }
 
 export function JournalEntryCard({ entry, onEdit, onDelete }: JournalEntryCardProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const locale = i18n.language.replace('_', '-');
 
   const encounterDate = new Date(entry.encounterDate + 'T00:00:00');
-  const formattedDate = encounterDate.toLocaleDateString(undefined, {
+  const formattedDate = encounterDate.toLocaleDateString(locale, {
     month: 'short',
     day: 'numeric',
   });
-  const fullDate = encounterDate.toLocaleDateString(undefined, {
+  const fullDate = encounterDate.toLocaleDateString(locale, {
     month: 'long',
     day: 'numeric',
     year: 'numeric',

@@ -19,7 +19,8 @@ function toMonthKey(date: Date): string {
 }
 
 export function JournalPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const locale = i18n.language.replace('_', '-');
   const now = new Date();
   const currentYear = now.getFullYear();
 
@@ -89,11 +90,11 @@ export function JournalPage() {
 
   // Month label for the nav header
   const calendarMonthLabel = useMemo(() => {
-    return calendarMonth.toLocaleDateString(undefined, {
+    return calendarMonth.toLocaleDateString(locale, {
       month: 'long',
       year: 'numeric',
     });
-  }, [calendarMonth]);
+  }, [calendarMonth, locale]);
 
   // Compute this-month count from summary
   const thisMonthKey = toMonthKey(now);
@@ -207,7 +208,7 @@ export function JournalPage() {
           {selectedDate && (
             <div className="space-y-3">
               <h3 className="journal-month-header">
-                {new Date(selectedDate + 'T00:00:00').toLocaleDateString(undefined, {
+                {new Date(selectedDate + 'T00:00:00').toLocaleDateString(locale, {
                   weekday: 'long',
                   month: 'long',
                   day: 'numeric',
