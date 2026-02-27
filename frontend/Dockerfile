@@ -25,8 +25,8 @@ RUN npm ci
 # Copy source code
 COPY . .
 
-# Build the application
-RUN npm run build
+# Build the application and prerender Layer 0 routes
+RUN npm run build:full
 
 # Runtime stage - use nginx for serving static files
 FROM nginx:alpine AS runtime
