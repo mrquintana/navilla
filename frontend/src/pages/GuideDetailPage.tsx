@@ -12,6 +12,7 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { STI_DATA, type Lang } from '../lib/stiContent';
+import { buildMedicalWebPageLD } from '../lib/structuredData';
 import { FactChips } from '../components/layer0/FactChips';
 import { SignUpCTA } from '../components/layer0/SignUpCTA';
 import { renderMarkdown } from '../lib/renderMarkdown';
@@ -87,6 +88,13 @@ export function GuideDetailPage({ forcedSlug }: Props) {
       <link rel="canonical" href={`https://www.navilla.app/guide/${slug}`} />
       <link rel="alternate" hrefLang="en" href={`https://www.navilla.app/guide/${slug}`} />
       <link rel="alternate" hrefLang="es" href={`https://www.navilla.app/guide/${slug}`} />
+      <script type="application/ld+json">
+        {JSON.stringify(buildMedicalWebPageLD({
+          name: metaTitle,
+          description: metaDescription,
+          url: `https://www.navilla.app/guide/${slug}`,
+        }))}
+      </script>
 
       <div className="guide-page">
         {/* Hero */}

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowRight, DollarSign, AlertCircle, FlaskConical } from 'lucide-react';
 import { STI_DATA, STI_ORDER, PROVIDER_TIERS, type Lang, type CostTier, type ProviderKey } from '../lib/stiContent';
+import { buildWebPageLD } from '../lib/structuredData';
 import { SignUpCTA } from '../components/layer0/SignUpCTA';
 
 function renderTierLabel(tier: CostTier | undefined, lang: string): string {
@@ -53,6 +54,15 @@ export function TestingCostPage() {
       <link rel="canonical" href="https://www.navilla.app/testing-cost" />
       <link rel="alternate" hrefLang="en" href="https://www.navilla.app/testing-cost" />
       <link rel="alternate" hrefLang="es" href="https://www.navilla.app/testing-cost" />
+      <script type="application/ld+json">
+        {JSON.stringify(buildWebPageLD({
+          name: lang === 'es' ? 'Costos de Pruebas de ITS en México — Navilla' : 'STI Testing Costs in Mexico — Navilla',
+          description: lang === 'es'
+            ? 'Rangos aproximados de costos de pruebas de ITS por tipo de proveedor en México.'
+            : 'Approximate STI testing cost tiers by provider type in Mexico.',
+          url: 'https://www.navilla.app/testing-cost',
+        }))}
+      </script>
 
       <div className="cost-page">
         {/* Hero */}

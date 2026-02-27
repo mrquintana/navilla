@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Calendar, Clock, CheckCircle2, AlertCircle, HelpCircle, ArrowRight, FlaskConical } from 'lucide-react';
 import { STI_DATA, STI_ORDER, type Lang } from '../lib/stiContent';
+import { buildWebApplicationLD } from '../lib/structuredData';
 import { SignUpCTA } from '../components/layer0/SignUpCTA';
 
 type Status = 'testable' | 'wait' | 'no-standard-test';
@@ -79,6 +80,15 @@ export function WindowPeriodCalculatorPage() {
       <link rel="canonical" href="https://www.navilla.app/calculator" />
       <link rel="alternate" hrefLang="en" href="https://www.navilla.app/calculator" />
       <link rel="alternate" hrefLang="es" href="https://www.navilla.app/calculator" />
+      <script type="application/ld+json">
+        {JSON.stringify(buildWebApplicationLD({
+          name: lang === 'es' ? 'Calculadora de Período de Ventana — Navilla' : 'Window Period Calculator — Navilla',
+          description: lang === 'es'
+            ? 'Calcula cuándo puedes hacerte la prueba de ITS después de una exposición.'
+            : 'Calculate when you can get tested for STIs after an exposure.',
+          url: 'https://www.navilla.app/calculator',
+        }))}
+      </script>
 
       <div className="calculator-page">
         {/* Hero section */}

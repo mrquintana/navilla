@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { BookOpen, ChevronRight, DollarSign, FlaskConical, X } from 'lucide-react';
 import { STI_DATA, SYMPTOM_LABELS, type Lang } from '../lib/stiContent';
+import { buildCollectionPageLD } from '../lib/structuredData';
 import { FactChips } from '../components/layer0/FactChips';
 import { useSymptomFilter } from '../hooks/useSymptomFilter';
 import { SignUpCTA } from '../components/layer0/SignUpCTA';
@@ -36,6 +37,15 @@ export function GuidesIndexPage() {
       <link rel="canonical" href="https://www.navilla.app/guides" />
       <link rel="alternate" hrefLang="en" href="https://www.navilla.app/guides" />
       <link rel="alternate" hrefLang="es" href="https://www.navilla.app/guides" />
+      <script type="application/ld+json">
+        {JSON.stringify(buildCollectionPageLD({
+          name: lang === 'es' ? 'Guías de ITS — Síntomas, Pruebas y Tratamiento | Navilla' : 'STI Guides — Symptoms, Testing & Treatment | Navilla',
+          description: lang === 'es'
+            ? 'Guías completas de ITS: qué son, cómo se transmiten, síntomas, pruebas y tratamiento.'
+            : 'Complete STI guides: what they are, transmission, symptoms, testing, and treatment.',
+          url: 'https://www.navilla.app/guides',
+        }))}
+      </script>
 
       <div className="guides-page">
         {/* Hero */}
