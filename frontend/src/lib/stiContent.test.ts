@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { STI_DATA, STI_ORDER, SYMPTOM_LABELS } from './stiContent';
+import { STI_DATA, STI_ORDER, SYMPTOM_LABELS, PROVIDER_TIERS } from './stiContent';
+import type { CostTier, ProviderKey } from './stiContent';
 
 const ALL_GUIDES = [...STI_ORDER];
 
@@ -127,6 +128,36 @@ describe('STI_DATA', () => {
           expect(source.url).toMatch(/^https?:\/\//);
         });
       });
+    });
+  });
+
+  describe('cost tier data', () => {
+    const VALID_COST_TIERS: CostTier[] = ['free', '$', '$$', '$$$', 'n/a'];
+    const PROVIDER_KEYS: ProviderKey[] = ['capasits', 'imss', 'private_lab', 'private_clinic', 'specialist'];
+
+    it('PROVIDER_TIERS has 5 entries with required fields', () => {
+      expect(PROVIDER_TIERS).toHaveLength(5);
+      for (const tier of PROVIDER_TIERS) {
+        expect(tier.key).toBeDefined();
+        expect(typeof tier.label.en).toBe('string');
+        expect(typeof tier.label.es).toBe('string');
+        expect(typeof tier.description.en).toBe('string');
+        expect(typeof tier.description.es).toBe('string');
+      }
+    });
+
+    it('PROVIDER_TIERS keys match ProviderKey union', () => {
+      const keys = PROVIDER_TIERS.map((t) => t.key);
+      expect(keys).toEqual(PROVIDER_KEYS);
+    });
+
+    it.each(STI_ORDER)('STI %s has costTiers with valid values', (slug) => {
+      const sti = STI_DATA[slug];
+      expect(sti.costTiers).toBeDefined();
+      for (const [key, value] of Object.entries(sti.costTiers!)) {
+        expect(PROVIDER_KEYS).toContain(key);
+        expect(VALID_COST_TIERS).toContain(value);
+      }
     });
   });
 });

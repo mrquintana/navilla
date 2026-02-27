@@ -1,21 +1,20 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 const COOKIE_NOTICE_KEY = 'navilla_cookie_notice_ack_v1';
 
+function isAcknowledged(): boolean {
+  try {
+    return localStorage.getItem(COOKIE_NOTICE_KEY) === 'true';
+  } catch {
+    return false;
+  }
+}
+
 export function CookieNoticeBanner() {
   const { t } = useTranslation();
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    try {
-      const acknowledged = localStorage.getItem(COOKIE_NOTICE_KEY) === 'true';
-      setVisible(!acknowledged);
-    } catch {
-      setVisible(true);
-    }
-  }, []);
+  const [visible, setVisible] = useState(() => !isAcknowledged());
 
   const handleAcknowledge = () => {
     try {

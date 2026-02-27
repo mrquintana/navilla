@@ -33,6 +33,10 @@ export interface GuideSection {
   sources: Array<{ label: string; url: string }>;
 }
 
+export type CostTier = 'free' | '$' | '$$' | '$$$' | 'n/a';
+
+export type ProviderKey = 'capasits' | 'imss' | 'private_lab' | 'private_clinic' | 'specialist';
+
 export interface STIContent {
   slug: string;
   title: { en: string; es: string };
@@ -51,10 +55,8 @@ export interface STIContent {
   /** Full guide content. undefined = coming soon */
   guide?: GuideSection;
   /** Cost tier per provider type (Mexico) */
-  costTiers?: Record<string, CostTier>;
+  costTiers?: Partial<Record<ProviderKey, CostTier>>;
 }
-
-export type CostTier = 'free' | '$' | '$$' | '$$$' | 'n/a';
 
 export interface ProviderTier {
   key: string;
