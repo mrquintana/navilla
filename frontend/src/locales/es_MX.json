@@ -69,7 +69,8 @@
     "health": "Estado de Salud",
     "notifications": "Notificaciones",
     "settings": "Configuración",
-    "profile": "Perfil"
+    "profile": "Perfil",
+    "journal": "Diario"
   },
   "dashboard": {
     "title": "Tu Red",
@@ -516,5 +517,45 @@
     "factVaccine": "Vacuna disponible",
     "factWindowDays": "días",
     "quickStatsCta": "Calcular mis fechas"
+  },
+  "journal": {
+    "title": "Mi Diario",
+    "addEntry": "Nueva Entrada",
+    "editEntry": "Editar Entrada",
+    "encounterDate": "Fecha",
+    "partnerAlias": "Alias de pareja",
+    "partnerAliasPlaceholder": "Nombre o apodo (opcional)",
+    "notes": "Notas",
+    "notesPlaceholder": "Agrega notas sobre este encuentro (opcional)",
+    "linkConnection": "Vincular a conexión",
+    "selectConnection": "Selecciona una conexión...",
+    "noConnection": "Ninguna",
+    "customFields": "Campos personalizados",
+    "addField": "Agregar campo",
+    "saveForFuture": "Guardar \"{{label}}\" para futuras entradas",
+    "maxFields": "Máximo 3 campos personalizados",
+    "fieldLabel": "Etiqueta",
+    "fieldValue": "Valor",
+    "fieldLabelPlaceholder": "ej., Ubicación",
+    "fieldValuePlaceholder": "ej., Roma Norte",
+    "timeline": "Cronología",
+    "calendar": "Calendario",
+    "monthSummary": "Este mes: {{count}} entradas",
+    "yearTotal": "Total del año: {{count}} entradas",
+    "empty": {
+      "title": "Comienza tu diario privado",
+      "description": "Tus entradas están encriptadas y solo tú puedes verlas. Registra encuentros para llevar un historial privado de tu salud sexual.",
+      "cta": "Registra tu primera entrada"
+    },
+    "encrypted": "Encriptado",
+    "encryptedTooltip": "Tus entradas están encriptadas con AES-256. Solo tú puedes verlas.",
+    "deleteConfirm": "¿Estás seguro de que quieres eliminar esta entrada? Esta acción no se puede deshacer.",
+    "deleteTitle": "Eliminar entrada",
+    "anonymous": "Anónimo",
+    "customFieldCount_one": "{{count}} campo personalizado",
+    "customFieldCount_other": "{{count}} campos personalizados",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "noEntries": "Sin entradas este mes"
   }
 }

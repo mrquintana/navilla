@@ -69,7 +69,8 @@
     "health": "Health Status",
     "notifications": "Notifications",
     "settings": "Settings",
-    "profile": "Profile"
+    "profile": "Profile",
+    "journal": "Journal"
   },
   "dashboard": {
     "title": "Your Network",
@@ -517,5 +518,45 @@
     "factVaccine": "Vaccine available",
     "factWindowDays": "days",
     "quickStatsCta": "Calculate my dates"
+  },
+  "journal": {
+    "title": "My Journal",
+    "addEntry": "New Entry",
+    "editEntry": "Edit Entry",
+    "encounterDate": "Date",
+    "partnerAlias": "Partner alias",
+    "partnerAliasPlaceholder": "Name or nickname (optional)",
+    "notes": "Notes",
+    "notesPlaceholder": "Add notes about this encounter (optional)",
+    "linkConnection": "Link to connection",
+    "selectConnection": "Select a connection...",
+    "noConnection": "None",
+    "customFields": "Custom fields",
+    "addField": "Add field",
+    "saveForFuture": "Save \"{{label}}\" for future entries",
+    "maxFields": "Maximum 3 custom fields",
+    "fieldLabel": "Label",
+    "fieldValue": "Value",
+    "fieldLabelPlaceholder": "e.g., Location",
+    "fieldValuePlaceholder": "e.g., Roma Norte",
+    "timeline": "Timeline",
+    "calendar": "Calendar",
+    "monthSummary": "This month: {{count}} entries",
+    "yearTotal": "Year total: {{count}} entries",
+    "empty": {
+      "title": "Start your private journal",
+      "description": "Your entries are encrypted and only visible to you. Log encounters to track your sexual health history privately.",
+      "cta": "Log your first entry"
+    },
+    "encrypted": "Encrypted",
+    "encryptedTooltip": "Your journal entries are encrypted with AES-256. Only you can see them.",
+    "deleteConfirm": "Are you sure you want to delete this entry? This cannot be undone.",
+    "deleteTitle": "Delete entry",
+    "anonymous": "Anonymous",
+    "customFieldCount_one": "{{count}} custom field",
+    "customFieldCount_other": "{{count}} custom fields",
+    "save": "Save",
+    "cancel": "Cancel",
+    "noEntries": "No entries this month"
   }
 }
