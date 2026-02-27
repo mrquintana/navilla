@@ -559,6 +559,17 @@
     "noEntries": "Sin entradas este mes",
     "dateRequired": "La fecha del encuentro es obligatoria",
     "saveFailed": "Error al guardar la entrada. Inténtalo de nuevo.",
-    "removeField": "Eliminar campo"
+    "removeField": "Eliminar campo",
+    "dayMon": "Lun",
+    "dayTue": "Mar",
+    "dayWed": "Mié",
+    "dayThu": "Jue",
+    "dayFri": "Vie",
+    "daySat": "Sáb",
+    "daySun": "Dom",
+    "noEntriesOnDate": "Sin entradas en esta fecha",
+    "entriesOnDate": "{{count}} entradas el {{date}}",
+    "previousMonth": "Mes anterior",
+    "nextMonth": "Mes siguiente"
   }
 }
