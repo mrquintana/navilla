@@ -557,6 +557,9 @@
     "customFieldCount_other": "{{count}} custom fields",
     "save": "Save",
     "cancel": "Cancel",
-    "noEntries": "No entries this month"
+    "noEntries": "No entries this month",
+    "dateRequired": "Encounter date is required",
+    "saveFailed": "Failed to save entry. Please try again.",
+    "removeField": "Remove field"
   }
 }

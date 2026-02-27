@@ -5,6 +5,7 @@ import { useJournalEntries, useJournalSummary, useDeleteJournalEntry } from '../
 import type { JournalEntry } from '../lib/api';
 import { JournalTimeline } from '../components/journal/JournalTimeline';
 import { JournalEmptyState } from '../components/journal/JournalEmptyState';
+import { JournalEntryModal } from '../components/journal/JournalEntryModal';
 import { PageSkeleton, SkeletonBlock, SkeletonRows } from '../components/ui/LoadingShell';
 
 type ViewMode = 'timeline' | 'calendar';
@@ -129,29 +130,15 @@ export function JournalPage() {
         </div>
       )}
 
-      {/* Modal placeholder — will be implemented in Task 12 */}
-      {isModalOpen && (
-        <div className="modal-backdrop" role="dialog" aria-modal="true">
-          <div className="modal">
-            <div className="flex items-center justify-between gap-4 mb-4">
-              <h3 className="font-semibold">
-                {editingEntry ? t('journal.editEntry') : t('journal.addEntry')}
-              </h3>
-              <button
-                type="button"
-                className="btn btn-secondary btn-sm"
-                onClick={() => setIsModalOpen(false)}
-              >
-                {t('common.close')}
-              </button>
-            </div>
-            <p className="text-sm text-muted">
-              {/* Placeholder — full form in Task 12 */}
-              Coming in the next task...
-            </p>
-          </div>
-        </div>
-      )}
+      {/* Create/Edit modal */}
+      <JournalEntryModal
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setEditingEntry(null);
+        }}
+        entry={editingEntry}
+      />
     </div>
   );
 }

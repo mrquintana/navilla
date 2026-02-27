@@ -556,6 +556,9 @@
     "customFieldCount_other": "{{count}} campos personalizados",
     "save": "Guardar",
     "cancel": "Cancelar",
-    "noEntries": "Sin entradas este mes"
+    "noEntries": "Sin entradas este mes",
+    "dateRequired": "La fecha del encuentro es obligatoria",
+    "saveFailed": "Error al guardar la entrada. Inténtalo de nuevo.",
+    "removeField": "Eliminar campo"
   }
 }
