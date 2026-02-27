@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Calendar, Clock, CheckCircle2, AlertCircle, HelpCircle, ArrowRight, FlaskConical } from 'lucide-react';
 import { STI_DATA, STI_ORDER, type Lang } from '../lib/stiContent';
+import { SignUpCTA } from '../components/layer0/SignUpCTA';
 
 type Status = 'testable' | 'wait' | 'no-standard-test';
 
@@ -253,6 +254,27 @@ export function WindowPeriodCalculatorPage() {
               </a>
             </div>
           </div>
+
+          {/* Cross-tool link: cost estimator */}
+          <div className="calculator-clinic-cta">
+            <div className="calculator-clinic-cta-inner">
+              <div>
+                <h3>{lang === 'es' ? '¿Sabes cuándo hacerte la prueba? Conoce los costos' : 'Know when to test? See what it costs'}</h3>
+                <p>{lang === 'es' ? 'Compara los costos de pruebas por tipo de proveedor en México.' : 'Compare testing costs across provider types in Mexico.'}</p>
+              </div>
+              <Link to="/testing-cost" className="btn btn-secondary">
+                {lang === 'es' ? 'Ver costos' : 'See costs'}
+                <ArrowRight className="w-4 h-4 ml-1" aria-hidden="true" />
+              </Link>
+            </div>
+          </div>
+
+          <SignUpCTA
+            titleEn="Track your results over time"
+            titleEs="Lleva un registro de tus resultados"
+            bodyEn="Log your test results and get reminders when it's time to retest."
+            bodyEs="Registra tus resultados y recibe recordatorios cuando sea hora de repetir la prueba."
+          />
 
           {/* Sources */}
           <div className="calculator-sources">

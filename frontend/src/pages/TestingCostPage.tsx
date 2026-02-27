@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { DollarSign, AlertCircle } from 'lucide-react';
+import { ArrowRight, DollarSign, AlertCircle, FlaskConical } from 'lucide-react';
 import { STI_DATA, STI_ORDER, PROVIDER_TIERS, type Lang, type CostTier, type ProviderKey } from '../lib/stiContent';
+import { SignUpCTA } from '../components/layer0/SignUpCTA';
 
 function renderTierLabel(tier: CostTier | undefined, lang: string): string {
   if (!tier) return '—';
@@ -186,6 +187,28 @@ export function TestingCostPage() {
               ))}
             </ul>
           </div>
+
+          {/* Cross-tool link: window period calculator */}
+          <div className="calculator-clinic-cta">
+            <div className="calculator-clinic-cta-inner">
+              <div>
+                <h3>{lang === 'es' ? '¿No sabes cuándo hacerte la prueba?' : 'Not sure when to get tested?'}</h3>
+                <p>{lang === 'es' ? 'Usa nuestra calculadora de período de ventana para ver tus fechas.' : 'Use our window period calculator to see your testing dates.'}</p>
+              </div>
+              <Link to="/calculator" className="btn btn-secondary">
+                <FlaskConical className="w-4 h-4 mr-1" aria-hidden="true" />
+                {lang === 'es' ? 'Ir a la calculadora' : 'Go to calculator'}
+                <ArrowRight className="w-4 h-4 ml-1" aria-hidden="true" />
+              </Link>
+            </div>
+          </div>
+
+          <SignUpCTA
+            titleEn="Log your tests and get reminders — free"
+            titleEs="Registra tus pruebas y recibe recordatorios — gratis"
+            bodyEn="Track your testing history and get reminders when it's time to retest."
+            bodyEs="Lleva un registro de tus pruebas y recibe recordatorios cuando sea hora de repetir."
+          />
 
           {/* Sources */}
           <div className="calculator-sources">

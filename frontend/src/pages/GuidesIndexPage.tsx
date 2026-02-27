@@ -1,9 +1,10 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { BookOpen, ChevronRight, FlaskConical, X } from 'lucide-react';
+import { BookOpen, ChevronRight, DollarSign, FlaskConical, X } from 'lucide-react';
 import { STI_DATA, SYMPTOM_LABELS, type Lang } from '../lib/stiContent';
 import { FactChips } from '../components/layer0/FactChips';
 import { useSymptomFilter } from '../hooks/useSymptomFilter';
+import { SignUpCTA } from '../components/layer0/SignUpCTA';
 
 export function GuidesIndexPage() {
   const { t, i18n } = useTranslation();
@@ -176,6 +177,28 @@ export function GuidesIndexPage() {
               </Link>
             </div>
           </div>
+
+          {/* Cross-tool link: cost estimator */}
+          <div className="calculator-clinic-cta">
+            <div className="calculator-clinic-cta-inner">
+              <div>
+                <h3>{lang === 'es' ? '¿Sabes cuándo hacerte la prueba? Conoce los costos' : 'Know when to test? See what it costs'}</h3>
+                <p>{lang === 'es' ? 'Compara los costos de pruebas por tipo de proveedor en México.' : 'Compare testing costs across provider types in Mexico.'}</p>
+              </div>
+              <Link to="/testing-cost" className="btn btn-secondary">
+                <DollarSign className="w-4 h-4 mr-1" aria-hidden="true" />
+                {lang === 'es' ? 'Ver costos' : 'See costs'}
+                <ChevronRight className="w-4 h-4 ml-1" aria-hidden="true" />
+              </Link>
+            </div>
+          </div>
+
+          <SignUpCTA
+            titleEn="Stay informed about your sexual health"
+            titleEs="Mantente informado sobre tu salud sexual"
+            bodyEn="Create a free account to log your test results and get personalized reminders."
+            bodyEs="Crea una cuenta gratis para registrar tus resultados y recibir recordatorios personalizados."
+          />
 
           {/* Disclaimer */}
           <p className="calculator-date-hint" style={{ textAlign: 'center', marginTop: '1.5rem' }}>
