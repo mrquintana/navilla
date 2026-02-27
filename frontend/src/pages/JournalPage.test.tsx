@@ -148,7 +148,8 @@ describe('JournalPage', () => {
 
   it('shows summary bar when entries exist', () => {
     const now = new Date();
-    const currentMonth = String(now.getMonth() + 1);
+    const m = now.getMonth() + 1;
+    const monthKey = `${now.getFullYear()}-${m < 10 ? '0' : ''}${m}`;
 
     const mockEntry = {
       id: '1',
@@ -164,7 +165,7 @@ describe('JournalPage', () => {
 
     renderLoaded([mockEntry], {
       year: 2026,
-      monthlyCounts: { [currentMonth]: 5 },
+      monthlyCounts: { [monthKey]: 5 },
       yearTotal: 12,
     });
 

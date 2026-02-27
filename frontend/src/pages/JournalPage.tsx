@@ -96,9 +96,8 @@ export function JournalPage() {
   }, [calendarMonth]);
 
   // Compute this-month count from summary
-  const currentMonth = now.getMonth() + 1;
-  const monthKey = String(currentMonth);
-  const thisMonthCount = summary?.monthlyCounts?.[monthKey] ?? 0;
+  const thisMonthKey = toMonthKey(now);
+  const thisMonthCount = summary?.monthlyCounts?.[thisMonthKey] ?? 0;
   const yearTotal = summary?.yearTotal ?? 0;
 
   if (isInitialLoading) {
