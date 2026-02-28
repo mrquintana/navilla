@@ -700,6 +700,61 @@ rm -f scripts/.seed-state.json
 
 ---
 
+## Session Notes (2026-02-27 — Week 5: Journal UX Polish)
+
+### Accomplished
+UX polish pass on the encounter journal — navigation improvements, date validation, and view hierarchy.
+
+**Calendar Smart Skip Navigation:**
+- Added `«` / `»` double-chevron buttons that jump to the nearest month with entries (not just +/- 1 month)
+- `monthsWithEntries` computed from client-side entry data — no extra API calls
+- Skip buttons disabled at boundaries with inline feedback text ("No encounters before this month")
+- "Today" pill button appears when not viewing the current month
+- Both en_US and es_MX locales updated
+- Files: `JournalPage.tsx`, `index.css` (4 new CSS classes), locale files
+
+**Encounter Date Validation (DOB + future):**
+- Date input now constrained: `min={dateOfBirth}` and `max={today}`
+- Submit handler validates both boundaries with clear error messages
+- Uses `useUser()` hook to fetch DOB from user profile — same pattern as HealthStatusPage
+- Files: `JournalEntryModal.tsx`, locale files (2 new keys per language)
+
+**View Toggle Hierarchy:**
+- Timeline and Calendar buttons grouped under a "VIEW" label (uppercase, muted, small)
+- Partners button separated by a vertical divider — makes clear it's a different section, not an alternate view
+- Wraps gracefully on mobile via `flex-wrap`
+- Files: `JournalPage.tsx`, locale files (1 new key per language)
+
+**Test Results:** 196 frontend tests passing, lint clean. No backend changes.
+
+### Where We Are in the Roadmap
+
+**Completed:**
+- Weeks 1-4: Foundation + Layer 0 ✅
+- Week 5: Encounter journal (core) ✅
+- Week 5 (extra): Journal partners / regulars feature ✅
+- Week 5 (extra): Journal UX polish (this session) ✅
+
+**Current position: End of Week 5, ahead of schedule.**
+The journal has more features than the roadmap specced (partners, smart skip nav, DOB validation, view grouping — none of these were in the Week 5 deliverables).
+
+**Up next (Week 6):** Testing History Tracker
+- Backend: `test_records` + `test_record_results` tables, API
+- Frontend: testing log UI, per-condition history, "days since last test" counter
+- Document upload (encrypted storage)
+- This extends the existing Health Status system rather than building from scratch
+
+**Weeks 7-9 remaining in Phase 2:**
+- Week 7: Smart reminders + medication tracking (PrEP, DoxyPEP, vaccination)
+- Week 8: Personal insights + doctor visit prep + saved clinics
+- Week 9: PWA + Layer 1 polish
+
+### Notes
+- `gh` CLI not authenticated — can't manage GitHub issues from this session
+- No backend changes this session — all frontend UX improvements
+
+---
+
 ## Session Notes (2026-02-27 — Week 5: Encounter Journal)
 
 ### Accomplished
