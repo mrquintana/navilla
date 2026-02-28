@@ -576,6 +576,7 @@
     "clearPartner": "Clear partner",
     "aliasManagedByPartner": "Name managed by partner",
     "unlinkFromPartner": "Unlink from partner",
+    "noExtraInfo": "No additional details for this encounter",
     "dayMon": "Mon",
     "dayTue": "Tue",
     "dayWed": "Wed",

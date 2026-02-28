@@ -91,6 +91,11 @@ export function JournalEntryCard({ entry, onEdit, onDelete, isDeleting, hidePart
                 ))}
               </div>
             )}
+            {hidePartnerName && !notesPreview && customFields.length === 0 && (
+              <p className="text-xs text-muted italic">
+                {t('journal.noExtraInfo')}
+              </p>
+            )}
           </div>
         </div>
 
