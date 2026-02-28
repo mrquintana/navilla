@@ -40,7 +40,15 @@ After completing any significant work, **always update the following**:
   - `frontend/src/locales/en_US.json`
   - `frontend/src/locales/es_MX.json` (Spanish translations or English placeholders)
 
-### 5. Tests (Required for code changes)
+### 5. Input Length Constraints (Required for all text fields)
+- **Every new text field must have max-length constraints on both sides:**
+  - Backend: `@Size(max = N)` on every String field in request DTOs
+  - Frontend: `maxLength={N}` on every `<input>` and `<textarea>`
+- **Standard limits:** email 254, password 128, alias/name 200, notes 5000, custom field label 100, custom field value 500, location 150, enum-like fields 50, confirmation inputs 50
+- **Nested DTOs:** must use `@Valid` on lists and `@Size` on the list itself to cap array length
+- See `docs/docs/api/input-constraints.md` for the full reference
+
+### 6. Tests (Required for code changes)
 - **All new code must have unit and integration tests**
 - Run backend tests: `cd backend && ./mvnw test`
 - Run frontend lint: `cd frontend && npm run lint` # Use `npm test` for unit tests once configured
@@ -48,7 +56,7 @@ After completing any significant work, **always update the following**:
   - Unit tests: `backend/src/test/java/app/navilla/service/`
   - Integration tests: `backend/src/test/java/app/navilla/controller/`
 
-### 6. Postman Collection (For API changes)
+### 7. Postman Collection (For API changes)
 - Update Postman collection when adding/modifying API endpoints
 - Location: `docs/static/postman/navilla-api.postman_collection.json`
 
