@@ -1616,6 +1616,23 @@ All factual content (symptoms, testing windows, treatment) must be verified agai
 | 8 | Personal insights + doctor visit prep | Frontend: insights dashboard (activity summary, testing summary, prevention summary). Doctor visit prep: generate summary, PDF export. Saved clinics feature |
 | 9 | PWA + Layer 1 polish | PWA: vite-plugin-pwa setup, manifest, service worker, push notifications. Install prompt. Offline caching for Layer 0 content. Layer 1 end-to-end testing. Bug fixes and UX polish |
 
+#### Progress Snapshot (February 27, 2026)
+
+- **Week 5 status:** ✅ Complete (ahead of schedule — delivered extras beyond spec).
+- **Completed (Week 5 — Encounter Journal + Partners + Polish):**
+  - Migration `008_encounter_journal.sql`: `encounter_journal` + `journal_field_templates` tables, AES-256-GCM encryption
+  - Migration `009_journal_partners.sql`: `journal_partners` table with soft-delete, `partner_id` FK on encounter_journal
+  - Backend: `EncounterJournalService`, `JournalPartnerService`, 16 REST endpoints, Micrometer metrics, 105 backend tests passing
+  - Frontend: JournalPage with timeline/calendar views, JournalEntryModal with partner picker autocomplete, JournalCalendar grid, JournalTimeline grouped by month, JournalPartnersTab, PartnerDetailPage with soft/destructive delete
+  - Promote-to-partner toast (3rd encounter heuristic)
+  - 196 frontend tests passing, full i18n (en_US + es_MX)
+- **Completed (Week 5 — UX polish, beyond original spec):**
+  - Calendar smart skip navigation: `«`/`»` buttons jump to nearest month with entries, "Today" pill, boundary feedback
+  - Encounter date validation: constrained between user DOB and today (matches HealthStatusPage pattern)
+  - View toggle hierarchy: Timeline/Calendar grouped under "View" label, Partners separated by divider
+- **Won't Do (descoped from Week 5):**
+  - ~~Client-side encryption for notes~~ — server-side AES-256-GCM is in place; client-side E2E encryption deferred to a future security sprint (requires key management UX)
+
 ### Phase 3: Layer 2 — Network Enhancements (Weeks 10-14)
 
 | Week | Focus | Deliverables |
@@ -1884,5 +1901,13 @@ The AGENT_EXECUTION_PLAYBOOK.md should be updated to align with this roadmap:
 - Medical review removed as requirement — cite sources directly, doctor review is future enhancement when budget allows
 - Panic button / quick exit marked as future nice-to-have (more relevant for mobile)
 - Removed data licensing / data selling from 500K+ features — Navilla does NOT sell data, ever
+
+### 2026-02-27
+- Week 5 (Encounter Journal) marked ✅ complete — progress snapshot added to Phase 2
+- Delivered beyond spec: journal partners/regulars feature (not in original Week 5 scope)
+- Calendar smart skip navigation: `«`/`»` jump to nearest month with entries, "Today" pill, boundary feedback
+- Encounter date validation: DOB min + future max constraints on date input and submit handler
+- View toggle hierarchy: Timeline/Calendar grouped under "View" label, Partners visually separated
+- Client-side E2E encryption for notes descoped from Week 5 — server-side AES-256-GCM sufficient for now
 - Updated Week 1 and Week 15-16 roadmap to reflect no-Astro and no-medical-review decisions
 - Added trust/UX polish emphasis to CLAUDE.md quality standards
