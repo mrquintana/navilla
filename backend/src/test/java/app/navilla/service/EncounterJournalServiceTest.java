@@ -45,6 +45,7 @@ import app.navilla.exception.ResourceNotFoundException;
 import app.navilla.metrics.JournalMetrics;
 import app.navilla.repository.EncounterJournalRepository;
 import app.navilla.repository.JournalFieldTemplateRepository;
+import app.navilla.repository.JournalPartnerRepository;
 import app.navilla.security.EncryptionService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -72,6 +73,9 @@ class EncounterJournalServiceTest {
 
   @Mock
   private JournalFieldTemplateRepository templateRepository;
+
+  @Mock
+  private JournalPartnerRepository partnerRepository;
 
   @Mock
   private EncryptionService encryptionService;

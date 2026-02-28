@@ -37,6 +37,7 @@ import app.navilla.exception.ResourceNotFoundException;
 import app.navilla.metrics.JournalMetrics;
 import app.navilla.repository.EncounterJournalRepository;
 import app.navilla.repository.JournalFieldTemplateRepository;
+import app.navilla.repository.JournalPartnerRepository;
 import app.navilla.security.EncryptionService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -64,6 +65,7 @@ public class EncounterJournalService {
 
   private final EncounterJournalRepository journalRepository;
   private final JournalFieldTemplateRepository templateRepository;
+  private final JournalPartnerRepository partnerRepository;
   private final EncryptionService encryptionService;
   private final ObjectMapper objectMapper;
   private final JournalMetrics journalMetrics;
@@ -316,13 +318,24 @@ public class EncounterJournalService {
           .countByPartnerIdAndUserHash(entry.getPartnerId(), userHash);
     }
 
+    // Resolve partner alias: prefer current partner name over stale entry alias
+    String partnerAlias;
+    if (entry.getPartnerId() != null) {
+      partnerAlias = partnerRepository.findById(entry.getPartnerId())
+          .map(p -> encryptionService.decryptFromBytes(p.getAliasEncrypted()))
+          .orElseGet(() -> entry.getPartnerAliasEncrypted() != null
+              ? encryptionService.decryptFromBytes(entry.getPartnerAliasEncrypted())
+              : null);
+    } else {
+      partnerAlias = entry.getPartnerAliasEncrypted() != null
+          ? encryptionService.decryptFromBytes(entry.getPartnerAliasEncrypted())
+          : null;
+    }
+
     return new JournalEntryResponse(
         entry.getId(),
         entry.getEncounterDate(),
-        entry.getPartnerAliasEncrypted() != null
-            ? encryptionService.decryptFromBytes(
-                entry.getPartnerAliasEncrypted())
-            : null,
+        partnerAlias,
         entry.getConnectionId(),
         null, // connectionDisplayName resolved later
         entry.getNotesEncrypted() != null
