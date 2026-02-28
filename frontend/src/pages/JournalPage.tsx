@@ -294,27 +294,31 @@ export function JournalPage() {
       </div>
 
       {/* View toggle */}
-      <div className="flex gap-2">
-        <button
-          type="button"
-          className={`btn btn-sm ${viewMode === 'timeline' ? 'btn-primary' : 'btn-secondary'}`}
-          onClick={() => handleViewModeChange('timeline')}
-        >
-          <span className="inline-flex items-center gap-1.5">
-            <List className="nav-icon" aria-hidden="true" />
-            {t('journal.timeline')}
-          </span>
-        </button>
-        <button
-          type="button"
-          className={`btn btn-sm ${viewMode === 'calendar' ? 'btn-primary' : 'btn-secondary'}`}
-          onClick={() => handleViewModeChange('calendar')}
-        >
-          <span className="inline-flex items-center gap-1.5">
-            <Calendar className="nav-icon" aria-hidden="true" />
-            {t('journal.calendar')}
-          </span>
-        </button>
+      <div className="flex items-center gap-3 flex-wrap">
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-medium text-muted uppercase tracking-wide">{t('journal.view')}</span>
+          <button
+            type="button"
+            className={`btn btn-sm ${viewMode === 'timeline' ? 'btn-primary' : 'btn-secondary'}`}
+            onClick={() => handleViewModeChange('timeline')}
+          >
+            <span className="inline-flex items-center gap-1.5">
+              <List className="nav-icon" aria-hidden="true" />
+              {t('journal.timeline')}
+            </span>
+          </button>
+          <button
+            type="button"
+            className={`btn btn-sm ${viewMode === 'calendar' ? 'btn-primary' : 'btn-secondary'}`}
+            onClick={() => handleViewModeChange('calendar')}
+          >
+            <span className="inline-flex items-center gap-1.5">
+              <Calendar className="nav-icon" aria-hidden="true" />
+              {t('journal.calendar')}
+            </span>
+          </button>
+        </div>
+        <span className="w-px h-5 bg-stone-200" aria-hidden="true" />
         <button
           type="button"
           className={`btn btn-sm ${viewMode === 'partners' ? 'btn-primary' : 'btn-secondary'}`}

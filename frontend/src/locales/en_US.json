@@ -539,6 +539,7 @@
     "fieldValue": "Value",
     "fieldLabelPlaceholder": "e.g., Location",
     "fieldValuePlaceholder": "e.g., Roma Norte",
+    "view": "View",
     "timeline": "Timeline",
     "calendar": "Calendar",
     "monthSummary": "This month: {{count}} entries",

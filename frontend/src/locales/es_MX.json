@@ -538,6 +538,7 @@
     "fieldValue": "Valor",
     "fieldLabelPlaceholder": "ej., Ubicación",
     "fieldValuePlaceholder": "ej., Roma Norte",
+    "view": "Vista",
     "timeline": "Cronología",
     "calendar": "Calendario",
     "monthSummary": "Este mes: {{count}} entradas",
