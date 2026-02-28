@@ -382,6 +382,34 @@ export const api = {
     recentAliases: (token: string) =>
       apiRequest<string[]>('/api/journal/recent-aliases', token),
   },
+  healthLog: {
+    visits: {
+      list: (token: string) =>
+        apiRequest<TestVisit[]>('/api/health-log/visits', token),
+      create: (token: string, data: CreateTestVisitRequest) =>
+        apiRequest<TestVisit>('/api/health-log/visits', token, { method: 'POST', body: data }),
+      get: (token: string, id: string) =>
+        apiRequest<TestVisit>(`/api/health-log/visits/${id}`, token),
+      update: (token: string, id: string, data: UpdateTestVisitRequest) =>
+        apiRequest<TestVisit>(`/api/health-log/visits/${id}`, token, { method: 'PUT', body: data }),
+      delete: (token: string, id: string) =>
+        apiRequest<void>(`/api/health-log/visits/${id}`, token, { method: 'DELETE' }),
+    },
+    summary: (token: string) =>
+      apiRequest<HealthLogSummary>('/api/health-log/summary', token),
+    condition: (token: string, type: string) =>
+      apiRequest<ConditionHistory>(`/api/health-log/condition/${type}`, token),
+    labs: {
+      list: (token: string) =>
+        apiRequest<Lab[]>('/api/health-log/labs', token),
+      create: (token: string, data: CreateLabRequest) =>
+        apiRequest<Lab>('/api/health-log/labs', token, { method: 'POST', body: data }),
+      update: (token: string, id: string, data: UpdateLabRequest) =>
+        apiRequest<Lab>(`/api/health-log/labs/${id}`, token, { method: 'PUT', body: data }),
+      delete: (token: string, id: string) =>
+        apiRequest<void>(`/api/health-log/labs/${id}`, token, { method: 'DELETE' }),
+    },
+  },
 };
 
 // Types
@@ -495,4 +523,116 @@ export interface ExposureSnapshot {
   nextUpdateAt?: string;
   message?: string | null;
   recommendation?: string | null;
+}
+
+// Health Log types
+export interface TestVisitResult {
+  id: string;
+  conditionType: string | null;
+  customCondition: string | null;
+  status: string;
+  resultValue: string | null;
+  referenceRange: string | null;
+  clearedAt: string | null;
+}
+
+export interface TestVisit {
+  id: string;
+  testDate: string;
+  labId: string | null;
+  labName: string | null;
+  labProvider: string | null;
+  labReference: string | null;
+  notes: string | null;
+  verified: boolean;
+  verifiedAt: string | null;
+  results: TestVisitResult[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface TestResultInput {
+  conditionType?: string;
+  customCondition?: string;
+  status: string;
+  resultValue?: string;
+  referenceRange?: string;
+}
+
+export interface CreateTestVisitRequest {
+  testDate: string;
+  labId?: string;
+  labReference?: string;
+  results: TestResultInput[];
+  notes?: string;
+}
+
+export interface UpdateTestVisitRequest {
+  testDate?: string;
+  labId?: string;
+  labReference?: string;
+  results?: TestResultInput[];
+  notes?: string;
+}
+
+export interface ConditionSummary {
+  conditionType: string | null;
+  customCondition: string | null;
+  latestStatus: string;
+  latestResultValue: string | null;
+  lastTestDate: string;
+  totalTests: number;
+  hasPositive: boolean;
+}
+
+export interface HealthLogSummary {
+  daysSinceLastTest: number;
+  testsThisYear: number;
+  conditionsCovered: number;
+  totalStandardConditions: number;
+  conditions: ConditionSummary[];
+}
+
+export interface ConditionHistoryEntry {
+  visitId: string;
+  testDate: string;
+  status: string;
+  resultValue: string | null;
+  referenceRange: string | null;
+  labName: string | null;
+  labProvider: string | null;
+  verified: boolean;
+  clearedAt: string | null;
+}
+
+export interface ConditionHistory {
+  conditionType: string;
+  latestStatus: string;
+  totalTests: number;
+  lastTestDate: string;
+  entries: ConditionHistoryEntry[];
+}
+
+export interface Lab {
+  id: string;
+  provider: string;
+  name: string;
+  credentials: LabCredential[];
+  createdAt: string;
+}
+
+export interface LabCredential {
+  key: string;
+  value: string;
+}
+
+export interface CreateLabRequest {
+  provider: string;
+  name: string;
+  credentials?: LabCredential[];
+}
+
+export interface UpdateLabRequest {
+  name?: string;
+  credentials?: LabCredential[];
 }
