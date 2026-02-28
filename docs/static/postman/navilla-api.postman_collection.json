@@ -40,6 +40,18 @@
       "value": "",
       "type": "string",
       "description": "Partner ID for partner detail/update/delete operations"
+    },
+    {
+      "key": "visitId",
+      "value": "",
+      "type": "string",
+      "description": "Test visit ID for health log visit operations"
+    },
+    {
+      "key": "labId",
+      "value": "",
+      "type": "string",
+      "description": "Lab ID for health log lab operations"
     }
   ],
   "auth": {
@@ -1452,6 +1464,205 @@
                   "path": ["api", "journal", "partners", "{{partnerId}}", "entries"]
                 },
                 "description": "Get all journal entries associated with a specific partner. Returns entries sorted by encounter date descending."
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Health Log",
+      "item": [
+        {
+          "name": "Visits",
+          "item": [
+            {
+              "name": "List Visits",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/health-log/visits",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "health-log", "visits"]
+                },
+                "description": "List all test visits for the authenticated user, newest first. Each visit includes its test results."
+              }
+            },
+            {
+              "name": "Create Visit",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"testDate\": \"2026-02-27\",\n  \"labId\": null,\n  \"labReference\": \"Order #12345\",\n  \"notes\": \"Routine quarterly testing\",\n  \"results\": [\n    {\n      \"conditionType\": \"HIV\",\n      \"status\": \"NEGATIVE\",\n      \"resultValue\": null,\n      \"referenceRange\": null\n    },\n    {\n      \"conditionType\": \"SYPHILIS\",\n      \"status\": \"POSITIVE\",\n      \"resultValue\": \"1:4\",\n      \"referenceRange\": \"<1:1\"\n    }\n  ]\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/health-log/visits",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "health-log", "visits"]
+                },
+                "description": "Log a new test visit with results. Automatically syncs positive/negative results to health_status for exposure calculation."
+              }
+            },
+            {
+              "name": "Get Visit",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/health-log/visits/{{visitId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "health-log", "visits", "{{visitId}}"]
+                },
+                "description": "Get a specific test visit with all its results."
+              }
+            },
+            {
+              "name": "Update Visit",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"testDate\": \"2026-02-27\",\n  \"labId\": null,\n  \"labReference\": \"Updated order #12345\",\n  \"notes\": \"Updated notes\",\n  \"results\": [\n    {\n      \"conditionType\": \"HIV\",\n      \"status\": \"NEGATIVE\"\n    }\n  ]\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/health-log/visits/{{visitId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "health-log", "visits", "{{visitId}}"]
+                },
+                "description": "Update an existing test visit and its results. Re-syncs health_status."
+              }
+            },
+            {
+              "name": "Delete Visit",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/health-log/visits/{{visitId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "health-log", "visits", "{{visitId}}"]
+                },
+                "description": "Delete a test visit and all its results. Re-derives health_status from remaining results."
+              }
+            }
+          ]
+        },
+        {
+          "name": "Summary & History",
+          "item": [
+            {
+              "name": "Get Summary",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/health-log/summary",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "health-log", "summary"]
+                },
+                "description": "Get health log dashboard stats: days since last test, tests this year, coverage count, latest status per condition."
+              }
+            },
+            {
+              "name": "Get Condition History",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/health-log/condition/HIV",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "health-log", "condition", "HIV"]
+                },
+                "description": "Get per-condition testing history across all visits. Replace 'HIV' with any condition type (CHLAMYDIA, GONORRHEA, SYPHILIS, etc.)."
+              }
+            }
+          ]
+        },
+        {
+          "name": "Labs",
+          "item": [
+            {
+              "name": "List Labs",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/health-log/labs",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "health-log", "labs"]
+                },
+                "description": "List saved labs with their credentials for the authenticated user."
+              }
+            },
+            {
+              "name": "Create Lab",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"provider\": \"CHOPO\",\n  \"name\": \"Chopo Polanco\",\n  \"credentials\": [\n    {\n      \"key\": \"patient_id\",\n      \"value\": \"12345678\"\n    }\n  ]\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/health-log/labs",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "health-log", "labs"]
+                },
+                "description": "Create a new saved lab with optional credentials. Providers: CHOPO, SALUD_DIGNA, OTHER."
+              }
+            },
+            {
+              "name": "Update Lab",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"provider\": \"CHOPO\",\n  \"name\": \"Chopo Roma\",\n  \"credentials\": [\n    {\n      \"key\": \"patient_id\",\n      \"value\": \"87654321\"\n    }\n  ]\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/health-log/labs/{{labId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "health-log", "labs", "{{labId}}"]
+                },
+                "description": "Update an existing lab's name, provider, and credentials."
+              }
+            },
+            {
+              "name": "Delete Lab",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/health-log/labs/{{labId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "health-log", "labs", "{{labId}}"]
+                },
+                "description": "Delete a saved lab and all its credentials."
               }
             }
           ]

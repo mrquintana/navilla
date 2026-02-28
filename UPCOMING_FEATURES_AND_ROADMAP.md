@@ -1634,6 +1634,19 @@ All factual content (symptoms, testing windows, treatment) must be verified agai
   - ~~Client-side encryption for notes~~ — server-side AES-256-GCM is in place; client-side E2E encryption deferred to a future security sprint (requires key management UX)
   - ~~Protection used (multi-select) + Encounter type (multi-select)~~ — specced in Feature 1.1 but deferred to Week 8 (Personal Insights). Rationale: these structured fields exist to power computed insights like "83% of encounters were protected." Custom fields already let users note protection freeform. No real users are logging entries yet, so no backfill problem. Adding two dropdowns + a migration is a half-day task — do it in Week 8 when we actually build the insights dashboard that consumes the data. Decision: 2026-02-27, product owner approved
 
+- **Week 6 status:** ✅ Complete
+- **Completed (Week 6 — Health Log):**
+  - Migration `010_health_log.sql`: `labs`, `lab_credentials`, `test_visits`, `test_results` tables with AES-256-GCM encryption
+  - Backend: `LabService` (lab CRUD + credentials), `HealthLogService` (visit CRUD, summary, condition history, write-through sync to health_status)
+  - Backend: `HealthLogController` with 11 endpoints, 14 integration tests, 159 total backend tests passing
+  - Frontend: HealthLogPage dashboard (stats bar, exposure overview, condition cards), ConditionDetailPage (per-condition timeline), TestVisitModal (log/edit visits), LabPicker (autocomplete + inline creation), HealthLogStats, ConditionCard
+  - React Query hooks for all endpoints, 236 frontend tests passing, full i18n (en_US + es_MX)
+  - Routing: `/health-log` + `/health-log/:condition`, `/health` redirects, nav updated
+- **Deferred (Week 6):**
+  - Document upload infrastructure (Week 9 — `document_ref_encrypted` column ready)
+  - Chopo/Salud Digna verification endpoint (future — schema supports it via `labs` + `lab_credentials`)
+  - Verified badge UI (needs verification endpoint first)
+
 ### Phase 3: Layer 2 — Network Enhancements (Weeks 10-14)
 
 | Week | Focus | Deliverables |
@@ -1912,3 +1925,10 @@ The AGENT_EXECUTION_PLAYBOOK.md should be updated to align with this roadmap:
 - Client-side E2E encryption for notes descoped from Week 5 — server-side AES-256-GCM sufficient for now
 - Updated Week 1 and Week 15-16 roadmap to reflect no-Astro and no-medical-review decisions
 - Added trust/UX polish emphasis to CLAUDE.md quality standards
+- Week 6 (Health Log) marked ✅ complete — progress snapshot added to Phase 2
+- Health Log replaces Health Status page: parent-child data model (visits → results), normalized lab storage, write-through sync to health_status
+- 4 new tables: `labs`, `lab_credentials`, `test_visits`, `test_results` (migration 010)
+- 11 new API endpoints under `/api/health-log/` (visits CRUD, summary, condition history, labs CRUD)
+- 6 new frontend components: HealthLogPage, ConditionDetailPage, TestVisitModal, LabPicker, HealthLogStats, ConditionCard
+- 159 backend tests, 236 frontend tests passing
+- Deferred: document upload (Week 9), Chopo/Salud Digna verification, verified badge UI

@@ -127,6 +127,29 @@ A detailed breakdown of the project's directory layout and key files can be foun
 
 ---
 
+## Session Notes (2026-02-27 — Week 6: Health Log)
+
+- ✅ **Full Health Log feature implemented** — complete rebuild of Health Status page as a testing history tracker
+- ✅ Migration `010_health_log.sql`: 4 new tables (`labs`, `lab_credentials`, `test_visits`, `test_results`) with AES-256-GCM encryption
+- ✅ Backend: `LabService` (CRUD for saved labs + credentials), `HealthLogService` (visit CRUD, summary, condition history, write-through sync to `health_status`)
+- ✅ Backend: `HealthLogController` with 11 REST endpoints under `/api/health-log/`
+- ✅ Backend: 159 tests passing (15 LabService + 24 HealthLogService + 14 controller integration tests + existing)
+- ✅ Frontend: 6 new components — `HealthLogStats`, `ConditionCard`, `LabPicker`, `TestVisitModal`, `HealthLogPage`, `ConditionDetailPage`
+- ✅ Frontend: React Query hooks (`useHealthLog.ts`) for all 11 endpoints
+- ✅ Frontend: 236 tests passing (40 new Health Log component tests)
+- ✅ Frontend: Full i18n (70+ keys in en_US + es_MX)
+- ✅ Routing: `/health-log` and `/health-log/:condition` routes, `/health` redirects to `/health-log`
+- ✅ Nav updated: "Health Status" → "Health Log" in header and dashboard links
+- **Key architecture decisions:**
+  - Parent-child data model: visits → results (one test visit = multiple results)
+  - Normalized lab storage: `labs` + `lab_credentials` EAV (decoupled from Chopo/Salud Digna)
+  - Write-through sync: POSITIVE/NEGATIVE results update `health_status`, PENDING/INDETERMINATE skipped
+  - Re-derive on delete: health_status rebuilt from remaining results when visits are deleted
+  - Custom conditions supported (conditionType=null + customConditionEncrypted)
+- **Deferred:** Document upload (Week 9), Chopo/Salud Digna verification endpoint, verified badge UI
+
+---
+
 ## Session Notes (2026-02-24)
 
 - ✅ Removed infrastructure/vendor names from public pages (StatusPage, SecurityPage, PrivacyPolicyPage) — no more "Railway", "Supabase", "SendGrid", "Spring Boot", "nginx" in user-facing content.
