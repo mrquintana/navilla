@@ -9,9 +9,10 @@ interface JournalEntryCardProps {
   onDelete: (id: string) => void;
   isDeleting?: boolean;
   hidePartnerLink?: boolean;
+  hidePartnerName?: boolean;
 }
 
-export function JournalEntryCard({ entry, onEdit, onDelete, isDeleting, hidePartnerLink }: JournalEntryCardProps) {
+export function JournalEntryCard({ entry, onEdit, onDelete, isDeleting, hidePartnerLink, hidePartnerName }: JournalEntryCardProps) {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const locale = i18n.language.replace('_', '-');
@@ -51,16 +52,18 @@ export function JournalEntryCard({ entry, onEdit, onDelete, isDeleting, hidePart
 
           {/* Content */}
           <div className="min-w-0">
-            <p className="text-sm font-medium text-foreground truncate flex items-center gap-1">
-              {partner || (
-                <span className="text-muted italic">
-                  {t('journal.anonymous')}
-                </span>
-              )}
-              {entry.partnerId && (
-                <Bookmark className="w-3 h-3 text-primary opacity-50 shrink-0" aria-hidden="true" />
-              )}
-            </p>
+            {!hidePartnerName && (
+              <p className="text-sm font-medium text-foreground truncate flex items-center gap-1">
+                {partner || (
+                  <span className="text-muted italic">
+                    {t('journal.anonymous')}
+                  </span>
+                )}
+                {entry.partnerId && (
+                  <Bookmark className="w-3 h-3 text-primary opacity-50 shrink-0" aria-hidden="true" />
+                )}
+              </p>
+            )}
             {!hidePartnerLink && entry.partnerId && entry.partnerEncounterCount && entry.partnerEncounterCount > 1 && (
               <button
                 type="button"

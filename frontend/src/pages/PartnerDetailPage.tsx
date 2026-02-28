@@ -308,6 +308,7 @@ export function PartnerDetailPage() {
             onDelete={handleDeleteEntryRequest}
             deletingId={deleteEntryMutation.isPending ? deletingEntryId : null}
             hidePartnerLink
+            hidePartnerName
           />
         </div>
       )}

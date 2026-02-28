@@ -195,9 +195,9 @@ describe('PartnerDetailPage', () => {
     const headings = screen.getAllByText('journal.partnerEncounterCount:5');
     expect(headings.length).toBeGreaterThanOrEqual(2);
 
-    // Entry cards should be rendered within the timeline (Alex appears in h1 + each entry card)
+    // Partner name appears only in the h1 heading (hidden on entry cards via hidePartnerName)
     const alexElements = screen.getAllByText('Alex');
-    expect(alexElements.length).toBeGreaterThanOrEqual(3); // h1 + 2 entry cards
+    expect(alexElements).toHaveLength(1);
   });
 
   it('shows delete modal on delete button click', () => {
