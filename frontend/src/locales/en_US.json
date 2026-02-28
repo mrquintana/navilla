@@ -373,7 +373,16 @@
     "ctaBody": "Use practical tools, track your own health timeline, and add network context only when you choose.",
     "ctaButton": "Create your free account",
     "ctaFinePrint": "No credit card. Delete any time.",
-    "ctaStatLabel": "names shared. Ever."
+    "ctaStatLabel": "names shared. Ever.",
+    "featuresTitle": "Your private toolkit",
+    "featuresSubtitle": "Everything you need to stay on top of your sexual health — encrypted and under your control.",
+    "featureJournalBadge": "Encounter Journal",
+    "featureJournalTitle": "Log encounters on your terms",
+    "featureJournalBody": "A private timeline of your encounters with custom fields, partner tracking, and calendar view. Encrypted so only you can read it.",
+    "featureHealthLogBadge": "Health Log",
+    "featureHealthLogTitle": "Track every test result",
+    "featureHealthLogBody": "Log test visits, save your labs, and see your full testing history per condition. Know exactly where you stand.",
+    "featuresCta": "Start tracking for free"
   },
   "howItWorks": {
     "title": "How It Works",

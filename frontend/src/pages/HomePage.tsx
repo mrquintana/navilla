@@ -10,6 +10,8 @@ import {
   LockKeyhole,
   ArrowRight,
   CircleHelp,
+  BookOpen,
+  HeartPulse,
 } from 'lucide-react';
 import { ConstellationGraphic } from '../components/landing/ConstellationGraphic';
 
@@ -136,6 +138,59 @@ export function HomePage() {
             <Link to="/privacy" className="btn btn-secondary">
               {t('landing.valueMore', 'Privacy details')}
             </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Features — Journal & Health Log showcase */}
+      <section className="container landing-section landing-section--features">
+        <div className="landing-panel landing-panel--values">
+          <h2 className="text-center mb-2">{t('landing.featuresTitle')}</h2>
+          <p className="text-center text-sm text-muted mb-6">{t('landing.featuresSubtitle')}</p>
+          <div className="landing-grid landing-grid--features">
+            {/* Journal card */}
+            <div className="feature-showcase-card">
+              <div className="feature-showcase-preview" aria-hidden="true">
+                {/* TODO: Replace with actual screenshot */}
+                <div className="feature-showcase-placeholder">
+                  <BookOpen className="w-8 h-8" />
+                </div>
+              </div>
+              <div className="feature-showcase-content">
+                <div className="feature-showcase-badge">
+                  <BookOpen className="w-4 h-4" aria-hidden="true" />
+                  <span>{t('landing.featureJournalBadge')}</span>
+                </div>
+                <h3>{t('landing.featureJournalTitle')}</h3>
+                <p>{t('landing.featureJournalBody')}</p>
+                <Link to="/signup" className="feature-card-cta">
+                  {t('landing.featuresCta')}
+                  <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
+                </Link>
+              </div>
+            </div>
+
+            {/* Health Log card */}
+            <div className="feature-showcase-card">
+              <div className="feature-showcase-preview" aria-hidden="true">
+                {/* TODO: Replace with actual screenshot */}
+                <div className="feature-showcase-placeholder">
+                  <HeartPulse className="w-8 h-8" />
+                </div>
+              </div>
+              <div className="feature-showcase-content">
+                <div className="feature-showcase-badge">
+                  <HeartPulse className="w-4 h-4" aria-hidden="true" />
+                  <span>{t('landing.featureHealthLogBadge')}</span>
+                </div>
+                <h3>{t('landing.featureHealthLogTitle')}</h3>
+                <p>{t('landing.featureHealthLogBody')}</p>
+                <Link to="/signup" className="feature-card-cta">
+                  {t('landing.featuresCta')}
+                  <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
       </section>

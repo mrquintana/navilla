@@ -372,7 +372,16 @@
     "ctaBody": "Usa herramientas prácticas, lleva tu propia línea de salud y agrega contexto de red solo cuando tú decidas.",
     "ctaButton": "Crea tu cuenta gratis",
     "ctaFinePrint": "Sin tarjeta de crédito. Elimina cuando quieras.",
-    "ctaStatLabel": "nombres compartidos. Jamás."
+    "ctaStatLabel": "nombres compartidos. Jamás.",
+    "featuresTitle": "Tu kit privado de salud",
+    "featuresSubtitle": "Todo lo que necesitas para cuidar tu salud sexual — cifrado y bajo tu control.",
+    "featureJournalBadge": "Diario de Encuentros",
+    "featureJournalTitle": "Registra encuentros a tu manera",
+    "featureJournalBody": "Una línea de tiempo privada de tus encuentros con campos personalizados, seguimiento de parejas y vista de calendario. Cifrado para que solo tú puedas leerlo.",
+    "featureHealthLogBadge": "Registro de Salud",
+    "featureHealthLogTitle": "Registra cada resultado de prueba",
+    "featureHealthLogBody": "Registra visitas de pruebas, guarda tus laboratorios y consulta tu historial completo por condición. Sabe exactamente dónde estás.",
+    "featuresCta": "Comienza a registrar gratis"
   },
   "howItWorks": {
     "title": "Cómo Funciona",

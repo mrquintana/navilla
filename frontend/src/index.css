@@ -1241,6 +1241,88 @@ section.hero + section {
   line-height: 1.55;
 }
 
+/* Feature showcase section — Journal & Health Log */
+.landing-grid--features {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(2, 1fr);
+}
+
+@media (max-width: 680px) {
+  .landing-grid--features {
+    grid-template-columns: 1fr;
+  }
+}
+
+.feature-showcase-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 1rem;
+  background: var(--color-background);
+  border: 1px solid var(--color-border-light);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.feature-showcase-card:hover {
+  border-color: var(--color-border);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+}
+
+.feature-showcase-preview {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 16 / 10;
+  background: var(--color-background-secondary);
+}
+
+.feature-showcase-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top left;
+}
+
+.feature-showcase-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  color: var(--color-primary-light);
+  opacity: 0.4;
+}
+
+.feature-showcase-content {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.feature-showcase-content h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-foreground);
+}
+
+.feature-showcase-content p {
+  font-size: 0.875rem;
+  color: var(--color-foreground-secondary);
+  line-height: 1.5;
+}
+
+.feature-showcase-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-primary);
+}
+
 /* Explore tools section — 2-column grid */
 .landing-grid--explore {
   display: grid;
