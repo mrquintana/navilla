@@ -13,6 +13,7 @@ export function Header() {
   const auth = useAuthOptional();
   const session = auth?.session ?? null;
   const signOut = auth?.signOut;
+  const authLoading = auth?.isLoading ?? false;
   const token = session?.access_token ?? '';
   const { data: profile } = useUser();
   const { pathname } = useLocation();
@@ -93,8 +94,8 @@ export function Header() {
           </span>
         </Link>
 
-        {/* Navigation */}
-        <nav className="flex items-center gap-2 sm:gap-3">
+        {/* Navigation — fade in after auth resolves to prevent flicker */}
+        <nav className={`navbar-nav${authLoading ? ' navbar-nav--loading' : ''}`}>
           <div className="nav-mobile sm:hidden" ref={mobileMenuRef}>
             <button
               type="button"
