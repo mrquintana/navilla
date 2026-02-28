@@ -523,6 +523,41 @@ select.input {
   color: var(--color-foreground);
 }
 
+.journal-month-nav-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.journal-month-nav-btn:disabled:hover {
+  background: transparent;
+  color: var(--color-foreground-secondary);
+}
+
+.journal-month-nav-skip {
+  font-size: 0.75rem;
+  letter-spacing: -0.05em;
+}
+
+.journal-month-nav-today {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  border: 1px solid var(--color-border);
+  background: transparent;
+  color: var(--color-primary);
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.journal-month-nav-today:hover {
+  background: var(--color-primary);
+  color: white;
+}
+
 /* Label styles */
 .label {
   display: block;

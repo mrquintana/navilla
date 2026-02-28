@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Lock, Plus, List, Calendar, Users, ChevronLeft, ChevronRight, AlertTriangle, X } from 'lucide-react';
+import { Lock, Plus, List, Calendar, Users, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, AlertTriangle, X } from 'lucide-react';
 import { useJournalEntries, useJournalSummary, useDeleteJournalEntry, usePromoteAlias } from '../hooks/useJournal';
 import type { JournalEntry } from '../lib/api';
 import { JournalTimeline } from '../components/journal/JournalTimeline';
@@ -96,6 +96,48 @@ export function JournalPage() {
     setSelectedDate(null);
   }, []);
 
+  // Sorted set of "YYYY-MM" keys that have entries
+  const monthsWithEntries = useMemo(() => {
+    if (!entries || entries.length === 0) return [];
+    const keys = new Set<string>();
+    for (const e of entries) {
+      keys.add(e.encounterDate.slice(0, 7));
+    }
+    return [...keys].sort();
+  }, [entries]);
+
+  const handleSkipPrev = useCallback(() => {
+    const key = toMonthKey(calendarMonth);
+    // Find the latest month with entries before the current month
+    for (let i = monthsWithEntries.length - 1; i >= 0; i--) {
+      if (monthsWithEntries[i] < key) {
+        const [y, m] = monthsWithEntries[i].split('-').map(Number);
+        setCalendarMonth(new Date(y, m - 1, 1));
+        setSelectedDate(null);
+        return;
+      }
+    }
+  }, [calendarMonth, monthsWithEntries]);
+
+  const handleSkipNext = useCallback(() => {
+    const key = toMonthKey(calendarMonth);
+    // Find the earliest month with entries after the current month
+    for (let i = 0; i < monthsWithEntries.length; i++) {
+      if (monthsWithEntries[i] > key) {
+        const [y, m] = monthsWithEntries[i].split('-').map(Number);
+        setCalendarMonth(new Date(y, m - 1, 1));
+        setSelectedDate(null);
+        return;
+      }
+    }
+  }, [calendarMonth, monthsWithEntries]);
+
+  const handleToday = useCallback(() => {
+    const today = new Date();
+    setCalendarMonth(new Date(today.getFullYear(), today.getMonth(), 1));
+    setSelectedDate(null);
+  }, []);
+
   // Promotion callback — called by JournalEntryModal after successful save
   const handlePromote = useCallback(
     (alias: string) => {
@@ -156,6 +198,11 @@ export function JournalPage() {
       year: 'numeric',
     });
   }, [calendarMonth, locale]);
+
+  // Skip button disabled state
+  const canSkipPrev = monthsWithEntries.some((k) => k < calendarMonthKey);
+  const canSkipNext = monthsWithEntries.some((k) => k > calendarMonthKey);
+  const isCurrentMonth = calendarMonthKey === toMonthKey(now);
 
   // Compute this-month count from summary
   const thisMonthKey = toMonthKey(now);
@@ -295,25 +342,60 @@ export function JournalPage() {
       ) : (
         <div className="space-y-6">
           {/* Month navigation */}
-          <nav className="journal-month-nav" aria-label={t('journal.calendar')}>
-            <button
-              type="button"
-              className="journal-month-nav-btn"
-              onClick={handlePrevMonth}
-              aria-label={t('journal.previousMonth')}
-            >
-              <ChevronLeft className="w-4 h-4" aria-hidden="true" />
-            </button>
-            <span className="journal-month-nav-label">{calendarMonthLabel}</span>
-            <button
-              type="button"
-              className="journal-month-nav-btn"
-              onClick={handleNextMonth}
-              aria-label={t('journal.nextMonth')}
-            >
-              <ChevronRight className="w-4 h-4" aria-hidden="true" />
-            </button>
-          </nav>
+          <div className="space-y-1">
+            <nav className="journal-month-nav" aria-label={t('journal.calendar')}>
+              <button
+                type="button"
+                className="journal-month-nav-btn journal-month-nav-skip"
+                onClick={handleSkipPrev}
+                disabled={!canSkipPrev}
+                aria-label={t('journal.skipPrevMonth')}
+              >
+                <ChevronsLeft className="w-4 h-4" aria-hidden="true" />
+              </button>
+              <button
+                type="button"
+                className="journal-month-nav-btn"
+                onClick={handlePrevMonth}
+                aria-label={t('journal.previousMonth')}
+              >
+                <ChevronLeft className="w-4 h-4" aria-hidden="true" />
+              </button>
+              <span className="journal-month-nav-label">{calendarMonthLabel}</span>
+              <button
+                type="button"
+                className="journal-month-nav-btn"
+                onClick={handleNextMonth}
+                aria-label={t('journal.nextMonth')}
+              >
+                <ChevronRight className="w-4 h-4" aria-hidden="true" />
+              </button>
+              <button
+                type="button"
+                className="journal-month-nav-btn journal-month-nav-skip"
+                onClick={handleSkipNext}
+                disabled={!canSkipNext}
+                aria-label={t('journal.skipNextMonth')}
+              >
+                <ChevronsRight className="w-4 h-4" aria-hidden="true" />
+              </button>
+              {!isCurrentMonth && (
+                <button
+                  type="button"
+                  className="journal-month-nav-today"
+                  onClick={handleToday}
+                >
+                  {t('journal.today')}
+                </button>
+              )}
+            </nav>
+            {!canSkipPrev && monthsWithEntries.length > 0 && (
+              <p className="text-xs text-muted text-center">{t('journal.noEncountersBefore')}</p>
+            )}
+            {!canSkipNext && monthsWithEntries.length > 0 && (
+              <p className="text-xs text-muted text-center">{t('journal.noEncountersAfter')}</p>
+            )}
+          </div>
 
           {/* Calendar grid */}
           <JournalCalendar
