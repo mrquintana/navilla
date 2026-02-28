@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
-import { X, Plus, Bookmark } from 'lucide-react';
+import { X, Plus, Bookmark, Unlink } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useUser } from '../../hooks/useUser';
 import {
@@ -400,46 +400,69 @@ function JournalEntryForm({
               {t('journal.partnerAlias')}
             </label>
 
-            {/* Recent partner chips */}
-            {chipSuggestions.length > 0 && (
-              <div className="mb-2">
-                <span className="text-xs text-muted mb-1 block">
-                  {t('journal.recentPartners')}
-                </span>
-                <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-1 px-1">
-                  {chipSuggestions.map((suggestion) => {
-                    const isActive =
-                      (suggestion.type === 'partner' && formPartnerId === suggestion.id) ||
-                      (suggestion.type === 'alias' &&
-                        !formPartnerId &&
-                        formAlias.toLowerCase() === suggestion.alias.toLowerCase());
-
-                    return (
-                      <button
-                        key={`${suggestion.type}-${suggestion.id ?? suggestion.alias}`}
-                        type="button"
-                        className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
-                          isActive
-                            ? 'bg-indigo-100 text-indigo-700 border border-indigo-300'
-                            : 'bg-indigo-50 text-stone-700 border border-stone-200 hover:border-indigo-200 hover:bg-indigo-50/80'
-                        }`}
-                        onClick={() => selectPartner(suggestion)}
-                      >
-                        {suggestion.type === 'partner' && (
-                          <Bookmark className="w-3 h-3 flex-shrink-0" aria-hidden="true" />
-                        )}
-                        {suggestion.alias}
-                      </button>
-                    );
-                  })}
+            {/* When linked to a partner: read-only alias + unlink option */}
+            {formPartnerId ? (
+              <div>
+                <input
+                  id="journal-alias"
+                  type="text"
+                  className="input w-full bg-stone-50 text-muted"
+                  value={formAlias}
+                  readOnly
+                  tabIndex={-1}
+                />
+                <div className="flex items-center justify-between mt-1.5">
+                  <span className="text-xs text-muted">
+                    {t('journal.aliasManagedByPartner')}
+                  </span>
+                  <button
+                    type="button"
+                    className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
+                    onClick={clearPartner}
+                  >
+                    <Unlink className="w-3 h-3" aria-hidden="true" />
+                    {t('journal.unlinkFromPartner')}
+                  </button>
                 </div>
               </div>
-            )}
+            ) : (
+              <>
+                {/* Recent partner chips */}
+                {chipSuggestions.length > 0 && (
+                  <div className="mb-2">
+                    <span className="text-xs text-muted mb-1 block">
+                      {t('journal.recentPartners')}
+                    </span>
+                    <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-1 px-1">
+                      {chipSuggestions.map((suggestion) => {
+                        const isActive =
+                          suggestion.type === 'alias' &&
+                          formAlias.toLowerCase() === suggestion.alias.toLowerCase();
 
-            {/* Alias input with clear button and autocomplete */}
-            <div className="relative">
-              <div className="flex items-center gap-2">
-                <div className="relative flex-1">
+                        return (
+                          <button
+                            key={`${suggestion.type}-${suggestion.id ?? suggestion.alias}`}
+                            type="button"
+                            className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
+                              isActive
+                                ? 'bg-indigo-100 text-indigo-700 border border-indigo-300'
+                                : 'bg-indigo-50 text-stone-700 border border-stone-200 hover:border-indigo-200 hover:bg-indigo-50/80'
+                            }`}
+                            onClick={() => selectPartner(suggestion)}
+                          >
+                            {suggestion.type === 'partner' && (
+                              <Bookmark className="w-3 h-3 flex-shrink-0" aria-hidden="true" />
+                            )}
+                            {suggestion.alias}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* Alias input with autocomplete */}
+                <div className="relative">
                   <input
                     ref={aliasInputRef}
                     id="journal-alias"
@@ -495,49 +518,38 @@ function JournalEntryForm({
                     }}
                     autoComplete="off"
                   />
-                </div>
-                {/* Clear button when a partner is selected */}
-                {formPartnerId && (
-                  <button
-                    type="button"
-                    className="btn btn-secondary btn-sm flex-shrink-0 p-1.5"
-                    onClick={clearPartner}
-                    aria-label={t('journal.clearPartner')}
-                  >
-                    <X className="w-4 h-4" aria-hidden="true" />
-                  </button>
-                )}
-              </div>
 
-              {/* Autocomplete dropdown */}
-              {shouldShowDropdown && (
-                <ul
-                  id="alias-suggestions"
-                  role="listbox"
-                  ref={suggestionsRef}
-                  className="absolute z-10 left-0 right-0 mt-1 bg-white border border-stone-200 rounded-lg shadow-lg max-h-48 overflow-y-auto list-none p-0 m-0"
-                >
-                  {filteredSuggestions.map((suggestion, index) => (
-                    <li
-                      key={`${suggestion.type}-${suggestion.id ?? suggestion.alias}`}
-                      id={`suggestion-${index}`}
-                      role="option"
-                      aria-selected={index === highlightedIndex}
-                      className={`w-full text-left px-3 py-2 text-sm hover:bg-indigo-50 flex items-center gap-2 transition-colors cursor-pointer ${index === highlightedIndex ? 'bg-indigo-50' : ''}`}
-                      onMouseDown={(e) => {
-                        e.preventDefault(); // Prevent blur before click
-                        selectPartner(suggestion);
-                      }}
+                  {/* Autocomplete dropdown */}
+                  {shouldShowDropdown && (
+                    <ul
+                      id="alias-suggestions"
+                      role="listbox"
+                      ref={suggestionsRef}
+                      className="absolute z-10 left-0 right-0 mt-1 bg-white border border-stone-200 rounded-lg shadow-lg max-h-48 overflow-y-auto list-none p-0 m-0"
                     >
-                      {suggestion.type === 'partner' && (
-                        <Bookmark className="w-3 h-3 text-indigo-500 flex-shrink-0" aria-hidden="true" />
-                      )}
-                      <span>{suggestion.alias}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
+                      {filteredSuggestions.map((suggestion, index) => (
+                        <li
+                          key={`${suggestion.type}-${suggestion.id ?? suggestion.alias}`}
+                          id={`suggestion-${index}`}
+                          role="option"
+                          aria-selected={index === highlightedIndex}
+                          className={`w-full text-left px-3 py-2 text-sm hover:bg-indigo-50 flex items-center gap-2 transition-colors cursor-pointer ${index === highlightedIndex ? 'bg-indigo-50' : ''}`}
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            selectPartner(suggestion);
+                          }}
+                        >
+                          {suggestion.type === 'partner' && (
+                            <Bookmark className="w-3 h-3 text-indigo-500 flex-shrink-0" aria-hidden="true" />
+                          )}
+                          <span>{suggestion.alias}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </>
+            )}
           </div>
 
           {/* Link to connection — hidden when a saved partner is selected */}

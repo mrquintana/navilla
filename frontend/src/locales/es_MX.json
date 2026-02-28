@@ -573,6 +573,8 @@
     "saveFailed": "Error al guardar la entrada. Inténtalo de nuevo.",
     "removeField": "Eliminar campo",
     "clearPartner": "Limpiar pareja",
+    "aliasManagedByPartner": "Nombre administrado por la pareja",
+    "unlinkFromPartner": "Desvincular de pareja",
     "dayMon": "Lun",
     "dayTue": "Mar",
     "dayWed": "Mié",
