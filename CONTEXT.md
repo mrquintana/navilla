@@ -618,7 +618,7 @@ For a quick start and a list of development commands, please refer to the main `
 
 ## Next Steps
 
-Week 5 (Encounter Journal) complete. Moving to Week 6 next.
+Week 5 (Encounter Journal + Journal Partners) complete. Moving to Week 6 next.
 
 | Priority | Item | GitHub Issue | Notes |
 |----------|------|-------------|-------|
@@ -744,6 +744,67 @@ Complete Week 5 Layer 1: Encounter journal — first personal tracker feature.
 
 ### Next Steps
 - Week 6: Testing history tracker (test records, per-condition history, document upload)
+
+---
+
+## Session Notes (2026-02-27 — Journal Partners / Regulars Feature)
+
+### Accomplished
+Designed and implemented the full Journal Partners ("Regulars") feature — allowing users to save recurring partners with notes, stats, and encounter history.
+
+**Database:**
+- Migration `009_journal_partners.sql`: new `journal_partners` table with encrypted alias/notes, optional FK to connections, soft-delete support
+- Added `partner_id` FK on `encounter_journal` table linking entries to saved partners
+- RLS policies for owner-only access
+
+**Backend (Java 25 + Spring Boot 4):**
+- `JournalPartner` JPA entity with encrypted fields
+- `JournalPartnerRepository` with owner-scoped queries
+- 6 DTOs: `JournalPartnerResponse`, `JournalPartnerDetailResponse`, `CreatePartnerRequest`, `UpdatePartnerRequest`, `PromoteAliasRequest`, `RecentAliasResponse`
+- `JournalPartnerService` — full CRUD + promote alias + recent aliases + soft/destructive delete
+- Updated `EncounterJournalService` to include `partnerId` and `partnerEncounterCount` in entry responses
+- 8 new REST endpoints on `EncounterJournalController`
+- `JournalMetrics` — added partner counters (create/update/delete/promote)
+- Backend i18n messages for partner validation errors
+- 25+ new service unit tests + controller integration tests (105 total backend tests passing)
+
+**Frontend (React 19 + TypeScript):**
+- `JournalPartner` and `JournalPartnerDetail` types in `api.ts`
+- 9 new API client methods in `api.journal.partners.*`
+- 7 new React Query hooks in `useJournal.ts`
+- `JournalPartnerCard.tsx` — partner card with alias, encounter count, last date, connection badge
+- `JournalPartnersTab.tsx` — partners list tab on journal page with empty/loading states
+- `PartnerDetailPage.tsx` — partner detail with rename, notes, stats, encounter timeline, soft/destructive delete modal
+- `JournalEntryCard.tsx` — updated with bookmark icon and encounter count link for partnered entries
+- `JournalEntryModal.tsx` — partner picker autocomplete with saved partners + recent aliases, 3rd-encounter promotion prompt
+- Protected route at `/journal/partner/:id`
+- 15 new frontend component tests (196 total frontend tests passing)
+- Full i18n (en_US + es_MX) for all partner strings
+
+**New API Endpoints:**
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/journal/partners` | List saved partners |
+| POST | `/api/journal/partners` | Create partner |
+| GET | `/api/journal/partners/:id` | Get partner detail |
+| PUT | `/api/journal/partners/:id` | Update partner |
+| DELETE | `/api/journal/partners/:id` | Delete partner (soft default, `?deleteEntries=true` for destructive) |
+| GET | `/api/journal/partners/:id/entries` | List entries for partner |
+| POST | `/api/journal/partners/promote` | Promote alias to saved partner |
+| GET | `/api/journal/recent-aliases` | Recent aliases without a partner |
+
+**New Frontend Route:**
+| Path | Component | Protected |
+|------|-----------|-----------|
+| `/journal/partner/:id` | PartnerDetailPage | Yes |
+
+**Migration Required:** Run `database/migrations/009_journal_partners.sql` in Supabase SQL Editor
+
+### Key Decisions
+- Partner alias stored encrypted (same AES-256-GCM as journal entries)
+- Soft delete by default (preserves entries, nulls partner_id); destructive delete requires explicit parameter
+- 3rd-encounter promotion prompt is client-side heuristic (no server-side counter)
+- Partner picker autocomplete combines saved partners + recent unlinked aliases
 
 ---
 

@@ -34,6 +34,12 @@
       "value": "",
       "type": "string",
       "description": "Journal entry ID for update/delete operations"
+    },
+    {
+      "key": "partnerId",
+      "value": "",
+      "type": "string",
+      "description": "Partner ID for partner detail/update/delete operations"
     }
   ],
   "auth": {
@@ -1100,6 +1106,355 @@
             },
             "description": "Get a summary of journal entries for a given year, including total count and monthly breakdown."
           }
+        },
+        {
+          "name": "Journal Partners",
+          "description": "Manage saved partners (regulars) in the encounter journal. Partners aggregate encounters under a named alias with notes and statistics.",
+          "item": [
+            {
+              "name": "List Partners",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 200', function() {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "pm.test('Response is an array', function() {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json).to.be.an('array');",
+                      "});",
+                      "",
+                      "pm.test('Each partner has required fields', function() {",
+                      "    const json = pm.response.json();",
+                      "    json.forEach(function(p) {",
+                      "        pm.expect(p).to.have.property('id');",
+                      "        pm.expect(p).to.have.property('alias');",
+                      "        pm.expect(p).to.have.property('encounterCount');",
+                      "    });",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/journal/partners",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "journal", "partners"]
+                },
+                "description": "List all saved partners for the authenticated user. Returns partners sorted by most recent encounter date descending."
+              }
+            },
+            {
+              "name": "Create Partner",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 201', function() {",
+                      "    pm.response.to.have.status(201);",
+                      "});",
+                      "",
+                      "pm.test('Response has partner fields', function() {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json).to.have.property('id');",
+                      "    pm.expect(json).to.have.property('alias');",
+                      "    pm.expect(json.alias).to.equal('Alex');",
+                      "});",
+                      "",
+                      "// Store partner ID for subsequent requests",
+                      "if (pm.response.code === 201) {",
+                      "    const json = pm.response.json();",
+                      "    pm.collectionVariables.set('partnerId', json.id);",
+                      "}"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"alias\": \"Alex\",\n  \"notes\": \"Optional notes about this partner\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/journal/partners",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "journal", "partners"]
+                },
+                "description": "Create a new saved partner. The alias must be unique per user."
+              }
+            },
+            {
+              "name": "Get Partner",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 200', function() {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "pm.test('Response has detail fields', function() {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json).to.have.property('id');",
+                      "    pm.expect(json).to.have.property('alias');",
+                      "    pm.expect(json).to.have.property('notes');",
+                      "    pm.expect(json).to.have.property('encounterCount');",
+                      "    pm.expect(json).to.have.property('firstEncounterDate');",
+                      "    pm.expect(json).to.have.property('mostRecentEncounterDate');",
+                      "    pm.expect(json).to.have.property('createdAt');",
+                      "    pm.expect(json).to.have.property('updatedAt');",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/journal/partners/{{partnerId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "journal", "partners", "{{partnerId}}"]
+                },
+                "description": "Get detailed information about a saved partner, including notes, encounter count, and date range."
+              }
+            },
+            {
+              "name": "Update Partner",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 200', function() {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "pm.test('Response has updated fields', function() {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json).to.have.property('id');",
+                      "    pm.expect(json).to.have.property('alias');",
+                      "    pm.expect(json.alias).to.equal('Updated Name');",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"alias\": \"Updated Name\",\n  \"notes\": \"Updated notes\",\n  \"unlinkConnection\": false\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/journal/partners/{{partnerId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "journal", "partners", "{{partnerId}}"]
+                },
+                "description": "Update a saved partner's alias, notes, or connection link. Set unlinkConnection to true to remove the connected user link."
+              }
+            },
+            {
+              "name": "Delete Partner (Soft)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 204', function() {",
+                      "    pm.response.to.have.status(204);",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/journal/partners/{{partnerId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "journal", "partners", "{{partnerId}}"]
+                },
+                "description": "Soft delete a partner. The partner is removed but their journal entries are preserved (partner_id set to null)."
+              }
+            },
+            {
+              "name": "Delete Partner (Destructive)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 204', function() {",
+                      "    pm.response.to.have.status(204);",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/journal/partners/{{partnerId}}?deleteEntries=true",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "journal", "partners", "{{partnerId}}"],
+                  "query": [
+                    {
+                      "key": "deleteEntries",
+                      "value": "true",
+                      "description": "When true, also deletes all journal entries associated with this partner"
+                    }
+                  ]
+                },
+                "description": "Destructive delete — removes the partner AND all their associated journal entries. Requires explicit deleteEntries=true parameter."
+              }
+            },
+            {
+              "name": "Promote Alias to Partner",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 201', function() {",
+                      "    pm.response.to.have.status(201);",
+                      "});",
+                      "",
+                      "pm.test('Response has new partner', function() {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json).to.have.property('id');",
+                      "    pm.expect(json).to.have.property('alias');",
+                      "    pm.expect(json.alias).to.equal('Alex');",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"alias\": \"Alex\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/journal/partners/promote",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "journal", "partners", "promote"]
+                },
+                "description": "Promote a recurring alias to a saved partner. Creates the partner and links all existing journal entries with that alias. Typically triggered after the 3rd encounter with the same alias."
+              }
+            },
+            {
+              "name": "Recent Aliases",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 200', function() {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "pm.test('Response is an array of strings', function() {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json).to.be.an('array');",
+                      "    json.forEach(function(alias) {",
+                      "        pm.expect(alias).to.be.a('string');",
+                      "    });",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/journal/recent-aliases",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "journal", "recent-aliases"]
+                },
+                "description": "Get recent partner aliases from journal entries that are not yet linked to a saved partner. Used for the autocomplete partner picker in the entry modal."
+              }
+            },
+            {
+              "name": "Partner Entries",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 200', function() {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "pm.test('Response is an array', function() {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json).to.be.an('array');",
+                      "});",
+                      "",
+                      "pm.test('All entries belong to the partner', function() {",
+                      "    const json = pm.response.json();",
+                      "    const partnerId = pm.collectionVariables.get('partnerId');",
+                      "    json.forEach(function(entry) {",
+                      "        pm.expect(entry).to.have.property('partnerId');",
+                      "        pm.expect(entry.partnerId).to.equal(partnerId);",
+                      "    });",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/journal/partners/{{partnerId}}/entries",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "journal", "partners", "{{partnerId}}", "entries"]
+                },
+                "description": "Get all journal entries associated with a specific partner. Returns entries sorted by encounter date descending."
+              }
+            }
+          ]
         }
       ]
     }
