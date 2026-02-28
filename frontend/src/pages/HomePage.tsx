@@ -145,7 +145,7 @@ export function HomePage() {
             <div className="feature-showcase-card">
               <div className="feature-showcase-preview" aria-hidden="true">
                 <img
-                  src="/images/preview-journal-calendar.png"
+                  src="/images/preview-health-log.png"
                   alt=""
                   className="feature-showcase-img"
                   loading="lazy"
