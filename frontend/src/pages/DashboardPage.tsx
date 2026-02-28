@@ -207,7 +207,7 @@ export function DashboardPage() {
             <div className="mt-3 space-y-2 text-sm">
               <div className="flex items-center justify-between gap-3">
                 <p className="text-xs text-muted">{t('dashboard.exposureSummary')}</p>
-                <Link to="/health" className="text-[11px] font-semibold tracking-wide uppercase text-primary">
+                <Link to="/health-log" className="text-[11px] font-semibold tracking-wide uppercase text-primary">
                   {t('dashboard.exposureSummaryMore')}
                 </Link>
               </div>
@@ -262,7 +262,7 @@ export function DashboardPage() {
             </div>
           )}
           <div className="mt-3 flex flex-wrap items-center gap-3">
-            <Link to="/health" className="text-sm text-primary font-medium">
+            <Link to="/health-log" className="text-sm text-primary font-medium">
               {t('dashboard.viewHealthStatus')}
             </Link>
             {DEV_MODE && (

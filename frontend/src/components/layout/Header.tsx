@@ -122,7 +122,7 @@ export function Header() {
                       <Users className="nav-icon" aria-hidden="true" />
                       {t('nav.connections')}
                     </Link>
-                    <Link to="/health" className={`nav-dropdown-item${pathname === '/health' ? ' nav-dropdown-item-active' : ''}`} role="menuitem">
+                    <Link to="/health-log" className={`nav-dropdown-item${pathname === '/health-log' || pathname.startsWith('/health-log/') ? ' nav-dropdown-item-active' : ''}`} role="menuitem">
                       <HeartPulse className="nav-icon" aria-hidden="true" />
                       {t('nav.health')}
                     </Link>
@@ -178,7 +178,7 @@ export function Header() {
                   <Users className="nav-icon" aria-hidden="true" />
                   {t('nav.connections')}
                 </Link>
-                <Link to="/health" className={`nav-link${pathname === '/health' ? ' nav-link-active' : ''}`}>
+                <Link to="/health-log" className={`nav-link${pathname === '/health-log' || pathname.startsWith('/health-log/') ? ' nav-link-active' : ''}`}>
                   <HeartPulse className="nav-icon" aria-hidden="true" />
                   {t('nav.health')}
                 </Link>

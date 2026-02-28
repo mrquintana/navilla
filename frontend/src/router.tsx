@@ -1,4 +1,4 @@
-import { createBrowserRouter } from 'react-router-dom';
+import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { Layout } from './components/layout/Layout';
 import { AuthLayout } from './components/layout/AuthLayout';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
@@ -10,7 +10,8 @@ import { ResetPasswordPage } from './pages/ResetPasswordPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { ConnectionsPage } from './pages/ConnectionsPage';
 import { ProfilePage } from './pages/ProfilePage';
-import { HealthStatusPage } from './pages/HealthStatusPage';
+import { HealthLogPage } from './pages/HealthLogPage';
+import { ConditionDetailPage } from './pages/ConditionDetailPage';
 import { NotificationsPage } from './pages/NotificationsPage';
 import { HowItWorksPage } from './pages/HowItWorksPage';
 import { ContactPage } from './pages/ContactPage';
@@ -84,12 +85,24 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: 'health',
+        path: 'health-log',
         element: (
           <ProtectedRoute>
-            <HealthStatusPage />
+            <HealthLogPage />
           </ProtectedRoute>
         ),
+      },
+      {
+        path: 'health-log/:condition',
+        element: (
+          <ProtectedRoute>
+            <ConditionDetailPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'health',
+        element: <Navigate to="/health-log" replace />,
       },
       {
         path: 'notifications',
