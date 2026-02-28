@@ -16,10 +16,13 @@ vi.mock('../hooks/useJournal', () => ({
   useJournalEntries: () => useJournalEntriesMock(),
   useJournalSummary: () => useJournalSummaryMock(),
   useDeleteJournalEntry: () => useDeleteJournalEntryMock(),
+  usePromoteAlias: () => defaultMutation,
   useCreateJournalEntry: () => defaultMutation,
   useUpdateJournalEntry: () => defaultMutation,
   useJournalTemplates: () => ({ data: { labels: [] } }),
   useSaveJournalTemplates: () => defaultMutation,
+  useJournalPartners: () => ({ data: [] }),
+  useRecentAliases: () => ({ data: [] }),
 }));
 
 vi.mock('../hooks/useAuth', () => ({

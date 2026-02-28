@@ -18,7 +18,7 @@ interface JournalEntryModalProps {
   isOpen: boolean;
   onClose: () => void;
   entry: JournalEntry | null; // null = create mode, defined = edit mode
-  onPromote?: (alias: string, matchCount: number) => void;
+  onPromote?: (alias: string) => void;
 }
 
 interface CustomFieldState {
@@ -95,7 +95,7 @@ interface JournalEntryFormProps {
   onClose: () => void;
   savedLabels: string[];
   connections: Connection[];
-  onPromote?: (alias: string, matchCount: number) => void;
+  onPromote?: (alias: string) => void;
 }
 
 function JournalEntryForm({
@@ -131,9 +131,10 @@ function JournalEntryForm({
   const [error, setError] = useState<string | null>(null);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
+  const [highlightedIndex, setHighlightedIndex] = useState(-1);
 
   const aliasInputRef = useRef<HTMLInputElement>(null);
-  const suggestionsRef = useRef<HTMLDivElement>(null);
+  const suggestionsRef = useRef<HTMLUListElement>(null);
 
   // Build the combined suggestion list (saved partners + recent aliases, deduplicated)
   const allSuggestions = useMemo((): PartnerSuggestion[] => {
@@ -184,14 +185,20 @@ function JournalEntryForm({
     return allSuggestions.filter((s) => s.alias.toLowerCase().includes(query));
   }, [allSuggestions, formAlias]);
 
-  // Close on Escape key
+  // Close on Escape key — dismiss autocomplete first, then the modal
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        onClose();
+        if (showSuggestions) {
+          setShowSuggestions(false);
+          setIsTyping(false);
+          setHighlightedIndex(-1);
+        } else {
+          onClose();
+        }
       }
     },
-    [onClose]
+    [onClose, showSuggestions]
   );
 
   useEffect(() => {
@@ -210,6 +217,7 @@ function JournalEntryForm({
       ) {
         setShowSuggestions(false);
         setIsTyping(false);
+        setHighlightedIndex(-1);
       }
     }
     document.addEventListener('mousedown', handleClickOutside);
@@ -239,6 +247,7 @@ function JournalEntryForm({
     }
     setShowSuggestions(false);
     setIsTyping(false);
+    setHighlightedIndex(-1);
   };
 
   // Clear partner selection
@@ -315,7 +324,7 @@ function JournalEntryForm({
 
       // Check for promotion prompt (only on create, only if no partner was selected)
       if (!isEditMode && !formPartnerId && alias && onPromote) {
-        onPromote(alias, 0); // matchCount will be computed by JournalPage
+        onPromote(alias);
       }
 
       onClose();
@@ -393,7 +402,7 @@ function JournalEntryForm({
 
                     return (
                       <button
-                        key={suggestion.id ?? suggestion.alias}
+                        key={`${suggestion.type}-${suggestion.id ?? suggestion.alias}`}
                         type="button"
                         className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
                           isActive
@@ -421,6 +430,15 @@ function JournalEntryForm({
                     ref={aliasInputRef}
                     id="journal-alias"
                     type="text"
+                    role="combobox"
+                    aria-autocomplete="list"
+                    aria-expanded={shouldShowDropdown}
+                    aria-controls="alias-suggestions"
+                    aria-activedescendant={
+                      shouldShowDropdown && highlightedIndex >= 0
+                        ? `suggestion-${highlightedIndex}`
+                        : undefined
+                    }
                     className="input w-full"
                     value={formAlias}
                     placeholder={t('journal.partnerAliasPlaceholder')}
@@ -430,18 +448,35 @@ function JournalEntryForm({
                       setFormPartnerId(null);
                       setIsTyping(true);
                       setShowSuggestions(true);
+                      setHighlightedIndex(-1);
                     }}
                     onFocus={() => {
                       if (formAlias.trim() && !formPartnerId) {
                         setShowSuggestions(true);
                         setIsTyping(true);
+                        setHighlightedIndex(-1);
                       }
                     }}
                     onKeyDown={(e) => {
-                      if (e.key === 'Enter' && shouldShowDropdown) {
+                      if (e.key === 'ArrowDown' && shouldShowDropdown) {
                         e.preventDefault();
-                        setShowSuggestions(false);
-                        setIsTyping(false);
+                        setHighlightedIndex((prev) =>
+                          prev < filteredSuggestions.length - 1 ? prev + 1 : 0
+                        );
+                      } else if (e.key === 'ArrowUp' && shouldShowDropdown) {
+                        e.preventDefault();
+                        setHighlightedIndex((prev) =>
+                          prev > 0 ? prev - 1 : filteredSuggestions.length - 1
+                        );
+                      } else if (e.key === 'Enter' && shouldShowDropdown) {
+                        e.preventDefault();
+                        if (highlightedIndex >= 0 && highlightedIndex < filteredSuggestions.length) {
+                          selectPartner(filteredSuggestions[highlightedIndex]);
+                        } else {
+                          setShowSuggestions(false);
+                          setIsTyping(false);
+                          setHighlightedIndex(-1);
+                        }
                       }
                     }}
                     autoComplete="off"
@@ -453,7 +488,7 @@ function JournalEntryForm({
                     type="button"
                     className="btn btn-secondary btn-sm flex-shrink-0 p-1.5"
                     onClick={clearPartner}
-                    aria-label={t('journal.removeField')}
+                    aria-label={t('journal.clearPartner')}
                   >
                     <X className="w-4 h-4" aria-hidden="true" />
                   </button>
@@ -462,15 +497,19 @@ function JournalEntryForm({
 
               {/* Autocomplete dropdown */}
               {shouldShowDropdown && (
-                <div
+                <ul
+                  id="alias-suggestions"
+                  role="listbox"
                   ref={suggestionsRef}
-                  className="absolute z-10 left-0 right-0 mt-1 bg-white border border-stone-200 rounded-lg shadow-lg max-h-48 overflow-y-auto"
+                  className="absolute z-10 left-0 right-0 mt-1 bg-white border border-stone-200 rounded-lg shadow-lg max-h-48 overflow-y-auto list-none p-0 m-0"
                 >
-                  {filteredSuggestions.map((suggestion) => (
-                    <button
-                      key={suggestion.id ?? `alias-${suggestion.alias}`}
-                      type="button"
-                      className="w-full text-left px-3 py-2 text-sm hover:bg-indigo-50 flex items-center gap-2 transition-colors"
+                  {filteredSuggestions.map((suggestion, index) => (
+                    <li
+                      key={`${suggestion.type}-${suggestion.id ?? suggestion.alias}`}
+                      id={`suggestion-${index}`}
+                      role="option"
+                      aria-selected={index === highlightedIndex}
+                      className={`w-full text-left px-3 py-2 text-sm hover:bg-indigo-50 flex items-center gap-2 transition-colors cursor-pointer ${index === highlightedIndex ? 'bg-indigo-50' : ''}`}
                       onMouseDown={(e) => {
                         e.preventDefault(); // Prevent blur before click
                         selectPartner(suggestion);
@@ -480,9 +519,9 @@ function JournalEntryForm({
                         <Bookmark className="w-3 h-3 text-indigo-500 flex-shrink-0" aria-hidden="true" />
                       )}
                       <span>{suggestion.alias}</span>
-                    </button>
+                    </li>
                   ))}
-                </div>
+                </ul>
               )}
             </div>
           </div>

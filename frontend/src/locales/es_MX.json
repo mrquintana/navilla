@@ -560,6 +560,7 @@
     "dateRequired": "La fecha del encuentro es obligatoria",
     "saveFailed": "Error al guardar la entrada. Inténtalo de nuevo.",
     "removeField": "Eliminar campo",
+    "clearPartner": "Limpiar pareja",
     "dayMon": "Lun",
     "dayTue": "Mar",
     "dayWed": "Mié",

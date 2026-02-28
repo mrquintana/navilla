@@ -561,6 +561,7 @@
     "dateRequired": "Encounter date is required",
     "saveFailed": "Failed to save entry. Please try again.",
     "removeField": "Remove field",
+    "clearPartner": "Clear partner",
     "dayMon": "Mon",
     "dayTue": "Tue",
     "dayWed": "Wed",

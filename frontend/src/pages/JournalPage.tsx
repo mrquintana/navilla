@@ -102,13 +102,15 @@ export function JournalPage() {
       // Skip if already dismissed this session
       if (dismissedAliasesRef.current.has(alias.toLowerCase())) return;
 
-      // Count entries with same alias (case-insensitive), including the one just saved
-      // The query cache may not have refreshed yet, so we count from current entries + 1
+      // Count entries with same alias (case-insensitive), including the one just saved.
+      // +1 for the entry just created — React Query cache may not yet reflect it
+      // since invalidateQueries fires asynchronously. This is a known approximation
+      // that only affects the toast message text, not the correctness of promotion.
       const currentEntries = entries ?? [];
       const matchCount =
         currentEntries.filter(
           (e) => e.partnerAlias?.toLowerCase() === alias.toLowerCase() && !e.partnerId
-        ).length + 1; // +1 for the entry that was just created
+        ).length + 1;
 
       if (matchCount >= 3) {
         setPromoteState({ alias, count: matchCount });

@@ -19,6 +19,8 @@ vi.mock('../../hooks/useJournal', () => ({
   useUpdateJournalEntry: () => useUpdateMock(),
   useJournalTemplates: () => useTemplatesMock(),
   useSaveJournalTemplates: () => useSaveTemplatesMock(),
+  useJournalPartners: () => ({ data: [] }),
+  useRecentAliases: () => ({ data: [] }),
 }));
 
 vi.mock('@tanstack/react-query', async () => {
@@ -42,6 +44,8 @@ const mockEntry: JournalEntry = {
   partnerAlias: 'Alex',
   connectionId: null,
   connectionDisplayName: null,
+  partnerId: null,
+  partnerEncounterCount: null,
   notes: 'A nice evening at a restaurant in Roma Norte.',
   customFields: [{ label: 'Location', value: 'Roma Norte' }],
   createdAt: '2026-03-15T10:00:00Z',
