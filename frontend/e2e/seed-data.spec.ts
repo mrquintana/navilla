@@ -79,7 +79,7 @@ async function createJournalEntry(
   if (opts.customFields && opts.customFields.length > 0) {
     // Get existing custom field rows
     const existingRows = page.locator('.custom-field-row, [class*="custom-field"]');
-    const existingCount = await existingRows.count().catch(() => 0);
+    await existingRows.count().catch(() => 0);
 
     for (let i = 0; i < opts.customFields.length; i++) {
       const cf = opts.customFields[i];
@@ -87,7 +87,7 @@ async function createJournalEntry(
       // If we need more rows than already present, click "Add field"
       // But first check: template labels auto-create rows, so some may exist already
       const labelInputs = page.locator('input[maxlength="100"]');
-      const valueInputs = page.locator('input[maxlength="500"]');
+      page.locator('input[maxlength="500"]');
       const labelCount = await labelInputs.count();
 
       if (i >= labelCount) {
@@ -508,12 +508,13 @@ const TEST_VISITS = [
   },
 ];
 
-const PARTNER_NOTES: Record<string, string> = {
-  'Carlos M.': 'Met at a friend\'s birthday party in Condesa. Really sweet guy, works in tech. Always uses protection and gets tested regularly.',
-  'Sofía R.': 'Yoga instructor from Roma Norte. We hang out occasionally — always good vibes.',
-  'Diego': 'Friend of a friend. Met him through the queer community in CDMX. Fun to be around.',
-  'Andrés L.': 'Lives in Polanco. Met on Grindr. Started PrEP recently. Verified negative on his last panel.',
-};
+// Partner notes — for future use when partner detail page e2e is added
+// const PARTNER_NOTES: Record<string, string> = {
+//   'Carlos M.': 'Met at a friend\'s birthday party in Condesa. Really sweet guy, works in tech.',
+//   'Sofía R.': 'Yoga instructor from Roma Norte. We hang out occasionally — always good vibes.',
+//   'Diego': 'Friend of a friend. Met him through the queer community in CDMX.',
+//   'Andrés L.': 'Lives in Polanco. Met on Grindr. Started PrEP recently.',
+// };
 
 // ─── Spec ───────────────────────────────────────────────────────────
 
@@ -560,7 +561,7 @@ test.describe.serial('Seed demo data', () => {
       const result = await page.evaluate(async (aliasName) => {
         // Get the access token from Supabase's local storage
         const storageKeys = Object.keys(localStorage);
-        const authKey = storageKeys.find((k) => k.includes('auth-token') || k.includes('supabase'));
+        storageKeys.find((k) => k.includes('auth-token') || k.includes('supabase'));
         let token = '';
         for (const key of storageKeys) {
           try {
@@ -573,7 +574,7 @@ test.describe.serial('Seed demo data', () => {
         }
         if (!token) return { error: 'No token found' };
 
-        const apiUrl = (window as any).__VITE_API_URL || 'https://api.navilla.app';
+        const apiUrl = (window as Record<string, unknown>).__VITE_API_URL as string || 'https://api.navilla.app';
         const resp = await fetch(`${apiUrl}/api/journal/partners/promote`, {
           method: 'POST',
           headers: {
