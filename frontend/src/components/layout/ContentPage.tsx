@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import type { ReactNode } from 'react';
 
 export interface ContentSection {
@@ -29,6 +30,7 @@ export function ContentPage({
   sections,
   footer,
 }: ContentPageProps) {
+  const { t } = useTranslation();
   return (
     <div className="container py-10 space-y-6 max-w-3xl">
       <title>{seoTitle}</title>
@@ -71,7 +73,7 @@ export function ContentPage({
       {footer && <div>{footer}</div>}
 
       <Link to="/" className="text-sm text-primary font-medium">
-        Back to Home
+        {t('common.backToHome')}
       </Link>
     </div>
   );
