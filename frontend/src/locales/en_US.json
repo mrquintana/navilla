@@ -559,6 +559,8 @@
     "cancel": "Cancel",
     "noEntries": "No entries this month",
     "dateRequired": "Encounter date is required",
+    "dateBeforeDob": "Encounter date cannot be before your date of birth.",
+    "dateInFuture": "Encounter date cannot be in the future.",
     "saveFailed": "Failed to save entry. Please try again.",
     "removeField": "Remove field",
     "clearPartner": "Clear partner",

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { X, Plus, Bookmark } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
+import { useUser } from '../../hooks/useUser';
 import {
   useCreateJournalEntry,
   useUpdateJournalEntry,
@@ -62,6 +63,7 @@ function buildInitialCustomFields(
 
 export function JournalEntryModal({ isOpen, onClose, entry, onPromote }: JournalEntryModalProps) {
   const { session } = useAuth();
+  const { data: userProfile } = useUser();
   const { data: templates } = useJournalTemplates();
 
   const connectionsQuery = useQuery({
@@ -86,6 +88,7 @@ export function JournalEntryModal({ isOpen, onClose, entry, onPromote }: Journal
       savedLabels={savedLabels}
       connections={connectionsQuery.data ?? []}
       onPromote={onPromote}
+      dateOfBirth={userProfile?.dateOfBirth}
     />
   );
 }
@@ -96,6 +99,7 @@ interface JournalEntryFormProps {
   savedLabels: string[];
   connections: Connection[];
   onPromote?: (alias: string) => void;
+  dateOfBirth?: string;
 }
 
 function JournalEntryForm({
@@ -104,6 +108,7 @@ function JournalEntryForm({
   savedLabels,
   connections,
   onPromote,
+  dateOfBirth,
 }: JournalEntryFormProps) {
   const { t } = useTranslation();
 
@@ -285,6 +290,14 @@ function JournalEntryForm({
       setError(t('journal.dateRequired'));
       return;
     }
+    if (dateOfBirth && formDate < dateOfBirth) {
+      setError(t('journal.dateBeforeDob'));
+      return;
+    }
+    if (formDate > todayISO()) {
+      setError(t('journal.dateInFuture'));
+      return;
+    }
 
     // Build custom fields (only include non-empty ones)
     const filteredCustomFields: CustomField[] = customFields
@@ -374,6 +387,7 @@ function JournalEntryForm({
               type="date"
               className="input"
               value={formDate}
+              min={dateOfBirth || undefined}
               max={todayISO()}
               onChange={(e) => setFormDate(e.target.value)}
               required

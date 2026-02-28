@@ -558,6 +558,8 @@
     "cancel": "Cancelar",
     "noEntries": "Sin entradas este mes",
     "dateRequired": "La fecha del encuentro es obligatoria",
+    "dateBeforeDob": "La fecha del encuentro no puede ser antes de tu fecha de nacimiento.",
+    "dateInFuture": "La fecha del encuentro no puede ser en el futuro.",
     "saveFailed": "Error al guardar la entrada. Inténtalo de nuevo.",
     "removeField": "Eliminar campo",
     "clearPartner": "Limpiar pareja",
