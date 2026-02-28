@@ -8,13 +8,14 @@ interface JournalTimelineProps {
   onEdit: (entry: JournalEntry) => void;
   onDelete: (id: string) => void;
   deletingId?: string | null;
+  hidePartnerLink?: boolean;
 }
 
 /**
  * Groups entries by month and renders them in a timeline.
  * Entries are expected to already be sorted newest-first from the API.
  */
-export function JournalTimeline({ entries, onEdit, onDelete, deletingId }: JournalTimelineProps) {
+export function JournalTimeline({ entries, onEdit, onDelete, deletingId, hidePartnerLink }: JournalTimelineProps) {
   const { i18n } = useTranslation();
   const locale = i18n.language.replace('_', '-');
 
@@ -58,6 +59,7 @@ export function JournalTimeline({ entries, onEdit, onDelete, deletingId }: Journ
                 onEdit={onEdit}
                 onDelete={onDelete}
                 isDeleting={deletingId === entry.id}
+                hidePartnerLink={hidePartnerLink}
               />
             ))}
           </div>

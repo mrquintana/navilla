@@ -226,6 +226,27 @@ class JournalPartnerControllerTest {
   }
 
   @Test
+  @DisplayName("PUT /api/journal/partners/{id} - should update notes without unlinkConnection field")
+  void shouldUpdatePartnerNotesOnly() throws Exception {
+    String body = createPartner("NotesPerson");
+    String id = extractId(body);
+
+    // Update only notes (no unlinkConnection in body)
+    mockMvc.perform(put("/api/journal/partners/" + id)
+            .with(jwt().jwt(builder -> builder
+                .subject("test-subject")
+                .claim("email", USER_EMAIL)))
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("""
+                {
+                  "notes": "Some partner notes"
+                }
+                """))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.alias").value("NotesPerson"));
+  }
+
+  @Test
   @DisplayName("DELETE /api/journal/partners/{id} - soft delete preserves entries")
   void shouldSoftDeletePartnerPreservingEntries() throws Exception {
     // Create partner

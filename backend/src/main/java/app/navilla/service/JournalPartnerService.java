@@ -196,7 +196,7 @@ public class JournalPartnerService {
       partner.setNotesEncrypted(encryptOptional(request.notes()));
     }
 
-    if (request.unlinkConnection()) {
+    if (Boolean.TRUE.equals(request.unlinkConnection())) {
       partner.setConnectionId(null);
     } else if (request.connectionId() != null) {
       partner.setConnectionId(request.connectionId());

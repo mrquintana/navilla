@@ -8,9 +8,10 @@ interface JournalEntryCardProps {
   onEdit: (entry: JournalEntry) => void;
   onDelete: (id: string) => void;
   isDeleting?: boolean;
+  hidePartnerLink?: boolean;
 }
 
-export function JournalEntryCard({ entry, onEdit, onDelete, isDeleting }: JournalEntryCardProps) {
+export function JournalEntryCard({ entry, onEdit, onDelete, isDeleting, hidePartnerLink }: JournalEntryCardProps) {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const locale = i18n.language.replace('_', '-');
@@ -60,7 +61,7 @@ export function JournalEntryCard({ entry, onEdit, onDelete, isDeleting }: Journa
                 <Bookmark className="w-3 h-3 text-primary opacity-50 shrink-0" aria-hidden="true" />
               )}
             </p>
-            {entry.partnerId && entry.partnerEncounterCount && entry.partnerEncounterCount > 1 && (
+            {!hidePartnerLink && entry.partnerId && entry.partnerEncounterCount && entry.partnerEncounterCount > 1 && (
               <button
                 type="button"
                 className="text-xs text-primary hover:underline cursor-pointer mt-0.5"

@@ -307,6 +307,7 @@ export function PartnerDetailPage() {
             onEdit={handleEditEntry}
             onDelete={handleDeleteEntryRequest}
             deletingId={deleteEntryMutation.isPending ? deletingEntryId : null}
+            hidePartnerLink
           />
         </div>
       )}

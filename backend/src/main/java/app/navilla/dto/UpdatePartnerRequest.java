@@ -37,5 +37,5 @@ public record UpdatePartnerRequest(
     @Size(max = 5000, message = "{journal.error.notesTooLong}")
     String notes,
 
-    boolean unlinkConnection
+    Boolean unlinkConnection
 ) {}
