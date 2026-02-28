@@ -187,9 +187,11 @@ public class JournalPartnerService {
           "journal.partner.error.notOwner");
     }
 
+    boolean aliasChanged = false;
     if (request.alias() != null && !request.alias().isBlank()) {
       partner.setAliasEncrypted(
           encryptionService.encryptToBytes(request.alias()));
+      aliasChanged = true;
     }
 
     if (request.notes() != null) {
@@ -203,6 +205,20 @@ public class JournalPartnerService {
     }
 
     JournalPartner saved = partnerRepository.save(partner);
+
+    // Write-time sync: update alias on all linked entries
+    if (aliasChanged) {
+      byte[] newAliasEncrypted = partner.getAliasEncrypted();
+      List<EncounterJournal> linkedEntries =
+          journalRepository.findByPartnerIdAndUserHash(
+              id, userHash);
+      for (EncounterJournal entry : linkedEntries) {
+        entry.setPartnerAliasEncrypted(newAliasEncrypted);
+      }
+      journalRepository.saveAll(linkedEntries);
+      log.info("Synced alias to {} linked entries", linkedEntries.size());
+    }
+
     log.info("Journal partner updated: {}", id);
     journalMetrics.recordPartnerUpdated();
 
@@ -271,11 +287,8 @@ public class JournalPartnerService {
         .findByUserHashAndPartnerIdOrderByEncounterDateDesc(
             userHash, partnerId);
 
-    String currentAlias = encryptionService
-        .decryptFromBytes(partner.getAliasEncrypted());
-
     return entries.stream()
-        .map(e -> toEntryResponse(e, userHash, currentAlias))
+        .map(e -> toEntryResponse(e, userHash))
         .toList();
   }
 
@@ -397,8 +410,7 @@ public class JournalPartnerService {
   }
 
   private JournalEntryResponse toEntryResponse(
-      EncounterJournal entry, String userHash,
-      String currentPartnerAlias) {
+      EncounterJournal entry, String userHash) {
     Long partnerEncounterCount = null;
     if (entry.getPartnerId() != null) {
       partnerEncounterCount = journalRepository
@@ -406,14 +418,10 @@ public class JournalPartnerService {
               entry.getPartnerId(), userHash);
     }
 
-    // Use the current partner alias (passed from caller)
-    // instead of the stale alias stored on the entry
-    String partnerAlias = currentPartnerAlias != null
-        ? currentPartnerAlias
-        : (entry.getPartnerAliasEncrypted() != null
-            ? encryptionService.decryptFromBytes(
-                entry.getPartnerAliasEncrypted())
-            : null);
+    String partnerAlias = entry.getPartnerAliasEncrypted() != null
+        ? encryptionService.decryptFromBytes(
+            entry.getPartnerAliasEncrypted())
+        : null;
 
     return new JournalEntryResponse(
         entry.getId(),

@@ -109,11 +109,17 @@ public class EncounterJournalService {
       Jwt jwt, CreateJournalEntryRequest request) {
     String userHash = hashEmail(jwt);
 
+    // When linked to a partner, use the partner's current alias
+    byte[] aliasEncrypted = request.partnerId() != null
+        ? partnerRepository.findById(request.partnerId())
+            .map(p -> p.getAliasEncrypted())
+            .orElse(encryptOptional(request.partnerAlias()))
+        : encryptOptional(request.partnerAlias());
+
     EncounterJournal entry = EncounterJournal.builder()
         .userHash(userHash)
         .encounterDate(request.encounterDate())
-        .partnerAliasEncrypted(
-            encryptOptional(request.partnerAlias()))
+        .partnerAliasEncrypted(aliasEncrypted)
         .connectionId(request.connectionId())
         .notesEncrypted(encryptOptional(request.notes()))
         .customFieldsEncrypted(
@@ -148,9 +154,15 @@ public class EncounterJournalService {
       throw new IllegalStateException("journal.error.notOwner");
     }
 
+    // When linked to a partner, use the partner's current alias
+    byte[] aliasEncrypted = request.partnerId() != null
+        ? partnerRepository.findById(request.partnerId())
+            .map(p -> p.getAliasEncrypted())
+            .orElse(encryptOptional(request.partnerAlias()))
+        : encryptOptional(request.partnerAlias());
+
     entry.setEncounterDate(request.encounterDate());
-    entry.setPartnerAliasEncrypted(
-        encryptOptional(request.partnerAlias()));
+    entry.setPartnerAliasEncrypted(aliasEncrypted);
     entry.setConnectionId(request.connectionId());
     entry.setNotesEncrypted(encryptOptional(request.notes()));
     entry.setCustomFieldsEncrypted(
@@ -318,19 +330,10 @@ public class EncounterJournalService {
           .countByPartnerIdAndUserHash(entry.getPartnerId(), userHash);
     }
 
-    // Resolve partner alias: prefer current partner name over stale entry alias
-    String partnerAlias;
-    if (entry.getPartnerId() != null) {
-      partnerAlias = partnerRepository.findById(entry.getPartnerId())
-          .map(p -> encryptionService.decryptFromBytes(p.getAliasEncrypted()))
-          .orElseGet(() -> entry.getPartnerAliasEncrypted() != null
-              ? encryptionService.decryptFromBytes(entry.getPartnerAliasEncrypted())
-              : null);
-    } else {
-      partnerAlias = entry.getPartnerAliasEncrypted() != null
-          ? encryptionService.decryptFromBytes(entry.getPartnerAliasEncrypted())
-          : null;
-    }
+    String partnerAlias = entry.getPartnerAliasEncrypted() != null
+        ? encryptionService.decryptFromBytes(
+            entry.getPartnerAliasEncrypted())
+        : null;
 
     return new JournalEntryResponse(
         entry.getId(),
