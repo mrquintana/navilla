@@ -173,13 +173,14 @@ describe('PartnerDetailPage', () => {
     expect(screen.getByText(/Feb 27, 2026/)).toBeInTheDocument();
   });
 
-  it('renders partner notes textarea with existing notes', () => {
+  it('renders partner notes as read-only text', () => {
     setupMocks();
     render(<PartnerDetailPage />);
 
-    const textarea = screen.getByPlaceholderText('journal.partnerNotesPlaceholder');
-    expect(textarea).toBeInTheDocument();
-    expect(textarea).toHaveValue('Some notes about Alex');
+    // Notes display as plain text by default (inline-edit pattern)
+    expect(screen.getByText('Some notes about Alex')).toBeInTheDocument();
+    // No textarea visible until edit mode is activated
+    expect(screen.queryByPlaceholderText('journal.partnerNotesPlaceholder')).not.toBeInTheDocument();
   });
 
   it('shows encounter timeline when entries exist', () => {

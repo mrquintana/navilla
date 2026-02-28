@@ -35,6 +35,7 @@ export function PartnerDetailPage() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteMode, setDeleteMode] = useState<DeleteMode>(null);
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const [isEditingNotes, setIsEditingNotes] = useState(false);
 
   // Entry edit/delete state
   const [editingEntry, setEditingEntry] = useState<JournalEntry | null>(null);
@@ -47,7 +48,6 @@ export function PartnerDetailPage() {
 
   // Derive notes: local override if user has edited, otherwise server data
   const notes = localNotes ?? partner?.notes ?? '';
-  const notesDirty = localNotes !== null;
 
   const isInitialLoading = (partnerLoading && !partner) || (entriesLoading && !entries);
 
@@ -102,9 +102,15 @@ export function PartnerDetailPage() {
       {
         onSuccess: () => {
           setLocalNotes(null);
+          setIsEditingNotes(false);
         },
       },
     );
+  };
+
+  const handleCancelNotes = () => {
+    setLocalNotes(null);
+    setIsEditingNotes(false);
   };
 
   const handleRename = () => {
@@ -269,30 +275,66 @@ export function PartnerDetailPage() {
 
       {/* Notes section */}
       <div className="space-y-2">
-        <h2 className="text-lg font-semibold">{t('journal.partnerNotes')}</h2>
-        <textarea
-          className="input w-full min-h-[100px] resize-y"
-          placeholder={t('journal.partnerNotesPlaceholder')}
-          value={notes}
-          onChange={(e) => {
-            setLocalNotes(e.target.value);
-          }}
-        />
-        {notesDirty && (
-          <div className="flex justify-end">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold">{t('journal.partnerNotes')}</h2>
+          {!isEditingNotes && notes && (
             <button
               type="button"
-              className="btn btn-primary btn-sm"
-              onClick={handleSaveNotes}
-              disabled={updateMutation.isPending}
+              className="btn btn-secondary btn-sm"
+              onClick={() => setIsEditingNotes(true)}
+              aria-label={t('common.edit')}
             >
-              {updateMutation.isPending ? (
-                <span className="spinner" aria-label={t('common.loading')} />
-              ) : (
-                t('common.save')
-              )}
+              <Pencil className="nav-icon" aria-hidden="true" />
             </button>
+          )}
+        </div>
+        {isEditingNotes ? (
+          <div className="space-y-2">
+            <textarea
+              className="input w-full min-h-[100px] resize-y"
+              placeholder={t('journal.partnerNotesPlaceholder')}
+              value={notes}
+              onChange={(e) => setLocalNotes(e.target.value)}
+              autoFocus
+            />
+            <div className="flex items-center justify-end gap-2">
+              <button
+                type="button"
+                className="btn btn-secondary btn-sm"
+                onClick={handleCancelNotes}
+                disabled={updateMutation.isPending}
+              >
+                {t('common.cancel')}
+              </button>
+              <button
+                type="button"
+                className="btn btn-primary btn-sm"
+                onClick={handleSaveNotes}
+                disabled={updateMutation.isPending}
+              >
+                {updateMutation.isPending ? (
+                  <span className="spinner" aria-label={t('common.loading')} />
+                ) : (
+                  t('common.save')
+                )}
+              </button>
+            </div>
           </div>
+        ) : notes ? (
+          <p
+            className="text-sm text-foreground whitespace-pre-wrap cursor-pointer rounded-lg p-3 bg-stone-50 hover:bg-stone-100 transition-colors"
+            onClick={() => setIsEditingNotes(true)}
+          >
+            {notes}
+          </p>
+        ) : (
+          <button
+            type="button"
+            className="w-full text-left text-sm text-muted italic p-3 rounded-lg border border-dashed border-stone-300 hover:border-primary hover:text-primary transition-colors"
+            onClick={() => setIsEditingNotes(true)}
+          >
+            {t('journal.partnerNotesAdd')}
+          </button>
         )}
       </div>
 

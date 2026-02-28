@@ -603,6 +603,7 @@
     "promoteNotNow": "Not now",
     "partnerNotes": "Notes",
     "partnerNotesPlaceholder": "Notes about this person...",
+    "partnerNotesAdd": "Add a note about this partner...",
     "partnerFirstEncounter": "First",
     "partnerLastEncounter": "Last",
     "partnerEncounterCount_one": "{{count}} encounter",
