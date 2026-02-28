@@ -175,4 +175,42 @@ describe('JournalEntryCard', () => {
     expect(onDelete).toHaveBeenCalledTimes(1);
     expect(onDelete).toHaveBeenCalledWith('entry-42');
   });
+
+  it('shows bookmark icon when partnerId is set', () => {
+    render(
+      <JournalEntryCard
+        entry={makeEntry({ partnerId: 'p1', partnerEncounterCount: 3 })}
+        onEdit={onEdit}
+        onDelete={onDelete}
+      />
+    );
+
+    // The Bookmark icon is rendered with aria-hidden="true"
+    const bookmarkIcon = document.querySelector('svg.lucide-bookmark');
+    expect(bookmarkIcon).toBeInTheDocument();
+  });
+
+  it('shows encounter count link when partnerId set and partnerEncounterCount > 1', () => {
+    render(
+      <JournalEntryCard
+        entry={makeEntry({ partnerId: 'p1', partnerEncounterCount: 3 })}
+        onEdit={onEdit}
+        onDelete={onDelete}
+      />
+    );
+
+    expect(screen.getByText('journal.encountersWith:3')).toBeInTheDocument();
+  });
+
+  it('does not show encounter link when partnerId is null', () => {
+    render(
+      <JournalEntryCard
+        entry={makeEntry()}
+        onEdit={onEdit}
+        onDelete={onDelete}
+      />
+    );
+
+    expect(screen.queryByText(/journal\.encountersWith/)).not.toBeInTheDocument();
+  });
 });
