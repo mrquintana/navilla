@@ -271,8 +271,11 @@ public class JournalPartnerService {
         .findByUserHashAndPartnerIdOrderByEncounterDateDesc(
             userHash, partnerId);
 
+    String currentAlias = encryptionService
+        .decryptFromBytes(partner.getAliasEncrypted());
+
     return entries.stream()
-        .map(e -> toEntryResponse(e, userHash))
+        .map(e -> toEntryResponse(e, userHash, currentAlias))
         .toList();
   }
 
@@ -394,7 +397,8 @@ public class JournalPartnerService {
   }
 
   private JournalEntryResponse toEntryResponse(
-      EncounterJournal entry, String userHash) {
+      EncounterJournal entry, String userHash,
+      String currentPartnerAlias) {
     Long partnerEncounterCount = null;
     if (entry.getPartnerId() != null) {
       partnerEncounterCount = journalRepository
@@ -402,13 +406,19 @@ public class JournalPartnerService {
               entry.getPartnerId(), userHash);
     }
 
+    // Use the current partner alias (passed from caller)
+    // instead of the stale alias stored on the entry
+    String partnerAlias = currentPartnerAlias != null
+        ? currentPartnerAlias
+        : (entry.getPartnerAliasEncrypted() != null
+            ? encryptionService.decryptFromBytes(
+                entry.getPartnerAliasEncrypted())
+            : null);
+
     return new JournalEntryResponse(
         entry.getId(),
         entry.getEncounterDate(),
-        entry.getPartnerAliasEncrypted() != null
-            ? encryptionService.decryptFromBytes(
-                entry.getPartnerAliasEncrypted())
-            : null,
+        partnerAlias,
         entry.getConnectionId(),
         null,
         entry.getNotesEncrypted() != null
