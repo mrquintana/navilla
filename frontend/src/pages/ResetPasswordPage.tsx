@@ -80,6 +80,7 @@ export function ResetPasswordPage() {
             className="input"
             required
             minLength={8}
+            maxLength={128}
           />
         </div>
 
@@ -95,6 +96,7 @@ export function ResetPasswordPage() {
             className="input"
             required
             minLength={8}
+            maxLength={128}
           />
         </div>
 

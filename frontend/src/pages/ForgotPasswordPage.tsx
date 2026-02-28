@@ -68,6 +68,7 @@ export function ForgotPasswordPage() {
             onChange={(e) => setEmail(e.target.value)}
             className="input"
             required
+            maxLength={254}
           />
         </div>
 

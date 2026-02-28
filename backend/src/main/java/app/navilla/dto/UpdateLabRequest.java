@@ -18,6 +18,9 @@ package app.navilla.dto;
 
 import java.util.List;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
+
 /**
  * Request DTO for updating an existing lab connection.
  *
@@ -25,6 +28,6 @@ import java.util.List;
  * @param credentials updated list of credential key-value pairs
  */
 public record UpdateLabRequest(
-    String name,
-    List<LabCredentialDto> credentials
+    @Size(max = 200) String name,
+    @Valid @Size(max = 10) List<LabCredentialDto> credentials
 ) {}

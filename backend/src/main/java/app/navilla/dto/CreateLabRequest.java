@@ -18,7 +18,9 @@ package app.navilla.dto;
 
 import java.util.List;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 /**
  * Request DTO for creating a new lab connection.
@@ -28,7 +30,7 @@ import jakarta.validation.constraints.NotBlank;
  * @param credentials optional list of credential key-value pairs
  */
 public record CreateLabRequest(
-    @NotBlank String provider,
-    @NotBlank String name,
-    List<LabCredentialDto> credentials
+    @NotBlank @Size(max = 200) String provider,
+    @NotBlank @Size(max = 200) String name,
+    @Valid @Size(max = 10) List<LabCredentialDto> credentials
 ) {}

@@ -19,9 +19,11 @@ package app.navilla.dto;
 import java.util.List;
 import java.util.UUID;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 /**
  * Request DTO for creating a new test visit with results.
@@ -35,9 +37,9 @@ import jakarta.validation.constraints.Pattern;
 public record CreateTestVisitRequest(
     @NotBlank @Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2}$") String testDate,
     UUID labId,
-    String labReference,
-    @NotEmpty List<TestResultInput> results,
-    String notes
+    @Size(max = 200) String labReference,
+    @NotEmpty @Valid @Size(max = 20) List<TestResultInput> results,
+    @Size(max = 5000) String notes
 ) {
 
   /**
@@ -50,10 +52,10 @@ public record CreateTestVisitRequest(
    * @param referenceRange optional reference range
    */
   public record TestResultInput(
-      String conditionType,
-      String customCondition,
-      @NotBlank String status,
-      String resultValue,
-      String referenceRange
+      @Size(max = 50) String conditionType,
+      @Size(max = 200) String customCondition,
+      @NotBlank @Size(max = 50) String status,
+      @Size(max = 200) String resultValue,
+      @Size(max = 200) String referenceRange
   ) {}
 }

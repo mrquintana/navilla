@@ -17,6 +17,7 @@
 package app.navilla.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 /**
  * Request DTO for promoting a freeform alias into a journal partner.
@@ -25,5 +26,6 @@ import jakarta.validation.constraints.NotBlank;
  */
 public record PromoteAliasRequest(
     @NotBlank(message = "{journal.partner.error.aliasRequired}")
+    @Size(max = 200)
     String alias
 ) {}

@@ -421,6 +421,7 @@ export function ProfilePage() {
                   className="input"
                   value={form.displayName ?? ''}
                   onChange={(e) => setForm({ ...form, displayName: e.target.value })}
+                  maxLength={100}
                 />
               </div>
               <div>
@@ -430,6 +431,7 @@ export function ProfilePage() {
                   className="input"
                   value={form.fullName ?? ''}
                   onChange={(e) => setForm({ ...form, fullName: e.target.value })}
+                  maxLength={200}
                 />
               </div>
             </div>
@@ -512,6 +514,7 @@ export function ProfilePage() {
                   className="input"
                   value={form.location ?? ''}
                   onChange={(e) => setForm({ ...form, location: e.target.value })}
+                  maxLength={150}
                 />
               </div>
             </div>
@@ -637,6 +640,7 @@ export function ProfilePage() {
                 onChange={(e) => setDeleteConfirmText(e.target.value)}
                 placeholder="DELETE"
                 autoComplete="off"
+                maxLength={50}
               />
             </div>
             {deleteError && <div className="alert alert-error">{deleteError}</div>}

@@ -17,6 +17,7 @@
 package app.navilla.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 /**
  * Request DTO for creating a new connection request.
@@ -30,5 +31,6 @@ import jakarta.validation.constraints.NotBlank;
  */
 public record CreateConnectionRequest(
     @NotBlank(message = "{connection.error.identifierRequired}")
+    @Size(max = 254)
     String identifier
 ) {}

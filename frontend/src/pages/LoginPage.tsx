@@ -56,6 +56,7 @@ export function LoginPage() {
             onChange={(e) => setEmail(e.target.value)}
             className="input"
             required
+            maxLength={254}
           />
         </div>
 
@@ -70,6 +71,7 @@ export function LoginPage() {
             onChange={(e) => setPassword(e.target.value)}
             className="input"
             required
+            maxLength={128}
           />
         </div>
 

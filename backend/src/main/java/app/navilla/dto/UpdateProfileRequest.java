@@ -61,9 +61,9 @@ public record UpdateProfileRequest(
     @Size(max = 120, message = "{validation.size.max}")
     String location,
 
-    String profileVisibility,
+    @Size(max = 20) String profileVisibility,
     Boolean displayNamePublic,
     Boolean searchableByEmail,
-    String avatarKey,
-    String avatarThumbKey
+    @Size(max = 500) String avatarKey,
+    @Size(max = 500) String avatarThumbKey
 ) {}

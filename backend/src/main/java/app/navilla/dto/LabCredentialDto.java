@@ -16,6 +16,9 @@
 
 package app.navilla.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
 /**
  * DTO for lab credential key-value pairs.
  *
@@ -23,6 +26,6 @@ package app.navilla.dto;
  * @param value the credential value
  */
 public record LabCredentialDto(
-    String key,
-    String value
+    @NotBlank @Size(max = 100) String key,
+    @NotBlank @Size(max = 500) String value
 ) {}

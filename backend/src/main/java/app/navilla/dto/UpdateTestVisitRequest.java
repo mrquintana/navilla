@@ -19,7 +19,9 @@ package app.navilla.dto;
 import java.util.List;
 import java.util.UUID;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 /**
  * Request DTO for updating an existing test visit.
@@ -33,7 +35,7 @@ import jakarta.validation.constraints.Pattern;
 public record UpdateTestVisitRequest(
     @Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2}$") String testDate,
     UUID labId,
-    String labReference,
-    List<CreateTestVisitRequest.TestResultInput> results,
-    String notes
+    @Size(max = 200) String labReference,
+    @Valid @Size(max = 20) List<CreateTestVisitRequest.TestResultInput> results,
+    @Size(max = 5000) String notes
 ) {}

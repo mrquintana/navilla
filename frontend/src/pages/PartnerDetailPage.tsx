@@ -188,6 +188,7 @@ export function PartnerDetailPage() {
                 className="input text-2xl font-bold py-1 px-2"
                 value={renameValue}
                 onChange={(e) => setRenameValue(e.target.value)}
+                maxLength={200}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') handleRename();
                   if (e.key === 'Escape') {
@@ -295,6 +296,7 @@ export function PartnerDetailPage() {
               placeholder={t('journal.partnerNotesPlaceholder')}
               value={notes}
               onChange={(e) => setLocalNotes(e.target.value)}
+              maxLength={5000}
               autoFocus
             />
             <div className="flex items-center justify-end gap-2">
@@ -448,6 +450,7 @@ export function PartnerDetailPage() {
                     value={deleteConfirmText}
                     onChange={(e) => setDeleteConfirmText(e.target.value)}
                     placeholder={confirmWord}
+                    maxLength={50}
                   />
                 </div>
               </div>

@@ -18,6 +18,7 @@ package app.navilla.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 /**
  * Request DTO for reporting a health status.
@@ -28,9 +29,11 @@ import jakarta.validation.constraints.Pattern;
  */
 public record HealthStatusRequest(
     @NotBlank(message = "{health.error.conditionRequired}")
+    @Size(max = 50)
     String condition,
 
     @NotBlank(message = "{health.error.statusRequired}")
+    @Size(max = 50)
     String status,
 
     @Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2}$", message = "{validation.date.invalid}")

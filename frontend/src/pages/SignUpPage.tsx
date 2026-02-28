@@ -210,6 +210,7 @@ export function SignUpPage() {
                 className="input"
                 required
                 autoComplete="email"
+                maxLength={254}
               />
             </div>
 
@@ -225,6 +226,7 @@ export function SignUpPage() {
                 className="input"
                 required
                 minLength={8}
+                maxLength={128}
                 autoComplete="new-password"
               />
               <p className="text-xs text-muted mt-1">{t('auth.passwordHint')}</p>
@@ -242,6 +244,7 @@ export function SignUpPage() {
                 className="input"
                 required
                 minLength={8}
+                maxLength={128}
                 autoComplete="new-password"
               />
             </div>
@@ -290,6 +293,7 @@ export function SignUpPage() {
                 onChange={(e) => setFullName(e.target.value)}
                 className="input"
                 autoComplete="name"
+                maxLength={200}
               />
             </div>
 
@@ -360,6 +364,7 @@ export function SignUpPage() {
                 onChange={(e) => setLocation(e.target.value)}
                 className="input"
                 placeholder={t('auth.locationPlaceholder')}
+                maxLength={150}
               />
             </div>
 
