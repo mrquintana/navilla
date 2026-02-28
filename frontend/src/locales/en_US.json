@@ -378,65 +378,79 @@
     "featuresCta": "Start tracking for free"
   },
   "howItWorks": {
+    "seoTitle": "How Navilla Works — Your Private Sexual Health Companion",
+    "seoDescription": "Learn how Navilla helps you track encounters, monitor your testing history, and stay informed with private tools, encrypted data, and anonymized exposure signals.",
     "title": "How It Works",
-    "subtitle": "A plain-language overview of how Navilla protects privacy and turns network data into useful health context.",
-    "showYou": {
-      "title": "What we show you",
-      "intro": "When someone in your network reports a positive health status, you'll see:",
-      "item1": "The condition name (e.g. Chlamydia)",
-      "item2": "How many people in your network reported it",
-      "item3": "The closest degree — how many connections away the nearest case is (1st, 2nd, 3rd)",
-      "item4": "Whether the report is recent (last 30 days) or older",
-      "item5": "Whether the condition is still active or has been cleared"
+    "subtitle": "Everything Navilla does to help you take control of your sexual health — privately and on your terms.",
+    "overview": {
+      "title": "What is Navilla?",
+      "body1": "Navilla is a private sexual health companion. It gives you tools to track your encounters, monitor your testing history, manage partners, and see anonymized exposure signals from your network — all encrypted and under your control.",
+      "body2": "Some features are free and require no account (testing calculator, STI guides). Others — like the encounter journal, health log, and exposure network — require a free account so your data can be stored securely."
     },
-    "neverShowYou": {
-      "title": "What we never show you",
-      "intro": "Navilla is built so that you can't identify who reported what:",
-      "item1": "We never show names, usernames, or emails of people who report a condition",
-      "item2": "You can't see which specific connection triggered an alert",
-      "item3": "There is no way to browse other people's health statuses"
+    "journal": {
+      "title": "Encounter Journal",
+      "body1": "A private, encrypted timeline where you log your sexual encounters. Only you can read it.",
+      "item1": "Log encounters with dates, partner aliases, and personal notes",
+      "item2": "Add custom fields like protection used, mood, or location",
+      "item3": "Switch between timeline view and calendar view to see your history from different angles",
+      "item4": "Use the calendar to quickly jump between months that have entries",
+      "item5": "All journal data is encrypted with AES-256-GCM before it reaches the database"
     },
-    "dataSource": {
-      "title": "Where data comes from",
-      "body1": "Today, most health status data is self-reported by users. This means reports can be delayed or incomplete. Verification labels (provider-verified, lab-verified) are planned to add confidence context as integrations roll out.",
-      "body2": "Exposure data refreshes in delayed snapshots instead of real time. This prevents people from adding a connection and immediately inferring that person's private status."
+    "partners": {
+      "title": "Partner Tracking",
+      "body1": "When you use the same alias across multiple journal entries, Navilla can promote that alias to a named partner — giving you a dedicated view of your history with that person.",
+      "item1": "Each partner gets a detail page showing all encounters, notes, and a timeline",
+      "item2": "Add private notes to any partner (visible only to you)",
+      "item3": "See encounter counts and date ranges at a glance from the Partners tab",
+      "body2": "Partner data is encrypted the same way as journal entries. Navilla never shares partner information with anyone — not even the partner themselves."
     },
-    "connections": {
-      "title": "How connections work",
-      "body1": "When you connect with someone and they accept, a confirmed connection is created between you. Connections are stored using cryptographic hashes — not real names or emails.",
-      "body2": "Your network extends beyond direct connections. If you're connected to Ana and Ana is connected to Luis, Luis is in your 2nd-degree network. This extends up to 5 degrees.",
-      "body3": "Only confirmed connections count. Pending or denied requests are never part of the graph."
+    "healthLog": {
+      "title": "Health Log",
+      "body1": "Track every STI test visit in one place. Know exactly where you stand and what to test for next.",
+      "item1": "Log test visits with date, lab, and results per condition",
+      "item2": "Save your labs (clinic name, location) for quick reuse on future visits",
+      "item3": "See your full testing history organized by condition — with status, result values, and reference ranges",
+      "item4": "Track your coverage: how many of the 10 most common STIs you've been tested for this year",
+      "item5": "See days since your last test at a glance from the health log dashboard"
     },
-    "exposure": {
-      "title": "How exposure is calculated",
-      "body1": "We build a graph of confirmed connections, traverse outward from you on the server, and group positive reports by condition. You see counts, nearest degree, and timing context.",
-      "body2": "If you have fewer than 3 connections, we don't show exposure data at all. With only 1 or 2 connections, an alert could reveal a specific person's status. The 3-connection minimum protects everyone's privacy."
-    },
-    "accuracy": {
-      "title": "Accuracy and limitations",
-      "body1": "Exposure signals are useful, but they have limitations you should understand:",
+    "network": {
+      "title": "Exposure Network",
+      "body1": "When you connect with other Navilla users and they report a health status, you see anonymized exposure signals — never names or identifying details.",
+      "body2": "Connections are stored as cryptographic hashes. Your network extends up to 5 degrees: if you're connected to Ana and Ana is connected to Luis, Luis is in your 2nd-degree network.",
+      "body3": "If you have fewer than 3 connections, exposure data is hidden entirely. With only 1 or 2 connections, a signal could reveal a specific person's status. The 3-connection minimum protects everyone.",
+      "body4": "Exposure signals are useful but have limitations:",
       "item1": "Exposure does not mean you are infected — it means someone in your extended network reported a condition",
-      "item2": "Exposure does not replace medical advice — use it as a signal to consider testing",
-      "item3": "Data is self-reported and may be inaccurate, delayed, or incomplete",
-      "item4": "The graph only includes Navilla users — your real-world exposure may differ",
-      "item5": "Recency matters — older reports should be interpreted differently from recent reports"
+      "item2": "Data is self-reported and may be delayed or incomplete",
+      "item3": "The network only includes Navilla users — your real-world exposure may differ",
+      "item4": "Exposure updates in delayed snapshots, not in real time, to prevent timing-based inference"
     },
-    "whatYouCanDo": {
-      "title": "What you can do",
-      "item1": "Add connections to build your trusted network",
-      "item2": "Report, clear, or delete your own health statuses at any time",
-      "item3": "Remove connections — they'll disappear from your graph on the next refresh",
-      "item4": "Use exposure data as one input when deciding whether to get tested"
+    "freeTools": {
+      "title": "Free Tools — No Account Needed",
+      "body1": "These tools are available to everyone, no signup required. No data is collected.",
+      "item1": "Testing timing calculator — enter a date and see exactly when each STI test becomes reliable based on window periods",
+      "item2": "STI guides — clear, plain-language guides on 10 common conditions covering symptoms, testing, and treatment",
+      "item3": "Testing cost reference — estimated costs for STI testing at clinics in Mexico"
+    },
+    "privacy": {
+      "title": "Privacy & Security",
+      "body1": "Privacy is not a feature — it's the foundation everything is built on.",
+      "item1": "All sensitive data (partner names, notes, health records) is encrypted with AES-256-GCM before reaching the database",
+      "item2": "Each user has a unique encryption key derived from a master secret",
+      "item3": "We never show names, usernames, or emails of people who report health conditions",
+      "item4": "We do not use third-party tracking, analytics SDKs, or advertising networks",
+      "item5": "We are working toward full end-to-end encryption where the server cannot read your data at all",
+      "learnMore": "Read the full details on our",
+      "securityLink": "Security page"
     },
     "dataRights": {
-      "title": "Your data rights",
-      "item1": "View your network size and exposure data at any time",
-      "item2": "Report, update, or delete your health statuses",
+      "title": "Your Data Rights",
+      "item1": "View all your data — journal, partners, health log, connections — at any time",
+      "item2": "Edit or delete any individual entry, partner, or test visit",
       "item3": "Add or remove connections freely",
       "item4": "Delete your account and all associated data permanently",
       "item5": "Request an export of your personal data"
     },
-    "goToDashboard": "Go to Dashboard"
+    "getStarted": "Get started — it's free"
   },
   "footer": {
     "product": "Product",

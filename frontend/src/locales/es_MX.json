@@ -377,65 +377,79 @@
     "featuresCta": "Comienza a registrar gratis"
   },
   "howItWorks": {
+    "seoTitle": "Cómo Funciona Navilla — Tu Compañero Privado de Salud Sexual",
+    "seoDescription": "Descubre cómo Navilla te ayuda a registrar encuentros, monitorear tu historial de pruebas y mantenerte informado con herramientas privadas, datos cifrados y señales anónimas de exposición.",
     "title": "Cómo Funciona",
-    "subtitle": "Una explicación clara de cómo Navilla protege tu privacidad y convierte datos de red en contexto útil de salud.",
-    "showYou": {
-      "title": "Lo que te mostramos",
-      "intro": "Cuando alguien en tu red reporta un estado de salud positivo, verás:",
-      "item1": "El nombre de la condición (ej. Clamidia)",
-      "item2": "Cuántas personas en tu red lo reportaron",
-      "item3": "El grado más cercano — cuántas conexiones de distancia está el caso más próximo (1º, 2º, 3º)",
-      "item4": "Si el reporte es reciente (últimos 30 días) o anterior",
-      "item5": "Si la condición sigue activa o fue resuelta"
+    "subtitle": "Todo lo que Navilla hace para ayudarte a tomar el control de tu salud sexual — de forma privada y en tus términos.",
+    "overview": {
+      "title": "¿Qué es Navilla?",
+      "body1": "Navilla es un compañero privado de salud sexual. Te da herramientas para registrar tus encuentros, monitorear tu historial de pruebas, gestionar parejas y ver señales anónimas de exposición de tu red — todo cifrado y bajo tu control.",
+      "body2": "Algunas herramientas son gratuitas y no requieren cuenta (calculadora de pruebas, guías de ITS). Otras — como el diario de encuentros, registro de salud y red de exposición — requieren una cuenta gratuita para almacenar tus datos de forma segura."
     },
-    "neverShowYou": {
-      "title": "Lo que nunca te mostramos",
-      "intro": "Navilla está diseñado para que no puedas identificar quién reportó qué:",
-      "item1": "Nunca mostramos nombres, usuarios o correos de quienes reportan una condición",
-      "item2": "No puedes ver qué conexión específica generó una alerta",
-      "item3": "No hay forma de ver los estados de salud de otras personas"
+    "journal": {
+      "title": "Diario de Encuentros",
+      "body1": "Una línea de tiempo privada y cifrada donde registras tus encuentros sexuales. Solo tú puedes leerla.",
+      "item1": "Registra encuentros con fechas, alias de parejas y notas personales",
+      "item2": "Agrega campos personalizados como protección usada, estado de ánimo o ubicación",
+      "item3": "Alterna entre vista de línea de tiempo y vista de calendario para ver tu historial desde diferentes ángulos",
+      "item4": "Usa el calendario para saltar rápidamente entre meses que tienen registros",
+      "item5": "Todos los datos del diario se cifran con AES-256-GCM antes de llegar a la base de datos"
     },
-    "dataSource": {
-      "title": "De dónde vienen los datos",
-      "body1": "Hoy, la mayoría de los datos son auto reportados por usuarios. Esto implica posibles retrasos o incompletitud. Las etiquetas de verificación (verificado por proveedor, verificado por laboratorio) están planificadas para dar más contexto de confianza cuando existan integraciones.",
-      "body2": "La exposición se actualiza en snapshots con retraso, no en tiempo real. Esto evita que alguien agregue una conexión e infiera de inmediato el estado privado de otra persona."
+    "partners": {
+      "title": "Seguimiento de Parejas",
+      "body1": "Cuando usas el mismo alias en varios registros del diario, Navilla puede promover ese alias a una pareja nombrada — dándote una vista dedicada de tu historial con esa persona.",
+      "item1": "Cada pareja tiene una página detallada mostrando todos los encuentros, notas y una línea de tiempo",
+      "item2": "Agrega notas privadas a cualquier pareja (visibles solo para ti)",
+      "item3": "Ve conteos de encuentros y rangos de fechas de un vistazo desde la pestaña de Parejas",
+      "body2": "Los datos de parejas se cifran igual que los registros del diario. Navilla nunca comparte información de parejas con nadie — ni siquiera con la pareja misma."
     },
-    "connections": {
-      "title": "Cómo funcionan las conexiones",
-      "body1": "Cuando te conectas con alguien y aceptan, se crea una conexión confirmada. Las conexiones se almacenan usando hashes criptográficos — no nombres reales ni correos.",
-      "body2": "Tu red se extiende más allá de conexiones directas. Si estás conectado con Ana y Ana con Luis, Luis está en tu red de 2º grado. Esto se extiende hasta 5 grados.",
-      "body3": "Solo las conexiones confirmadas cuentan. Las solicitudes pendientes o rechazadas nunca son parte del grafo."
+    "healthLog": {
+      "title": "Registro de Salud",
+      "body1": "Registra cada visita de pruebas de ITS en un solo lugar. Sabe exactamente dónde estás y qué necesitas hacer después.",
+      "item1": "Registra visitas de pruebas con fecha, laboratorio y resultados por condición",
+      "item2": "Guarda tus laboratorios (nombre de clínica, ubicación) para reutilizar en futuras visitas",
+      "item3": "Ve tu historial completo de pruebas organizado por condición — con estado, valores de resultado y rangos de referencia",
+      "item4": "Monitorea tu cobertura: cuántas de las 10 ITS más comunes te has hecho pruebas este año",
+      "item5": "Ve los días desde tu última prueba de un vistazo desde el panel de registro de salud"
     },
-    "exposure": {
-      "title": "Cómo se calcula la exposición",
-      "body1": "Construimos un grafo de conexiones confirmadas, lo recorremos en servidor desde tu nodo y agrupamos reportes positivos por condición. Ves conteos, grado más cercano y contexto temporal.",
-      "body2": "Si tienes menos de 3 conexiones, no mostramos datos de exposición. Con solo 1 o 2 conexiones, una alerta podría revelar el estado de una persona específica. El mínimo de 3 conexiones protege la privacidad de todos."
-    },
-    "accuracy": {
-      "title": "Precisión y limitaciones",
-      "body1": "Las señales de exposición son útiles, pero tienen limitaciones que debes entender:",
+    "network": {
+      "title": "Red de Exposición",
+      "body1": "Cuando te conectas con otros usuarios de Navilla y reportan un estado de salud, ves señales anónimas de exposición — nunca nombres ni detalles identificables.",
+      "body2": "Las conexiones se almacenan como hashes criptográficos. Tu red se extiende hasta 5 grados: si estás conectado con Ana y Ana con Luis, Luis está en tu red de 2º grado.",
+      "body3": "Si tienes menos de 3 conexiones, los datos de exposición se ocultan completamente. Con solo 1 o 2 conexiones, una señal podría revelar el estado de una persona específica. El mínimo de 3 conexiones protege a todos.",
+      "body4": "Las señales de exposición son útiles pero tienen limitaciones:",
       "item1": "Exposición no significa que estés infectado — significa que alguien en tu red extendida reportó una condición",
-      "item2": "La exposición no reemplaza el consejo médico — úsala como señal para considerar hacerte pruebas",
-      "item3": "Los datos son auto reportados y pueden ser inexactos, tardíos o incompletos",
-      "item4": "El grafo solo incluye usuarios de Navilla — tu exposición real puede ser diferente",
-      "item5": "La recencia importa — reportes antiguos deben interpretarse distinto a reportes recientes"
+      "item2": "Los datos son auto reportados y pueden ser tardíos o incompletos",
+      "item3": "La red solo incluye usuarios de Navilla — tu exposición real puede ser diferente",
+      "item4": "La exposición se actualiza en snapshots con retraso, no en tiempo real, para prevenir inferencias por temporalidad"
     },
-    "whatYouCanDo": {
-      "title": "Lo que puedes hacer",
-      "item1": "Agrega conexiones para construir tu red de confianza",
-      "item2": "Reporta, resuelve o elimina tus estados de salud en cualquier momento",
-      "item3": "Elimina conexiones — desaparecerán de tu grafo en la siguiente actualización",
-      "item4": "Usa los datos de exposición como un factor al decidir si hacerte pruebas"
+    "freeTools": {
+      "title": "Herramientas Gratuitas — Sin Cuenta",
+      "body1": "Estas herramientas están disponibles para todos, sin necesidad de registrarse. No se recopilan datos.",
+      "item1": "Calculadora de ventana de detección — ingresa una fecha y ve exactamente cuándo cada prueba de ITS se vuelve confiable según los períodos de ventana",
+      "item2": "Guías de ITS — guías claras y en lenguaje sencillo sobre 10 condiciones comunes cubriendo síntomas, pruebas y tratamiento",
+      "item3": "Referencia de costos de pruebas — costos estimados para pruebas de ITS en clínicas de México"
+    },
+    "privacy": {
+      "title": "Privacidad y Seguridad",
+      "body1": "La privacidad no es una función — es la base sobre la que todo está construido.",
+      "item1": "Todos los datos sensibles (nombres de parejas, notas, registros de salud) se cifran con AES-256-GCM antes de llegar a la base de datos",
+      "item2": "Cada usuario tiene una clave de cifrado única derivada de un secreto maestro",
+      "item3": "Nunca mostramos nombres, usuarios o correos de personas que reportan condiciones de salud",
+      "item4": "No usamos rastreo de terceros, SDKs de analítica ni redes publicitarias",
+      "item5": "Estamos trabajando hacia cifrado de extremo a extremo completo donde el servidor no pueda leer tus datos",
+      "learnMore": "Lee los detalles completos en nuestra",
+      "securityLink": "página de Seguridad"
     },
     "dataRights": {
-      "title": "Tus derechos sobre tus datos",
-      "item1": "Ve tu tamaño de red y datos de exposición en cualquier momento",
-      "item2": "Reporta, actualiza o elimina tus estados de salud",
+      "title": "Tus Derechos sobre tus Datos",
+      "item1": "Ve todos tus datos — diario, parejas, registro de salud, conexiones — en cualquier momento",
+      "item2": "Edita o elimina cualquier registro, pareja o visita de pruebas individual",
       "item3": "Agrega o elimina conexiones libremente",
       "item4": "Elimina tu cuenta y todos los datos asociados permanentemente",
       "item5": "Solicita una exportación de tus datos personales"
     },
-    "goToDashboard": "Ir al Panel"
+    "getStarted": "Comienza — es gratis"
   },
   "footer": {
     "product": "Producto",

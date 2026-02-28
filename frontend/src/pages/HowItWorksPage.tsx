@@ -1,14 +1,14 @@
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import {
-  Eye,
-  EyeOff,
-  Network,
+  BookOpen,
+  HeartPulse,
   Users,
+  Network,
   Calculator,
-  AlertTriangle,
-  BarChart3,
+  Shield,
   UserCog,
+  Compass,
 } from 'lucide-react';
 
 interface SectionProps {
@@ -41,92 +41,120 @@ export function HowItWorksPage() {
 
   return (
     <div className="container py-10 space-y-6 max-w-3xl">
-      <title>How Navilla Works — Privacy-First Health Exposure Network</title>
-      <meta name="description" content="Learn how Navilla protects privacy while giving sexual health context through tools and anonymized network exposure signals." />
+      <title>{t('howItWorks.seoTitle')}</title>
+      <meta name="description" content={t('howItWorks.seoDescription')} />
       <link rel="canonical" href="https://www.navilla.app/how-it-works" />
       <div>
         <h1 className="text-3xl font-bold mb-2">{t('howItWorks.title')}</h1>
         <p className="text-muted">{t('howItWorks.subtitle')}</p>
       </div>
 
+      {/* Overview */}
       <Section
-        icon={<Eye className="w-5 h-5 text-primary" />}
-        title={t('howItWorks.showYou.title')}
+        icon={<Compass className="w-5 h-5 text-primary" />}
+        title={t('howItWorks.overview.title')}
       >
-        <p>{t('howItWorks.showYou.intro')}</p>
+        <p>{t('howItWorks.overview.body1')}</p>
+        <p>{t('howItWorks.overview.body2')}</p>
+      </Section>
+
+      {/* Encounter Journal */}
+      <Section
+        icon={<BookOpen className="w-5 h-5 text-primary" />}
+        title={t('howItWorks.journal.title')}
+      >
+        <p>{t('howItWorks.journal.body1')}</p>
         <ul className="list-disc list-inside space-y-1 pl-1">
-          <li>{t('howItWorks.showYou.item1')}</li>
-          <li>{t('howItWorks.showYou.item2')}</li>
-          <li>{t('howItWorks.showYou.item3')}</li>
-          <li>{t('howItWorks.showYou.item4')}</li>
-          <li>{t('howItWorks.showYou.item5')}</li>
+          <li>{t('howItWorks.journal.item1')}</li>
+          <li>{t('howItWorks.journal.item2')}</li>
+          <li>{t('howItWorks.journal.item3')}</li>
+          <li>{t('howItWorks.journal.item4')}</li>
+          <li>{t('howItWorks.journal.item5')}</li>
         </ul>
       </Section>
 
+      {/* Partner Tracking */}
       <Section
-        icon={<EyeOff className="w-5 h-5 text-primary" />}
-        title={t('howItWorks.neverShowYou.title')}
+        icon={<Users className="w-5 h-5 text-primary" />}
+        title={t('howItWorks.partners.title')}
       >
-        <p>{t('howItWorks.neverShowYou.intro')}</p>
+        <p>{t('howItWorks.partners.body1')}</p>
         <ul className="list-disc list-inside space-y-1 pl-1">
-          <li>{t('howItWorks.neverShowYou.item1')}</li>
-          <li>{t('howItWorks.neverShowYou.item2')}</li>
-          <li>{t('howItWorks.neverShowYou.item3')}</li>
+          <li>{t('howItWorks.partners.item1')}</li>
+          <li>{t('howItWorks.partners.item2')}</li>
+          <li>{t('howItWorks.partners.item3')}</li>
+        </ul>
+        <p>{t('howItWorks.partners.body2')}</p>
+      </Section>
+
+      {/* Health Log */}
+      <Section
+        icon={<HeartPulse className="w-5 h-5 text-primary" />}
+        title={t('howItWorks.healthLog.title')}
+      >
+        <p>{t('howItWorks.healthLog.body1')}</p>
+        <ul className="list-disc list-inside space-y-1 pl-1">
+          <li>{t('howItWorks.healthLog.item1')}</li>
+          <li>{t('howItWorks.healthLog.item2')}</li>
+          <li>{t('howItWorks.healthLog.item3')}</li>
+          <li>{t('howItWorks.healthLog.item4')}</li>
+          <li>{t('howItWorks.healthLog.item5')}</li>
         </ul>
       </Section>
 
-      <Section
-        icon={<BarChart3 className="w-5 h-5 text-primary" />}
-        title={t('howItWorks.dataSource.title')}
-      >
-        <p>{t('howItWorks.dataSource.body1')}</p>
-        <p>{t('howItWorks.dataSource.body2')}</p>
-      </Section>
-
+      {/* Exposure Network */}
       <Section
         sectionId="network-size-explainer"
-        icon={<Users className="w-5 h-5 text-primary" />}
-        title={t('howItWorks.connections.title')}
+        icon={<Network className="w-5 h-5 text-primary" />}
+        title={t('howItWorks.network.title')}
       >
-        <p>{t('howItWorks.connections.body1')}</p>
-        <p>{t('howItWorks.connections.body2')}</p>
-        <p>{t('howItWorks.connections.body3')}</p>
+        <p>{t('howItWorks.network.body1')}</p>
+        <p>{t('howItWorks.network.body2')}</p>
+        <p>{t('howItWorks.network.body3')}</p>
+        <p>{t('howItWorks.network.body4')}</p>
+        <ul className="list-disc list-inside space-y-1 pl-1">
+          <li>{t('howItWorks.network.item1')}</li>
+          <li>{t('howItWorks.network.item2')}</li>
+          <li>{t('howItWorks.network.item3')}</li>
+          <li>{t('howItWorks.network.item4')}</li>
+        </ul>
       </Section>
 
+      {/* Free Tools */}
       <Section
         icon={<Calculator className="w-5 h-5 text-primary" />}
-        title={t('howItWorks.exposure.title')}
+        title={t('howItWorks.freeTools.title')}
       >
-        <p>{t('howItWorks.exposure.body1')}</p>
-        <p>{t('howItWorks.exposure.body2')}</p>
-      </Section>
-
-      <Section
-        icon={<AlertTriangle className="w-5 h-5 text-primary" />}
-        title={t('howItWorks.accuracy.title')}
-      >
-        <p>{t('howItWorks.accuracy.body1')}</p>
+        <p>{t('howItWorks.freeTools.body1')}</p>
         <ul className="list-disc list-inside space-y-1 pl-1">
-          <li>{t('howItWorks.accuracy.item1')}</li>
-          <li>{t('howItWorks.accuracy.item2')}</li>
-          <li>{t('howItWorks.accuracy.item3')}</li>
-          <li>{t('howItWorks.accuracy.item4')}</li>
-          <li>{t('howItWorks.accuracy.item5')}</li>
+          <li>{t('howItWorks.freeTools.item1')}</li>
+          <li>{t('howItWorks.freeTools.item2')}</li>
+          <li>{t('howItWorks.freeTools.item3')}</li>
         </ul>
       </Section>
 
+      {/* Privacy & Security */}
       <Section
-        icon={<Network className="w-5 h-5 text-primary" />}
-        title={t('howItWorks.whatYouCanDo.title')}
+        icon={<Shield className="w-5 h-5 text-primary" />}
+        title={t('howItWorks.privacy.title')}
       >
+        <p>{t('howItWorks.privacy.body1')}</p>
         <ul className="list-disc list-inside space-y-1 pl-1">
-          <li>{t('howItWorks.whatYouCanDo.item1')}</li>
-          <li>{t('howItWorks.whatYouCanDo.item2')}</li>
-          <li>{t('howItWorks.whatYouCanDo.item3')}</li>
-          <li>{t('howItWorks.whatYouCanDo.item4')}</li>
+          <li>{t('howItWorks.privacy.item1')}</li>
+          <li>{t('howItWorks.privacy.item2')}</li>
+          <li>{t('howItWorks.privacy.item3')}</li>
+          <li>{t('howItWorks.privacy.item4')}</li>
+          <li>{t('howItWorks.privacy.item5')}</li>
         </ul>
+        <p>
+          {t('howItWorks.privacy.learnMore')}{' '}
+          <Link to="/security" className="text-primary font-medium hover:underline">
+            {t('howItWorks.privacy.securityLink')}
+          </Link>
+        </p>
       </Section>
 
+      {/* Your Data Rights */}
       <Section
         icon={<UserCog className="w-5 h-5 text-primary" />}
         title={t('howItWorks.dataRights.title')}
@@ -141,11 +169,11 @@ export function HowItWorksPage() {
       </Section>
 
       <div className="flex flex-wrap gap-3 pt-2">
-        <Link to="/dashboard" className="btn btn-primary">
-          {t('howItWorks.goToDashboard')}
+        <Link to="/signup" className="btn btn-primary">
+          {t('howItWorks.getStarted')}
         </Link>
         <Link to="/" className="btn btn-secondary">
-          {t('common.back')}
+          {t('common.backToHome')}
         </Link>
       </div>
     </div>
