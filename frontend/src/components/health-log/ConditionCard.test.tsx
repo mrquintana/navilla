@@ -72,7 +72,7 @@ describe('ConditionCard', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/health-log/SYPHILIS');
   });
 
-  it('navigates to /health-log/custom for custom conditions', () => {
+  it('does not navigate for custom conditions (no detail page)', () => {
     render(
       <ConditionCard
         condition={makeCondition({
@@ -82,10 +82,10 @@ describe('ConditionCard', () => {
       />
     );
 
-    const button = screen.getByRole('button');
-    fireEvent.click(button);
-
-    expect(mockNavigate).toHaveBeenCalledWith('/health-log/custom');
+    // Custom conditions render as a div, not a button
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+    // Verify no navigation happens
+    expect(mockNavigate).not.toHaveBeenCalled();
   });
 
   it('renders custom condition name when conditionType is null', () => {

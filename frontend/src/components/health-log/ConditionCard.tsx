@@ -27,7 +27,7 @@ export function ConditionCard({ condition }: ConditionCardProps) {
   const navigate = useNavigate();
   const locale = i18n.language.replace('_', '-');
 
-  const routeKey = condition.conditionType ?? 'custom';
+  const isCustom = !condition.conditionType;
   const conditionName = condition.conditionType
     ? t(`healthLog.conditions.${condition.conditionType}`)
     : condition.customCondition ?? t('healthLog.addCustomCondition');
@@ -45,13 +45,17 @@ export function ConditionCard({ condition }: ConditionCardProps) {
       : `${condition.totalTests} ${t('healthLog.tests')}`;
 
   const handleClick = () => {
-    navigate(`/health-log/${routeKey}`);
+    if (!isCustom) {
+      navigate(`/health-log/${condition.conditionType}`);
+    }
   };
 
+  const Tag = isCustom ? 'div' : 'button';
+
   return (
-    <button
-      type="button"
-      className="journal-entry-card w-full text-left cursor-pointer"
+    <Tag
+      type={isCustom ? undefined : 'button'}
+      className={`journal-entry-card w-full text-left${isCustom ? '' : ' cursor-pointer'}`}
       onClick={handleClick}
       aria-label={`${conditionName} - ${statusLabel}`}
     >
@@ -75,9 +79,11 @@ export function ConditionCard({ condition }: ConditionCardProps) {
           </div>
         </div>
 
-        {/* Right: chevron */}
-        <ChevronRight className="w-4 h-4 text-muted flex-shrink-0" aria-hidden="true" />
+        {/* Right: chevron (only for standard conditions with detail page) */}
+        {!isCustom && (
+          <ChevronRight className="w-4 h-4 text-muted flex-shrink-0" aria-hidden="true" />
+        )}
       </div>
-    </button>
+    </Tag>
   );
 }

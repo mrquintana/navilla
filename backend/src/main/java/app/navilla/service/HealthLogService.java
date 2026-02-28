@@ -363,7 +363,12 @@ public class HealthLogService {
   public ConditionHistoryResponse getConditionHistory(Jwt jwt, String conditionType) {
     String userHash = hashEmail(jwt);
 
-    ConditionType parsedType = ConditionType.valueOf(conditionType.toUpperCase());
+    ConditionType parsedType;
+    try {
+      parsedType = ConditionType.valueOf(conditionType.toUpperCase());
+    } catch (IllegalArgumentException e) {
+      throw new ResourceNotFoundException("healthLog.error.conditionNotFound");
+    }
     List<TestResult> results = testResultRepository.findByUserAndCondition(userHash, parsedType);
 
     if (results.isEmpty()) {
