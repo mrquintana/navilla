@@ -17,13 +17,18 @@
 package app.navilla.service;
 
 import java.time.LocalDate;
-import java.time.OffsetDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import app.navilla.dto.ConditionHistoryResponse;
+import app.navilla.dto.ConditionSummary;
 import app.navilla.dto.CreateTestVisitRequest;
+import app.navilla.dto.HealthLogSummaryResponse;
 import app.navilla.dto.TestResultDto;
 import app.navilla.dto.TestVisitResponse;
 import app.navilla.dto.UpdateTestVisitRequest;
@@ -242,6 +247,172 @@ public class HealthLogService {
           return toResponse(visit, results);
         })
         .toList();
+  }
+
+  /**
+   * Returns a summary of the user's health log, including days since last test,
+   * tests this year, condition coverage, and per-condition summaries.
+   *
+   * @param jwt the authenticated user's JWT
+   * @return the health log summary response
+   */
+  @Transactional(readOnly = true)
+  public HealthLogSummaryResponse getSummary(Jwt jwt) {
+    String userHash = hashEmail(jwt);
+
+    List<TestVisit> visits = testVisitRepository.findByUserHashOrderByTestDateDesc(userHash);
+    List<TestResult> allResults = testResultRepository.findAllByUserHash(userHash);
+
+    // daysSinceLastTest: -1 if never tested
+    int daysSinceLastTest;
+    if (visits.isEmpty()) {
+      daysSinceLastTest = -1;
+    } else {
+      daysSinceLastTest = (int) ChronoUnit.DAYS.between(
+          visits.getFirst().getTestDate(), LocalDate.now());
+    }
+
+    // testsThisYear: count visits where testDate.getYear() == current year
+    int currentYear = LocalDate.now().getYear();
+    int testsThisYear = (int) visits.stream()
+        .filter(v -> v.getTestDate().getYear() == currentYear)
+        .count();
+
+    // Group results by condition key
+    // Key: conditionType.name() for standard, "CUSTOM:" + decrypted for custom
+    Map<String, List<TestResult>> groupedResults = new LinkedHashMap<>();
+    for (TestResult result : allResults) {
+      String key;
+      if (result.getConditionType() != null) {
+        key = result.getConditionType().name();
+      } else {
+        String decrypted = encryptionService.decryptFromBytes(
+            result.getCustomConditionEncrypted());
+        key = "CUSTOM:" + decrypted;
+      }
+      groupedResults.computeIfAbsent(key, k -> new ArrayList<>()).add(result);
+    }
+
+    // Build ConditionSummary for each group
+    List<ConditionSummary> conditions = new ArrayList<>();
+    for (Map.Entry<String, List<TestResult>> entry : groupedResults.entrySet()) {
+      String key = entry.getKey();
+      List<TestResult> groupResults = entry.getValue();
+      TestResult latest = groupResults.getFirst(); // already sorted by testDate DESC
+
+      String conditionType;
+      String customCondition;
+      if (key.startsWith("CUSTOM:")) {
+        conditionType = null;
+        customCondition = key.substring("CUSTOM:".length());
+      } else {
+        conditionType = key;
+        customCondition = null;
+      }
+
+      String latestStatus = latest.getStatus().name();
+      String latestResultValue = latest.getResultValueEncrypted() != null
+          ? encryptionService.decryptFromBytes(latest.getResultValueEncrypted())
+          : null;
+
+      // Lookup test date from the visit for the latest result
+      LocalDate lastTestDate = null;
+      Optional<TestVisit> visitOpt = testVisitRepository.findById(latest.getVisitId());
+      if (visitOpt.isPresent()) {
+        lastTestDate = visitOpt.get().getTestDate();
+      }
+
+      int totalTests = groupResults.size();
+      boolean hasPositive = groupResults.stream()
+          .anyMatch(r -> r.getStatus() == TestResultStatus.POSITIVE);
+
+      conditions.add(new ConditionSummary(
+          conditionType, customCondition, latestStatus, latestResultValue,
+          lastTestDate, totalTests, hasPositive));
+    }
+
+    // conditionsCovered: count distinct standard conditionTypes tested in current year
+    int conditionsCovered = (int) allResults.stream()
+        .filter(r -> r.getConditionType() != null)
+        .filter(r -> {
+          Optional<TestVisit> resultVisit = testVisitRepository.findById(r.getVisitId());
+          return resultVisit.isPresent()
+              && resultVisit.get().getTestDate().getYear() == currentYear;
+        })
+        .map(TestResult::getConditionType)
+        .distinct()
+        .count();
+
+    int totalStandardConditions = ConditionType.values().length;
+
+    return new HealthLogSummaryResponse(
+        daysSinceLastTest, testsThisYear, conditionsCovered,
+        totalStandardConditions, conditions);
+  }
+
+  /**
+   * Returns the testing history for a specific condition type, including
+   * all visits, lab info, and result details.
+   *
+   * @param jwt           the authenticated user's JWT
+   * @param conditionType the condition type to retrieve history for (case-insensitive)
+   * @return the condition history response
+   * @throws IllegalStateException if the condition type is invalid
+   */
+  @Transactional(readOnly = true)
+  public ConditionHistoryResponse getConditionHistory(Jwt jwt, String conditionType) {
+    String userHash = hashEmail(jwt);
+
+    ConditionType parsedType = ConditionType.valueOf(conditionType.toUpperCase());
+    List<TestResult> results = testResultRepository.findByUserAndCondition(userHash, parsedType);
+
+    if (results.isEmpty()) {
+      return new ConditionHistoryResponse(
+          parsedType.name(), null, 0, null, List.of());
+    }
+
+    List<ConditionHistoryResponse.HistoryEntry> entries = new ArrayList<>();
+    for (TestResult result : results) {
+      Optional<TestVisit> visitOpt = testVisitRepository.findById(result.getVisitId());
+      TestVisit visit = visitOpt.orElse(null);
+
+      LocalDate testDate = visit != null ? visit.getTestDate() : null;
+      boolean verified = visit != null && Boolean.TRUE.equals(visit.getVerified());
+
+      String labName = null;
+      String labProvider = null;
+      if (visit != null && visit.getLabId() != null) {
+        Optional<Lab> labOpt = labRepository.findById(visit.getLabId());
+        if (labOpt.isPresent()) {
+          Lab lab = labOpt.get();
+          labName = encryptionService.decryptFromBytes(lab.getNameEncrypted());
+          labProvider = lab.getProvider().name();
+        }
+      }
+
+      String resultValue = result.getResultValueEncrypted() != null
+          ? encryptionService.decryptFromBytes(result.getResultValueEncrypted())
+          : null;
+
+      entries.add(new ConditionHistoryResponse.HistoryEntry(
+          result.getVisitId(),
+          testDate,
+          result.getStatus().name(),
+          resultValue,
+          result.getReferenceRange(),
+          labName,
+          labProvider,
+          verified,
+          result.getClearedAt()));
+    }
+
+    TestResult first = results.getFirst();
+    String latestStatus = first.getStatus().name();
+    LocalDate lastTestDate = entries.getFirst().testDate();
+
+    return new ConditionHistoryResponse(
+        parsedType.name(), latestStatus, results.size(),
+        lastTestDate, entries);
   }
 
   // ---- Private helpers ----

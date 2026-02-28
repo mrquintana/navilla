@@ -31,8 +31,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import app.navilla.dto.ConditionHistoryResponse;
+import app.navilla.dto.ConditionSummary;
 import app.navilla.dto.CreateTestVisitRequest;
 import app.navilla.dto.CreateTestVisitRequest.TestResultInput;
+import app.navilla.dto.HealthLogSummaryResponse;
 import app.navilla.dto.TestVisitResponse;
 import app.navilla.dto.UpdateTestVisitRequest;
 import app.navilla.entity.ConditionType;
@@ -663,6 +666,260 @@ class HealthLogServiceTest {
       List<TestVisitResponse> result = healthLogService.listVisits(jwt);
 
       assertThat(result).isEmpty();
+    }
+  }
+
+  @Nested
+  @DisplayName("getSummary")
+  class GetSummary {
+
+    @Test
+    @DisplayName("should return daysSinceLastTest")
+    void getSummary_shouldReturnDaysSinceLastTest() {
+      Jwt jwt = mockJwt();
+
+      LocalDate tenDaysAgo = LocalDate.now().minusDays(10);
+      TestVisit visit = buildVisit(VISIT_ID, USER_HASH);
+      visit.setTestDate(tenDaysAgo);
+
+      when(testVisitRepository.findByUserHashOrderByTestDateDesc(USER_HASH))
+          .thenReturn(List.of(visit));
+      when(testResultRepository.findAllByUserHash(USER_HASH))
+          .thenReturn(Collections.emptyList());
+
+      HealthLogSummaryResponse response = healthLogService.getSummary(jwt);
+
+      assertThat(response.daysSinceLastTest()).isEqualTo(10);
+    }
+
+    @Test
+    @DisplayName("should return testsThisYear")
+    void getSummary_shouldReturnTestsThisYear() {
+      Jwt jwt = mockJwt();
+
+      int currentYear = LocalDate.now().getYear();
+
+      TestVisit visit1 = buildVisit(UUID.randomUUID(), USER_HASH);
+      visit1.setTestDate(LocalDate.of(currentYear, 1, 15));
+
+      TestVisit visit2 = buildVisit(UUID.randomUUID(), USER_HASH);
+      visit2.setTestDate(LocalDate.of(currentYear, 2, 20));
+
+      TestVisit visit3 = buildVisit(UUID.randomUUID(), USER_HASH);
+      visit3.setTestDate(LocalDate.of(currentYear - 1, 6, 10));
+
+      when(testVisitRepository.findByUserHashOrderByTestDateDesc(USER_HASH))
+          .thenReturn(List.of(visit2, visit1, visit3));
+      when(testResultRepository.findAllByUserHash(USER_HASH))
+          .thenReturn(Collections.emptyList());
+
+      HealthLogSummaryResponse response = healthLogService.getSummary(jwt);
+
+      assertThat(response.testsThisYear()).isEqualTo(2);
+    }
+
+    @Test
+    @DisplayName("should return coverageCount for standard conditions this year")
+    void getSummary_shouldReturnCoverageCount() {
+      Jwt jwt = mockJwt();
+
+      int currentYear = LocalDate.now().getYear();
+      UUID visitId = UUID.randomUUID();
+
+      TestVisit visit = buildVisit(visitId, USER_HASH);
+      visit.setTestDate(LocalDate.of(currentYear, 2, 1));
+
+      TestResult hivResult = buildResult(visitId, ConditionType.HIV, TestResultStatus.NEGATIVE);
+      TestResult syphilisResult = buildResult(visitId, ConditionType.SYPHILIS, TestResultStatus.NEGATIVE);
+      TestResult chlamydiaResult = buildResult(visitId, ConditionType.CHLAMYDIA, TestResultStatus.NEGATIVE);
+
+      when(testVisitRepository.findByUserHashOrderByTestDateDesc(USER_HASH))
+          .thenReturn(List.of(visit));
+      when(testResultRepository.findAllByUserHash(USER_HASH))
+          .thenReturn(List.of(hivResult, syphilisResult, chlamydiaResult));
+      when(testVisitRepository.findById(visitId)).thenReturn(Optional.of(visit));
+
+      HealthLogSummaryResponse response = healthLogService.getSummary(jwt);
+
+      assertThat(response.conditionsCovered()).isEqualTo(3);
+      assertThat(response.totalStandardConditions()).isEqualTo(10);
+    }
+
+    @Test
+    @DisplayName("should return latest status per condition")
+    void getSummary_shouldReturnLatestStatusPerCondition() {
+      Jwt jwt = mockJwt();
+
+      int currentYear = LocalDate.now().getYear();
+
+      // Newer visit (most recent)
+      UUID newerVisitId = UUID.randomUUID();
+      TestVisit newerVisit = buildVisit(newerVisitId, USER_HASH);
+      newerVisit.setTestDate(LocalDate.of(currentYear, 2, 20));
+
+      // Older visit
+      UUID olderVisitId = UUID.randomUUID();
+      TestVisit olderVisit = buildVisit(olderVisitId, USER_HASH);
+      olderVisit.setTestDate(LocalDate.of(currentYear, 1, 10));
+
+      // Results sorted by testDate DESC (newer first) — matches repository behavior
+      TestResult newerHiv = buildResult(newerVisitId, ConditionType.HIV, TestResultStatus.NEGATIVE);
+      TestResult olderHiv = buildResult(olderVisitId, ConditionType.HIV, TestResultStatus.POSITIVE);
+
+      when(testVisitRepository.findByUserHashOrderByTestDateDesc(USER_HASH))
+          .thenReturn(List.of(newerVisit, olderVisit));
+      when(testResultRepository.findAllByUserHash(USER_HASH))
+          .thenReturn(List.of(newerHiv, olderHiv));
+      when(testVisitRepository.findById(newerVisitId)).thenReturn(Optional.of(newerVisit));
+      when(testVisitRepository.findById(olderVisitId)).thenReturn(Optional.of(olderVisit));
+
+      HealthLogSummaryResponse response = healthLogService.getSummary(jwt);
+
+      assertThat(response.conditions()).hasSize(1);
+      ConditionSummary hivSummary = response.conditions().getFirst();
+      assertThat(hivSummary.conditionType()).isEqualTo("HIV");
+      // Latest status should be NEGATIVE (from the most recent visit)
+      assertThat(hivSummary.latestStatus()).isEqualTo("NEGATIVE");
+      // hasPositive should still be true because there IS a POSITIVE result
+      assertThat(hivSummary.hasPositive()).isTrue();
+      assertThat(hivSummary.totalTests()).isEqualTo(2);
+    }
+
+    @Test
+    @DisplayName("should include custom conditions in summary")
+    void getSummary_shouldIncludeCustomConditions() {
+      Jwt jwt = mockJwt();
+
+      UUID visitId = UUID.randomUUID();
+      TestVisit visit = buildVisit(visitId, USER_HASH);
+      visit.setTestDate(LocalDate.now());
+
+      TestResult customResult = TestResult.builder()
+          .id(UUID.randomUUID())
+          .visitId(visitId)
+          .conditionType(null)
+          .customConditionEncrypted(ENCRYPTED_CUSTOM_CONDITION)
+          .status(TestResultStatus.NEGATIVE)
+          .resultValueEncrypted(null)
+          .referenceRange(null)
+          .clearedAt(null)
+          .createdAt(OffsetDateTime.now())
+          .updatedAt(OffsetDateTime.now())
+          .build();
+
+      when(testVisitRepository.findByUserHashOrderByTestDateDesc(USER_HASH))
+          .thenReturn(List.of(visit));
+      when(testResultRepository.findAllByUserHash(USER_HASH))
+          .thenReturn(List.of(customResult));
+      when(testVisitRepository.findById(visitId)).thenReturn(Optional.of(visit));
+      when(encryptionService.decryptFromBytes(ENCRYPTED_CUSTOM_CONDITION)).thenReturn("Mycoplasma");
+
+      HealthLogSummaryResponse response = healthLogService.getSummary(jwt);
+
+      assertThat(response.conditions()).hasSize(1);
+      ConditionSummary custom = response.conditions().getFirst();
+      assertThat(custom.conditionType()).isNull();
+      assertThat(custom.customCondition()).isEqualTo("Mycoplasma");
+      assertThat(custom.latestStatus()).isEqualTo("NEGATIVE");
+    }
+
+    @Test
+    @DisplayName("should return -1 when no visits exist")
+    void getSummary_shouldReturnNegativeOneWhenNoVisits() {
+      Jwt jwt = mockJwt();
+
+      when(testVisitRepository.findByUserHashOrderByTestDateDesc(USER_HASH))
+          .thenReturn(Collections.emptyList());
+      when(testResultRepository.findAllByUserHash(USER_HASH))
+          .thenReturn(Collections.emptyList());
+
+      HealthLogSummaryResponse response = healthLogService.getSummary(jwt);
+
+      assertThat(response.daysSinceLastTest()).isEqualTo(-1);
+      assertThat(response.testsThisYear()).isZero();
+      assertThat(response.conditionsCovered()).isZero();
+      assertThat(response.conditions()).isEmpty();
+    }
+  }
+
+  @Nested
+  @DisplayName("getConditionHistory")
+  class GetConditionHistory {
+
+    @Test
+    @DisplayName("should return all visits for a condition")
+    void getConditionHistory_shouldReturnAllVisitsForCondition() {
+      Jwt jwt = mockJwt();
+
+      UUID visitId1 = UUID.randomUUID();
+      UUID visitId2 = UUID.randomUUID();
+      UUID visitId3 = UUID.randomUUID();
+
+      TestVisit visit1 = buildVisit(visitId1, USER_HASH);
+      visit1.setTestDate(LocalDate.of(2026, 2, 20));
+      TestVisit visit2 = buildVisit(visitId2, USER_HASH);
+      visit2.setTestDate(LocalDate.of(2026, 1, 15));
+      TestVisit visit3 = buildVisit(visitId3, USER_HASH);
+      visit3.setTestDate(LocalDate.of(2025, 12, 1));
+
+      TestResult r1 = buildResult(visitId1, ConditionType.HIV, TestResultStatus.NEGATIVE);
+      TestResult r2 = buildResult(visitId2, ConditionType.HIV, TestResultStatus.NEGATIVE);
+      TestResult r3 = buildResult(visitId3, ConditionType.HIV, TestResultStatus.POSITIVE);
+
+      when(testResultRepository.findByUserAndCondition(USER_HASH, ConditionType.HIV))
+          .thenReturn(List.of(r1, r2, r3));
+      when(testVisitRepository.findById(visitId1)).thenReturn(Optional.of(visit1));
+      when(testVisitRepository.findById(visitId2)).thenReturn(Optional.of(visit2));
+      when(testVisitRepository.findById(visitId3)).thenReturn(Optional.of(visit3));
+
+      ConditionHistoryResponse response = healthLogService.getConditionHistory(jwt, "HIV");
+
+      assertThat(response.conditionType()).isEqualTo("HIV");
+      assertThat(response.totalTests()).isEqualTo(3);
+      assertThat(response.latestStatus()).isEqualTo("NEGATIVE");
+      assertThat(response.lastTestDate()).isEqualTo(LocalDate.of(2026, 2, 20));
+      assertThat(response.entries()).hasSize(3);
+      assertThat(response.entries().get(0).testDate()).isEqualTo(LocalDate.of(2026, 2, 20));
+      assertThat(response.entries().get(1).testDate()).isEqualTo(LocalDate.of(2026, 1, 15));
+      assertThat(response.entries().get(2).testDate()).isEqualTo(LocalDate.of(2025, 12, 1));
+    }
+
+    @Test
+    @DisplayName("should include lab info in history entries")
+    void getConditionHistory_shouldIncludeLabInfo() {
+      Jwt jwt = mockJwt();
+
+      UUID visitId = UUID.randomUUID();
+      TestVisit visit = buildVisit(visitId, USER_HASH);
+      visit.setTestDate(LocalDate.of(2026, 2, 15));
+      visit.setLabId(LAB_ID);
+
+      Lab lab = Lab.builder()
+          .id(LAB_ID)
+          .provider(LabProvider.CHOPO)
+          .nameEncrypted(ENCRYPTED_LAB_NAME)
+          .build();
+
+      TestResult result = buildResult(visitId, ConditionType.HIV, TestResultStatus.NEGATIVE);
+      result.setResultValueEncrypted(ENCRYPTED_RESULT_VALUE);
+      result.setReferenceRange("< 1.0");
+
+      when(testResultRepository.findByUserAndCondition(USER_HASH, ConditionType.HIV))
+          .thenReturn(List.of(result));
+      when(testVisitRepository.findById(visitId)).thenReturn(Optional.of(visit));
+      when(labRepository.findById(LAB_ID)).thenReturn(Optional.of(lab));
+      when(encryptionService.decryptFromBytes(ENCRYPTED_LAB_NAME)).thenReturn("Mi Chopo");
+      when(encryptionService.decryptFromBytes(ENCRYPTED_RESULT_VALUE)).thenReturn("non-reactive");
+
+      ConditionHistoryResponse response = healthLogService.getConditionHistory(jwt, "hiv");
+
+      assertThat(response.entries()).hasSize(1);
+      ConditionHistoryResponse.HistoryEntry entry = response.entries().getFirst();
+      assertThat(entry.labName()).isEqualTo("Mi Chopo");
+      assertThat(entry.labProvider()).isEqualTo("CHOPO");
+      assertThat(entry.resultValue()).isEqualTo("non-reactive");
+      assertThat(entry.referenceRange()).isEqualTo("< 1.0");
+      assertThat(entry.verified()).isFalse();
     }
   }
 }
