@@ -1630,8 +1630,9 @@ All factual content (symptoms, testing windows, treatment) must be verified agai
   - Calendar smart skip navigation: `«`/`»` buttons jump to nearest month with entries, "Today" pill, boundary feedback
   - Encounter date validation: constrained between user DOB and today (matches HealthStatusPage pattern)
   - View toggle hierarchy: Timeline/Calendar grouped under "View" label, Partners separated by divider
-- **Won't Do (descoped from Week 5):**
+- **Deferred (not blocked, will add when needed):**
   - ~~Client-side encryption for notes~~ — server-side AES-256-GCM is in place; client-side E2E encryption deferred to a future security sprint (requires key management UX)
+  - ~~Protection used (multi-select) + Encounter type (multi-select)~~ — specced in Feature 1.1 but deferred to Week 8 (Personal Insights). Rationale: these structured fields exist to power computed insights like "83% of encounters were protected." Custom fields already let users note protection freeform. No real users are logging entries yet, so no backfill problem. Adding two dropdowns + a migration is a half-day task — do it in Week 8 when we actually build the insights dashboard that consumes the data. Decision: 2026-02-27, product owner approved
 
 ### Phase 3: Layer 2 — Network Enhancements (Weeks 10-14)
 

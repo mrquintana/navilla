@@ -738,6 +738,14 @@ UX polish pass on the encounter journal — navigation improvements, date valida
 **Current position: End of Week 5, ahead of schedule.**
 The journal has more features than the roadmap specced (partners, smart skip nav, DOB validation, view grouping — none of these were in the Week 5 deliverables).
 
+### Key Decision: Protection + Encounter Type Fields Deferred to Week 8
+Feature 1.1 spec includes "Protection used" (multi-select) and "Type of encounter" (multi-select) as structured fields. These exist to power computed insights like "83% of encounters were protected" in Week 8. Decision: defer adding them until Week 8 (Personal Insights), when we actually need the data. Rationale:
+- Custom fields already let users note protection freeform if they want
+- No real users logging entries yet → no backfill problem when we add later
+- Adding two dropdowns + a migration is a half-day task, not a blocker
+- Structured data without a consumer (the insights dashboard) is premature
+- Product owner approved 2026-02-27
+
 **Up next (Week 6):** Testing History Tracker
 - Backend: `test_records` + `test_record_results` tables, API
 - Frontend: testing log UI, per-condition history, "days since last test" counter
