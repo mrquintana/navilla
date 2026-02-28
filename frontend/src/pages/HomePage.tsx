@@ -115,10 +115,12 @@ export function HomePage() {
             {/* Journal card */}
             <div className="feature-showcase-card">
               <div className="feature-showcase-preview" aria-hidden="true">
-                {/* TODO: Replace with actual screenshot */}
-                <div className="feature-showcase-placeholder">
-                  <BookOpen className="w-8 h-8" />
-                </div>
+                <img
+                  src="/images/preview-journal-timeline.png"
+                  alt=""
+                  className="feature-showcase-img"
+                  loading="lazy"
+                />
               </div>
               <div className="feature-showcase-content">
                 <div className="feature-showcase-badge">
@@ -142,10 +144,12 @@ export function HomePage() {
             {/* Health Log card */}
             <div className="feature-showcase-card">
               <div className="feature-showcase-preview" aria-hidden="true">
-                {/* TODO: Replace with actual screenshot */}
-                <div className="feature-showcase-placeholder">
-                  <HeartPulse className="w-8 h-8" />
-                </div>
+                <img
+                  src="/images/preview-journal-calendar.png"
+                  alt=""
+                  className="feature-showcase-img"
+                  loading="lazy"
+                />
               </div>
               <div className="feature-showcase-content">
                 <div className="feature-showcase-badge">
