@@ -1,17 +1,12 @@
 import { Link, Navigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
+import { useTranslation, Trans } from 'react-i18next';
 import { useAuthOptional } from '../contexts/AuthContext';
 import {
-  Network,
-  ShieldCheck,
-  UserPlus,
-  UserRoundCheck,
-  Activity,
-  LockKeyhole,
   ArrowRight,
   CircleHelp,
   BookOpen,
   HeartPulse,
+  Calculator,
 } from 'lucide-react';
 import { ConstellationGraphic } from '../components/landing/ConstellationGraphic';
 
@@ -66,17 +61,22 @@ export function HomePage() {
               <div className="feature-card-head">
                 <span className="feature-kicker">{t('landing.stepLabel1')}</span>
                 <span className="feature-icon" aria-hidden="true">
-                  <UserPlus className="w-4 h-4" />
+                  <BookOpen className="w-4 h-4" />
                 </span>
               </div>
               <h3>{t('landing.stepOneTitle')}</h3>
-              <p>{t('landing.stepOneBody')}</p>
+              <p>
+                <Trans
+                  i18nKey="landing.stepOneBody"
+                  components={{ encryptedLink: <Link to="/security" className="text-primary font-medium hover:underline" /> }}
+                />
+              </p>
             </div>
             <div className="feature-card feature-card--step">
               <div className="feature-card-head">
                 <span className="feature-kicker">{t('landing.stepLabel2')}</span>
                 <span className="feature-icon" aria-hidden="true">
-                  <UserRoundCheck className="w-4 h-4" />
+                  <HeartPulse className="w-4 h-4" />
                 </span>
               </div>
               <h3>{t('landing.stepTwoTitle')}</h3>
@@ -86,7 +86,7 @@ export function HomePage() {
               <div className="feature-card-head">
                 <span className="feature-kicker">{t('landing.stepLabel3')}</span>
                 <span className="feature-icon" aria-hidden="true">
-                  <Network className="w-4 h-4" />
+                  <Calculator className="w-4 h-4" />
                 </span>
               </div>
               <h3>{t('landing.stepThreeTitle')}</h3>
@@ -101,52 +101,16 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* Why it feels different */}
-      <section className="container landing-section landing-section--values">
-        <div className="landing-panel landing-panel--values">
-          <h2 className="text-center mb-6">{t('landing.valueTitle')}</h2>
-          <div className="landing-grid landing-grid--values">
-            <div className="feature-card feature-card--value">
-              <div className="feature-card-head feature-card-head--icon-only">
-                <span className="feature-icon" aria-hidden="true">
-                  <ShieldCheck className="w-4 h-4" />
-                </span>
-              </div>
-              <h3>{t('landing.valueOneTitle')}</h3>
-              <p>{t('landing.valueOneBody')}</p>
-            </div>
-            <div className="feature-card feature-card--value">
-              <div className="feature-card-head feature-card-head--icon-only">
-                <span className="feature-icon" aria-hidden="true">
-                  <Activity className="w-4 h-4" />
-                </span>
-              </div>
-              <h3>{t('landing.valueTwoTitle')}</h3>
-              <p>{t('landing.valueTwoBody')}</p>
-            </div>
-            <div className="feature-card feature-card--value">
-              <div className="feature-card-head feature-card-head--icon-only">
-                <span className="feature-icon" aria-hidden="true">
-                  <LockKeyhole className="w-4 h-4" />
-                </span>
-              </div>
-              <h3>{t('landing.valueThreeTitle')}</h3>
-              <p>{t('landing.valueThreeBody')}</p>
-            </div>
-          </div>
-          <div className="text-center mt-6">
-            <Link to="/privacy" className="btn btn-secondary">
-              {t('landing.valueMore', 'Privacy details')}
-            </Link>
-          </div>
-        </div>
-      </section>
-
       {/* Features — Journal & Health Log showcase */}
       <section className="container landing-section landing-section--features">
         <div className="landing-panel landing-panel--values">
           <h2 className="text-center mb-2">{t('landing.featuresTitle')}</h2>
-          <p className="text-center text-sm text-muted mb-6">{t('landing.featuresSubtitle')}</p>
+          <p className="text-center text-sm text-muted mb-6">
+            <Trans
+              i18nKey="landing.featuresSubtitle"
+              components={{ encryptedLink: <Link to="/security" className="text-primary font-medium hover:underline" /> }}
+            />
+          </p>
           <div className="landing-grid landing-grid--features">
             {/* Journal card */}
             <div className="feature-showcase-card">
@@ -162,7 +126,12 @@ export function HomePage() {
                   <span>{t('landing.featureJournalBadge')}</span>
                 </div>
                 <h3>{t('landing.featureJournalTitle')}</h3>
-                <p>{t('landing.featureJournalBody')}</p>
+                <p>
+                  <Trans
+                    i18nKey="landing.featureJournalBody"
+                    components={{ encryptedLink: <Link to="/security" className="text-primary font-medium hover:underline" /> }}
+                  />
+                </p>
                 <Link to="/signup" className="feature-card-cta">
                   {t('landing.featuresCta')}
                   <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
