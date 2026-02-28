@@ -1662,7 +1662,48 @@ All factual content (symptoms, testing windows, treatment) must be verified agai
 | Week | Focus | Deliverables |
 |------|-------|-------------|
 | 15 | Anonymous notifications + content verification | Backend: anonymous_notifications table, link generation/serving. Frontend: notification generation screen, public landing page. Verify all Layer 0 content against official sources for accuracy — including symptom-to-STI mappings (SYMPTOM_LABELS + symptoms[] arrays in stiContent.ts) |
-| 16 | Launch prep | Final testing pass (unit + E2E). Performance optimization. Content accuracy fixes. Security audit (OWASP top 10 check). Reddit community created. Social media accounts set up |
+| 16 | Launch prep + security hardening | Final testing pass (unit + E2E). Performance optimization. Content accuracy fixes. **API security hardening** (see details below). Reddit community created. Social media accounts set up |
+
+#### Week 16: API Security Hardening (Details)
+
+Security measures to implement before soft launch. Not needed during POC phase (free-tier infra limits exposure), but mandatory before real users arrive.
+
+**Rate limiting (Bucket4j + Spring Boot):**
+- Write operations (create/update/delete): 30 req/min per user
+- Read operations (list/get): 120 req/min per user
+- Auth-sensitive endpoints (connections): 10 req/min per user
+- Global per-IP fallback: 300 req/min
+- Return 429 Too Many Requests with Retry-After header
+
+**Per-user resource caps (hard limits, checked on every create):**
+- Journal entries: 10,000 per user
+- Partners: 500 per user
+- Custom field templates: 10 per user
+- Test visits: 5,000 per user
+- Labs: 50 per user
+- Connections: 500 per user
+
+**Request body size limits:**
+- `server.tomcat.max-http-post-size: 1MB`
+- `spring.servlet.multipart.max-file-size: 1MB`
+
+**Validation sweep:**
+- Ensure all DTOs have `@Size` constraints on every string field (backend)
+- Ensure all inputs have `maxLength` attributes (frontend)
+- Fill gaps: `UpdateLabRequest`, `UpdateTestVisitRequest` missing validation
+
+**Abuse detection (Grafana/Loki alerting rules):**
+- Alert on >100 writes/hour from single user
+- Alert on >1000 requests/hour from single IP
+- Log authentication failures with IP + user agent
+
+**OWASP top 10 check:**
+- SQL injection (JPA parameterized queries — already safe)
+- XSS (React auto-escaping — already safe)
+- CSRF (stateless JWT — N/A)
+- Broken auth (Supabase JWT verification — already solid)
+- Security misconfiguration (review headers, error responses, actuator exposure)
+- Sensitive data exposure (encryption audit — AES-256-GCM already in place)
 
 ### Phase 5: Soft Launch + Growth (Weeks 17-20)
 
