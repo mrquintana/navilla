@@ -109,6 +109,10 @@
     "exposureLabelDegree": "Grado",
     "exposureLabelCount": "Casos",
     "exposureLabelStatus": "Estado",
+    "quickActions": "Acciones Rápidas",
+    "goToHealth": "Mi Salud",
+    "goToJournal": "Diario",
+    "goToConnections": "Red",
     "snapshotTitle": "Por qué los datos no son en vivo",
     "snapshotBody": "Las exposiciones y el tamaño de red se actualizan cada pocos días para proteger la privacidad y mantener cálculos estables. Este retraso reduce el riesgo de identificar personas y ayuda a manejar grafos grandes.",
     "exposureStatusLabels": {

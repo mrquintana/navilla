@@ -31,6 +31,11 @@ vi.mock('@tanstack/react-query', async () => {
   };
 });
 
+// Mock UpcomingReminders to avoid needing the full reminders hooks/API
+vi.mock('../components/reminders/UpcomingReminders', () => ({
+  UpcomingReminders: () => <div data-testid="upcoming-reminders">Reminders</div>,
+}));
+
 function renderDashboard() {
   return render(
     <MemoryRouter>
@@ -127,5 +132,47 @@ describe('DashboardPage loading behavior', () => {
     const greeting = screen.getByRole('heading', { name: 'dashboard.welcome, Migue' });
     expect(greeting).toBeInTheDocument();
     expect(greeting).not.toHaveTextContent('migue1990');
+  });
+
+  it('renders upcoming reminders section and quick actions', () => {
+    useAuthMock.mockReturnValue({
+      user: { email: 'migue1990@example.com', user_metadata: {} },
+      session: { access_token: 'token' },
+      isLoading: false,
+    });
+
+    useUserMock.mockReturnValue({
+      data: {
+        displayName: 'Migue',
+        email: 'migue1990@example.com',
+        profileVisibility: 'PRIVATE',
+      },
+      isLoading: false,
+      error: null,
+    });
+
+    useQueryMock.mockImplementation((input: { queryKey: string[] }) => {
+      const rootKey = input.queryKey[0];
+      if (rootKey === 'connections') {
+        return { data: { confirmedCount: 3 }, isLoading: false };
+      }
+      if (rootKey === 'exposures') {
+        return { data: { exposures: [], totalGraphNodes: 12, maxDepth: 5 }, isLoading: false, refetch: vi.fn() };
+      }
+      if (rootKey === 'health') {
+        return { data: [], isLoading: false };
+      }
+      return { data: undefined, isLoading: false };
+    });
+
+    renderDashboard();
+
+    // Upcoming reminders is rendered (mocked)
+    expect(screen.getByTestId('upcoming-reminders')).toBeInTheDocument();
+
+    // Quick action links are present
+    expect(screen.getByText('dashboard.goToHealth')).toBeInTheDocument();
+    expect(screen.getByText('dashboard.goToJournal')).toBeInTheDocument();
+    expect(screen.getByText('dashboard.goToConnections')).toBeInTheDocument();
   });
 });
