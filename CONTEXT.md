@@ -127,6 +127,39 @@ A detailed breakdown of the project's directory layout and key files can be foun
 
 ---
 
+## Session Notes (2026-03-03 — Week 7: Smart Reminders + Medication Tracking)
+
+- ✅ **Feature 1.3 fully implemented** — smart reminders, medication tracking, vaccination tracking, dashboard redesign
+- ✅ Migration `011_reminders_medications.sql`: 5 new tables (`medications`, `medication_logs`, `vaccinations`, `reminders`, `reminder_settings`) with AES-256-GCM encryption, 8 indexes
+- ✅ **Configuration-driven health catalog** — all medication types, vaccine series, frequencies, heuristic thresholds defined in YAML (`navilla.health-catalog` in application.yaml). No hardcoded enums. Adding new types = YAML changes only, no migrations
+- ✅ Backend: `MedicationService` (CRUD + dose logging + adherence + auto-reminder), `VaccinationService` (dose tracking + series completion + auto-reminder), `ReminderService` (list/snooze/complete/toggle/delete + settings CRUD), `ReminderCalculationEngine` (testing + follow-up heuristics from config), `ReminderSchedulerJob` (`@Scheduled` daily cron at 6 AM)
+- ✅ Backend: 4 controllers (`CatalogController` public, `MedicationController` 7 endpoints, `VaccinationController` 4 endpoints, `ReminderController` 8 endpoints), 234 backend tests passing
+- ✅ Frontend: 15 new DTO types + 14 API client methods, 4 React Query hook files (`useCatalog`, `useMedications`, `useVaccinations`, `useReminders`)
+- ✅ Frontend: 10 new components — `MedicationModal`, `MedicationCard`, `DoseLogButton`, `VaccinationModal`, `VaccinationSeriesCard`, `UpcomingReminders`, `ReminderSettingsModal`, `MedicationDetailPage`, `CreatePartnerModal`
+- ✅ **Health Log → "My Health" tabbed page**: Upcoming Reminders card + Tests/Medications/Vaccines tabs, mobile-first horizontal scroll
+- ✅ **Dashboard redesign**: Removed profile card, added "Next Up" reminders widget, quick action buttons (My Health/Journal/Network), 2-col Status + Connections layout, snapshot notice moved to bottom
+- ✅ i18n: ~100 new keys in en_US + es_MX (medications, vaccinations, reminders, partner creation, dashboard)
+- ✅ Full test suite: 234 backend tests + 237 frontend tests = **471 tests passing**
+- **Key architecture decisions:**
+  - Configuration-driven types (user requested: "don't hardcode anything") — YAML catalog + `@ConfigurationProperties` + VARCHAR columns, not Java enums
+  - Unified reminder engine — single `reminders` table as scheduling surface for all types (TESTING, MEDICATION, VACCINATION, FOLLOW_UP)
+  - Tabbed My Health page (user preferred over separate pages for mobile UX)
+  - Dashboard focused on actionable health info (removed profile card)
+- **Deferred:** Push notifications (Week 9 — PWA), email digest sending (toggle stored, sending in Week 9), E2E tests for scheduler
+- **Needs manual action:** Run migration `011_reminders_medications.sql` on Supabase
+
+---
+
+## Session Notes (2026-02-28 — Landing Page Polish + Week 7 Prep)
+
+- ✅ Landing page: Added real screenshots (journal timeline, health log) to feature showcase cards, cropped nav headers
+- ✅ Security page: Full i18n rewrite (was English-only), 40+ locale keys added
+- ✅ How It Works page: Complete rewrite — 8 sections covering all features
+- ✅ ContentPage.tsx: Fixed hardcoded "Back to Home" → i18n
+- ✅ Pre-rendering: Extended `scripts/prerender.ts` from 13→25 routes, added i18n SSR support
+
+---
+
 ## Session Notes (2026-02-27 — Week 6: Health Log)
 
 - ✅ **Full Health Log feature implemented** — complete rebuild of Health Status page as a testing history tracker
@@ -641,11 +674,13 @@ For a quick start and a list of development commands, please refer to the main `
 
 ## Next Steps
 
-Week 5 (Encounter Journal + Journal Partners) complete. Moving to Week 6 next.
+Week 7 (Smart Reminders + Medication Tracking) complete. Moving to Week 8 next.
 
 | Priority | Item | GitHub Issue | Notes |
 |----------|------|-------------|-------|
-| **Next** | Week 6: Testing history tracker | — | Test records, per-condition history, document upload |
+| **Next** | Week 8: Personal insights + doctor visit prep | — | Insights dashboard, PDF export, saved clinics |
+| **Action** | Run migration 011 on Supabase | — | `011_reminders_medications.sql` — 5 new tables |
+| **Action** | Merge `feature/week7-reminders-medications` → `develop` | — | ~25 commits, all tests passing |
 | High | Backend Spanish translations | #8 | Frontend done, backend messages_es_MX.properties still English |
 | High | SendGrid SMTP for password reset | #14 | Infrastructure config — not code |
 | Medium | User guide documentation | #19 | Screenshots + walkthrough for end users |

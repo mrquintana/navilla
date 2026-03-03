@@ -1647,6 +1647,22 @@ All factual content (symptoms, testing windows, treatment) must be verified agai
   - Chopo/Salud Digna verification endpoint (future — schema supports it via `labs` + `lab_credentials`)
   - Verified badge UI (needs verification endpoint first)
 
+- **Week 7 status:** ✅ Complete
+- **Completed (Week 7 — Smart Reminders + Medication Tracking):**
+  - Migration `011_reminders_medications.sql`: `medications`, `medication_logs`, `vaccinations`, `reminders`, `reminder_settings` tables with AES-256-GCM encryption
+  - Configuration-driven health catalog (`navilla.health-catalog` in application.yaml) — all medication types, vaccine series, frequencies, heuristic thresholds in YAML. No hardcoded enums. Adding new types = YAML only
+  - Backend: `MedicationService`, `VaccinationService`, `ReminderService`, `ReminderCalculationEngine`, `ReminderSchedulerJob` (daily cron)
+  - Backend: `CatalogController` (public), `MedicationController` (7 endpoints), `VaccinationController` (4 endpoints), `ReminderController` (8 endpoints), 234 backend tests
+  - Frontend: 15 DTO types, 14 API methods, 4 hook files, 10 new components
+  - Health Log → "My Health" tabbed page: Upcoming Reminders + Tests/Medications/Vaccines tabs
+  - Dashboard redesign: "Next Up" widget, quick actions, removed profile card, 2-col layout
+  - Partner creation modal in JournalPartnersTab (quick win)
+  - Full i18n (~100 new keys), 237 frontend tests
+- **Deferred (Week 7):**
+  - Push notifications (Week 9 — PWA)
+  - Email digest sending (toggle stored, sending in Week 9)
+  - E2E tests for scheduler
+
 ### Phase 3: Layer 2 — Network Enhancements (Weeks 10-14)
 
 | Week | Focus | Deliverables |
