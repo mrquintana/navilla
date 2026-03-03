@@ -28,17 +28,20 @@ public record CatalogResponse(
     Map<String, VaccineSeriesInfo> vaccineSeries
 ) {
 
+  /** Info about a medication type from the catalog. */
   public record MedicationTypeInfo(
       String labelKey,
       String defaultFrequency,
       boolean ongoing
   ) {}
 
+  /** Info about a dosing frequency from the catalog. */
   public record FrequencyInfo(
       Integer hours,
       Integer days
   ) {}
 
+  /** Info about a vaccine series from the catalog. */
   public record VaccineSeriesInfo(
       String labelKey,
       int totalDoses,

@@ -21,12 +21,16 @@ public record HealthCatalogProperties(
     FollowUpRulesConfig followUpRules
 ) {
 
+  /** Configuration for a single medication type. */
   public record MedicationTypeConfig(String labelKey, String defaultFrequency, boolean ongoing) {}
 
+  /** Configuration for a dosing frequency. */
   public record FrequencyConfig(Integer hours, Integer days) {}
 
+  /** Configuration for a vaccine series (doses and intervals). */
   public record VaccineSeriesConfig(String labelKey, int totalDoses, List<Integer> doseIntervalsDays) {}
 
+  /** Heuristic thresholds for auto-generating testing reminders. */
   public record TestingHeuristicsConfig(
       int highActivityIntervalDays,
       int moderateActivityIntervalDays,
@@ -34,5 +38,6 @@ public record HealthCatalogProperties(
       int nudgeAfterDays
   ) {}
 
+  /** Rules for follow-up reminders after positive results. */
   public record FollowUpRulesConfig(int testOfCureDays, int windowPeriodDefaultDays) {}
 }
