@@ -124,6 +124,10 @@ public class EncounterJournalService {
         .notesEncrypted(encryptOptional(request.notes()))
         .customFieldsEncrypted(
             encryptCustomFields(request.customFields()))
+        .encounterTypesEncrypted(
+            encryptStringList(request.encounterTypes()))
+        .protectionMethodsEncrypted(
+            encryptStringList(request.protectionMethods()))
         .partnerId(request.partnerId())
         .build();
 
@@ -167,6 +171,10 @@ public class EncounterJournalService {
     entry.setNotesEncrypted(encryptOptional(request.notes()));
     entry.setCustomFieldsEncrypted(
         encryptCustomFields(request.customFields()));
+    entry.setEncounterTypesEncrypted(
+        encryptStringList(request.encounterTypes()));
+    entry.setProtectionMethodsEncrypted(
+        encryptStringList(request.protectionMethods()));
     entry.setPartnerId(request.partnerId());
 
     EncounterJournal saved = journalRepository.save(entry);
@@ -322,6 +330,34 @@ public class EncounterJournalService {
     }
   }
 
+  private byte[] encryptStringList(List<String> values) {
+    if (values == null || values.isEmpty()) {
+      return null;
+    }
+    try {
+      String json = objectMapper.writeValueAsString(values);
+      return encryptionService.encryptToBytes(json);
+    } catch (Exception ex) {
+      throw new RuntimeException(
+          "Failed to serialize string list", ex);
+    }
+  }
+
+  private List<String> decryptStringList(byte[] encrypted) {
+    if (encrypted == null) {
+      return null;
+    }
+    try {
+      String json =
+          encryptionService.decryptFromBytes(encrypted);
+      return objectMapper.readValue(
+          json, new TypeReference<List<String>>() {});
+    } catch (Exception ex) {
+      throw new RuntimeException(
+          "Failed to deserialize string list", ex);
+    }
+  }
+
   private JournalEntryResponse toResponse(
       EncounterJournal entry, String userHash) {
     Long partnerEncounterCount = null;
@@ -348,6 +384,8 @@ public class EncounterJournalService {
         decryptCustomFields(entry.getCustomFieldsEncrypted()),
         entry.getPartnerId(),
         partnerEncounterCount,
+        decryptStringList(entry.getEncounterTypesEncrypted()),
+        decryptStringList(entry.getProtectionMethodsEncrypted()),
         entry.getCreatedAt(),
         entry.getUpdatedAt()
     );

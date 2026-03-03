@@ -198,7 +198,7 @@ class EncounterJournalServiceTest {
       stubAuth();
       List<CustomFieldDto> customFields = List.of(new CustomFieldDto("Location", "Home"));
       CreateJournalEntryRequest request = new CreateJournalEntryRequest(
-          LocalDate.of(2026, 3, 15), "Partner A", null, "Some notes", customFields, null);
+          LocalDate.of(2026, 3, 15), "Partner A", null, "Some notes", customFields, null, null, null);
 
       when(encryptionService.encryptToBytes("Partner A")).thenReturn(ENCRYPTED_ALIAS);
       when(encryptionService.encryptToBytes("Some notes")).thenReturn(ENCRYPTED_NOTES);
@@ -237,7 +237,7 @@ class EncounterJournalServiceTest {
     void shouldHandleNullOptionalFields() throws Exception {
       stubAuth();
       CreateJournalEntryRequest request = new CreateJournalEntryRequest(
-          LocalDate.of(2026, 3, 15), null, null, null, null, null);
+          LocalDate.of(2026, 3, 15), null, null, null, null, null, null, null);
 
       when(journalRepository.save(any(EncounterJournal.class))).thenAnswer(invocation -> {
         EncounterJournal saved = invocation.getArgument(0);
@@ -255,9 +255,13 @@ class EncounterJournalServiceTest {
       assertThat(captured.getPartnerAliasEncrypted()).isNull();
       assertThat(captured.getNotesEncrypted()).isNull();
       assertThat(captured.getCustomFieldsEncrypted()).isNull();
+      assertThat(captured.getEncounterTypesEncrypted()).isNull();
+      assertThat(captured.getProtectionMethodsEncrypted()).isNull();
       assertThat(result.partnerAlias()).isNull();
       assertThat(result.notes()).isNull();
       assertThat(result.customFields()).isNull();
+      assertThat(result.encounterTypes()).isNull();
+      assertThat(result.protectionMethods()).isNull();
       verify(encryptionService, never()).encryptToBytes(anyString());
     }
 
@@ -269,7 +273,7 @@ class EncounterJournalServiceTest {
           new CustomFieldDto("Location", "Home"),
           new CustomFieldDto("Mood", "Happy"));
       CreateJournalEntryRequest request = new CreateJournalEntryRequest(
-          LocalDate.of(2026, 3, 15), null, null, null, customFields, null);
+          LocalDate.of(2026, 3, 15), null, null, null, customFields, null, null, null);
 
       String customJson = "[{\"label\":\"Location\",\"value\":\"Home\"},{\"label\":\"Mood\",\"value\":\"Happy\"}]";
       when(objectMapper.writeValueAsString(customFields)).thenReturn(customJson);
@@ -291,6 +295,50 @@ class EncounterJournalServiceTest {
       verify(objectMapper).writeValueAsString(customFields);
       verify(encryptionService).encryptToBytes(customJson);
       assertThat(result.customFields()).hasSize(2);
+    }
+
+    @Test
+    @DisplayName("should encrypt encounter types and protection methods")
+    void shouldEncryptEncounterTypesAndProtectionMethods() throws Exception {
+      stubAuth();
+      List<String> encounterTypes = List.of("ORAL", "ANAL");
+      List<String> protectionMethods = List.of("CONDOM", "PREP");
+      CreateJournalEntryRequest request = new CreateJournalEntryRequest(
+          LocalDate.of(2026, 3, 15), null, null, null, null, null,
+          encounterTypes, protectionMethods);
+
+      byte[] encTypes = new byte[]{50, 51, 52};
+      byte[] encProtection = new byte[]{60, 61, 62};
+      String typesJson = "[\"ORAL\",\"ANAL\"]";
+      String protectionJson = "[\"CONDOM\",\"PREP\"]";
+      when(objectMapper.writeValueAsString(encounterTypes)).thenReturn(typesJson);
+      when(encryptionService.encryptToBytes(typesJson)).thenReturn(encTypes);
+      when(objectMapper.writeValueAsString(protectionMethods)).thenReturn(protectionJson);
+      when(encryptionService.encryptToBytes(protectionJson)).thenReturn(encProtection);
+      when(journalRepository.save(any(EncounterJournal.class))).thenAnswer(invocation -> {
+        EncounterJournal saved = invocation.getArgument(0);
+        saved.setId(ENTRY_ID);
+        saved.setCreatedAt(OffsetDateTime.now());
+        saved.setUpdatedAt(OffsetDateTime.now());
+        return saved;
+      });
+      // Decryption stubs for toResponse
+      when(encryptionService.decryptFromBytes(encTypes)).thenReturn(typesJson);
+      when(encryptionService.decryptFromBytes(encProtection)).thenReturn(protectionJson);
+      when(objectMapper.readValue(eq(typesJson), any(TypeReference.class)))
+          .thenReturn(encounterTypes);
+      when(objectMapper.readValue(eq(protectionJson), any(TypeReference.class)))
+          .thenReturn(protectionMethods);
+
+      JournalEntryResponse result = encounterJournalService.createEntry(jwt, request);
+
+      ArgumentCaptor<EncounterJournal> captor = ArgumentCaptor.forClass(EncounterJournal.class);
+      verify(journalRepository).save(captor.capture());
+      EncounterJournal captured = captor.getValue();
+      assertThat(captured.getEncounterTypesEncrypted()).isEqualTo(encTypes);
+      assertThat(captured.getProtectionMethodsEncrypted()).isEqualTo(encProtection);
+      assertThat(result.encounterTypes()).containsExactly("ORAL", "ANAL");
+      assertThat(result.protectionMethods()).containsExactly("CONDOM", "PREP");
     }
   }
 
@@ -315,7 +363,7 @@ class EncounterJournalServiceTest {
       when(encryptionService.decryptFromBytes(newNotes)).thenReturn("Updated notes");
 
       UpdateJournalEntryRequest request = new UpdateJournalEntryRequest(
-          LocalDate.of(2026, 4, 1), "Partner B", null, "Updated notes", null, null);
+          LocalDate.of(2026, 4, 1), "Partner B", null, "Updated notes", null, null, null, null);
 
       JournalEntryResponse result = encounterJournalService.updateEntry(jwt, ENTRY_ID, request);
 
@@ -330,6 +378,51 @@ class EncounterJournalServiceTest {
     }
 
     @Test
+    @DisplayName("should update encounter types and protection methods")
+    void shouldUpdateEncounterTypesAndProtectionMethods() throws Exception {
+      stubAuth();
+      EncounterJournal existing = buildEntry(ENTRY_ID, USER_HASH);
+      when(journalRepository.findById(ENTRY_ID)).thenReturn(Optional.of(existing));
+
+      List<String> encounterTypes = List.of("VAGINAL");
+      List<String> protectionMethods = List.of("CONDOM", "DENTAL_DAM");
+      byte[] encTypes = new byte[]{50, 51, 52};
+      byte[] encProtection = new byte[]{60, 61, 62};
+      byte[] newAlias = new byte[]{20, 21, 22};
+      String typesJson = "[\"VAGINAL\"]";
+      String protectionJson = "[\"CONDOM\",\"DENTAL_DAM\"]";
+
+      when(encryptionService.encryptToBytes("Partner B")).thenReturn(newAlias);
+      when(objectMapper.writeValueAsString(encounterTypes)).thenReturn(typesJson);
+      when(encryptionService.encryptToBytes(typesJson)).thenReturn(encTypes);
+      when(objectMapper.writeValueAsString(protectionMethods)).thenReturn(protectionJson);
+      when(encryptionService.encryptToBytes(protectionJson)).thenReturn(encProtection);
+      when(journalRepository.save(any(EncounterJournal.class))).thenAnswer(i -> i.getArgument(0));
+      // Decryption stubs for toResponse
+      when(encryptionService.decryptFromBytes(newAlias)).thenReturn("Partner B");
+      when(encryptionService.decryptFromBytes(encTypes)).thenReturn(typesJson);
+      when(encryptionService.decryptFromBytes(encProtection)).thenReturn(protectionJson);
+      when(objectMapper.readValue(eq(typesJson), any(TypeReference.class)))
+          .thenReturn(encounterTypes);
+      when(objectMapper.readValue(eq(protectionJson), any(TypeReference.class)))
+          .thenReturn(protectionMethods);
+
+      UpdateJournalEntryRequest request = new UpdateJournalEntryRequest(
+          LocalDate.of(2026, 4, 1), "Partner B", null, null, null, null,
+          encounterTypes, protectionMethods);
+
+      JournalEntryResponse result = encounterJournalService.updateEntry(jwt, ENTRY_ID, request);
+
+      ArgumentCaptor<EncounterJournal> captor = ArgumentCaptor.forClass(EncounterJournal.class);
+      verify(journalRepository).save(captor.capture());
+      EncounterJournal captured = captor.getValue();
+      assertThat(captured.getEncounterTypesEncrypted()).isEqualTo(encTypes);
+      assertThat(captured.getProtectionMethodsEncrypted()).isEqualTo(encProtection);
+      assertThat(result.encounterTypes()).containsExactly("VAGINAL");
+      assertThat(result.protectionMethods()).containsExactly("CONDOM", "DENTAL_DAM");
+    }
+
+    @Test
     @DisplayName("should reject update for non-owner")
     void shouldRejectUpdateForNonOwner() {
       stubAuth();
@@ -337,7 +430,7 @@ class EncounterJournalServiceTest {
       when(journalRepository.findById(ENTRY_ID)).thenReturn(Optional.of(existing));
 
       UpdateJournalEntryRequest request = new UpdateJournalEntryRequest(
-          LocalDate.of(2026, 4, 1), "Partner B", null, "Updated notes", null, null);
+          LocalDate.of(2026, 4, 1), "Partner B", null, "Updated notes", null, null, null, null);
 
       assertThatThrownBy(() -> encounterJournalService.updateEntry(jwt, ENTRY_ID, request))
           .isInstanceOf(IllegalStateException.class)
@@ -353,7 +446,7 @@ class EncounterJournalServiceTest {
       when(journalRepository.findById(ENTRY_ID)).thenReturn(Optional.empty());
 
       UpdateJournalEntryRequest request = new UpdateJournalEntryRequest(
-          LocalDate.of(2026, 4, 1), "Partner B", null, "Updated notes", null, null);
+          LocalDate.of(2026, 4, 1), "Partner B", null, "Updated notes", null, null, null, null);
 
       assertThatThrownBy(() -> encounterJournalService.updateEntry(jwt, ENTRY_ID, request))
           .isInstanceOf(ResourceNotFoundException.class)

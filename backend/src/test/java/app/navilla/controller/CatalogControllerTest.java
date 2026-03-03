@@ -69,4 +69,32 @@ class CatalogControllerTest {
         .andExpect(jsonPath("$.vaccineSeries.HPV.doseIntervalsDays[1]").value(60))
         .andExpect(jsonPath("$.vaccineSeries.HPV.doseIntervalsDays[2]").value(120));
   }
+
+  @Test
+  @DisplayName("should contain encounter types list")
+  void shouldContainEncounterTypes() throws Exception {
+    mockMvc.perform(get("/api/catalog"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.encounterTypes").isArray())
+        .andExpect(jsonPath("$.encounterTypes[0]").value("ORAL"))
+        .andExpect(jsonPath("$.encounterTypes[1]").value("ANAL"))
+        .andExpect(jsonPath("$.encounterTypes[2]").value("VAGINAL"))
+        .andExpect(jsonPath("$.encounterTypes[3]").value("MANUAL"))
+        .andExpect(jsonPath("$.encounterTypes[4]").value("OTHER"));
+  }
+
+  @Test
+  @DisplayName("should contain protection methods list")
+  void shouldContainProtectionMethods() throws Exception {
+    mockMvc.perform(get("/api/catalog"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.protectionMethods").isArray())
+        .andExpect(jsonPath("$.protectionMethods[0]").value("CONDOM"))
+        .andExpect(jsonPath("$.protectionMethods[1]").value("INTERNAL_CONDOM"))
+        .andExpect(jsonPath("$.protectionMethods[2]").value("PREP"))
+        .andExpect(jsonPath("$.protectionMethods[3]").value("PEP"))
+        .andExpect(jsonPath("$.protectionMethods[4]").value("DENTAL_DAM"))
+        .andExpect(jsonPath("$.protectionMethods[5]").value("NONE"))
+        .andExpect(jsonPath("$.protectionMethods[6]").value("OTHER"));
+  }
 }

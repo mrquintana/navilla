@@ -34,6 +34,8 @@ public record JournalEntryResponse(
     List<CustomFieldDto> customFields,
     UUID partnerId,
     Long partnerEncounterCount,
+    List<String> encounterTypes,
+    List<String> protectionMethods,
     OffsetDateTime createdAt,
     OffsetDateTime updatedAt
 ) {}

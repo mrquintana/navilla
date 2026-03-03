@@ -436,6 +436,8 @@ public class JournalPartnerService {
         decryptCustomFields(entry.getCustomFieldsEncrypted()),
         entry.getPartnerId(),
         partnerEncounterCount,
+        decryptStringList(entry.getEncounterTypesEncrypted()),
+        decryptStringList(entry.getProtectionMethodsEncrypted()),
         entry.getCreatedAt(),
         entry.getUpdatedAt()
     );
@@ -454,6 +456,21 @@ public class JournalPartnerService {
     } catch (Exception ex) {
       throw new RuntimeException(
           "Failed to deserialize custom fields", ex);
+    }
+  }
+
+  private List<String> decryptStringList(byte[] encrypted) {
+    if (encrypted == null) {
+      return null;
+    }
+    try {
+      String json =
+          encryptionService.decryptFromBytes(encrypted);
+      return objectMapper.readValue(
+          json, new TypeReference<List<String>>() {});
+    } catch (Exception ex) {
+      throw new RuntimeException(
+          "Failed to deserialize string list", ex);
     }
   }
 }
