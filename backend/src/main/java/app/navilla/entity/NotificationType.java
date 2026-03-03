@@ -25,7 +25,11 @@ public enum NotificationType {
   CONNECTION_DENIED,
   EXPOSURE_ALERT,
   EXPOSURE_CLEARED,
-  ACCOUNT_SECURITY;
+  ACCOUNT_SECURITY,
+  MEDICATION_REMINDER,
+  VACCINATION_REMINDER,
+  TESTING_REMINDER,
+  FOLLOW_UP_REMINDER;
 
   /**
    * Parses a user-facing value into a {@link NotificationType}.

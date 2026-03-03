@@ -82,6 +82,21 @@ public class NotificationService {
   }
 
   /**
+   * Creates a reminder notification for the given user.
+   *
+   * @param userHash        recipient user hash
+   * @param type            notification type (e.g., MEDICATION_REMINDER)
+   * @param messageKey      i18n message key for the notification
+   * @param referenceId     the reminder or related entity ID (stored as connectionId in payload)
+   */
+  @Transactional
+  public void createReminderNotification(String userHash, NotificationType type,
+                                          String messageKey, UUID referenceId) {
+    createNotification(userHash, type,
+        new NotificationPayload(messageKey, referenceId));
+  }
+
+  /**
    * Lists notifications for the authenticated user.
    *
    * @param jwt the JWT token containing user info
