@@ -867,5 +867,13 @@
     "emailSecurityBody": "Transactional email is configured with modern domain authentication controls (SPF, DKIM, DMARC) to reduce spoofing risk.",
     "vulnerabilityHeading": "Reporting a vulnerability",
     "vulnerabilityBody": "If you discover a security vulnerability in Navilla, please report it responsibly to contact@navilla.app. We take all reports seriously and will respond promptly."
+  },
+  "toast": {
+    "saved": "Saved successfully",
+    "deleted": "Deleted successfully",
+    "error": "Something went wrong. Please try again.",
+    "snoozed": "Reminder snoozed",
+    "completed": "Marked as complete",
+    "copied": "Copied to clipboard"
   }
 }
