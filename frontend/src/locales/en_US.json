@@ -67,7 +67,7 @@
     "home": "Home",
     "dashboard": "Your Network",
     "connections": "Connections",
-    "health": "Health Log",
+    "health": "My Health",
     "notifications": "Notifications",
     "settings": "Settings",
     "profile": "Profile",
@@ -629,7 +629,12 @@
     "partnerDeleted": "Partner deleted",
     "partnerSaved": "Partner saved",
     "partnerUpdated": "Partner updated",
-    "backToJournal": "Back to Journal"
+    "backToJournal": "Back to Journal",
+    "addPartner": "Add Partner",
+    "partnerAlias": "Partner Name or Alias",
+    "createPartner": "Create Partner",
+    "createPartnerDescription": "Add someone you see regularly for easy encounter logging.",
+    "createPartnerNotes": "Notes (optional)"
   },
   "healthLog": {
     "title": "Health Log",
@@ -713,6 +718,110 @@
     },
     "exposureOverview": "Exposure Overview",
     "backToHealthLog": "Health Log"
+  },
+  "myHealth": {
+    "title": "My Health",
+    "tabs": {
+      "tests": "Tests",
+      "medications": "Meds",
+      "vaccines": "Vaccines"
+    },
+    "upcoming": {
+      "title": "Upcoming",
+      "noReminders": "No upcoming reminders",
+      "seeAll": "See all",
+      "dueToday": "Today",
+      "dueTomorrow": "Tomorrow",
+      "dueInDays": "in {{count}} days",
+      "overdue": "Overdue"
+    }
+  },
+  "medications": {
+    "add": "Add Medication",
+    "edit": "Edit Medication",
+    "name": "Medication Name",
+    "namePlaceholder": "e.g., Truvada, Doxycycline",
+    "type": "Type",
+    "dosage": "Dosage",
+    "dosagePlaceholder": "e.g., 200mg/300mg daily",
+    "frequency": "Frequency",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "reminderTime": "Daily Reminder Time",
+    "notes": "Notes",
+    "notesPlaceholder": "Take with food, etc.",
+    "active": "Active",
+    "inactive": "Past Medications",
+    "logDose": "Log Dose",
+    "taken": "Taken",
+    "missed": "Missed",
+    "notYet": "Not yet taken",
+    "adherence": "Adherence",
+    "adherenceRate": "{{rate}}% this month",
+    "takenCount": "{{taken}} of {{total}}",
+    "dayOf": "Day {{current}} of {{total}}",
+    "noMedications": "No medications tracked yet",
+    "noMedicationsDescription": "Track PrEP, treatments, and other medications here.",
+    "types": {
+      "PREP_DAILY": "PrEP (Daily)",
+      "PREP_INJECTABLE": "PrEP (Injectable)",
+      "TREATMENT_COURSE": "Treatment Course",
+      "DOXY_PEP": "DoxyPEP"
+    },
+    "frequencies": {
+      "DAILY": "Daily",
+      "EVERY_2_MONTHS": "Every 2 Months",
+      "WEEKLY": "Weekly",
+      "AS_NEEDED": "As Needed",
+      "CUSTOM": "Custom"
+    },
+    "errors": {
+      "nameRequired": "Medication name is required",
+      "typeRequired": "Medication type is required",
+      "saveFailed": "Failed to save medication",
+      "logFailed": "Failed to log dose"
+    }
+  },
+  "vaccinations": {
+    "add": "Log Dose",
+    "edit": "Edit Dose",
+    "doseNumber": "Dose {{current}} of {{total}}",
+    "complete": "Complete",
+    "nextDose": "Next dose: {{date}}",
+    "administeredDate": "Date Administered",
+    "location": "Location",
+    "locationPlaceholder": "e.g., Clínica Condesa",
+    "notes": "Notes",
+    "noVaccinations": "No vaccinations tracked yet",
+    "noVaccinationsDescription": "Track your HPV, Hepatitis, and Mpox vaccination series here.",
+    "types": {
+      "HPV": "HPV",
+      "HEPATITIS_B": "Hepatitis B",
+      "MPOX": "Mpox",
+      "HEPATITIS_A": "Hepatitis A"
+    },
+    "errors": {
+      "typeRequired": "Vaccine type is required",
+      "saveFailed": "Failed to save vaccination"
+    }
+  },
+  "reminders": {
+    "settings": "Reminder Settings",
+    "quietHours": "Quiet Hours",
+    "quietHoursStart": "Start",
+    "quietHoursEnd": "End",
+    "emailDigest": "Weekly Email Digest",
+    "emailDigestDay": "Send on",
+    "testingReminders": "Testing Reminders",
+    "medicationReminders": "Medication Reminders",
+    "vaccinationReminders": "Vaccination Reminders",
+    "snooze": "Snooze",
+    "snooze1Day": "1 day",
+    "snooze3Days": "3 days",
+    "snooze1Week": "1 week",
+    "markDone": "Mark Done",
+    "enable": "Enable",
+    "disable": "Disable"
   },
   "security": {
     "seoTitle": "Security — Navilla",
