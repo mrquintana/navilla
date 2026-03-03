@@ -14,22 +14,24 @@
  * limitations under the License.
  */
 
-package app.navilla.repository;
+package app.navilla.dto;
 
 import java.util.List;
-import java.util.UUID;
 
-import app.navilla.entity.Medication;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-
-@Repository
-public interface MedicationRepository extends JpaRepository<Medication, UUID> {
-
-  List<Medication> findByUserHashOrderByActiveDescCreatedAtDesc(String userHash);
-
-  List<Medication> findByUserHashAndActiveTrue(String userHash);
-
-  List<Medication> findByUserHashAndMedicationTypeAndActive(
-      String userHash, String medicationType, Boolean active);
+/**
+ * Response DTO for PrEP adherence streak data with milestone tracking.
+ */
+public record PrepStreakResponse(
+    int currentStreakDays,
+    int longestStreakDays,
+    List<Milestone> milestones
+) {
+  /**
+   * Represents an adherence milestone (e.g., 7 days, 30 days, 90 days).
+   */
+  public record Milestone(
+      int days,
+      String labelKey,
+      boolean achieved
+  ) {}
 }

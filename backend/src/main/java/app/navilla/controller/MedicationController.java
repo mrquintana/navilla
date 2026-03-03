@@ -24,6 +24,7 @@ import app.navilla.dto.DoseLogEntry;
 import app.navilla.dto.LogDoseRequest;
 import app.navilla.dto.MedicationAdherenceResponse;
 import app.navilla.dto.MedicationResponse;
+import app.navilla.dto.PrepStreakResponse;
 import app.navilla.dto.UpdateMedicationRequest;
 import app.navilla.service.MedicationService;
 import jakarta.validation.Valid;
@@ -159,5 +160,17 @@ public class MedicationController {
       @PathVariable UUID id,
       @RequestParam String month) {
     return ResponseEntity.ok(medicationService.getAdherence(jwt, id, month));
+  }
+
+  /**
+   * Returns PrEP adherence streak data with milestones for the authenticated user.
+   *
+   * @param jwt the JWT token containing user info
+   * @return the PrEP streak response with current/longest streaks and milestones
+   */
+  @GetMapping("/prep-streak")
+  public ResponseEntity<PrepStreakResponse> getPrepStreak(
+      @AuthenticationPrincipal Jwt jwt) {
+    return ResponseEntity.ok(medicationService.getPrepStreak(jwt));
   }
 }
