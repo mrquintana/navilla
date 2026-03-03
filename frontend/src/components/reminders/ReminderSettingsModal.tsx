@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { X } from 'lucide-react';
 import {
@@ -16,7 +17,7 @@ const DAYS_OF_WEEK = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'S
 
 export function ReminderSettingsModal({ isOpen, onClose }: ReminderSettingsModalProps) {
   if (!isOpen) return null;
-  return <ReminderSettingsLoader onClose={onClose} />;
+  return createPortal(<ReminderSettingsLoader onClose={onClose} />, document.body);
 }
 
 /** Loader that fetches settings then renders the form once data is ready */
