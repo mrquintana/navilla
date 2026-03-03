@@ -868,6 +868,18 @@
     "vulnerabilityHeading": "Reporting a vulnerability",
     "vulnerabilityBody": "If you discover a security vulnerability in Navilla, please report it responsibly to contact@navilla.app. We take all reports seriously and will respond promptly."
   },
+  "onboarding": {
+    "step1Title": "Log your first test",
+    "step1Body": "Keep track of your STI testing history. Recording your tests helps you stay on top of your health and know when it's time for your next check-up.",
+    "step2Title": "Set up reminders",
+    "step2Body": "Never miss a medication dose or testing appointment. Smart reminders help you stay consistent with your health routine.",
+    "step3Title": "Explore your dashboard",
+    "step3Body": "Your personal health insights are ready. View trends, track your progress, and stay informed about your health.",
+    "next": "Next",
+    "skip": "Skip for now",
+    "getStarted": "Get started",
+    "stepOf": "Step {{current}} of {{total}}"
+  },
   "toast": {
     "saved": "Saved successfully",
     "deleted": "Deleted successfully",

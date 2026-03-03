@@ -10,11 +10,15 @@ import { useState } from 'react';
 import { getConditionInfo } from '../lib/conditionInfo';
 import { PageSkeleton, SkeletonBlock } from '../components/ui/LoadingShell';
 import { UpcomingReminders } from '../components/reminders/UpcomingReminders';
+import { OnboardingFlow } from '../components/onboarding/OnboardingFlow';
 
 export function DashboardPage() {
   const { t, i18n } = useTranslation();
   const [showSnapshotNotice, setShowSnapshotNotice] = useState(
     () => localStorage.getItem('navilla_hide_snapshot_notice') !== 'true'
+  );
+  const [showOnboarding, setShowOnboarding] = useState(
+    () => localStorage.getItem('navilla_onboarding_complete') !== 'true'
   );
   const [showExposureHelp, setShowExposureHelp] = useState(false);
   const { user, session, isLoading: authLoading } = useAuth();
@@ -388,6 +392,10 @@ export function DashboardPage() {
             </button>
           </div>
         </div>
+      )}
+
+      {showOnboarding && (
+        <OnboardingFlow onComplete={() => setShowOnboarding(false)} />
       )}
     </div>
   );
