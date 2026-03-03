@@ -42,4 +42,6 @@ public interface ReminderRepository extends JpaRepository<Reminder, UUID> {
       OffsetDateTime before);
 
   void deleteByReferenceId(UUID referenceId);
+
+  long countByUserHashAndActiveTrueAndCompletedAtIsNull(String userHash);
 }
