@@ -67,7 +67,7 @@
     "home": "Inicio",
     "dashboard": "Tu Red",
     "connections": "Conexiones",
-    "health": "Registro de Salud",
+    "health": "Mi Salud",
     "notifications": "Notificaciones",
     "settings": "Configuración",
     "profile": "Perfil",
@@ -109,6 +109,10 @@
     "exposureLabelDegree": "Grado",
     "exposureLabelCount": "Casos",
     "exposureLabelStatus": "Estado",
+    "quickActions": "Acciones Rápidas",
+    "goToHealth": "Mi Salud",
+    "goToJournal": "Diario",
+    "goToConnections": "Red",
     "snapshotTitle": "Por qué los datos no son en vivo",
     "snapshotBody": "Las exposiciones y el tamaño de red se actualizan cada pocos días para proteger la privacidad y mantener cálculos estables. Este retraso reduce el riesgo de identificar personas y ayuda a manejar grafos grandes.",
     "exposureStatusLabels": {
@@ -628,7 +632,12 @@
     "partnerDeleted": "Pareja eliminada",
     "partnerSaved": "Pareja guardada",
     "partnerUpdated": "Pareja actualizada",
-    "backToJournal": "Volver al Diario"
+    "backToJournal": "Volver al Diario",
+    "addPartner": "Agregar Compañero",
+    "partnerAlias": "Nombre o Alias del Compañero",
+    "createPartner": "Crear Compañero",
+    "createPartnerDescription": "Agrega a alguien que ves regularmente para facilitar el registro de encuentros.",
+    "createPartnerNotes": "Notas (opcional)"
   },
   "healthLog": {
     "title": "Registro de Salud",
@@ -712,6 +721,110 @@
     },
     "exposureOverview": "Resumen de Exposición",
     "backToHealthLog": "Registro de Salud"
+  },
+  "myHealth": {
+    "title": "Mi Salud",
+    "tabs": {
+      "tests": "Pruebas",
+      "medications": "Medicamentos",
+      "vaccines": "Vacunas"
+    },
+    "upcoming": {
+      "title": "Próximamente",
+      "noReminders": "Sin recordatorios próximos",
+      "seeAll": "Ver todos",
+      "dueToday": "Hoy",
+      "dueTomorrow": "Mañana",
+      "dueInDays": "en {{count}} días",
+      "overdue": "Vencido"
+    }
+  },
+  "medications": {
+    "add": "Agregar Medicamento",
+    "edit": "Editar Medicamento",
+    "name": "Nombre del Medicamento",
+    "namePlaceholder": "ej., Truvada, Doxiciclina",
+    "type": "Tipo",
+    "dosage": "Dosis",
+    "dosagePlaceholder": "ej., 200mg/300mg diario",
+    "frequency": "Frecuencia",
+    "startDate": "Fecha de Inicio",
+    "endDate": "Fecha de Fin",
+    "reminderTime": "Hora de Recordatorio Diario",
+    "notes": "Notas",
+    "notesPlaceholder": "Tomar con alimentos, etc.",
+    "active": "Activos",
+    "inactive": "Medicamentos Anteriores",
+    "logDose": "Registrar Dosis",
+    "taken": "Tomado",
+    "missed": "Omitido",
+    "notYet": "Aún no tomado",
+    "adherence": "Adherencia",
+    "adherenceRate": "{{rate}}% este mes",
+    "takenCount": "{{taken}} de {{total}}",
+    "dayOf": "Día {{current}} de {{total}}",
+    "noMedications": "Aún no hay medicamentos registrados",
+    "noMedicationsDescription": "Registra PrEP, tratamientos y otros medicamentos aquí.",
+    "types": {
+      "PREP_DAILY": "PrEP (Diario)",
+      "PREP_INJECTABLE": "PrEP (Inyectable)",
+      "TREATMENT_COURSE": "Tratamiento",
+      "DOXY_PEP": "DoxyPEP"
+    },
+    "frequencies": {
+      "DAILY": "Diario",
+      "EVERY_2_MONTHS": "Cada 2 Meses",
+      "WEEKLY": "Semanal",
+      "AS_NEEDED": "Según Sea Necesario",
+      "CUSTOM": "Personalizado"
+    },
+    "errors": {
+      "nameRequired": "El nombre del medicamento es obligatorio",
+      "typeRequired": "El tipo de medicamento es obligatorio",
+      "saveFailed": "Error al guardar el medicamento",
+      "logFailed": "Error al registrar la dosis"
+    }
+  },
+  "vaccinations": {
+    "add": "Registrar Dosis",
+    "edit": "Editar Dosis",
+    "doseNumber": "Dosis {{current}} de {{total}}",
+    "complete": "Completa",
+    "nextDose": "Siguiente dosis: {{date}}",
+    "administeredDate": "Fecha de Aplicación",
+    "location": "Ubicación",
+    "locationPlaceholder": "ej., Clínica Condesa",
+    "notes": "Notas",
+    "noVaccinations": "Aún no hay vacunas registradas",
+    "noVaccinationsDescription": "Registra tus series de vacunas de VPH, Hepatitis y Mpox aquí.",
+    "types": {
+      "HPV": "VPH",
+      "HEPATITIS_B": "Hepatitis B",
+      "MPOX": "Mpox",
+      "HEPATITIS_A": "Hepatitis A"
+    },
+    "errors": {
+      "typeRequired": "El tipo de vacuna es obligatorio",
+      "saveFailed": "Error al guardar la vacuna"
+    }
+  },
+  "reminders": {
+    "settings": "Configuración de Recordatorios",
+    "quietHours": "Horario de Silencio",
+    "quietHoursStart": "Inicio",
+    "quietHoursEnd": "Fin",
+    "emailDigest": "Resumen Semanal por Correo",
+    "emailDigestDay": "Enviar el",
+    "testingReminders": "Recordatorios de Pruebas",
+    "medicationReminders": "Recordatorios de Medicamentos",
+    "vaccinationReminders": "Recordatorios de Vacunas",
+    "snooze": "Posponer",
+    "snooze1Day": "1 día",
+    "snooze3Days": "3 días",
+    "snooze1Week": "1 semana",
+    "markDone": "Marcar como Hecho",
+    "enable": "Activar",
+    "disable": "Desactivar"
   },
   "security": {
     "seoTitle": "Seguridad — Navilla",

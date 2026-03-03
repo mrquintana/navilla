@@ -5,10 +5,11 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { api } from '../lib/api';
 import { Link } from 'react-router-dom';
 import { DEV_MODE } from '../lib/devMode';
-import { HelpCircle, ExternalLink, Mail, MapPin, Shield, Calendar, Pencil } from 'lucide-react';
+import { HelpCircle, ExternalLink, Heart, BookOpen, Users } from 'lucide-react';
 import { useState } from 'react';
 import { getConditionInfo } from '../lib/conditionInfo';
 import { PageSkeleton, SkeletonBlock } from '../components/ui/LoadingShell';
+import { UpcomingReminders } from '../components/reminders/UpcomingReminders';
 
 export function DashboardPage() {
   const { t, i18n } = useTranslation();
@@ -17,7 +18,7 @@ export function DashboardPage() {
   );
   const [showExposureHelp, setShowExposureHelp] = useState(false);
   const { user, session, isLoading: authLoading } = useAuth();
-  const { data: profile, isLoading, error } = useUser();
+  const { data: profile, isLoading } = useUser();
   const token = session?.access_token ?? '';
 
   const statsQuery = useQuery({
@@ -66,7 +67,6 @@ export function DashboardPage() {
     || exposureInitialLoading
     || healthInitialLoading;
 
-  // Get display name or first part of email (once content is ready)
   const displayName = profile?.displayName
     || profile?.fullName
     || profile?.username
@@ -74,33 +74,10 @@ export function DashboardPage() {
     || user?.user_metadata?.username
     || user?.email?.split('@')[0]
     || '';
-  const profileName = profile?.displayName
-    || profile?.fullName
-    || profile?.username
-    || profile?.email
-    || '—';
-  const profileSubtitle = profile?.username
-    ? `@${profile.username}`
-    : profile?.email;
-  const visibilityKey = profile?.profileVisibility?.toLowerCase() || '';
-  const visibilityLabel = visibilityKey === 'public'
-    ? t('profile.visibilityPublic')
-    : visibilityKey === 'connections'
-      ? t('profile.visibilityConnections')
-      : visibilityKey === 'private'
-        ? t('profile.visibilityPrivate')
-        : '—';
-  const avatarUrl = profile?.avatarThumbUrl || profile?.avatarUrl;
-  const avatarInitials = profileName
-    .split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase())
-    .join('');
 
   const formatDegree = (degree: number) => {
     if (i18n.language.startsWith('es')) {
-      return `${degree}º`;
+      return `${degree}\u00BA`;
     }
     const suffix = degree === 1 ? 'st' : degree === 2 ? 'nd' : degree === 3 ? 'rd' : 'th';
     return `${degree}${suffix}`;
@@ -109,20 +86,26 @@ export function DashboardPage() {
   if (isInitialLoading) {
     return (
       <PageSkeleton loadingLabel={t('common.loading')}>
-        <SkeletonBlock className="h-20 w-full rounded-2xl" />
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          <SkeletonBlock className="h-80 rounded-2xl" />
-          <SkeletonBlock className="h-80 rounded-2xl" />
-          <SkeletonBlock className="h-80 rounded-2xl" />
+        <SkeletonBlock className="h-16 w-full rounded-2xl" />
+        <SkeletonBlock className="h-32 w-full rounded-2xl" />
+        <div className="flex gap-3">
+          <SkeletonBlock className="h-12 flex-1 rounded-full" />
+          <SkeletonBlock className="h-12 flex-1 rounded-full" />
+          <SkeletonBlock className="h-12 flex-1 rounded-full" />
+        </div>
+        <div className="grid gap-6 md:grid-cols-2">
+          <SkeletonBlock className="h-64 rounded-2xl" />
+          <SkeletonBlock className="h-64 rounded-2xl" />
         </div>
       </PageSkeleton>
     );
   }
 
   return (
-    <div className="container py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">
+    <div className="container py-8 space-y-6">
+      {/* Greeting */}
+      <div>
+        <h1 className="text-3xl font-bold mb-1">
           {t('dashboard.welcome')}, {displayName}
         </h1>
         <p className="text-muted text-lg">
@@ -130,32 +113,57 @@ export function DashboardPage() {
         </p>
       </div>
 
-      {showSnapshotNotice && (
-        <div className="card card-elevated mb-6">
-          <div className="flex items-start justify-between gap-4">
-            <div className="space-y-2">
-              <h3 className="font-semibold">{t('dashboard.snapshotTitle')}</h3>
-              <p className="text-sm text-muted">{t('dashboard.snapshotBody')}</p>
-            </div>
-            <button
-              type="button"
-              className="btn btn-secondary btn-sm"
-              onClick={() => {
-                setShowSnapshotNotice(false);
-                localStorage.setItem('navilla_hide_snapshot_notice', 'true');
-              }}
-              aria-label={t('common.close')}
-              title={t('common.close')}
-            >
-              {t('common.close')}
-            </button>
-          </div>
-        </div>
-      )}
+      {/* Next Up — Reminders */}
+      <div className="card card-elevated">
+        <UpcomingReminders />
+      </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {/* Status Card - Most Important */}
-        <div className="card card-elevated dashboard-card">
+      {/* Quick Actions */}
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--color-muted)' }}>
+          {t('dashboard.quickActions')}
+        </p>
+        <div className="grid grid-cols-3 gap-3">
+          <Link
+            to="/health-log"
+            className="flex items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium transition-colors"
+            style={{
+              background: 'rgba(99, 102, 241, 0.08)',
+              color: 'var(--color-primary)',
+            }}
+          >
+            <Heart className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
+            <span className="truncate">{t('dashboard.goToHealth')}</span>
+          </Link>
+          <Link
+            to="/journal"
+            className="flex items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium transition-colors"
+            style={{
+              background: 'rgba(99, 102, 241, 0.08)',
+              color: 'var(--color-primary)',
+            }}
+          >
+            <BookOpen className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
+            <span className="truncate">{t('dashboard.goToJournal')}</span>
+          </Link>
+          <Link
+            to="/connections"
+            className="flex items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium transition-colors"
+            style={{
+              background: 'rgba(99, 102, 241, 0.08)',
+              color: 'var(--color-primary)',
+            }}
+          >
+            <Users className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
+            <span className="truncate">{t('dashboard.goToConnections')}</span>
+          </Link>
+        </div>
+      </div>
+
+      {/* Status + Connections — 2-col on md+ */}
+      <div className="grid gap-6 md:grid-cols-2">
+        {/* Status Card */}
+        <div className="card card-elevated">
           <div className="flex items-center gap-3 mb-4">
             <div
               className={`w-10 h-10 rounded-full flex items-center justify-center ${
@@ -171,8 +179,12 @@ export function DashboardPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <h3 className="profile-card-title">{t('dashboard.exposureStatus')}</h3>
+            <h3 className="text-sm font-semibold uppercase tracking-wider" style={{ color: 'var(--color-muted)' }}>
+              {t('dashboard.exposureStatus')}
+            </h3>
           </div>
+
+          {/* Status badge */}
           {healthInitialLoading || exposureInitialLoading ? (
             <div role="status" aria-live="polite" className="mt-1">
               <span className="sr-only">{t('common.loading')}</span>
@@ -197,12 +209,16 @@ export function DashboardPage() {
           ) : (
             <span className="badge badge-success text-sm">{t('dashboard.noExposure')}</span>
           )}
+
+          {/* Exposure help tooltip */}
           {showExposureHelp && (
             <div className="mt-3 rounded-md border border-border-light bg-white/70 p-3 text-xs text-muted">
               <p className="font-semibold text-foreground mb-1">{t('dashboard.exposureHelpTitle')}</p>
               <p>{t('dashboard.exposureHelpBody')}</p>
             </div>
           )}
+
+          {/* Exposure items */}
           {(exposureQuery.data?.exposures?.length ?? 0) > 0 && (
             <div className="mt-3 space-y-2 text-sm">
               <div className="flex items-center justify-between gap-3">
@@ -249,9 +265,9 @@ export function DashboardPage() {
                           <div className="text-muted">{t('dashboard.exposureLabelStatus')}</div>
                           <div
                             className="font-medium cursor-help"
-                            title={`${t(`dashboard.exposureStatusHint.${item.status}`)} · ${t(`dashboard.exposureTimeframeHint.${item.timeframe}`)}`}
+                            title={`${t(`dashboard.exposureStatusHint.${item.status}`)} \u00B7 ${t(`dashboard.exposureTimeframeHint.${item.timeframe}`)}`}
                           >
-                            {t(`dashboard.exposureStatusLabels.${item.status}`)} · {t(`dashboard.exposureTimeframe.${item.timeframe}`)}
+                            {t(`dashboard.exposureStatusLabels.${item.status}`)} \u00B7 {t(`dashboard.exposureTimeframe.${item.timeframe}`)}
                           </div>
                         </div>
                       </div>
@@ -261,7 +277,9 @@ export function DashboardPage() {
               </div>
             </div>
           )}
-          <div className="mt-3 flex flex-wrap items-center gap-3">
+
+          {/* Footer links */}
+          <div className="mt-4 flex flex-wrap items-center gap-3">
             <Link to="/health-log" className="text-sm text-primary font-medium">
               {t('dashboard.viewHealthStatus')}
             </Link>
@@ -276,28 +294,32 @@ export function DashboardPage() {
               </button>
             )}
           </div>
+
+          {/* Dev debug */}
           {DEV_MODE && (
             <div className="mt-4 rounded-md border border-red-200 bg-red-50 p-3 text-xs text-red-700">
               <div className="font-semibold mb-1">{t('dashboard.devExposureDebug')}</div>
-              <div>{t('dashboard.devConnectionCount')}: {exposureQuery.data?.connectionCount ?? '—'}</div>
-              <div>{t('dashboard.devSecondDegree')}: {exposureQuery.data?.secondDegreeCount ?? '—'}</div>
-              <div>{t('dashboard.devThirdDegree')}: {exposureQuery.data?.thirdDegreeCount ?? '—'}</div>
+              <div>{t('dashboard.devConnectionCount')}: {exposureQuery.data?.connectionCount ?? '\u2014'}</div>
+              <div>{t('dashboard.devSecondDegree')}: {exposureQuery.data?.secondDegreeCount ?? '\u2014'}</div>
+              <div>{t('dashboard.devThirdDegree')}: {exposureQuery.data?.thirdDegreeCount ?? '\u2014'}</div>
               <div>{t('dashboard.devExposureCount')}: {exposureQuery.data?.exposures?.length ?? 0}</div>
             </div>
           )}
         </div>
 
         {/* Connections Card */}
-        <div className="card card-elevated dashboard-card">
+        <div className="card card-elevated">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-full bg-indigo-50 flex items-center justify-center">
-              <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: 'rgba(99, 102, 241, 0.08)' }}>
+              <svg className="w-5 h-5" style={{ color: 'var(--color-primary)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
               </svg>
             </div>
-            <h3 className="profile-card-title">{t('dashboard.connectionCount')}</h3>
+            <h3 className="text-sm font-semibold uppercase tracking-wider" style={{ color: 'var(--color-muted)' }}>
+              {t('dashboard.connectionCount')}
+            </h3>
           </div>
-          <p className="text-4xl font-bold text-primary mb-1">
+          <p className="text-4xl font-bold mb-1" style={{ color: 'var(--color-primary)' }}>
             {statsQuery.data?.confirmedCount ?? 0}
           </p>
           <p className="text-sm text-muted">{t('dashboard.connectionDescription')}</p>
@@ -306,8 +328,8 @@ export function DashboardPage() {
               <div className="flex items-center gap-2">
                 <div className="flex-1 h-2 rounded-full bg-stone-200">
                   <div
-                    className="h-2 rounded-full bg-primary transition-all"
-                    style={{ width: `${((statsQuery.data?.confirmedCount ?? 0) / 3) * 100}%` }}
+                    className="h-2 rounded-full transition-all"
+                    style={{ width: `${((statsQuery.data?.confirmedCount ?? 0) / 3) * 100}%`, background: 'var(--color-primary)' }}
                   />
                 </div>
                 <span className="text-xs font-medium text-muted whitespace-nowrap">
@@ -323,7 +345,7 @@ export function DashboardPage() {
             <div className="flex items-center justify-between">
               <span>{t('dashboard.networkSize')}</span>
               <span className="font-semibold text-foreground">
-                {exposureQuery.data?.totalGraphNodes ?? '—'}
+                {exposureQuery.data?.totalGraphNodes ?? '\u2014'}
               </span>
             </div>
             <p className="text-xs text-muted">
@@ -334,80 +356,39 @@ export function DashboardPage() {
               </Link>
             </p>
           </div>
-          <div className="mt-3">
+          <div className="mt-4">
             <Link to="/connections" className="text-sm text-primary font-medium">
               {t('dashboard.manageConnections')}
             </Link>
           </div>
         </div>
-
-        {/* Profile Card */}
-        <div className="card card-elevated profile-card">
-          <div className="profile-card-header">
-            <div className="profile-card-avatar">
-              {avatarUrl ? (
-                <img src={avatarUrl} alt={t('profile.avatarAlt')} />
-              ) : (
-                <span className="profile-card-initials">{avatarInitials || 'N'}</span>
-              )}
-            </div>
-            <div className="profile-card-heading">
-              <p className="profile-card-title">{t('dashboard.yourProfile')}</p>
-              <h3 className="profile-card-name">{profileName}</h3>
-              {profileSubtitle && <p className="profile-card-subtitle">{profileSubtitle}</p>}
-            </div>
-            <div className="profile-card-actions">
-              <Link to="/profile" className="btn btn-secondary btn-sm" title={t('dashboard.editProfile')}>
-                <Pencil className="nav-icon" aria-hidden="true" />
-              </Link>
-            </div>
-          </div>
-          {isLoading ? (
-            <p className="text-muted">{t('common.loading')}</p>
-          ) : error ? (
-            <p className="text-error">{t('common.error')}</p>
-          ) : profile ? (
-            <div className="profile-card-details">
-              <div className="profile-detail">
-                <Mail className="profile-detail-icon" aria-hidden="true" />
-                <div>
-                  <p className="profile-detail-label">{t('auth.email')}</p>
-                  <p className="profile-detail-value">{profile.email}</p>
-                </div>
-              </div>
-              {(profile.location || profile.country) && (
-                <div className="profile-detail">
-                  <MapPin className="profile-detail-icon" aria-hidden="true" />
-                  <div>
-                    <p className="profile-detail-label">{t('auth.location')}</p>
-                    <p className="profile-detail-value">
-                      {[profile.location, profile.country].filter(Boolean).join(', ')}
-                    </p>
-                  </div>
-                </div>
-              )}
-              <div className="profile-detail">
-                <Shield className="profile-detail-icon" aria-hidden="true" />
-                <div>
-                  <p className="profile-detail-label">{t('profile.visibility')}</p>
-                  <p className="profile-detail-value">{visibilityLabel}</p>
-                </div>
-              </div>
-              {profile.showAge && profile.age !== undefined && (
-                <div className="profile-detail">
-                  <Calendar className="profile-detail-icon" aria-hidden="true" />
-                  <div>
-                    <p className="profile-detail-label">{t('profile.ageLabel')}</p>
-                    <p className="profile-detail-value">{t('profile.age', { age: profile.age })}</p>
-                  </div>
-                </div>
-              )}
-            </div>
-          ) : (
-            <p className="text-muted">—</p>
-          )}
-        </div>
       </div>
+
+      {/* Snapshot notice — bottom, dismissible */}
+      {showSnapshotNotice && (
+        <div className="card" style={{ borderColor: 'var(--color-border-light)', background: 'var(--color-background-secondary, #f5f5f4)' }}>
+          <div className="flex items-start justify-between gap-4">
+            <div className="space-y-1">
+              <h3 className="text-sm font-semibold" style={{ color: 'var(--color-foreground)' }}>
+                {t('dashboard.snapshotTitle')}
+              </h3>
+              <p className="text-xs text-muted">{t('dashboard.snapshotBody')}</p>
+            </div>
+            <button
+              type="button"
+              className="btn btn-secondary btn-sm flex-shrink-0"
+              onClick={() => {
+                setShowSnapshotNotice(false);
+                localStorage.setItem('navilla_hide_snapshot_notice', 'true');
+              }}
+              aria-label={t('common.close')}
+              title={t('common.close')}
+            >
+              {t('common.close')}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

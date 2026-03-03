@@ -410,6 +410,66 @@ export const api = {
         apiRequest<void>(`/api/health-log/labs/${id}`, token, { method: 'DELETE' }),
     },
   },
+  catalog: {
+    get: async (): Promise<CatalogResponse> => {
+      if (E2E_MODE) {
+        return { medicationTypes: {}, frequencies: {}, vaccineSeries: {} };
+      }
+      const baseUrl = getApiBaseUrl();
+      const response = await fetch(`${baseUrl}/api/catalog`, { method: 'GET' });
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
+        throw new ApiError(error.message || 'Failed to fetch catalog', response.status, error);
+      }
+      return response.json();
+    },
+  },
+  medications: {
+    list: (token: string) =>
+      apiRequest<Medication[]>('/api/medications', token),
+    create: (token: string, data: CreateMedicationRequest) =>
+      apiRequest<Medication>('/api/medications', token, { method: 'POST', body: data }),
+    get: (token: string, id: string) =>
+      apiRequest<Medication>(`/api/medications/${id}`, token),
+    update: (token: string, id: string, data: UpdateMedicationRequest) =>
+      apiRequest<Medication>(`/api/medications/${id}`, token, { method: 'PUT', body: data }),
+    delete: (token: string, id: string) =>
+      apiRequest<void>(`/api/medications/${id}`, token, { method: 'DELETE' }),
+    logDose: (token: string, id: string, data: LogDoseRequest) =>
+      apiRequest<DoseLogEntry>(`/api/medications/${id}/doses`, token, { method: 'POST', body: data }),
+    adherence: (token: string, id: string, month: string) =>
+      apiRequest<MedicationAdherence>(`/api/medications/${id}/adherence?month=${month}`, token),
+  },
+  vaccinations: {
+    list: (token: string) =>
+      apiRequest<VaccineSeries[]>('/api/vaccinations', token),
+    create: (token: string, data: CreateVaccinationRequest) =>
+      apiRequest<VaccinationDose>('/api/vaccinations', token, { method: 'POST', body: data }),
+    update: (token: string, id: string, data: UpdateVaccinationRequest) =>
+      apiRequest<VaccinationDose>(`/api/vaccinations/${id}`, token, { method: 'PUT', body: data }),
+    delete: (token: string, id: string) =>
+      apiRequest<void>(`/api/vaccinations/${id}`, token, { method: 'DELETE' }),
+  },
+  reminders: {
+    list: (token: string) =>
+      apiRequest<Reminder[]>('/api/reminders', token),
+    upcoming: (token: string, days: number) =>
+      apiRequest<Reminder[]>(`/api/reminders/upcoming?days=${days}`, token),
+    snooze: (token: string, id: string, until: string) =>
+      apiRequest<Reminder>(`/api/reminders/${id}/snooze`, token, { method: 'POST', body: { until } }),
+    complete: (token: string, id: string) =>
+      apiRequest<Reminder>(`/api/reminders/${id}/complete`, token, { method: 'POST' }),
+    toggle: (token: string, id: string) =>
+      apiRequest<Reminder>(`/api/reminders/${id}/toggle`, token, { method: 'POST' }),
+    delete: (token: string, id: string) =>
+      apiRequest<void>(`/api/reminders/${id}`, token, { method: 'DELETE' }),
+    settings: {
+      get: (token: string) =>
+        apiRequest<ReminderSettings>('/api/reminders/settings', token),
+      update: (token: string, data: UpdateReminderSettingsRequest) =>
+        apiRequest<ReminderSettings>('/api/reminders/settings', token, { method: 'PUT', body: data }),
+    },
+  },
 };
 
 // Types
@@ -636,3 +696,123 @@ export interface UpdateLabRequest {
   name?: string;
   credentials?: LabCredential[];
 }
+
+// ── Catalog ──
+export interface CatalogResponse {
+  medicationTypes: Record<string, { labelKey: string; defaultFrequency: string; ongoing: boolean }>;
+  frequencies: Record<string, { hours?: number; days?: number }>;
+  vaccineSeries: Record<string, { labelKey: string; totalDoses: number; doseIntervalsDays: number[] }>;
+}
+
+// ── Medications ──
+export interface Medication {
+  id: string;
+  medicationType: string;
+  name: string;
+  dosage: string | null;
+  startDate: string;
+  endDate: string | null;
+  frequency: string;
+  reminderTime: string | null;
+  notes: string | null;
+  active: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateMedicationRequest {
+  medicationType: string;
+  name: string;
+  dosage?: string;
+  startDate: string;
+  endDate?: string;
+  frequency: string;
+  reminderTime?: string;
+  notes?: string;
+}
+
+export interface UpdateMedicationRequest extends Partial<CreateMedicationRequest> {
+  active?: boolean;
+}
+
+export interface LogDoseRequest {
+  scheduledFor: string;
+  taken: boolean;
+  notes?: string;
+}
+
+export interface DoseLogEntry {
+  id: string;
+  scheduledFor: string;
+  taken: boolean;
+  loggedAt: string;
+  notes: string | null;
+}
+
+export interface MedicationAdherence {
+  month: string;
+  totalDays: number;
+  takenCount: number;
+  missedCount: number;
+  adherenceRate: number;
+  logs: DoseLogEntry[];
+}
+
+// ── Vaccinations ──
+export interface VaccinationDose {
+  id: string;
+  vaccineType: string;
+  doseNumber: number;
+  totalDoses: number;
+  administeredDate: string;
+  location: string | null;
+  notes: string | null;
+  createdAt: string;
+}
+
+export interface VaccineSeries {
+  vaccineType: string;
+  labelKey: string;
+  totalDoses: number;
+  completedDoses: number;
+  complete: boolean;
+  nextDoseDate: string | null;
+  doses: VaccinationDose[];
+}
+
+export interface CreateVaccinationRequest {
+  vaccineType: string;
+  doseNumber: number;
+  administeredDate: string;
+  location?: string;
+  notes?: string;
+}
+
+export type UpdateVaccinationRequest = Partial<CreateVaccinationRequest>;
+
+// ── Reminders ──
+export interface Reminder {
+  id: string;
+  reminderType: string;
+  referenceId: string | null;
+  title: string;
+  message: string | null;
+  scheduledFor: string;
+  repeatRule: string | null;
+  snoozedUntil: string | null;
+  completedAt: string | null;
+  active: boolean;
+  createdAt: string;
+}
+
+export interface ReminderSettings {
+  quietHoursStart: string | null;
+  quietHoursEnd: string | null;
+  emailDigestEnabled: boolean;
+  emailDigestDay: string | null;
+  testingRemindersEnabled: boolean;
+  medicationRemindersEnabled: boolean;
+  vaccinationRemindersEnabled: boolean;
+}
+
+export type UpdateReminderSettingsRequest = Partial<ReminderSettings>;

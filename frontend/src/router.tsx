@@ -33,6 +33,7 @@ import { WindowPeriodCalculatorPage } from './pages/WindowPeriodCalculatorPage';
 import { GuidesIndexPage } from './pages/GuidesIndexPage';
 import { GuideDetailPage } from './pages/GuideDetailPage';
 import { TestingCostPage } from './pages/TestingCostPage';
+import { MedicationDetailPage } from './pages/MedicationDetailPage';
 
 export const router = createBrowserRouter([
   {
@@ -89,6 +90,14 @@ export const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <HealthLogPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'health-log/medication/:id',
+        element: (
+          <ProtectedRoute>
+            <MedicationDetailPage />
           </ProtectedRoute>
         ),
       },

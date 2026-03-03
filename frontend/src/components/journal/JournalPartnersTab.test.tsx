@@ -14,6 +14,10 @@ vi.mock('react-router-dom', () => ({
   useNavigate: () => vi.fn(),
 }));
 
+vi.mock('./CreatePartnerModal', () => ({
+  CreatePartnerModal: () => null,
+}));
+
 function makePartner(overrides: Partial<JournalPartner> = {}): JournalPartner {
   return {
     id: 'p1',

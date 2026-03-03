@@ -16,13 +16,16 @@
 
 package app.navilla;
 
+import app.navilla.config.HealthCatalogProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.env.Environment;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
  * Main entry point for the Navilla Backend Application.
@@ -37,6 +40,8 @@ import org.springframework.core.env.Environment;
  * @since 2026-01-30
  */
 @SpringBootApplication
+@EnableScheduling
+@EnableConfigurationProperties(HealthCatalogProperties.class)
 @SuppressWarnings("checkstyle:HideUtilityClassConstructor")
 public class NavillaBackendApplication {
   private static final Logger log = LoggerFactory.getLogger(NavillaBackendApplication.class);

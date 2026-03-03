@@ -1,17 +1,83 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
-import { Lock, Plus, HelpCircle, ExternalLink } from 'lucide-react';
+import { Lock, Plus, HelpCircle, ExternalLink, Pill, Syringe, ChevronDown } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { useHealthLogSummary } from '../hooks/useHealthLog';
+import { useMedications } from '../hooks/useMedications';
+import { useVaccinations } from '../hooks/useVaccinations';
 import { api } from '../lib/api';
 import { getConditionInfo } from '../lib/conditionInfo';
 import { HealthLogStats } from '../components/health-log/HealthLogStats';
 import { ConditionCard } from '../components/health-log/ConditionCard';
 import { TestVisitModal } from '../components/health-log/TestVisitModal';
-import { PageSkeleton, SkeletonBlock, SkeletonRows } from '../components/ui/LoadingShell';
+import { MedicationCard } from '../components/reminders/MedicationCard';
+import { MedicationModal } from '../components/reminders/MedicationModal';
+import { VaccinationSeriesCard } from '../components/reminders/VaccinationSeriesCard';
+import { VaccinationModal } from '../components/reminders/VaccinationModal';
+import { UpcomingReminders } from '../components/reminders/UpcomingReminders';
+import { SkeletonBlock, SkeletonRows } from '../components/ui/LoadingShell';
+import type { VaccineSeries } from '../lib/api';
+
+type HealthTab = 'tests' | 'medications' | 'vaccines';
 
 export function HealthLogPage() {
+  const { t } = useTranslation();
+  const [activeTab, setActiveTab] = useState<HealthTab>('tests');
+
+  return (
+    <div className="container py-8 space-y-6">
+      {/* Page header */}
+      <div>
+        <h1 className="text-3xl font-bold mb-1">{t('myHealth.title')}</h1>
+        <div className="flex items-center gap-2 text-xs text-muted">
+          <Lock className="w-3.5 h-3.5" aria-hidden="true" />
+          <span>{t('healthLog.encrypted')}</span>
+        </div>
+      </div>
+
+      {/* Upcoming Reminders — persistent above tabs */}
+      <UpcomingReminders />
+
+      {/* Tab Bar */}
+      <div
+        className="flex border-b"
+        style={{ borderColor: 'var(--color-border)' }}
+        role="tablist"
+        aria-label={t('myHealth.title')}
+      >
+        {(['tests', 'medications', 'vaccines'] as const).map((tab) => (
+          <button
+            key={tab}
+            type="button"
+            role="tab"
+            aria-selected={activeTab === tab}
+            aria-controls={`tabpanel-${tab}`}
+            onClick={() => setActiveTab(tab)}
+            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === tab
+                ? 'border-[var(--color-primary)] text-[var(--color-primary)]'
+                : 'border-transparent text-[var(--color-muted)] hover:text-[var(--color-foreground)]'
+            }`}
+          >
+            {t(`myHealth.tabs.${tab}`)}
+          </button>
+        ))}
+      </div>
+
+      {/* Tab Content */}
+      <div id={`tabpanel-${activeTab}`} role="tabpanel">
+        {activeTab === 'tests' && <TestsTabContent />}
+        {activeTab === 'medications' && <MedicationsTabContent />}
+        {activeTab === 'vaccines' && <VaccinesTabContent />}
+      </div>
+    </div>
+  );
+}
+
+// ── Tests Tab ──────────────────────────────────────────────────────────
+
+function TestsTabContent() {
   const { t, i18n } = useTranslation();
   const { session } = useAuth();
   const token = session?.access_token ?? '';
@@ -20,10 +86,7 @@ export function HealthLogPage() {
   const [showAllExposures, setShowAllExposures] = useState(false);
   const [showExposureInfo, setShowExposureInfo] = useState(false);
 
-  // Health log summary (conditions, stats)
   const summaryQuery = useHealthLogSummary();
-
-  // Exposure data (ported from HealthStatusPage)
   const exposureQuery = useQuery({
     queryKey: ['exposures'],
     queryFn: () => api.exposures.get(token),
@@ -38,7 +101,7 @@ export function HealthLogPage() {
 
   if (isInitialLoading) {
     return (
-      <PageSkeleton loadingLabel={t('common.loading')}>
+      <div className="space-y-4">
         <SkeletonBlock className="h-24 rounded-2xl" />
         <SkeletonBlock className="h-40 rounded-2xl" />
         <div className="grid gap-3 sm:grid-cols-2">
@@ -47,23 +110,16 @@ export function HealthLogPage() {
           <SkeletonBlock className="h-20 rounded-xl" />
           <SkeletonBlock className="h-20 rounded-xl" />
         </div>
-      </PageSkeleton>
+      </div>
     );
   }
 
   const hasConditions = (summary?.conditions?.length ?? 0) > 0;
 
   return (
-    <div className="container py-8 space-y-6">
-      {/* Page header */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold mb-1">{t('healthLog.title')}</h1>
-          <div className="flex items-center gap-2 text-xs text-muted">
-            <Lock className="w-3.5 h-3.5" aria-hidden="true" />
-            <span>{t('healthLog.encrypted')}</span>
-          </div>
-        </div>
+    <div className="space-y-6">
+      {/* Add Visit button */}
+      <div className="flex justify-end">
         <button
           type="button"
           className="btn btn-primary btn-sm"
@@ -251,6 +307,183 @@ export function HealthLogPage() {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+// ── Medications Tab ────────────────────────────────────────────────────
+
+function MedicationsTabContent() {
+  const { t } = useTranslation();
+  const { data: medications, isLoading } = useMedications();
+  const [modalOpen, setModalOpen] = useState(false);
+  const [showInactive, setShowInactive] = useState(false);
+
+  if (isLoading && !medications) {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <span className="spinner" aria-label={t('common.loading')} />
+      </div>
+    );
+  }
+
+  const all = medications ?? [];
+  const active = all.filter((m) => m.active);
+  const inactive = all.filter((m) => !m.active);
+
+  return (
+    <div className="space-y-4">
+      {/* Add Medication button */}
+      <div className="flex justify-end">
+        <button
+          type="button"
+          className="btn btn-primary btn-sm"
+          onClick={() => setModalOpen(true)}
+        >
+          <span className="inline-flex items-center gap-1">
+            <Plus className="w-4 h-4" aria-hidden="true" />
+            {t('medications.add')}
+          </span>
+        </button>
+      </div>
+
+      {all.length === 0 ? (
+        <div className="flex flex-col items-center justify-center text-center py-16 px-6">
+          <div
+            className="w-16 h-16 rounded-full flex items-center justify-center mb-6"
+            style={{ backgroundColor: 'rgba(79, 70, 229, 0.08)' }}
+          >
+            <Pill className="w-8 h-8" style={{ color: 'var(--color-primary)' }} aria-hidden="true" />
+          </div>
+          <h3 className="text-xl font-semibold mb-2">
+            {t('medications.noMedications')}
+          </h3>
+          <p className="text-muted text-sm max-w-md">
+            {t('medications.noMedicationsDescription')}
+          </p>
+        </div>
+      ) : (
+        <>
+          {/* Active medications */}
+          {active.length > 0 && (
+            <div className="space-y-2">
+              {active.map((med) => (
+                <MedicationCard key={med.id} medication={med} />
+              ))}
+            </div>
+          )}
+
+          {/* Inactive / past medications */}
+          {inactive.length > 0 && (
+            <div>
+              <button
+                type="button"
+                className="flex items-center gap-2 text-sm font-medium py-2"
+                style={{ color: 'var(--color-muted)' }}
+                onClick={() => setShowInactive((v) => !v)}
+              >
+                <ChevronDown
+                  className={`w-4 h-4 transition-transform ${showInactive ? 'rotate-180' : ''}`}
+                  aria-hidden="true"
+                />
+                {t('medications.inactive')} ({inactive.length})
+              </button>
+              {showInactive && (
+                <div className="space-y-2">
+                  {inactive.map((med) => (
+                    <MedicationCard key={med.id} medication={med} />
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </>
+      )}
+
+      {/* Medication modal */}
+      <MedicationModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+      />
+    </div>
+  );
+}
+
+// ── Vaccines Tab ───────────────────────────────────────────────────────
+
+function VaccinesTabContent() {
+  const { t } = useTranslation();
+  const { data: series, isLoading } = useVaccinations();
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedSeries, setSelectedSeries] = useState<VaccineSeries | null>(null);
+
+  if (isLoading && !series) {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <span className="spinner" aria-label={t('common.loading')} />
+      </div>
+    );
+  }
+
+  const all = series ?? [];
+
+  const handleLogDose = (s?: VaccineSeries) => {
+    setSelectedSeries(s ?? null);
+    setModalOpen(true);
+  };
+
+  return (
+    <div className="space-y-4">
+      {/* Add Dose button */}
+      <div className="flex justify-end">
+        <button
+          type="button"
+          className="btn btn-primary btn-sm"
+          onClick={() => handleLogDose()}
+        >
+          <span className="inline-flex items-center gap-1">
+            <Plus className="w-4 h-4" aria-hidden="true" />
+            {t('vaccinations.add')}
+          </span>
+        </button>
+      </div>
+
+      {all.length === 0 ? (
+        <div className="flex flex-col items-center justify-center text-center py-16 px-6">
+          <div
+            className="w-16 h-16 rounded-full flex items-center justify-center mb-6"
+            style={{ backgroundColor: 'rgba(79, 70, 229, 0.08)' }}
+          >
+            <Syringe className="w-8 h-8" style={{ color: 'var(--color-primary)' }} aria-hidden="true" />
+          </div>
+          <h3 className="text-xl font-semibold mb-2">
+            {t('vaccinations.noVaccinations')}
+          </h3>
+          <p className="text-muted text-sm max-w-md">
+            {t('vaccinations.noVaccinationsDescription')}
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {all.map((s) => (
+            <VaccinationSeriesCard
+              key={s.vaccineType}
+              series={s}
+              onLogDose={() => handleLogDose(s)}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Vaccination modal */}
+      <VaccinationModal
+        isOpen={modalOpen}
+        onClose={() => {
+          setModalOpen(false);
+          setSelectedSeries(null);
+        }}
+        existingSeries={selectedSeries}
+      />
     </div>
   );
 }

@@ -67,6 +67,18 @@ vi.mock('../lib/conditionInfo', () => ({
   getConditionInfo: () => ({ label: 'HIV', url: 'https://example.com' }),
 }));
 
+vi.mock('../hooks/useMedications', () => ({
+  useMedications: () => ({ data: [], isLoading: false }),
+}));
+
+vi.mock('../hooks/useVaccinations', () => ({
+  useVaccinations: () => ({ data: [], isLoading: false }),
+}));
+
+vi.mock('../components/reminders/UpcomingReminders', () => ({
+  UpcomingReminders: () => null,
+}));
+
 function makeSummary(overrides: Partial<HealthLogSummary> = {}): HealthLogSummary {
   return {
     daysSinceLastTest: 14,
@@ -100,8 +112,9 @@ describe('HealthLogPage', () => {
 
     const { container } = render(<HealthLogPage />);
 
+    // Page header is always visible; skeleton appears inside the active tab content
+    expect(screen.getByText('myHealth.title')).toBeInTheDocument();
     expect(container.querySelectorAll('.skeleton').length).toBeGreaterThan(0);
-    expect(screen.queryByText('healthLog.title')).not.toBeInTheDocument();
   });
 
   it('renders page title when loaded', () => {
@@ -112,7 +125,7 @@ describe('HealthLogPage', () => {
 
     render(<HealthLogPage />);
 
-    expect(screen.getByText('healthLog.title')).toBeInTheDocument();
+    expect(screen.getByText('myHealth.title')).toBeInTheDocument();
   });
 
   it('shows encrypted badge', () => {
