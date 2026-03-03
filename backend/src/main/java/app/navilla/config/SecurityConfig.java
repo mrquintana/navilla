@@ -101,6 +101,7 @@ public class SecurityConfig {
             .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
             .requestMatchers("/actuator/health", "/actuator/info").permitAll()
             .requestMatchers("/api/health").permitAll()
+            .requestMatchers("/api/catalog", "/api/catalog/**").permitAll()
             .requestMatchers("/error").permitAll()
             // All other API endpoints require authentication
             .requestMatchers("/api/**").authenticated()

@@ -26,3 +26,55 @@ navilla:
   storage:
     public-base-url: https://test.supabase.co/storage/v1/object/public
     avatar-bucket: avatars
+  health-catalog:
+    medication-types:
+      PREP_DAILY:
+        label-key: "medications.type.prepDaily"
+        default-frequency: DAILY
+        ongoing: true
+      PREP_INJECTABLE:
+        label-key: "medications.type.prepInjectable"
+        default-frequency: EVERY_2_MONTHS
+        ongoing: true
+      TREATMENT_COURSE:
+        label-key: "medications.type.treatmentCourse"
+        default-frequency: DAILY
+        ongoing: false
+      DOXY_PEP:
+        label-key: "medications.type.doxyPep"
+        default-frequency: AS_NEEDED
+        ongoing: false
+    frequencies:
+      DAILY:
+        hours: 24
+      EVERY_2_MONTHS:
+        days: 60
+      WEEKLY:
+        days: 7
+      AS_NEEDED: {}
+      CUSTOM: {}
+    vaccine-series:
+      HPV:
+        label-key: "vaccinations.type.hpv"
+        total-doses: 3
+        dose-intervals-days: [0, 60, 120]
+      HEPATITIS_B:
+        label-key: "vaccinations.type.hepatitisB"
+        total-doses: 3
+        dose-intervals-days: [0, 30, 150]
+      MPOX:
+        label-key: "vaccinations.type.mpox"
+        total-doses: 2
+        dose-intervals-days: [0, 28]
+      HEPATITIS_A:
+        label-key: "vaccinations.type.hepatitisA"
+        total-doses: 2
+        dose-intervals-days: [0, 180]
+    testing-heuristics:
+      high-activity-interval-days: 90
+      moderate-activity-interval-days: 180
+      high-activity-threshold: 3
+      nudge-after-days: 180
+    follow-up-rules:
+      test-of-cure-days: 21
+      window-period-default-days: 14
