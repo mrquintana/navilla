@@ -18,7 +18,8 @@ COPY src/ src/
 COPY checkstyle/ checkstyle/
 
 # Build the application and extract Spring Boot layers
-RUN ./mvnw package -DskipTests -q && \
+# Skip javadoc to avoid a second JAR that breaks the glob
+RUN ./mvnw package -DskipTests -Dmaven.javadoc.skip=true -q && \
     java -Djarmode=tools -jar target/*.jar extract --layers --launcher --destination extracted
 
 # Runtime stage — JRE only, no build tools
