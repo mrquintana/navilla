@@ -60,15 +60,16 @@ function MedicationForm({ medication, onClose }: MedicationFormProps) {
   const [notes, setNotes] = useState(medication?.notes ?? '');
   const [error, setError] = useState<string | null>(null);
 
-  // When medication type changes, auto-set default frequency from catalog
-  useEffect(() => {
-    if (!isEditMode && medicationType && catalog?.medicationTypes) {
-      const typeInfo = catalog.medicationTypes[medicationType];
+  // Handle medication type change — auto-set default frequency from catalog
+  const handleMedicationTypeChange = (newType: string) => {
+    setMedicationType(newType);
+    if (!isEditMode && newType && catalog?.medicationTypes) {
+      const typeInfo = catalog.medicationTypes[newType];
       if (typeInfo?.defaultFrequency) {
         setFrequency(typeInfo.defaultFrequency);
       }
     }
-  }, [medicationType, catalog, isEditMode]);
+  };
 
   // Close on Escape
   const handleKeyDown = useCallback(
@@ -171,7 +172,7 @@ function MedicationForm({ medication, onClose }: MedicationFormProps) {
               id="med-type"
               className="input"
               value={medicationType}
-              onChange={(e) => setMedicationType(e.target.value)}
+              onChange={(e) => handleMedicationTypeChange(e.target.value)}
             >
               <option value="">{t('medications.type')}</option>
               {medicationTypes.map(([key]) => (

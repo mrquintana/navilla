@@ -9,19 +9,6 @@ import {
 import type { Reminder } from '../../lib/api';
 import { ReminderSettingsModal } from './ReminderSettingsModal';
 
-function getReminderIcon(type: string) {
-  switch (type) {
-    case 'MEDICATION':
-      return Pill;
-    case 'VACCINATION':
-      return Syringe;
-    case 'TESTING':
-      return ClipboardCheck;
-    default:
-      return Bell;
-  }
-}
-
 function getRelativeTime(scheduledFor: string, t: (key: string, opts?: Record<string, unknown>) => string): string {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -47,12 +34,24 @@ interface ReminderCardProps {
   reminder: Reminder;
 }
 
+function ReminderIcon({ type }: { type: string }) {
+  switch (type) {
+    case 'MEDICATION':
+      return <Pill className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: 'var(--color-primary)' }} aria-hidden="true" />;
+    case 'VACCINATION':
+      return <Syringe className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: 'var(--color-primary)' }} aria-hidden="true" />;
+    case 'TESTING':
+      return <ClipboardCheck className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: 'var(--color-primary)' }} aria-hidden="true" />;
+    default:
+      return <Bell className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: 'var(--color-primary)' }} aria-hidden="true" />;
+  }
+}
+
 function ReminderCard({ reminder }: ReminderCardProps) {
   const { t } = useTranslation();
   const completeMutation = useCompleteReminder();
   const snoozeMutation = useSnoozeReminder();
 
-  const Icon = getReminderIcon(reminder.reminderType);
   const relativeTime = getRelativeTime(reminder.scheduledFor, t);
 
   const isOverdue = new Date(reminder.scheduledFor) < new Date(new Date().toISOString().split('T')[0]);
@@ -76,7 +75,7 @@ function ReminderCard({ reminder }: ReminderCardProps) {
       }}
     >
       <div className="flex items-start gap-2 mb-2">
-        <Icon className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: 'var(--color-primary)' }} aria-hidden="true" />
+        <ReminderIcon type={reminder.reminderType} />
         <div className="min-w-0 flex-1">
           <p className="text-sm font-medium truncate" style={{ color: 'var(--color-foreground)' }}>
             {reminder.title}

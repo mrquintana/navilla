@@ -16,7 +16,7 @@ import { MedicationModal } from '../components/reminders/MedicationModal';
 import { VaccinationSeriesCard } from '../components/reminders/VaccinationSeriesCard';
 import { VaccinationModal } from '../components/reminders/VaccinationModal';
 import { UpcomingReminders } from '../components/reminders/UpcomingReminders';
-import { PageSkeleton, SkeletonBlock, SkeletonRows } from '../components/ui/LoadingShell';
+import { SkeletonBlock, SkeletonRows } from '../components/ui/LoadingShell';
 import type { VaccineSeries } from '../lib/api';
 
 type HealthTab = 'tests' | 'medications' | 'vaccines';

@@ -5,6 +5,7 @@ import {
   useReminderSettings,
   useUpdateReminderSettings,
 } from '../../hooks/useReminders';
+import type { ReminderSettings } from '../../lib/api';
 
 interface ReminderSettingsModalProps {
   isOpen: boolean;
@@ -15,39 +16,13 @@ const DAYS_OF_WEEK = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'S
 
 export function ReminderSettingsModal({ isOpen, onClose }: ReminderSettingsModalProps) {
   if (!isOpen) return null;
-  return <ReminderSettingsForm onClose={onClose} />;
+  return <ReminderSettingsLoader onClose={onClose} />;
 }
 
-interface ReminderSettingsFormProps {
-  onClose: () => void;
-}
-
-function ReminderSettingsForm({ onClose }: ReminderSettingsFormProps) {
+/** Loader that fetches settings then renders the form once data is ready */
+function ReminderSettingsLoader({ onClose }: { onClose: () => void }) {
   const { t } = useTranslation();
   const { data: settings, isLoading } = useReminderSettings();
-  const updateMutation = useUpdateReminderSettings();
-
-  const [quietHoursStart, setQuietHoursStart] = useState('');
-  const [quietHoursEnd, setQuietHoursEnd] = useState('');
-  const [emailDigestEnabled, setEmailDigestEnabled] = useState(false);
-  const [emailDigestDay, setEmailDigestDay] = useState('MONDAY');
-  const [testingRemindersEnabled, setTestingRemindersEnabled] = useState(true);
-  const [medicationRemindersEnabled, setMedicationRemindersEnabled] = useState(true);
-  const [vaccinationRemindersEnabled, setVaccinationRemindersEnabled] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  // Populate form from fetched settings
-  useEffect(() => {
-    if (settings) {
-      setQuietHoursStart(settings.quietHoursStart ?? '');
-      setQuietHoursEnd(settings.quietHoursEnd ?? '');
-      setEmailDigestEnabled(settings.emailDigestEnabled);
-      setEmailDigestDay(settings.emailDigestDay ?? 'MONDAY');
-      setTestingRemindersEnabled(settings.testingRemindersEnabled);
-      setMedicationRemindersEnabled(settings.medicationRemindersEnabled);
-      setVaccinationRemindersEnabled(settings.vaccinationRemindersEnabled);
-    }
-  }, [settings]);
 
   // Close on Escape
   const handleKeyDown = useCallback(
@@ -64,26 +39,6 @@ function ReminderSettingsForm({ onClose }: ReminderSettingsFormProps) {
 
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) onClose();
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-
-    try {
-      await updateMutation.mutateAsync({
-        quietHoursStart: quietHoursStart || null,
-        quietHoursEnd: quietHoursEnd || null,
-        emailDigestEnabled,
-        emailDigestDay: emailDigestEnabled ? emailDigestDay : null,
-        testingRemindersEnabled,
-        medicationRemindersEnabled,
-        vaccinationRemindersEnabled,
-      });
-      onClose();
-    } catch {
-      setError(t('common.error', 'Failed to save settings'));
-    }
   };
 
   return (
@@ -110,132 +65,171 @@ function ReminderSettingsForm({ onClose }: ReminderSettingsFormProps) {
           </button>
         </div>
 
-        {isLoading ? (
+        {isLoading || !settings ? (
           <div className="flex items-center justify-center py-8">
             <span className="spinner" aria-label={t('common.loading')} />
           </div>
         ) : (
-          <form className="space-y-5" onSubmit={handleSubmit}>
-            {/* Quiet Hours */}
-            <fieldset>
-              <legend className="label mb-2">{t('reminders.quietHours')}</legend>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="text-xs" style={{ color: 'var(--color-muted)' }} htmlFor="quiet-start">
-                    {t('reminders.quietHoursStart')}
-                  </label>
-                  <input
-                    id="quiet-start"
-                    type="time"
-                    className="input"
-                    value={quietHoursStart}
-                    onChange={(e) => setQuietHoursStart(e.target.value)}
-                  />
-                </div>
-                <div>
-                  <label className="text-xs" style={{ color: 'var(--color-muted)' }} htmlFor="quiet-end">
-                    {t('reminders.quietHoursEnd')}
-                  </label>
-                  <input
-                    id="quiet-end"
-                    type="time"
-                    className="input"
-                    value={quietHoursEnd}
-                    onChange={(e) => setQuietHoursEnd(e.target.value)}
-                  />
-                </div>
-              </div>
-            </fieldset>
-
-            {/* Email Digest */}
-            <fieldset className="space-y-2">
-              <div className="flex items-center justify-between">
-                <label className="label mb-0" htmlFor="email-digest">
-                  {t('reminders.emailDigest')}
-                </label>
-                <input
-                  id="email-digest"
-                  type="checkbox"
-                  checked={emailDigestEnabled}
-                  onChange={(e) => setEmailDigestEnabled(e.target.checked)}
-                  className="accent-indigo-600 w-5 h-5"
-                />
-              </div>
-              {emailDigestEnabled && (
-                <div>
-                  <label className="text-xs" style={{ color: 'var(--color-muted)' }} htmlFor="digest-day">
-                    {t('reminders.emailDigestDay')}
-                  </label>
-                  <select
-                    id="digest-day"
-                    className="input"
-                    value={emailDigestDay}
-                    onChange={(e) => setEmailDigestDay(e.target.value)}
-                  >
-                    {DAYS_OF_WEEK.map((day) => (
-                      <option key={day} value={day}>
-                        {t(`common.days.${day}`, day.charAt(0) + day.slice(1).toLowerCase())}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
-            </fieldset>
-
-            {/* Per-type toggles */}
-            <fieldset className="space-y-3">
-              <ToggleRow
-                label={t('reminders.testingReminders')}
-                id="toggle-testing"
-                checked={testingRemindersEnabled}
-                onChange={setTestingRemindersEnabled}
-              />
-              <ToggleRow
-                label={t('reminders.medicationReminders')}
-                id="toggle-medication"
-                checked={medicationRemindersEnabled}
-                onChange={setMedicationRemindersEnabled}
-              />
-              <ToggleRow
-                label={t('reminders.vaccinationReminders')}
-                id="toggle-vaccination"
-                checked={vaccinationRemindersEnabled}
-                onChange={setVaccinationRemindersEnabled}
-              />
-            </fieldset>
-
-            {/* Error */}
-            {error && <div className="alert alert-error">{error}</div>}
-
-            {/* Actions */}
-            <div className="flex items-center justify-end gap-2 pt-2">
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={onClose}
-                disabled={updateMutation.isPending}
-              >
-                {t('healthLog.cancel')}
-              </button>
-              <button
-                type="submit"
-                className="btn btn-primary"
-                disabled={updateMutation.isPending}
-              >
-                {updateMutation.isPending ? (
-                  <span className="inline-flex items-center gap-2">
-                    <span className="spinner" aria-hidden="true" />
-                    {t('common.loading')}
-                  </span>
-                ) : (
-                  t('healthLog.save')
-                )}
-              </button>
-            </div>
-          </form>
+          <ReminderSettingsForm settings={settings} onClose={onClose} />
         )}
       </div>
     </div>
+  );
+}
+
+/** Form that initializes state from settings props (no useEffect sync needed) */
+function ReminderSettingsForm({ settings, onClose }: { settings: ReminderSettings; onClose: () => void }) {
+  const { t } = useTranslation();
+  const updateMutation = useUpdateReminderSettings();
+
+  const [quietHoursStart, setQuietHoursStart] = useState(settings.quietHoursStart ?? '');
+  const [quietHoursEnd, setQuietHoursEnd] = useState(settings.quietHoursEnd ?? '');
+  const [emailDigestEnabled, setEmailDigestEnabled] = useState(settings.emailDigestEnabled);
+  const [emailDigestDay, setEmailDigestDay] = useState(settings.emailDigestDay ?? 'MONDAY');
+  const [testingRemindersEnabled, setTestingRemindersEnabled] = useState(settings.testingRemindersEnabled);
+  const [medicationRemindersEnabled, setMedicationRemindersEnabled] = useState(settings.medicationRemindersEnabled);
+  const [vaccinationRemindersEnabled, setVaccinationRemindersEnabled] = useState(settings.vaccinationRemindersEnabled);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+
+    try {
+      await updateMutation.mutateAsync({
+        quietHoursStart: quietHoursStart || null,
+        quietHoursEnd: quietHoursEnd || null,
+        emailDigestEnabled,
+        emailDigestDay: emailDigestEnabled ? emailDigestDay : null,
+        testingRemindersEnabled,
+        medicationRemindersEnabled,
+        vaccinationRemindersEnabled,
+      });
+      onClose();
+    } catch {
+      setError(t('common.error', 'Failed to save settings'));
+    }
+  };
+
+  return (
+    <form className="space-y-5" onSubmit={handleSubmit}>
+      {/* Quiet Hours */}
+      <fieldset>
+        <legend className="label mb-2">{t('reminders.quietHours')}</legend>
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="text-xs" style={{ color: 'var(--color-muted)' }} htmlFor="quiet-start">
+              {t('reminders.quietHoursStart')}
+            </label>
+            <input
+              id="quiet-start"
+              type="time"
+              className="input"
+              value={quietHoursStart}
+              onChange={(e) => setQuietHoursStart(e.target.value)}
+            />
+          </div>
+          <div>
+            <label className="text-xs" style={{ color: 'var(--color-muted)' }} htmlFor="quiet-end">
+              {t('reminders.quietHoursEnd')}
+            </label>
+            <input
+              id="quiet-end"
+              type="time"
+              className="input"
+              value={quietHoursEnd}
+              onChange={(e) => setQuietHoursEnd(e.target.value)}
+            />
+          </div>
+        </div>
+      </fieldset>
+
+      {/* Email Digest */}
+      <fieldset className="space-y-2">
+        <div className="flex items-center justify-between">
+          <label className="label mb-0" htmlFor="email-digest">
+            {t('reminders.emailDigest')}
+          </label>
+          <input
+            id="email-digest"
+            type="checkbox"
+            checked={emailDigestEnabled}
+            onChange={(e) => setEmailDigestEnabled(e.target.checked)}
+            className="accent-indigo-600 w-5 h-5"
+          />
+        </div>
+        {emailDigestEnabled && (
+          <div>
+            <label className="text-xs" style={{ color: 'var(--color-muted)' }} htmlFor="digest-day">
+              {t('reminders.emailDigestDay')}
+            </label>
+            <select
+              id="digest-day"
+              className="input"
+              value={emailDigestDay}
+              onChange={(e) => setEmailDigestDay(e.target.value)}
+            >
+              {DAYS_OF_WEEK.map((day) => (
+                <option key={day} value={day}>
+                  {t(`common.days.${day}`, day.charAt(0) + day.slice(1).toLowerCase())}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+      </fieldset>
+
+      {/* Per-type toggles */}
+      <fieldset className="space-y-3">
+        <ToggleRow
+          label={t('reminders.testingReminders')}
+          id="toggle-testing"
+          checked={testingRemindersEnabled}
+          onChange={setTestingRemindersEnabled}
+        />
+        <ToggleRow
+          label={t('reminders.medicationReminders')}
+          id="toggle-medication"
+          checked={medicationRemindersEnabled}
+          onChange={setMedicationRemindersEnabled}
+        />
+        <ToggleRow
+          label={t('reminders.vaccinationReminders')}
+          id="toggle-vaccination"
+          checked={vaccinationRemindersEnabled}
+          onChange={setVaccinationRemindersEnabled}
+        />
+      </fieldset>
+
+      {/* Error */}
+      {error && <div className="alert alert-error">{error}</div>}
+
+      {/* Actions */}
+      <div className="flex items-center justify-end gap-2 pt-2">
+        <button
+          type="button"
+          className="btn btn-secondary"
+          onClick={onClose}
+          disabled={updateMutation.isPending}
+        >
+          {t('healthLog.cancel')}
+        </button>
+        <button
+          type="submit"
+          className="btn btn-primary"
+          disabled={updateMutation.isPending}
+        >
+          {updateMutation.isPending ? (
+            <span className="inline-flex items-center gap-2">
+              <span className="spinner" aria-hidden="true" />
+              {t('common.loading')}
+            </span>
+          ) : (
+            t('healthLog.save')
+          )}
+        </button>
+      </div>
+    </form>
   );
 }
 
