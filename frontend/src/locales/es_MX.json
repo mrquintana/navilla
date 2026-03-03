@@ -870,7 +870,7 @@
   "toast": {
     "saved": "Guardado correctamente",
     "deleted": "Eliminado correctamente",
-    "error": "Algo salio mal. Intentalo de nuevo.",
+    "error": "Algo salió mal. Inténtalo de nuevo.",
     "snoozed": "Recordatorio pospuesto",
     "completed": "Marcado como completado",
     "copied": "Copiado al portapapeles"
