@@ -27,7 +27,8 @@ function getRelativeTime(scheduledFor: string, t: (key: string, opts?: Record<st
 function tomorrowISO(): string {
   const d = new Date();
   d.setDate(d.getDate() + 1);
-  return d.toISOString().split('T')[0];
+  d.setHours(9, 0, 0, 0);
+  return d.toISOString();
 }
 
 interface ReminderCardProps {
