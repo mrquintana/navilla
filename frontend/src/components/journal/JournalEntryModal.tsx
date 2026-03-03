@@ -133,6 +133,8 @@ function JournalEntryForm({
   const [customFields, setCustomFields] = useState<CustomFieldState[]>(
     () => buildInitialCustomFields(entry, savedLabels)
   );
+  const [formEncounterTypes, setFormEncounterTypes] = useState<string[]>(entry?.encounterTypes ?? []);
+  const [formProtectionMethods, setFormProtectionMethods] = useState<string[]>(entry?.protectionMethods ?? []);
   const [error, setError] = useState<string | null>(null);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
@@ -313,6 +315,8 @@ function JournalEntryForm({
       partnerId: formPartnerId || undefined,
       notes: formNotes.trim() || undefined,
       customFields: filteredCustomFields.length > 0 ? filteredCustomFields : undefined,
+      encounterTypes: formEncounterTypes.length > 0 ? formEncounterTypes : undefined,
+      protectionMethods: formProtectionMethods.length > 0 ? formProtectionMethods : undefined,
     };
 
     try {
@@ -573,6 +577,62 @@ function JournalEntryForm({
               </select>
             </div>
           )}
+
+          {/* Encounter types */}
+          <div>
+            <label className="label">{t('journal.encounterType')}</label>
+            <div className="flex flex-wrap gap-1.5">
+              {['ORAL', 'ANAL', 'VAGINAL', 'MANUAL', 'OTHER'].map((type) => {
+                const selected = formEncounterTypes.includes(type);
+                return (
+                  <button
+                    key={type}
+                    type="button"
+                    className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
+                      selected
+                        ? 'bg-indigo-100 border-indigo-300 text-indigo-700'
+                        : 'bg-white border-stone-200 text-stone-600 hover:border-indigo-200'
+                    }`}
+                    onClick={() =>
+                      setFormEncounterTypes((prev) =>
+                        selected ? prev.filter((et) => et !== type) : [...prev, type]
+                      )
+                    }
+                  >
+                    {t(`journal.encounterTypes.${type}`)}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Protection methods */}
+          <div>
+            <label className="label">{t('journal.protectionMethods')}</label>
+            <div className="flex flex-wrap gap-1.5">
+              {['CONDOM', 'INTERNAL_CONDOM', 'PREP', 'PEP', 'DENTAL_DAM', 'NONE', 'OTHER'].map((method) => {
+                const selected = formProtectionMethods.includes(method);
+                return (
+                  <button
+                    key={method}
+                    type="button"
+                    className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
+                      selected
+                        ? 'bg-indigo-100 border-indigo-300 text-indigo-700'
+                        : 'bg-white border-stone-200 text-stone-600 hover:border-indigo-200'
+                    }`}
+                    onClick={() =>
+                      setFormProtectionMethods((prev) =>
+                        selected ? prev.filter((pm) => pm !== method) : [...prev, method]
+                      )
+                    }
+                  >
+                    {t(`journal.protectionLabels.${method}`)}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
 
           {/* Notes */}
           <div>

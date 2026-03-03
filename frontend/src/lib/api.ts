@@ -163,6 +163,8 @@ export interface JournalEntry {
   partnerEncounterCount: number | null;
   notes: string | null;
   customFields: CustomField[] | null;
+  encounterTypes: string[] | null;
+  protectionMethods: string[] | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -174,6 +176,8 @@ export interface CreateJournalEntryRequest {
   partnerId?: string;
   notes?: string;
   customFields?: CustomField[];
+  encounterTypes?: string[];
+  protectionMethods?: string[];
 }
 
 export interface UpdateJournalEntryRequest {
@@ -183,6 +187,8 @@ export interface UpdateJournalEntryRequest {
   partnerId?: string;
   notes?: string;
   customFields?: CustomField[];
+  encounterTypes?: string[];
+  protectionMethods?: string[];
 }
 
 export interface JournalSummary {
@@ -413,7 +419,7 @@ export const api = {
   catalog: {
     get: async (): Promise<CatalogResponse> => {
       if (E2E_MODE) {
-        return { medicationTypes: {}, frequencies: {}, vaccineSeries: {} };
+        return { medicationTypes: {}, frequencies: {}, vaccineSeries: {}, encounterTypes: [], protectionMethods: [] };
       }
       const baseUrl = getApiBaseUrl();
       const response = await fetch(`${baseUrl}/api/catalog`, { method: 'GET' });
@@ -702,6 +708,8 @@ export interface CatalogResponse {
   medicationTypes: Record<string, { labelKey: string; defaultFrequency: string; ongoing: boolean }>;
   frequencies: Record<string, { hours?: number; days?: number }>;
   vaccineSeries: Record<string, { labelKey: string; totalDoses: number; doseIntervalsDays: number[] }>;
+  encounterTypes: string[];
+  protectionMethods: string[];
 }
 
 // ── Medications ──

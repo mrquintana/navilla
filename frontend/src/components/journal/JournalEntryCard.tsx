@@ -81,6 +81,21 @@ export function JournalEntryCard({ entry, onEdit, onDelete, isDeleting, hidePart
                 {notesPreview}
               </p>
             )}
+            {/* Encounter types + protection badges */}
+            {(entry.encounterTypes?.length || entry.protectionMethods?.length) ? (
+              <div className="flex flex-wrap gap-1 mt-2">
+                {entry.encounterTypes?.map((type) => (
+                  <span key={type} className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-indigo-50 text-indigo-600 border border-indigo-100">
+                    {t(`journal.encounterTypes.${type}`)}
+                  </span>
+                ))}
+                {entry.protectionMethods?.map((method) => (
+                  <span key={method} className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-stone-100 text-stone-600 border border-stone-200">
+                    {t(`journal.protectionLabels.${method}`)}
+                  </span>
+                ))}
+              </div>
+            ) : null}
             {customFields.length > 0 && (
               <div className="flex flex-wrap gap-1.5 mt-1.5">
                 {customFields.map((cf, i) => (

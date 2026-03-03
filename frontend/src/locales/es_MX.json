@@ -637,7 +637,25 @@
     "partnerAlias": "Nombre o Alias del Compañero",
     "createPartner": "Crear Compañero",
     "createPartnerDescription": "Agrega a alguien que ves regularmente para facilitar el registro de encuentros.",
-    "createPartnerNotes": "Notas (opcional)"
+    "createPartnerNotes": "Notas (opcional)",
+    "encounterType": "Tipo de encuentro",
+    "protectionMethods": "Protección utilizada",
+    "encounterTypes": {
+      "ORAL": "Oral",
+      "ANAL": "Anal",
+      "VAGINAL": "Vaginal",
+      "MANUAL": "Manual",
+      "OTHER": "Otro"
+    },
+    "protectionLabels": {
+      "CONDOM": "Condón externo",
+      "INTERNAL_CONDOM": "Condón interno",
+      "PREP": "PrEP",
+      "PEP": "PEP",
+      "DENTAL_DAM": "Barrera dental",
+      "NONE": "Ninguno",
+      "OTHER": "Otro"
+    }
   },
   "healthLog": {
     "title": "Registro de Salud",

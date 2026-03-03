@@ -638,7 +638,25 @@
     "partnerAlias": "Partner Name or Alias",
     "createPartner": "Create Partner",
     "createPartnerDescription": "Add someone you see regularly for easy encounter logging.",
-    "createPartnerNotes": "Notes (optional)"
+    "createPartnerNotes": "Notes (optional)",
+    "encounterType": "Type of encounter",
+    "protectionMethods": "Protection used",
+    "encounterTypes": {
+      "ORAL": "Oral",
+      "ANAL": "Anal",
+      "VAGINAL": "Vaginal",
+      "MANUAL": "Manual",
+      "OTHER": "Other"
+    },
+    "protectionLabels": {
+      "CONDOM": "External condom",
+      "INTERNAL_CONDOM": "Internal condom",
+      "PREP": "PrEP",
+      "PEP": "PEP",
+      "DENTAL_DAM": "Dental dam",
+      "NONE": "None",
+      "OTHER": "Other"
+    }
   },
   "healthLog": {
     "title": "Health Log",
