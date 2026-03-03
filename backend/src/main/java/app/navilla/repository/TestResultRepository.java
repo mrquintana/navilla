@@ -41,4 +41,9 @@ public interface TestResultRepository extends JpaRepository<TestResult, UUID> {
   @Query("SELECT r FROM TestResult r JOIN TestVisit v ON r.visitId = v.id "
       + "WHERE v.userHash = :userHash ORDER BY v.testDate DESC")
   List<TestResult> findAllByUserHash(@Param("userHash") String userHash);
+
+  @Query("SELECT r FROM TestResult r JOIN TestVisit v ON r.visitId = v.id "
+      + "WHERE v.userHash = :userHash AND r.status = app.navilla.entity.TestResultStatus.POSITIVE "
+      + "ORDER BY v.testDate DESC")
+  List<TestResult> findPositiveByUserHash(@Param("userHash") String userHash);
 }

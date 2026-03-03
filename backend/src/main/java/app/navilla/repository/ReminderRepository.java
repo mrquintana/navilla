@@ -35,6 +35,9 @@ public interface ReminderRepository extends JpaRepository<Reminder, UUID> {
 
   List<Reminder> findByReferenceIdAndActiveTrueAndCompletedAtIsNull(UUID referenceId);
 
+  List<Reminder> findByUserHashAndReminderTypeAndActiveTrueAndCompletedAtIsNull(
+      String userHash, String reminderType);
+
   List<Reminder> findByActiveTrueAndCompletedAtIsNullAndScheduledForBefore(
       OffsetDateTime before);
 
