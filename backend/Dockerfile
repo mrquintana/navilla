@@ -1,5 +1,5 @@
 # Navilla Backend Dockerfile
-# Multi-stage build for optimized production image
+# Multi-stage build with Spring Boot layered JAR extraction
 
 # Build stage
 FROM eclipse-temurin:25-jdk-alpine AS builder
@@ -17,10 +17,11 @@ RUN ./mvnw dependency:go-offline -q
 COPY src/ src/
 COPY checkstyle/ checkstyle/
 
-# Build the application
-RUN ./mvnw package -DskipTests -q
+# Build the application and extract Spring Boot layers
+RUN ./mvnw package -DskipTests -q && \
+    java -Djarmode=tools -jar target/*.jar extract --layers --launcher --destination extracted
 
-# Runtime stage
+# Runtime stage — JRE only, no build tools
 FROM eclipse-temurin:25-jre-alpine AS runtime
 
 # Build arguments for labels
@@ -40,14 +41,17 @@ LABEL org.opencontainers.image.created="${BUILD_DATE}" \
       org.opencontainers.image.description="Privacy-preserving sexual health platform backend"
 
 # Create non-root user for security
-RUN apk add --no-cache curl && \
-    addgroup -g 1001 -S navilla && \
+RUN addgroup -g 1001 -S navilla && \
     adduser -u 1001 -S navilla -G navilla
 
 WORKDIR /app
 
-# Copy JAR from builder stage
-COPY --from=builder /app/target/*.jar app.jar
+# Copy Spring Boot layers — ordered from least to most frequently changing.
+# Dependencies (~90% of image) are cached until pom.xml changes.
+COPY --from=builder /app/extracted/dependencies/ ./
+COPY --from=builder /app/extracted/spring-boot-loader/ ./
+COPY --from=builder /app/extracted/snapshot-dependencies/ ./
+COPY --from=builder /app/extracted/application/ ./
 
 # Change ownership to non-root user
 RUN chown -R navilla:navilla /app
@@ -58,9 +62,9 @@ USER navilla
 # Expose port
 EXPOSE 8080
 
-# Health check
+# Health check (wget is built into Alpine — no extra packages needed)
 HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
-    CMD curl -fsS http://localhost:8080/api/health >/dev/null || exit 1
+    CMD wget -qO /dev/null http://localhost:8080/api/health || exit 1
 
 # JVM settings for containers
 # Override JAVA_OPTS at deploy time for different environments
@@ -78,5 +82,5 @@ ENV JAVA_OPTS="-XX:+UseContainerSupport \
 #
 # JAVA_OPTS=-XX:+UseContainerSupport -XX:MaxRAMPercentage=70.0 -XX:InitialRAMPercentage=30.0 -XX:+UseSerialGC -XX:MaxMetaspaceSize=150m -XX:+TieredCompilation -XX:TieredStopAtLevel=1 -Xss256k -Djava.security.egd=file:/dev/./urandom -Dspring.profiles.active=production
 
-# Run the application
-ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
+# Run via Spring Boot launcher (works with extracted layers)
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS org.springframework.boot.loader.launch.JarLauncher"]
