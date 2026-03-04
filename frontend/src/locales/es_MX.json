@@ -130,7 +130,38 @@
     "exposureTimeframeHint": {
       "recent": "Reportado en los ultimos 30 dias",
       "older": "Reportado hace mas de 30 dias"
-    }
+    },
+    "goToInsights": "Perspectivas"
+  },
+  "insights": {
+    "title": "Perspectivas personales",
+    "subtitle": "Tus datos de salud de un vistazo",
+    "activity": "Actividad",
+    "testing": "Pruebas",
+    "prevention": "Prevenci\u00f3n",
+    "encountersThisMonth": "Este mes",
+    "totalEncounters": "Total de encuentros",
+    "protectionRate": "Tasa de protecci\u00f3n",
+    "encounterTypes": "Tipos de encuentro",
+    "protectionMethods": "M\u00e9todos de protecci\u00f3n",
+    "daysSinceTest": "D\u00edas desde la \u00faltima prueba",
+    "neverTested": "Sin pruebas a\u00fan",
+    "testsThisYear": "Pruebas este a\u00f1o",
+    "conditionCoverage": "Cobertura de condiciones",
+    "coverageStatus": "Cobertura por condici\u00f3n",
+    "prepAdherence": "Adherencia a PrEP",
+    "noPrepData": "Sin medicamento PrEP registrado",
+    "currentStreak": "Racha actual",
+    "longestStreak": "Mejor racha",
+    "days": "{{count}} d\u00edas",
+    "streakMilestones": "Hitos",
+    "vaccines": "Vacunas",
+    "vaccinesCompleted": "Completadas",
+    "vaccinesPending": "Pendientes",
+    "activeReminders": "Recordatorios activos",
+    "noEncounters": "Sin encuentros registrados",
+    "noTests": "Sin pruebas registradas",
+    "noVaccines": "Sin vacunas registradas"
   },
   "connections": {
     "title": "Conexiones",

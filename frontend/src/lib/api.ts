@@ -476,6 +476,10 @@ export const api = {
         apiRequest<ReminderSettings>('/api/reminders/settings', token, { method: 'PUT', body: data }),
     },
   },
+  insights: {
+    get: (token: string) =>
+      apiRequest<InsightsResponse>('/api/insights', token),
+  },
 };
 
 // Types
@@ -824,3 +828,37 @@ export interface ReminderSettings {
 }
 
 export type UpdateReminderSettingsRequest = Partial<ReminderSettings>;
+
+// ── Insights ──
+export interface InsightsActivity {
+  totalEncounters: number;
+  encountersThisMonth: number;
+  encountersByMonth: Record<string, number>;
+  protectionRate: number;
+  encounterTypeCounts: Record<string, number>;
+  protectionMethodCounts: Record<string, number>;
+}
+
+export interface InsightsTesting {
+  daysSinceLastTest: number;
+  testsThisYear: number;
+  conditionsCovered: number;
+  totalStandardConditions: number;
+  lastTestDate: string | null;
+  coverageMap: Record<string, string>;
+}
+
+export interface InsightsPrevention {
+  prepAdherenceRate: number | null;
+  currentPrepStreakDays: number;
+  longestPrepStreakDays: number;
+  completedVaccines: string[];
+  pendingVaccines: string[];
+  activeReminders: number;
+}
+
+export interface InsightsResponse {
+  activity: InsightsActivity;
+  testing: InsightsTesting;
+  prevention: InsightsPrevention;
+}

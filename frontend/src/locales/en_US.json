@@ -130,7 +130,38 @@
     "exposureTimeframeHint": {
       "recent": "Reported within the last 30 days",
       "older": "Reported more than 30 days ago"
-    }
+    },
+    "goToInsights": "Insights"
+  },
+  "insights": {
+    "title": "Personal Insights",
+    "subtitle": "Your health data at a glance",
+    "activity": "Activity",
+    "testing": "Testing",
+    "prevention": "Prevention",
+    "encountersThisMonth": "This month",
+    "totalEncounters": "Total encounters",
+    "protectionRate": "Protection rate",
+    "encounterTypes": "Encounter types",
+    "protectionMethods": "Protection methods",
+    "daysSinceTest": "Days since last test",
+    "neverTested": "No tests yet",
+    "testsThisYear": "Tests this year",
+    "conditionCoverage": "Condition coverage",
+    "coverageStatus": "Coverage by condition",
+    "prepAdherence": "PrEP adherence",
+    "noPrepData": "No PrEP medication tracked",
+    "currentStreak": "Current streak",
+    "longestStreak": "Best streak",
+    "days": "{{count}} days",
+    "streakMilestones": "Milestones",
+    "vaccines": "Vaccinations",
+    "vaccinesCompleted": "Completed",
+    "vaccinesPending": "Pending",
+    "activeReminders": "Active reminders",
+    "noEncounters": "No encounters logged yet",
+    "noTests": "No tests recorded yet",
+    "noVaccines": "No vaccinations recorded"
   },
   "connections": {
     "title": "Connections",
