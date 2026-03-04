@@ -200,7 +200,7 @@ navilla:
   # Email Configuration
   email:
     enabled: ${EMAIL_ENABLED:false}
-    from: ${EMAIL_FROM:noreply@navilla.app}
+    from: ${EMAIL_FROM:no-reply@navilla.app}
     from-name: ${EMAIL_FROM_NAME:Navilla}
     reply-to: ${EMAIL_REPLY_TO:contact@navilla.app}
 

@@ -81,7 +81,7 @@ Navilla uses SendGrid for all transactional email, authenticated through the `na
 ### Sender address
 
 ```
-noreply@navilla.app
+no-reply@navilla.app
 ```
 
 Auth emails configured in **Supabase → Authentication → SMTP Settings**.
@@ -105,13 +105,13 @@ Digest emails configured via `navilla.email.*` properties in `application.yaml`.
 | `SMTP_USERNAME` | `apikey` | SendGrid uses literal "apikey" as username |
 | `SMTP_PASSWORD` | — | Your SendGrid API key (`SG.xxx`) |
 | `EMAIL_ENABLED` | `false` | Set to `true` to enable digest sending |
-| `EMAIL_FROM` | `noreply@navilla.app` | Sender address |
+| `EMAIL_FROM` | `no-reply@navilla.app` | Sender address |
 
 ### SendGrid domain authentication
 
 The `navilla.app` domain is authenticated in SendGrid with DKIM and SPF via the three CNAME records listed in the DNS table above. DMARC (`p=quarantine`) was already provisioned by GoDaddy and covers the policy layer.
 
-> **No mailbox needed.** `noreply@navilla.app` is a sending-only address. No inbox, no Titan/Google Workspace subscription required.
+> **No mailbox needed.** `no-reply@navilla.app` is a sending-only address. No inbox, no Titan/Google Workspace subscription required.
 
 ---
 

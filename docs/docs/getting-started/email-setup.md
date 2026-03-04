@@ -44,7 +44,7 @@ In your Supabase Dashboard:
 | Port | `587` |
 | Username | `apikey` |
 | Password | Your SendGrid API key |
-| Sender email | `noreply@navilla.app` |
+| Sender email | `no-reply@navilla.app` |
 | Sender name | `Navilla` |
 
 4. Click **Save**
