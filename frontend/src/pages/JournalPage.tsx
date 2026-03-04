@@ -43,12 +43,13 @@ export function JournalPage() {
   const [promoteState, setPromoteState] = useState<PromoteState | null>(null);
   const dismissedAliasesRef = useRef<Set<string>>(new Set());
 
-  const { data: entries, isLoading: entriesLoading } = useJournalEntries();
+  const { data: entries, isLoading: entriesLoading, isFetching: entriesFetching } = useJournalEntries();
   const { data: summary } = useJournalSummary(currentYear);
   const deleteMutation = useDeleteJournalEntry();
   const promoteMutation = usePromoteAlias();
 
   const isInitialLoading = entriesLoading && !entries;
+  const isRefetching = entriesFetching && !entriesLoading;
 
   const handleAdd = () => {
     setEditingEntry(null);
@@ -330,6 +331,14 @@ export function JournalPage() {
           </span>
         </button>
       </div>
+
+      {/* Refetching indicator */}
+      {isRefetching && (
+        <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--color-primary)' }}>
+          <span className="spinner" aria-hidden="true" />
+          {t('common.loading')}
+        </div>
+      )}
 
       {/* Content */}
       {viewMode === 'partners' ? (
