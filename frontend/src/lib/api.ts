@@ -4,6 +4,9 @@
 
 import { E2E_MODE, getE2eUserFromToken, type E2eUser } from './e2eMocks';
 import { env } from './env';
+import type { ReciprocityStatus } from '../types/reciprocity';
+import type { ConditionCatalogItem, NetworkStage } from '../types/catalog';
+import type { PhoneMatchNotification } from '../types/phoneMatch';
 
 const RAW_API_URL = env.get('VITE_API_URL') ?? '';
 const NORMALIZED_API_URL = RAW_API_URL.replace(/\/+$/, '');
@@ -114,6 +117,18 @@ function mockApiRequest<T>(
     return Promise.resolve([] as T);
   }
 
+  if (endpoint === '/api/reciprocity/status') {
+    return Promise.resolve({ optedIn: false, optedInAt: null, optedOutAt: null, cooldownDaysRemaining: null } as T);
+  }
+
+  if (endpoint === '/api/reciprocity/opt-in' || endpoint === '/api/reciprocity/opt-out') {
+    return Promise.resolve({ optedIn: false, optedInAt: null, optedOutAt: null, cooldownDaysRemaining: null } as T);
+  }
+
+  if (endpoint === '/api/phone-match/pending') {
+    return Promise.resolve([] as T);
+  }
+
   if (endpoint.startsWith('/api/journal/templates')) return Promise.resolve({ labels: [] } as T);
   if (endpoint.startsWith('/api/journal/summary')) return Promise.resolve({ year: 2026, monthlyCounts: {}, yearTotal: 0 } as T);
   if (endpoint === '/api/journal' && (!options || options.method === undefined || options.method === 'GET')) return Promise.resolve([] as T);
@@ -174,6 +189,7 @@ export interface CreateJournalEntryRequest {
   partnerAlias?: string;
   connectionId?: string;
   partnerId?: string;
+  phone?: string;
   notes?: string;
   customFields?: CustomField[];
   encounterTypes?: string[];
@@ -185,6 +201,7 @@ export interface UpdateJournalEntryRequest {
   partnerAlias?: string;
   connectionId?: string;
   partnerId?: string;
+  phone?: string;
   notes?: string;
   customFields?: CustomField[];
   encounterTypes?: string[];
@@ -433,6 +450,30 @@ export const api = {
       }
       return response.json();
     },
+    conditions: async (): Promise<ConditionCatalogItem[]> => {
+      if (E2E_MODE) {
+        return [];
+      }
+      const baseUrl = getApiBaseUrl();
+      const response = await fetch(`${baseUrl}/api/catalog/conditions`, { method: 'GET' });
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
+        throw new ApiError(error.message || 'Failed to fetch conditions catalog', response.status, error);
+      }
+      return response.json();
+    },
+    stages: async (): Promise<NetworkStage[]> => {
+      if (E2E_MODE) {
+        return [];
+      }
+      const baseUrl = getApiBaseUrl();
+      const response = await fetch(`${baseUrl}/api/catalog/stages`, { method: 'GET' });
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
+        throw new ApiError(error.message || 'Failed to fetch network stages', response.status, error);
+      }
+      return response.json();
+    },
   },
   medications: {
     list: (token: string) =>
@@ -500,6 +541,24 @@ export const api = {
       apiRequest<void>(`/api/push/subscriptions/${id}`, token, { method: 'DELETE' }),
     list: (token: string) =>
       apiRequest<PushSubscriptionItem[]>('/api/push/subscriptions', token),
+  },
+  reciprocity: {
+    status: (token: string) =>
+      apiRequest<ReciprocityStatus>('/api/reciprocity/status', token),
+    optIn: (token: string) =>
+      apiRequest<ReciprocityStatus>('/api/reciprocity/opt-in', token, { method: 'POST' }),
+    optOut: (token: string) =>
+      apiRequest<ReciprocityStatus>('/api/reciprocity/opt-out', token, { method: 'POST' }),
+  },
+  phoneMatch: {
+    pending: (token: string) =>
+      apiRequest<PhoneMatchNotification[]>('/api/phone-match/pending', token),
+    confirm: (token: string, entryId: string) =>
+      apiRequest<void>(`/api/phone-match/${entryId}/confirm`, token, { method: 'POST' }),
+    deny: (token: string, entryId: string) =>
+      apiRequest<void>(`/api/phone-match/${entryId}/deny`, token, { method: 'POST' }),
+    block: (token: string, body: { phoneHash: string }) =>
+      apiRequest<void>('/api/phone-match/block', token, { method: 'POST', body }),
   },
 };
 

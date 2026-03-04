@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { X, Plus } from 'lucide-react';
 import { useUser } from '../../hooks/useUser';
@@ -6,6 +6,7 @@ import {
   useCreateTestVisit,
   useUpdateTestVisit,
 } from '../../hooks/useHealthLog';
+import { useConditionCatalog } from '../../hooks/useCatalog';
 import type { TestVisit, TestResultInput } from '../../lib/api';
 import { LabPicker } from './LabPicker';
 
@@ -15,7 +16,8 @@ interface TestVisitModalProps {
   editVisit?: TestVisit | null;
 }
 
-const STANDARD_CONDITIONS = [
+/** Fallback conditions used when the catalog has not loaded yet */
+const FALLBACK_CONDITIONS = [
   'HIV',
   'CHLAMYDIA',
   'GONORRHEA',
@@ -43,8 +45,8 @@ function todayISO(): string {
   return new Date().toISOString().split('T')[0];
 }
 
-function buildInitialRows(editVisit?: TestVisit | null): ConditionRow[] {
-  const rows: ConditionRow[] = STANDARD_CONDITIONS.map((ct) => {
+function buildInitialRows(conditions: readonly string[], editVisit?: TestVisit | null): ConditionRow[] {
+  const rows: ConditionRow[] = conditions.map((ct) => {
     const existing = editVisit?.results.find(
       (r) => r.conditionType === ct
     );
@@ -79,6 +81,18 @@ function buildInitialRows(editVisit?: TestVisit | null): ConditionRow[] {
 }
 
 export function TestVisitModal({ isOpen, onClose, editVisit }: TestVisitModalProps) {
+  const { data: catalogConditions } = useConditionCatalog();
+
+  // Derive condition codes from catalog, falling back to hardcoded list
+  const conditionCodes = useMemo(() => {
+    if (catalogConditions && catalogConditions.length > 0) {
+      return catalogConditions
+        .sort((a, b) => a.displayOrder - b.displayOrder)
+        .map((c) => c.code);
+    }
+    return [...FALLBACK_CONDITIONS];
+  }, [catalogConditions]);
+
   // Use a key to reset form state when modal opens with different visit
   const formKey = isOpen
     ? `${editVisit?.id ?? 'new'}-${editVisit?.updatedAt ?? ''}`
@@ -91,6 +105,7 @@ export function TestVisitModal({ isOpen, onClose, editVisit }: TestVisitModalPro
       key={formKey}
       editVisit={editVisit}
       onClose={onClose}
+      conditionCodes={conditionCodes}
     />
   );
 }
@@ -98,9 +113,10 @@ export function TestVisitModal({ isOpen, onClose, editVisit }: TestVisitModalPro
 interface TestVisitFormProps {
   editVisit?: TestVisit | null;
   onClose: () => void;
+  conditionCodes: string[];
 }
 
-function TestVisitForm({ editVisit, onClose }: TestVisitFormProps) {
+function TestVisitForm({ editVisit, onClose, conditionCodes }: TestVisitFormProps) {
   const { t } = useTranslation();
   const { data: userProfile } = useUser();
 
@@ -116,7 +132,7 @@ function TestVisitForm({ editVisit, onClose }: TestVisitFormProps) {
   const [labReference, setLabReference] = useState(editVisit?.labReference ?? '');
   const [notes, setNotes] = useState(editVisit?.notes ?? '');
   const [conditionRows, setConditionRows] = useState<ConditionRow[]>(
-    () => buildInitialRows(editVisit)
+    () => buildInitialRows(conditionCodes, editVisit)
   );
   const [error, setError] = useState<string | null>(null);
 

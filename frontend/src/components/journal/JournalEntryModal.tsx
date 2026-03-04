@@ -129,6 +129,7 @@ function JournalEntryForm({
   const [formAlias, setFormAlias] = useState(entry?.partnerAlias ?? '');
   const [formConnectionId, setFormConnectionId] = useState<string>(entry?.connectionId ?? '');
   const [formPartnerId, setFormPartnerId] = useState<string | null>(entry?.partnerId ?? null);
+  const [formPhone, setFormPhone] = useState('');
   const [formNotes, setFormNotes] = useState(entry?.notes ?? '');
   const [customFields, setCustomFields] = useState<CustomFieldState[]>(
     () => buildInitialCustomFields(entry, savedLabels)
@@ -313,6 +314,7 @@ function JournalEntryForm({
       partnerAlias: alias,
       connectionId: formConnectionId || undefined,
       partnerId: formPartnerId || undefined,
+      phone: formPhone.trim() || undefined,
       notes: formNotes.trim() || undefined,
       customFields: filteredCustomFields.length > 0 ? filteredCustomFields : undefined,
       encounterTypes: formEncounterTypes.length > 0 ? formEncounterTypes : undefined,
@@ -577,6 +579,26 @@ function JournalEntryForm({
               </select>
             </div>
           )}
+
+          {/* Phone number */}
+          <div>
+            <label className="label" htmlFor="journal-phone">
+              {t('journal.phone')}
+            </label>
+            <input
+              id="journal-phone"
+              type="tel"
+              className="input"
+              value={formPhone}
+              placeholder="+52 55 1234 5678"
+              maxLength={20}
+              onChange={(e) => setFormPhone(e.target.value)}
+              autoComplete="off"
+            />
+            <p className="text-xs text-muted mt-1">
+              {t('journal.phoneHint')}
+            </p>
+          </div>
 
           {/* Encounter types */}
           <div>

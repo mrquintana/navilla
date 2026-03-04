@@ -582,6 +582,8 @@
     "linkConnection": "Vincular a conexión",
     "selectConnection": "Selecciona una conexión...",
     "noConnection": "Ninguna",
+    "phone": "Teléfono del compañero/a",
+    "phoneHint": "Permite conexión automática",
     "customFields": "Campos personalizados",
     "addField": "Agregar campo",
     "saveForFuture": "Guardar \"{{label}}\" para futuras entradas",
@@ -949,5 +951,28 @@
     "updateAvailable": "Una nueva versión está disponible.",
     "updateButton": "Actualizar",
     "updateDismiss": "Después"
+  },
+  "reciprocity": {
+    "title": "Red de Exposición",
+    "description": "Comparte tus resultados para ver datos de exposición de la red de tus conexiones.",
+    "benefit1": "Ve si se han reportado condiciones en tu red",
+    "benefit2": "Recibe notificaciones de posibles riesgos de exposición",
+    "benefit3": "Contribuye a la concientización de salud comunitaria",
+    "optIn": "Unirme a la Red de Exposición",
+    "optOut": "Salir de la Red de Exposición",
+    "cooldown": "Puedes volver a unirte en {{days}} días",
+    "active": "Eres parte de la Red de Exposición",
+    "leaveWarning": "Perderás acceso a los datos de exposición y tus resultados serán removidos de la red."
+  },
+  "phoneMatch": {
+    "pending": "Posibles Coincidencias",
+    "description": "Alguien registró un encuentro que puede involucrarte",
+    "from": "Alguien en {{location}}",
+    "date": "Alrededor de {{date}}",
+    "phone": "Teléfono: {{phone}}",
+    "confirm": "Sí, lo recuerdo",
+    "deny": "No soy yo",
+    "block": "Bloquear este número",
+    "report": "Reportar abuso"
   }
 }

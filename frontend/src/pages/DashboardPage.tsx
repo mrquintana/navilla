@@ -11,6 +11,8 @@ import { getConditionInfo } from '../lib/conditionInfo';
 import { PageSkeleton, SkeletonBlock } from '../components/ui/LoadingShell';
 import { UpcomingReminders } from '../components/reminders/UpcomingReminders';
 import { OnboardingFlow } from '../components/onboarding/OnboardingFlow';
+import { useReciprocityStatus } from '../hooks/useReciprocity';
+import { ReciprocityOptInCard } from '../components/reciprocity/ReciprocityOptInCard';
 
 export function DashboardPage() {
   const { t, i18n } = useTranslation();
@@ -42,6 +44,9 @@ export function DashboardPage() {
     queryFn: () => api.health.list(token),
     enabled: !!token,
   });
+
+  const reciprocityQuery = useReciprocityStatus();
+  const isOptedIn = reciprocityQuery.data?.optedIn ?? false;
 
   const hasPositiveStatus = (healthQuery.data ?? []).some(
     (status) => status.status === 'positive' && !status.clearedAt
@@ -177,150 +182,154 @@ export function DashboardPage() {
 
       {/* Status + Connections — 2-col on md+ */}
       <div className="grid gap-6 md:grid-cols-2">
-        {/* Status Card */}
-        <div className="card card-elevated">
-          <div className="flex items-center gap-3 mb-4">
-            <div
-              className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                hasPositiveStatus ? 'bg-red-100' : 'bg-green-100'
-              }`}
-            >
-              <svg
-                className={`w-5 h-5 ${hasPositiveStatus ? 'text-red-600' : 'text-green-600'}`}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+        {/* Status Card — gated by reciprocity */}
+        {!isOptedIn ? (
+          <ReciprocityOptInCard />
+        ) : (
+          <div className="card card-elevated">
+            <div className="flex items-center gap-3 mb-4">
+              <div
+                className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                  hasPositiveStatus ? 'bg-red-100' : 'bg-green-100'
+                }`}
               >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <h3 className="text-sm font-semibold uppercase tracking-wider" style={{ color: 'var(--color-muted)' }}>
-              {t('dashboard.exposureStatus')}
-            </h3>
-          </div>
-
-          {/* Status badge */}
-          {healthInitialLoading || exposureInitialLoading ? (
-            <div role="status" aria-live="polite" className="mt-1">
-              <span className="sr-only">{t('common.loading')}</span>
-              <SkeletonBlock className="h-7 w-44 rounded-full" />
-            </div>
-          ) : hasPositiveStatus ? (
-            <span className="badge badge-error text-sm">{t('dashboard.selfPositive')}</span>
-          ) : (exposureQuery.data?.exposures?.length ?? 0) > 0 ? (
-            <div className="flex items-center gap-2">
-              <span className="badge badge-warning text-sm">{t('dashboard.potentialExposure')}</span>
-              <button
-                type="button"
-                className="btn btn-secondary btn-sm"
-                onClick={() => setShowExposureHelp((prev) => !prev)}
-                title={t('dashboard.exposureHelpTitle')}
-              >
-                <HelpCircle className="nav-icon" aria-hidden="true" />
-              </button>
-            </div>
-          ) : exposureQuery.data?.message ? (
-            <span className="badge badge-warning text-sm">{t(exposureQuery.data.message)}</span>
-          ) : (
-            <span className="badge badge-success text-sm">{t('dashboard.noExposure')}</span>
-          )}
-
-          {/* Exposure help tooltip */}
-          {showExposureHelp && (
-            <div className="mt-3 rounded-md border border-border-light bg-white/70 p-3 text-xs text-muted">
-              <p className="font-semibold text-foreground mb-1">{t('dashboard.exposureHelpTitle')}</p>
-              <p>{t('dashboard.exposureHelpBody')}</p>
-            </div>
-          )}
-
-          {/* Exposure items */}
-          {(exposureQuery.data?.exposures?.length ?? 0) > 0 && (
-            <div className="mt-3 space-y-2 text-sm">
-              <div className="flex items-center justify-between gap-3">
-                <p className="text-xs text-muted">{t('dashboard.exposureSummary')}</p>
-                <Link to="/health-log" className="text-[11px] font-semibold tracking-wide uppercase text-primary">
-                  {t('dashboard.exposureSummaryMore')}
-                </Link>
+                <svg
+                  className={`w-5 h-5 ${hasPositiveStatus ? 'text-red-600' : 'text-green-600'}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
               </div>
-              <p className="text-[11px] text-muted">
-                {t('dashboard.exposureSummaryPreview', {
-                  shown: Math.min(3, exposureQuery.data?.exposures?.length ?? 0),
-                  total: exposureQuery.data?.exposures?.length ?? 0,
-                })}
-              </p>
-              <div className="space-y-2">
-                {exposureQuery.data?.exposures?.slice(0, 3).map((item) => {
-                  const info = getConditionInfo(item.condition, i18n.language);
-                  return (
-                    <div
-                      key={item.condition}
-                      className="exposure-item"
-                    >
-                      <div className="text-xs font-semibold uppercase tracking-wide text-foreground">
-                        <a
-                          className="health-condition-link"
-                          href={info.url}
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          {item.condition}
-                          <ExternalLink className="nav-icon" aria-hidden="true" />
-                        </a>
-                      </div>
-                      <div className="mt-2 grid gap-2 text-xs sm:grid-cols-3">
-                        <div className="space-y-1">
-                          <div className="text-muted">{t('dashboard.exposureLabelDegree')}</div>
-                          <div className="font-medium">{formatDegree(item.closestDegree)}</div>
-                        </div>
-                        <div className="space-y-1">
-                          <div className="text-muted">{t('dashboard.exposureLabelCount')}</div>
-                          <div className="font-medium">{item.count}</div>
-                        </div>
-                        <div className="space-y-1">
-                          <div className="text-muted">{t('dashboard.exposureLabelStatus')}</div>
-                          <div
-                            className="font-medium cursor-help"
-                            title={`${t(`dashboard.exposureStatusHint.${item.status}`)} \u00B7 ${t(`dashboard.exposureTimeframeHint.${item.timeframe}`)}`}
+              <h3 className="text-sm font-semibold uppercase tracking-wider" style={{ color: 'var(--color-muted)' }}>
+                {t('dashboard.exposureStatus')}
+              </h3>
+            </div>
+
+            {/* Status badge */}
+            {healthInitialLoading || exposureInitialLoading ? (
+              <div role="status" aria-live="polite" className="mt-1">
+                <span className="sr-only">{t('common.loading')}</span>
+                <SkeletonBlock className="h-7 w-44 rounded-full" />
+              </div>
+            ) : hasPositiveStatus ? (
+              <span className="badge badge-error text-sm">{t('dashboard.selfPositive')}</span>
+            ) : (exposureQuery.data?.exposures?.length ?? 0) > 0 ? (
+              <div className="flex items-center gap-2">
+                <span className="badge badge-warning text-sm">{t('dashboard.potentialExposure')}</span>
+                <button
+                  type="button"
+                  className="btn btn-secondary btn-sm"
+                  onClick={() => setShowExposureHelp((prev) => !prev)}
+                  title={t('dashboard.exposureHelpTitle')}
+                >
+                  <HelpCircle className="nav-icon" aria-hidden="true" />
+                </button>
+              </div>
+            ) : exposureQuery.data?.message ? (
+              <span className="badge badge-warning text-sm">{t(exposureQuery.data.message)}</span>
+            ) : (
+              <span className="badge badge-success text-sm">{t('dashboard.noExposure')}</span>
+            )}
+
+            {/* Exposure help tooltip */}
+            {showExposureHelp && (
+              <div className="mt-3 rounded-md border border-border-light bg-white/70 p-3 text-xs text-muted">
+                <p className="font-semibold text-foreground mb-1">{t('dashboard.exposureHelpTitle')}</p>
+                <p>{t('dashboard.exposureHelpBody')}</p>
+              </div>
+            )}
+
+            {/* Exposure items */}
+            {(exposureQuery.data?.exposures?.length ?? 0) > 0 && (
+              <div className="mt-3 space-y-2 text-sm">
+                <div className="flex items-center justify-between gap-3">
+                  <p className="text-xs text-muted">{t('dashboard.exposureSummary')}</p>
+                  <Link to="/health-log" className="text-[11px] font-semibold tracking-wide uppercase text-primary">
+                    {t('dashboard.exposureSummaryMore')}
+                  </Link>
+                </div>
+                <p className="text-[11px] text-muted">
+                  {t('dashboard.exposureSummaryPreview', {
+                    shown: Math.min(3, exposureQuery.data?.exposures?.length ?? 0),
+                    total: exposureQuery.data?.exposures?.length ?? 0,
+                  })}
+                </p>
+                <div className="space-y-2">
+                  {exposureQuery.data?.exposures?.slice(0, 3).map((item) => {
+                    const info = getConditionInfo(item.condition, i18n.language);
+                    return (
+                      <div
+                        key={item.condition}
+                        className="exposure-item"
+                      >
+                        <div className="text-xs font-semibold uppercase tracking-wide text-foreground">
+                          <a
+                            className="health-condition-link"
+                            href={info.url}
+                            target="_blank"
+                            rel="noreferrer"
                           >
-                            {t(`dashboard.exposureStatusLabels.${item.status}`)} \u00B7 {t(`dashboard.exposureTimeframe.${item.timeframe}`)}
+                            {item.condition}
+                            <ExternalLink className="nav-icon" aria-hidden="true" />
+                          </a>
+                        </div>
+                        <div className="mt-2 grid gap-2 text-xs sm:grid-cols-3">
+                          <div className="space-y-1">
+                            <div className="text-muted">{t('dashboard.exposureLabelDegree')}</div>
+                            <div className="font-medium">{formatDegree(item.closestDegree)}</div>
+                          </div>
+                          <div className="space-y-1">
+                            <div className="text-muted">{t('dashboard.exposureLabelCount')}</div>
+                            <div className="font-medium">{item.count}</div>
+                          </div>
+                          <div className="space-y-1">
+                            <div className="text-muted">{t('dashboard.exposureLabelStatus')}</div>
+                            <div
+                              className="font-medium cursor-help"
+                              title={`${t(`dashboard.exposureStatusHint.${item.status}`)} \u00B7 ${t(`dashboard.exposureTimeframeHint.${item.timeframe}`)}`}
+                            >
+                              {t(`dashboard.exposureStatusLabels.${item.status}`)} \u00B7 {t(`dashboard.exposureTimeframe.${item.timeframe}`)}
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Footer links */}
-          <div className="mt-4 flex flex-wrap items-center gap-3">
-            <Link to="/health-log" className="text-sm text-primary font-medium">
-              {t('dashboard.viewHealthStatus')}
-            </Link>
+            {/* Footer links */}
+            <div className="mt-4 flex flex-wrap items-center gap-3">
+              <Link to="/health-log" className="text-sm text-primary font-medium">
+                {t('dashboard.viewHealthStatus')}
+              </Link>
+              {DEV_MODE && (
+                <button
+                  className="btn btn-secondary btn-sm"
+                  type="button"
+                  onClick={() => recomputeMutation.mutate()}
+                  disabled={recomputeMutation.isPending}
+                >
+                  {recomputeMutation.isPending ? t('common.loading') : t('dashboard.recomputeExposure')}
+                </button>
+              )}
+            </div>
+
+            {/* Dev debug */}
             {DEV_MODE && (
-              <button
-                className="btn btn-secondary btn-sm"
-                type="button"
-                onClick={() => recomputeMutation.mutate()}
-                disabled={recomputeMutation.isPending}
-              >
-                {recomputeMutation.isPending ? t('common.loading') : t('dashboard.recomputeExposure')}
-              </button>
+              <div className="mt-4 rounded-md border border-red-200 bg-red-50 p-3 text-xs text-red-700">
+                <div className="font-semibold mb-1">{t('dashboard.devExposureDebug')}</div>
+                <div>{t('dashboard.devConnectionCount')}: {exposureQuery.data?.connectionCount ?? '\u2014'}</div>
+                <div>{t('dashboard.devSecondDegree')}: {exposureQuery.data?.secondDegreeCount ?? '\u2014'}</div>
+                <div>{t('dashboard.devThirdDegree')}: {exposureQuery.data?.thirdDegreeCount ?? '\u2014'}</div>
+                <div>{t('dashboard.devExposureCount')}: {exposureQuery.data?.exposures?.length ?? 0}</div>
+              </div>
             )}
           </div>
-
-          {/* Dev debug */}
-          {DEV_MODE && (
-            <div className="mt-4 rounded-md border border-red-200 bg-red-50 p-3 text-xs text-red-700">
-              <div className="font-semibold mb-1">{t('dashboard.devExposureDebug')}</div>
-              <div>{t('dashboard.devConnectionCount')}: {exposureQuery.data?.connectionCount ?? '\u2014'}</div>
-              <div>{t('dashboard.devSecondDegree')}: {exposureQuery.data?.secondDegreeCount ?? '\u2014'}</div>
-              <div>{t('dashboard.devThirdDegree')}: {exposureQuery.data?.thirdDegreeCount ?? '\u2014'}</div>
-              <div>{t('dashboard.devExposureCount')}: {exposureQuery.data?.exposures?.length ?? 0}</div>
-            </div>
-          )}
-        </div>
+        )}
 
         {/* Connections Card */}
         <div className="card card-elevated">

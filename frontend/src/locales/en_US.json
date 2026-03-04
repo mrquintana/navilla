@@ -583,6 +583,8 @@
     "linkConnection": "Link to connection",
     "selectConnection": "Select a connection...",
     "noConnection": "None",
+    "phone": "Partner's phone number",
+    "phoneHint": "Enables automatic connection matching",
     "customFields": "Custom fields",
     "addField": "Add field",
     "saveForFuture": "Save \"{{label}}\" for future entries",
@@ -950,5 +952,28 @@
     "updateAvailable": "A new version is available.",
     "updateButton": "Update",
     "updateDismiss": "Later"
+  },
+  "reciprocity": {
+    "title": "Exposure Network",
+    "description": "Share your test results to see exposure data from your connections' network.",
+    "benefit1": "See if conditions have been reported in your network",
+    "benefit2": "Get notified of potential exposure risks",
+    "benefit3": "Contribute to community health awareness",
+    "optIn": "Join the Exposure Network",
+    "optOut": "Leave the Exposure Network",
+    "cooldown": "You can rejoin in {{days}} days",
+    "active": "You are part of the Exposure Network",
+    "leaveWarning": "You will lose access to exposure data and your results will be removed from the network."
+  },
+  "phoneMatch": {
+    "pending": "Potential Matches",
+    "description": "Someone logged an encounter that may involve you",
+    "from": "Someone in {{location}}",
+    "date": "Around {{date}}",
+    "phone": "Phone: {{phone}}",
+    "confirm": "Yes, I remember",
+    "deny": "Not me",
+    "block": "Block this number",
+    "report": "Report abuse"
   }
 }
