@@ -19,7 +19,8 @@
     "page": "Page",
     "of": "of",
     "select": "Select...",
-    "backToHome": "Back to Home"
+    "backToHome": "Back to Home",
+    "comingSoon": "Coming soon"
   },
   "auth": {
     "signIn": "Sign In",
@@ -338,6 +339,18 @@
     "deleteAccountWarning": "Are you sure? This will permanently delete your account and anonymize all your data. Your connections, health statuses, and profile will be removed. This action cannot be undone.",
     "deleteAccountTypeConfirm": "Type DELETE to confirm",
     "deleteAccountConfirmButton": "Permanently Delete Account"
+  },
+  "preferences": {
+    "title": "Preferences",
+    "exposureDescription": "Share your results to see exposure data from your network",
+    "active": "Active",
+    "leave": "Leave",
+    "joinNetwork": "Join",
+    "matchNotifications": "Match Notifications",
+    "matchNotificationsDescription": "Get notified when someone logs an encounter that may involve you",
+    "emailDigestDescription": "Receive a weekly summary of your health reminders by email",
+    "reminderSettingsDescription": "Quiet hours, reminder types, and notification preferences",
+    "configure": "Configure"
   },
   "errors": {
     "required": "This field is required",

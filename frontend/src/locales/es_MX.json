@@ -19,7 +19,8 @@
     "page": "Página",
     "of": "de",
     "select": "Seleccionar...",
-    "backToHome": "Volver al Inicio"
+    "backToHome": "Volver al Inicio",
+    "comingSoon": "Próximamente"
   },
   "auth": {
     "signIn": "Iniciar Sesión",
@@ -337,6 +338,18 @@
     "deleteAccountWarning": "¿Estás seguro? Esto eliminará permanentemente tu cuenta y anonimizará todos tus datos. Tus conexiones, estados de salud y perfil serán removidos. Esta acción no se puede deshacer.",
     "deleteAccountTypeConfirm": "Escribe DELETE para confirmar",
     "deleteAccountConfirmButton": "Eliminar Cuenta Permanentemente"
+  },
+  "preferences": {
+    "title": "Preferencias",
+    "exposureDescription": "Comparte tus resultados para ver datos de exposición de tu red",
+    "active": "Activo",
+    "leave": "Salir",
+    "joinNetwork": "Unirme",
+    "matchNotifications": "Notificaciones de Coincidencia",
+    "matchNotificationsDescription": "Recibe notificaciones cuando alguien registre un encuentro que pueda involucrarte",
+    "emailDigestDescription": "Recibe un resumen semanal de tus recordatorios de salud por correo",
+    "reminderSettingsDescription": "Horas silenciosas, tipos de recordatorios y preferencias de notificación",
+    "configure": "Configurar"
   },
   "errors": {
     "required": "Este campo es obligatorio",

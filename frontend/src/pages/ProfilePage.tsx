@@ -10,8 +10,12 @@ import { queryClient } from '../queryClient';
 import { LanguageSwitcher } from '../components/LanguageSwitcher';
 import { countries } from '../lib/geolocation';
 import { DEV_MODE } from '../lib/devMode';
-import { AtSign, Calendar, Eye, MapPin, Shield, Trash2, User, UserCircle2 } from 'lucide-react';
+import { AtSign, Bell, BellOff, Calendar, Eye, MapPin, Phone, Settings, Shield, Trash2, User, UserCircle2 } from 'lucide-react';
 import { PageSkeleton, SkeletonBlock, SkeletonRows } from '../components/ui/LoadingShell';
+import { useReciprocityStatus, useOptIn, useOptOut } from '../hooks/useReciprocity';
+import { useReminderSettings, useUpdateReminderSettings } from '../hooks/useReminders';
+import { usePushNotifications } from '../hooks/usePushNotifications';
+import { ReminderSettingsModal } from '../components/reminders/ReminderSettingsModal';
 
 const AVATAR_BUCKET = 'avatars';
 const AVATAR_SIZE = 512;
@@ -607,6 +611,8 @@ export function ProfilePage() {
         </div>
       </div>
 
+      <PreferencesSection />
+
       <div className="card border-red-200 bg-red-50/50 space-y-4">
         <h3 className="font-semibold text-red-700">{t('settings.dangerZone')}</h3>
         <p className="text-sm text-red-600">{t('settings.dangerZoneDescription')}</p>
@@ -666,5 +672,218 @@ export function ProfilePage() {
         </div>
       )}
     </div>
+  );
+}
+
+function PreferencesSection() {
+  const { t } = useTranslation();
+  const { data: reciprocityStatus, isLoading: reciprocityLoading } = useReciprocityStatus();
+  const optInMutation = useOptIn();
+  const optOutMutation = useOptOut();
+  const { data: reminderSettings, isLoading: reminderLoading } = useReminderSettings();
+  const updateReminderMutation = useUpdateReminderSettings();
+  const { isSupported: pushSupported, permission: pushPermission, isSubscribed: pushSubscribed, isLoading: pushLoading, subscribe: pushSubscribe, unsubscribe: pushUnsubscribe } = usePushNotifications();
+  const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
+  const [showReminderModal, setShowReminderModal] = useState(false);
+
+  const isLoading = reciprocityLoading || reminderLoading;
+
+  return (
+    <>
+      <div className="card card-elevated space-y-5">
+        <div className="flex items-center gap-3">
+          <Settings className="w-5 h-5" style={{ color: 'var(--color-primary)' }} aria-hidden="true" />
+          <h3 className="font-semibold">{t('preferences.title')}</h3>
+        </div>
+
+        {isLoading ? (
+          <div className="flex items-center justify-center py-4">
+            <span className="spinner" aria-label={t('common.loading')} />
+          </div>
+        ) : (
+          <div className="divide-y" style={{ borderColor: 'var(--color-border-light)' }}>
+            {/* Exposure Network */}
+            <div className="py-4 first:pt-0">
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <Shield className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--color-primary)' }} aria-hidden="true" />
+                  <div>
+                    <p className="text-sm font-medium">{t('reciprocity.title')}</p>
+                    <p className="text-xs" style={{ color: 'var(--color-muted)' }}>
+                      {t('preferences.exposureDescription')}
+                    </p>
+                  </div>
+                </div>
+                {reciprocityStatus && (
+                  <div className="flex-shrink-0">
+                    {reciprocityStatus.optedIn ? (
+                      !showLeaveConfirm ? (
+                        <button
+                          type="button"
+                          className="badge badge-success text-xs cursor-pointer hover:opacity-80 transition-opacity"
+                          onClick={() => setShowLeaveConfirm(true)}
+                          title={t('reciprocity.optOut')}
+                        >
+                          {t('preferences.active')}
+                        </button>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            className="btn btn-secondary btn-sm text-xs"
+                            onClick={() => setShowLeaveConfirm(false)}
+                            disabled={optOutMutation.isPending}
+                          >
+                            {t('common.cancel')}
+                          </button>
+                          <button
+                            type="button"
+                            className="btn btn-sm text-xs text-white"
+                            style={{ background: '#dc3545' }}
+                            onClick={() => {
+                              optOutMutation.mutate(undefined, {
+                                onSuccess: () => setShowLeaveConfirm(false),
+                              });
+                            }}
+                            disabled={optOutMutation.isPending}
+                          >
+                            {optOutMutation.isPending ? (
+                              <span className="spinner" aria-hidden="true" />
+                            ) : (
+                              t('preferences.leave')
+                            )}
+                          </button>
+                        </div>
+                      )
+                    ) : reciprocityStatus.cooldownDaysRemaining && reciprocityStatus.cooldownDaysRemaining > 0 ? (
+                      <span className="text-xs" style={{ color: 'var(--color-muted)' }}>
+                        {t('reciprocity.cooldown', { days: reciprocityStatus.cooldownDaysRemaining })}
+                      </span>
+                    ) : (
+                      <button
+                        type="button"
+                        className="btn btn-primary btn-sm text-xs"
+                        onClick={() => optInMutation.mutate()}
+                        disabled={optInMutation.isPending}
+                      >
+                        {optInMutation.isPending ? (
+                          <span className="spinner" aria-hidden="true" />
+                        ) : (
+                          t('preferences.joinNetwork')
+                        )}
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Match Notifications */}
+            <div className="py-4">
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <Phone className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--color-primary)' }} aria-hidden="true" />
+                  <div>
+                    <p className="text-sm font-medium">{t('preferences.matchNotifications')}</p>
+                    <p className="text-xs" style={{ color: 'var(--color-muted)' }}>
+                      {t('preferences.matchNotificationsDescription')}
+                    </p>
+                  </div>
+                </div>
+                <span className="text-xs px-2 py-1 rounded-full" style={{ background: 'var(--color-background-secondary)', color: 'var(--color-muted)' }}>
+                  {t('common.comingSoon')}
+                </span>
+              </div>
+            </div>
+
+            {/* Push Notifications */}
+            {pushSupported && (
+              <div className="py-4">
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <Bell className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--color-primary)' }} aria-hidden="true" />
+                    <div>
+                      <p className="text-sm font-medium">{t('reminders.pushNotifications')}</p>
+                      <p className="text-xs" style={{ color: 'var(--color-muted)' }}>
+                        {t('reminders.pushDescription')}
+                      </p>
+                      {pushPermission === 'denied' && (
+                        <p className="flex items-center gap-1 text-xs text-amber-600 mt-1">
+                          <BellOff className="w-3 h-3" aria-hidden="true" />
+                          {t('reminders.pushBlocked')}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={pushSubscribed}
+                    disabled={pushLoading || pushPermission === 'denied'}
+                    onChange={(e) => {
+                      if (e.target.checked) pushSubscribe();
+                      else pushUnsubscribe();
+                    }}
+                    className="accent-indigo-600 w-5 h-5 flex-shrink-0"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Email Digest */}
+            <div className="py-4">
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <Bell className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--color-primary)' }} aria-hidden="true" />
+                  <div>
+                    <p className="text-sm font-medium">{t('reminders.emailDigest')}</p>
+                    <p className="text-xs" style={{ color: 'var(--color-muted)' }}>
+                      {t('preferences.emailDigestDescription')}
+                    </p>
+                  </div>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={!!reminderSettings?.emailDigestEnabled}
+                  onChange={(e) => {
+                    if (!reminderSettings) return;
+                    updateReminderMutation.mutate({
+                      ...reminderSettings,
+                      emailDigestEnabled: e.target.checked,
+                      emailDigestDay: e.target.checked ? (reminderSettings.emailDigestDay ?? 'MONDAY') : null,
+                    });
+                  }}
+                  disabled={updateReminderMutation.isPending}
+                  className="accent-indigo-600 w-5 h-5 flex-shrink-0"
+                />
+              </div>
+            </div>
+
+            {/* Reminder Settings */}
+            <div className="py-4 last:pb-0">
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <Settings className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--color-primary)' }} aria-hidden="true" />
+                  <div>
+                    <p className="text-sm font-medium">{t('reminders.settings')}</p>
+                    <p className="text-xs" style={{ color: 'var(--color-muted)' }}>
+                      {t('preferences.reminderSettingsDescription')}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  className="btn btn-secondary btn-sm text-xs"
+                  onClick={() => setShowReminderModal(true)}
+                >
+                  {t('preferences.configure')}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <ReminderSettingsModal isOpen={showReminderModal} onClose={() => setShowReminderModal(false)} />
+    </>
   );
 }
