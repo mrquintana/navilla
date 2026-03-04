@@ -33,6 +33,7 @@ import org.springframework.context.annotation.Configuration;
  * <p>Named caches:
  * <ul>
  *   <li>{@code catalog} — global, 1 hour TTL (public health catalog data)</li>
+ *   <li>{@code appConfig} — global, 1 hour TTL (runtime configuration)</li>
  *   <li>{@code healthLogSummary} — per-user, 5 minute TTL</li>
  *   <li>{@code insights} — per-user, 5 minute TTL</li>
  *   <li>{@code prepStreak} — per-user, 10 minute TTL</li>
@@ -52,6 +53,7 @@ public class CacheConfig {
     SimpleCacheManager manager = new SimpleCacheManager();
     manager.setCaches(List.of(
         buildCache("catalog", 1, TimeUnit.HOURS, 1),
+        buildCache("appConfig", 1, TimeUnit.HOURS, 200),
         buildCache("healthLogSummary", 5, TimeUnit.MINUTES, 500),
         buildCache("insights", 5, TimeUnit.MINUTES, 500),
         buildCache("prepStreak", 10, TimeUnit.MINUTES, 500)
