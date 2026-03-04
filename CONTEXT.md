@@ -127,6 +127,35 @@ A detailed breakdown of the project's directory layout and key files can be foun
 
 ---
 
+## Session Notes (2026-03-03 — Week 9: PWA + Push Notifications + Caching + Email)
+
+- ✅ **Caffeine cache setup** — `@EnableCaching` with 4 named caches: catalog (1hr), healthLogSummary (5min), insights (5min), prepStreak (10min). `@Cacheable` on read paths, `@CacheEvict` on write paths
+- ✅ **Push subscription backend** — Migration `013_push_subscriptions.sql`, `PushSubscription` entity with AES-256-GCM encrypted endpoint/p256dh/auth, CRUD controller at `/api/push/*`
+- ✅ **Web Push service (VAPID/RFC 8030)** — jose4j for JWT signing (Java 25 compatible), `WebPushService` sends fire-and-forget push via HttpClient, handles 404/410 stale subscription cleanup
+- ✅ **Email infrastructure** — Spring Mail + SendGrid SMTP, Thymeleaf email templates (en/es), `EmailService` with fire-and-forget delivery, configurable `navilla.email.enabled` flag
+- ✅ **Email digest job** — `@Scheduled` daily at batch-hour, sends weekly digest with PrEP adherence, testing status, upcoming reminders, vaccine due dates. Day-of-week filtering per user settings
+- ✅ **Push wired into notification system** — `NotificationService.createNotification()` sends push after persisting notification. Single push point (no duplication). Maps all 10 NotificationType values to click URLs
+- ✅ **PWA manifest + icons** — vite-plugin-pwa with `injectManifest` strategy, manifest.webmanifest (theme_color #4f46e5, standalone display), Apple meta tags, generated icons (192/512/512-maskable)
+- ✅ **Custom service worker** — Workbox precaching (66 entries) + runtime caching: API (NetworkFirst 10s), Catalog (StaleWhileRevalidate 1hr), Google Fonts (CacheFirst 1yr), Images (CacheFirst 30d)
+- ✅ **Install prompt + offline indicator** — PWA install banner with 7-day dismiss, offline amber top bar, update prompt (SKIP_WAITING flow)
+- ✅ **Push subscription frontend** — `usePushNotifications` hook, `pushNotifications.ts` utility (urlBase64ToUint8Array, subscribe/unsubscribe), push API in `api.ts`
+- ✅ **SW push handler** — `push` event shows notification with icon/badge/tag, `notificationclick` focuses existing window or opens new
+- ✅ **Push toggle in settings UI** — Toggle in ReminderSettingsModal, permission-denied warning with BellOff icon
+- ✅ **nginx.conf updated** — CSP: added `worker-src 'self'`, `manifest-src 'self'`. No-cache rules for sw.js and manifest.webmanifest
+- ✅ **Postman collection updated** — Push Notifications folder (4 endpoints: VAPID key, subscribe, list, unsubscribe)
+- ✅ i18n: ~15 new keys in en_US + es_MX (pwa.*, reminders.push*, notifications.*)
+- ✅ Full test suite: 299 backend tests passing, frontend lint + build:full clean
+- **Branch:** `feature/week9-pwa-push-notifications`
+- **Needs manual action:** Run migration `013_push_subscriptions.sql` on Supabase
+- **Railway env vars needed:** `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `SENDGRID_API_KEY`, `EMAIL_ENABLED`
+- **Key architecture decisions:**
+  - jose4j instead of webpush-java (Java 25 compatibility)
+  - Push sending centralized in NotificationService (not scattered across schedulers)
+  - injectManifest strategy for custom service worker (more control than generateSW)
+  - Email digest is fire-and-forget with `enabled=false` as safe default
+
+---
+
 ## Session Notes (2026-03-03 — Week 8: Personal Insights + Onboarding + Quick Wins)
 
 - ✅ **Toast notification system** — global `ToastContext` + `ToastContainer` with auto-dismiss (4s), slide-in animation, `prefers-reduced-motion` support, `aria-live="polite"` accessibility
@@ -691,16 +720,18 @@ For a quick start and a list of development commands, please refer to the main `
 
 ## Next Steps
 
-Week 7 (Smart Reminders + Medication Tracking) complete. Moving to Week 8 next.
+Week 9 (PWA + Push Notifications + Caching + Email) complete. Moving to Week 10 next.
 
 | Priority | Item | GitHub Issue | Notes |
 |----------|------|-------------|-------|
-| **Next** | Week 8: Personal insights + doctor visit prep | — | Insights dashboard, PDF export, saved clinics |
-| **Action** | Run migration 011 on Supabase | — | `011_reminders_medications.sql` — 5 new tables |
-| **Action** | Merge `feature/week7-reminders-medications` → `develop` | — | ~25 commits, all tests passing |
+| **Next** | Week 10: Per roadmap | — | Check `UPCOMING_FEATURES_AND_ROADMAP.md` |
+| **Action** | Run migration 013 on Supabase | — | `013_push_subscriptions.sql` — push_subscriptions table |
+| **Action** | Set Railway env vars | — | `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `SENDGRID_API_KEY`, `EMAIL_ENABLED` |
+| **Action** | Merge `feature/week9-pwa-push-notifications` → `develop` | — | All tests passing |
+| **Action** | Generate VAPID key pair | — | `npx web-push generate-vapid-keys` or openssl |
 | High | Backend Spanish translations | #8 | Frontend done, backend messages_es_MX.properties still English |
-| High | SendGrid SMTP for password reset | #14 | Infrastructure config — not code |
 | Medium | User guide documentation | #19 | Screenshots + walkthrough for end users |
+| Medium | Lighthouse PWA audit | — | Run after deployment to verify installability |
 
 Run `gh issue list` for the full list.
 
