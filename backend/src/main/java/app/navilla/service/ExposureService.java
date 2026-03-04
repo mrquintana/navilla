@@ -34,10 +34,12 @@ import app.navilla.entity.ConnectionStatus;
 import app.navilla.entity.ExposureSnapshot;
 import app.navilla.entity.HealthStatus;
 import app.navilla.entity.HealthStatusValue;
+import app.navilla.entity.User;
 import app.navilla.metrics.ExposureMetrics;
 import app.navilla.repository.ConnectionRepository;
 import app.navilla.repository.ExposureSnapshotRepository;
 import app.navilla.repository.HealthStatusRepository;
+import app.navilla.repository.UserRepository;
 import app.navilla.security.EncryptionService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -55,6 +57,7 @@ public class ExposureService {
   private final ConnectionRepository connectionRepository;
   private final HealthStatusRepository healthStatusRepository;
   private final ExposureSnapshotRepository exposureSnapshotRepository;
+  private final UserRepository userRepository;
   private final EncryptionService encryptionService;
   private final ObjectMapper objectMapper;
   private final ExposureMetrics exposureMetrics;
@@ -71,6 +74,11 @@ public class ExposureService {
   @Transactional(readOnly = true)
   public ExposureResponse getExposureSnapshot(Jwt jwt) {
     String userHash = encryptionService.hashEmail(jwt.getClaimAsString("email"));
+
+    // Reciprocity guard: user must be opted into the exposure network
+    if (!isUserOptedIn(userHash)) {
+      return buildReciprocityRequiredResponse();
+    }
 
     ExposureSnapshot snapshot = exposureSnapshotRepository.findByUserHash(userHash).orElse(null);
     if (snapshot != null && snapshot.getExpiresAt().isAfter(OffsetDateTime.now())) {
@@ -126,6 +134,12 @@ public class ExposureService {
   @Transactional
   public ExposureResponse recomputeExposureSnapshot(Jwt jwt) {
     String userHash = encryptionService.hashEmail(jwt.getClaimAsString("email"));
+
+    // Reciprocity guard: user must be opted into the exposure network
+    if (!isUserOptedIn(userHash)) {
+      return buildReciprocityRequiredResponse();
+    }
+
     ExposureResponse response = exposureMetrics.timeComputation(() -> computeExposureSnapshot(userHash));
     persistSnapshot(userHash, response);
     return response;
@@ -165,10 +179,14 @@ public class ExposureService {
         .map(Map.Entry::getKey)
         .toList();
 
-    List<HealthStatus> statuses = exposureUsers.isEmpty()
+    // Filter to only include users who have opted into the exposure network.
+    // Non-opted-in users' health data should not appear in anyone's exposure calculations.
+    List<String> optedInExposureUsers = filterOptedInUsers(exposureUsers);
+
+    List<HealthStatus> statuses = optedInExposureUsers.isEmpty()
         ? List.of()
         : healthStatusRepository.findByUserHashInAndStatus(
-            exposureUsers, HealthStatusValue.POSITIVE);
+            optedInExposureUsers, HealthStatusValue.POSITIVE);
 
     Map<String, ExposureAggregate> aggregates = new HashMap<>();
 
@@ -287,6 +305,50 @@ public class ExposureService {
     } catch (Exception ex) {
       log.warn("Failed to persist exposure snapshot for user {}", userHash, ex);
     }
+  }
+
+  /**
+   * Checks whether the user identified by their hash has opted into the exposure network.
+   *
+   * @param userHash the user's hashed identifier
+   * @return true if the user exists and has opted in
+   */
+  private boolean isUserOptedIn(String userHash) {
+    return userRepository.findByEmailHash(userHash)
+        .map(User::getExposureOptedIn)
+        .orElse(false);
+  }
+
+  /**
+   * Builds a response indicating the user must opt into the exposure network.
+   *
+   * @return an ExposureResponse with no exposure data and a reciprocity required message
+   */
+  private ExposureResponse buildReciprocityRequiredResponse() {
+    return new ExposureResponse(
+        0, null, null, null, null,
+        List.of(),
+        OffsetDateTime.now(), null,
+        "exposure.reciprocityRequired", null
+    );
+  }
+
+  /**
+   * Filters a list of user hashes to only include users who have opted into the exposure network.
+   *
+   * @param userHashes list of user hashes to filter
+   * @return filtered list containing only opted-in users
+   */
+  private List<String> filterOptedInUsers(List<String> userHashes) {
+    if (userHashes.isEmpty()) {
+      return userHashes;
+    }
+    Set<String> hashSet = new HashSet<>(userHashes);
+    List<User> users = userRepository.findByEmailHashIn(hashSet);
+    return users.stream()
+        .filter(u -> Boolean.TRUE.equals(u.getExposureOptedIn()))
+        .map(User::getEmailHash)
+        .toList();
   }
 
   private static final class ExposureAggregate {

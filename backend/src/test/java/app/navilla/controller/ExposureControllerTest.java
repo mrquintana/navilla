@@ -38,15 +38,15 @@ class ExposureControllerTest {
   private MockMvc mockMvc;
 
   @Test
-  @DisplayName("should return exposure snapshot for authenticated user")
-  void shouldReturnExposureSnapshot() throws Exception {
+  @DisplayName("should return reciprocity required message for user not opted in")
+  void shouldReturnReciprocityRequiredForNonOptedInUser() throws Exception {
     mockMvc.perform(get("/api/exposures")
             .with(jwt().jwt(builder -> builder
                 .subject("test-subject")
                 .claim("email", "exposure@example.com"))))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.connectionCount").exists())
-        .andExpect(jsonPath("$.totalGraphNodes").exists())
-        .andExpect(jsonPath("$.maxDepth").exists());
+        .andExpect(jsonPath("$.connectionCount").value(0))
+        .andExpect(jsonPath("$.message").value("exposure.reciprocityRequired"))
+        .andExpect(jsonPath("$.exposures").isEmpty());
   }
 }
