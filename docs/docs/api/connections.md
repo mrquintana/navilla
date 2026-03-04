@@ -254,6 +254,19 @@ No response body.
 | `DENIED` | Connection rejected by recipient |
 | `EXPIRED` | Request expired without response |
 
+## Connection Types (Phase 3)
+
+Connections now track how they were formed via the `connection_type` field:
+
+| Type | Description | Confirmation |
+|------|-------------|-------------|
+| `PHONE_MATCH` | Both users logged each other's phone numbers within ±2 days | Automatic (mutual logging = consent) |
+| `NOTIFICATION_MATCH` | One user logged phone, other confirmed via notification | Manual ("Yes, I remember") |
+| `EXPLICIT` | Traditional request via email/username (default) | Manual (accept/deny) |
+| `LINK` | Connected via shareable link | Manual (accept) |
+
+See [Phone Matching](./phone-matching) for details on phone-based connection paths.
+
 ## Postman Collection
 
 A Postman collection with all API endpoints is available for download:

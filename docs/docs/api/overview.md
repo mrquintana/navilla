@@ -59,3 +59,6 @@ Responses return plain JSON objects or arrays. Error responses use the standard 
 | [Health Status](./health-status) | STI status management |
 | [Exposures](./exposures) | Exposure calculations |
 | [Notifications](./notifications) | In-app notifications |
+| [Catalog](./catalog) | Conditions, network stages, health catalog |
+| [Reciprocity](./reciprocity) | Exposure network opt-in/out |
+| [Phone Matching](./phone-matching) | Phone-based connection matching |
