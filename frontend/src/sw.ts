@@ -84,3 +84,50 @@ registerRoute(
     ],
   })
 )
+
+// ── Push Notifications ──
+
+interface PushData {
+  title?: string
+  body?: string
+  url?: string
+  icon?: string
+  tag?: string
+}
+
+// Show notification when push is received
+self.addEventListener('push', (event: PushEvent) => {
+  const data: PushData = event.data?.json() ?? {}
+  const title = data.title ?? 'Navilla'
+  const options: NotificationOptions = {
+    body: data.body ?? '',
+    icon: data.icon ?? '/icons/icon-192.png',
+    badge: '/icons/icon-192.png',
+    tag: data.tag ?? 'navilla-notification',
+    data: { url: data.url ?? '/' },
+  }
+
+  event.waitUntil(self.registration.showNotification(title, options))
+})
+
+// Navigate to URL when notification is clicked
+self.addEventListener('notificationclick', (event: NotificationEvent) => {
+  event.notification.close()
+
+  const targetUrl = (event.notification.data as { url?: string })?.url ?? '/'
+
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+      // Focus existing window if available
+      for (const client of clientList) {
+        if ('focus' in client) {
+          client.focus()
+          client.navigate(targetUrl)
+          return
+        }
+      }
+      // Otherwise open new window
+      self.clients.openWindow(targetUrl)
+    })
+  )
+})

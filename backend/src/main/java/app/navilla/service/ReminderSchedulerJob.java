@@ -131,7 +131,8 @@ public class ReminderSchedulerJob {
 
   /**
    * Creates a notification for the given reminder, mapping the reminder type
-   * to the appropriate {@link NotificationType}.
+   * to the appropriate {@link NotificationType}. Also sends a web push
+   * notification (fire-and-forget).
    */
   private void createNotificationForReminder(Reminder reminder) {
     NotificationType notificationType = mapReminderTypeToNotificationType(
@@ -145,6 +146,7 @@ public class ReminderSchedulerJob {
         reminder.getId());
 
     log.info("Created {} notification for reminder {}", notificationType, reminder.getId());
+    // Push is sent by NotificationService.createNotification() — no duplicate needed
   }
 
   /**

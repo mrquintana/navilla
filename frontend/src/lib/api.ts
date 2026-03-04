@@ -486,6 +486,21 @@ export const api = {
     get: (token: string) =>
       apiRequest<InsightsResponse>('/api/insights', token),
   },
+  push: {
+    vapidPublicKey: async () => {
+      const baseUrl = getApiBaseUrl();
+      const res = await fetch(`${baseUrl}/api/push/vapid-public-key`);
+      if (!res.ok) throw new Error('Failed to fetch VAPID key');
+      const data: { publicKey: string } = await res.json();
+      return data.publicKey;
+    },
+    subscribe: (token: string, data: PushSubscriptionData) =>
+      apiRequest<PushSubscriptionItem>('/api/push/subscribe', token, { method: 'POST', body: data }),
+    unsubscribe: (token: string, id: string) =>
+      apiRequest<void>(`/api/push/subscriptions/${id}`, token, { method: 'DELETE' }),
+    list: (token: string) =>
+      apiRequest<PushSubscriptionItem[]>('/api/push/subscriptions', token),
+  },
 };
 
 // Types
@@ -879,4 +894,16 @@ export interface InsightsResponse {
   activity: InsightsActivity;
   testing: InsightsTesting;
   prevention: InsightsPrevention;
+}
+
+// ── Push Subscriptions ──
+export interface PushSubscriptionData {
+  endpoint: string;
+  p256dh: string;
+  auth: string;
+}
+
+export interface PushSubscriptionItem {
+  id: string;
+  createdAt: string;
 }

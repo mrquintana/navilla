@@ -22,6 +22,7 @@ import java.util.UUID;
 
 import app.navilla.dto.NotificationPayload;
 import app.navilla.dto.NotificationResponse;
+import app.navilla.dto.PushPayload;
 import app.navilla.entity.Notification;
 import app.navilla.entity.NotificationType;
 import app.navilla.exception.ResourceNotFoundException;
@@ -44,6 +45,8 @@ public class NotificationService {
   private final EncryptionService encryptionService;
   private final ObjectMapper objectMapper;
   private final NotificationMetrics notificationMetrics;
+  private final WebPushService webPushService;
+  private final PushSubscriptionService pushSubscriptionService;
 
   /**
    * Creates a connection request notification.
@@ -159,7 +162,8 @@ public class NotificationService {
     return unread.size();
   }
 
-  private void createNotification(String userHash, NotificationType type, NotificationPayload payload) {
+  private void createNotification(String userHash, NotificationType type,
+                                    NotificationPayload payload) {
     try {
       String json = objectMapper.writeValueAsString(payload);
       byte[] encrypted = encryptionService.encryptToBytes(json);
@@ -173,10 +177,50 @@ public class NotificationService {
 
       notificationRepository.save(notification);
       notificationMetrics.recordCreated(type);
+
+      // Fire-and-forget web push
+      sendPushForNotification(userHash, type, payload.messageKey());
     } catch (Exception ex) {
       log.error("Failed to create notification", ex);
       notificationMetrics.recordCreationFailed(type);
     }
+  }
+
+  /**
+   * Sends a web push notification for an in-app notification. Fire-and-forget:
+   * failures are logged but never propagated.
+   *
+   * @param userHash   the hashed user identifier
+   * @param type       the notification type
+   * @param messageKey the i18n message key
+   */
+  private void sendPushForNotification(String userHash, NotificationType type,
+                                        String messageKey) {
+    try {
+      String url = mapNotificationTypeToUrl(type);
+      PushPayload pushPayload = PushPayload.withDefaults(
+          type.name(), messageKey, url, type.name());
+      webPushService.sendPushToUser(userHash, pushPayload, pushSubscriptionService);
+    } catch (Exception ex) {
+      log.warn("Failed to send push notification (non-fatal): {}", ex.getMessage());
+    }
+  }
+
+  /**
+   * Maps a {@link NotificationType} to the frontend route URL that should
+   * open when the push notification is clicked.
+   *
+   * @param type the notification type
+   * @return the frontend route path
+   */
+  private String mapNotificationTypeToUrl(NotificationType type) {
+    return switch (type) {
+      case MEDICATION_REMINDER, VACCINATION_REMINDER, TESTING_REMINDER,
+           FOLLOW_UP_REMINDER -> "/health-log";
+      case CONNECTION_REQUEST, CONNECTION_CONFIRMED, CONNECTION_DENIED -> "/connections";
+      case EXPOSURE_ALERT, EXPOSURE_CLEARED -> "/connections";
+      case ACCOUNT_SECURITY -> "/settings";
+    };
   }
 
   private NotificationResponse toResponse(Notification notification) {

@@ -223,4 +223,5 @@ class ReminderSchedulerJobTest {
     verify(notificationService, never()).createReminderNotification(
         any(), any(), any(), any());
   }
+
 }

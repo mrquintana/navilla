@@ -875,7 +875,10 @@
     "snooze1Week": "1 week",
     "markDone": "Mark Done",
     "enable": "Enable",
-    "disable": "Disable"
+    "disable": "Disable",
+    "pushNotifications": "Push Notifications",
+    "pushDescription": "Receive medication reminders and health alerts directly on your device.",
+    "pushBlocked": "Notifications are blocked in your browser settings. Please allow notifications for Navilla to enable push."
   },
   "security": {
     "seoTitle": "Security — Navilla",

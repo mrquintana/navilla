@@ -1,11 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import { X } from 'lucide-react';
+import { X, BellOff } from 'lucide-react';
 import {
   useReminderSettings,
   useUpdateReminderSettings,
 } from '../../hooks/useReminders';
+import { usePushNotifications } from '../../hooks/usePushNotifications';
 import type { ReminderSettings } from '../../lib/api';
 
 interface ReminderSettingsModalProps {
@@ -180,6 +181,9 @@ function ReminderSettingsForm({ settings, onClose }: { settings: ReminderSetting
         )}
       </fieldset>
 
+      {/* Push Notifications */}
+      <PushNotificationsSection />
+
       {/* Per-type toggles */}
       <fieldset className="space-y-3">
         <ToggleRow
@@ -231,6 +235,46 @@ function ReminderSettingsForm({ settings, onClose }: { settings: ReminderSetting
         </button>
       </div>
     </form>
+  );
+}
+
+function PushNotificationsSection() {
+  const { t } = useTranslation();
+  const { isSupported, permission, isSubscribed, isLoading, subscribe, unsubscribe } = usePushNotifications();
+
+  if (!isSupported) return null;
+
+  return (
+    <fieldset className="space-y-2">
+      <div className="flex items-center justify-between">
+        <label className="label mb-0" htmlFor="push-toggle">
+          {t('reminders.pushNotifications')}
+        </label>
+        <input
+          id="push-toggle"
+          type="checkbox"
+          checked={isSubscribed}
+          disabled={isLoading || permission === 'denied'}
+          onChange={(e) => {
+            if (e.target.checked) {
+              subscribe();
+            } else {
+              unsubscribe();
+            }
+          }}
+          className="accent-indigo-600 w-5 h-5"
+        />
+      </div>
+      <p className="text-xs" style={{ color: 'var(--color-muted)' }}>
+        {t('reminders.pushDescription')}
+      </p>
+      {permission === 'denied' && (
+        <div className="flex items-center gap-2 text-xs text-amber-600">
+          <BellOff className="w-4 h-4 shrink-0" />
+          {t('reminders.pushBlocked')}
+        </div>
+      )}
+    </fieldset>
   );
 }
 
