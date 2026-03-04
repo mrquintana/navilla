@@ -16,6 +16,7 @@
 
 package app.navilla.repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -27,4 +28,6 @@ import org.springframework.stereotype.Repository;
 public interface ReminderSettingsRepository extends JpaRepository<ReminderSettings, UUID> {
 
   Optional<ReminderSettings> findByUserHash(String userHash);
+
+  List<ReminderSettings> findByEmailDigestEnabledTrueAndEmailDigestDay(String day);
 }
