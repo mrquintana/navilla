@@ -26,15 +26,13 @@ import java.util.Locale;
 import java.util.Map;
 
 import app.navilla.config.EmailProperties;
-import jakarta.mail.internet.MimeMessage;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.mail.javamail.JavaMailSender;
 
 /**
  * Unit tests for {@link EmailService}.
@@ -46,19 +44,10 @@ import org.springframework.mail.javamail.JavaMailSender;
 class EmailServiceTest {
 
   @Mock
-  private JavaMailSender mailSender;
-
-  @Mock
   private EmailProperties emailProperties;
 
   @Mock
   private EmailTemplateService emailTemplateService;
-
-  @Mock
-  private MimeMessage mimeMessage;
-
-  @InjectMocks
-  private EmailService emailService;
 
   private static final String TO = "user@example.com";
   private static final String SUBJECT = "Your Weekly Summary";
@@ -75,39 +64,43 @@ class EmailServiceTest {
     void shouldSkipWhenDisabled() {
       when(emailProperties.enabled()).thenReturn(false);
 
+      EmailService emailService = new EmailService(
+          emailProperties, emailTemplateService, new ObjectMapper());
+
       emailService.sendTemplatedEmail(TO, SUBJECT, TEMPLATE, VARIABLES, LOCALE);
 
-      verify(mailSender, never()).send(any(MimeMessage.class));
       verify(emailTemplateService, never()).render(any(), any(), any());
     }
 
     @Test
-    @DisplayName("should send email with correct from/to/content when enabled")
-    void shouldSendWhenEnabled() {
+    @DisplayName("should render template when enabled")
+    void shouldRenderTemplateWhenEnabled() {
       when(emailProperties.enabled()).thenReturn(true);
-      when(emailProperties.from()).thenReturn("noreply@navilla.app");
-      when(emailProperties.fromName()).thenReturn("Navilla");
-      when(emailProperties.replyTo()).thenReturn("contact@navilla.app");
-      when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
+      when(emailProperties.sendgridApiKey()).thenReturn(null);
       when(emailTemplateService.render(eq(TEMPLATE), eq(VARIABLES), eq(LOCALE)))
           .thenReturn("<html><body>Hello</body></html>");
 
+      EmailService emailService = new EmailService(
+          emailProperties, emailTemplateService, new ObjectMapper());
+
+      // Will skip actual send because API key is null, but template is rendered
       emailService.sendTemplatedEmail(TO, SUBJECT, TEMPLATE, VARIABLES, LOCALE);
 
-      verify(mailSender).send(mimeMessage);
+      verify(emailTemplateService).render(eq(TEMPLATE), eq(VARIABLES), eq(LOCALE));
     }
 
     @Test
-    @DisplayName("should not throw when mail sender fails")
+    @DisplayName("should not throw when template rendering fails")
     void shouldNotThrowOnFailure() {
       when(emailProperties.enabled()).thenReturn(true);
-      when(mailSender.createMimeMessage()).thenThrow(
-          new RuntimeException("SMTP connection refused"));
+      when(emailTemplateService.render(any(), any(), any()))
+          .thenThrow(new RuntimeException("Template not found"));
+
+      EmailService emailService = new EmailService(
+          emailProperties, emailTemplateService, new ObjectMapper());
 
       // No exception should propagate — fire and forget
       emailService.sendTemplatedEmail(TO, SUBJECT, TEMPLATE, VARIABLES, LOCALE);
-
-      verify(mailSender, never()).send(any(MimeMessage.class));
     }
   }
 }

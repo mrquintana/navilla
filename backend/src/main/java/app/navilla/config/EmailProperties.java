@@ -35,5 +35,6 @@ public record EmailProperties(
     boolean enabled,
     String from,
     String fromName,
-    String replyTo
+    String replyTo,
+    String sendgridApiKey
 ) {}

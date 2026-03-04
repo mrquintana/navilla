@@ -35,23 +35,10 @@ spring:
           issuer-uri: ${SUPABASE_URL:https://your-project.supabase.co}/auth/v1
           jwk-set-uri: ${SUPABASE_URL:https://your-project.supabase.co}/auth/v1/.well-known/jwks.json
 
-  # Email Configuration (SendGrid SMTP)
+  # Email Configuration (SendGrid HTTP API — SMTP ports blocked on Railway)
   mail:
-    host: ${SMTP_HOST:smtp.sendgrid.net}
-    port: ${SMTP_PORT:465}
-    username: ${SMTP_USERNAME:apikey}
-    password: ${SMTP_PASSWORD:}
-    properties:
-      mail:
-        smtp:
-          auth: true
-          ssl:
-            enable: true
-          starttls:
-            enable: false
-          connectiontimeout: 5000
-          timeout: 5000
-          writetimeout: 5000
+    host: ${SMTP_HOST:localhost}
+    port: ${SMTP_PORT:25}
 
 # Server Configuration
 server:
@@ -208,6 +195,7 @@ navilla:
     from: ${EMAIL_FROM:no-reply@navilla.app}
     from-name: ${EMAIL_FROM_NAME:Navilla}
     reply-to: ${EMAIL_REPLY_TO:contact@navilla.app}
+    sendgrid-api-key: ${SENDGRID_API_KEY:}
 
   cors:
     allowed-origins:

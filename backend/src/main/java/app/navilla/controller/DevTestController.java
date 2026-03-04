@@ -4,19 +4,21 @@
 
 package app.navilla.controller;
 
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
 import app.navilla.config.EmailProperties;
 import app.navilla.service.EmailTemplateService;
-import jakarta.mail.internet.InternetAddress;
-import jakarta.mail.internet.MimeMessage;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,9 +37,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class DevTestController {
 
-  private final JavaMailSender mailSender;
   private final EmailProperties emailProperties;
   private final EmailTemplateService emailTemplateService;
+  private final ObjectMapper objectMapper;
 
   @GetMapping("/email-status")
   public ResponseEntity<Map<String, Object>> emailStatus(
@@ -46,7 +48,9 @@ public class DevTestController {
         "emailEnabled", emailProperties.enabled(),
         "from", emailProperties.from(),
         "fromName", emailProperties.fromName(),
-        "replyTo", emailProperties.replyTo()));
+        "replyTo", emailProperties.replyTo(),
+        "hasApiKey", emailProperties.sendgridApiKey() != null
+            && !emailProperties.sendgridApiKey().isBlank()));
   }
 
   @PostMapping("/test-email")
@@ -59,10 +63,11 @@ public class DevTestController {
           .body(Map.of("error", "Missing 'to' field"));
     }
 
-    if (!emailProperties.enabled()) {
+    String apiKey = emailProperties.sendgridApiKey();
+    if (apiKey == null || apiKey.isBlank()) {
       return ResponseEntity.ok(Map.of(
           "status", "skipped",
-          "reason", "EMAIL_ENABLED is false"));
+          "reason", "SENDGRID_API_KEY not set"));
     }
 
     String locale = request.getOrDefault("locale", "en");
@@ -81,23 +86,47 @@ public class DevTestController {
                   "HPV dose 2 — Apr 1")),
           Locale.forLanguageTag(locale));
 
-      MimeMessage message = mailSender.createMimeMessage();
-      MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-      helper.setFrom(new InternetAddress(emailProperties.from(), emailProperties.fromName()));
-      helper.setReplyTo(emailProperties.replyTo());
-      helper.setTo(to);
-      helper.setSubject("Navilla — Test Email (" + locale + ")");
-      helper.setText(htmlContent, true);
+      // Direct SendGrid HTTP API call for clear error reporting
+      Map<String, Object> payload = Map.of(
+          "personalizations", new Object[]{
+              Map.of("to", new Object[]{Map.of("email", to)})},
+          "from", Map.of(
+              "email", emailProperties.from(),
+              "name", emailProperties.fromName()),
+          "reply_to", Map.of("email", emailProperties.replyTo()),
+          "subject", "Navilla — Test Email (" + locale + ")",
+          "content", new Object[]{
+              Map.of("type", "text/html", "value", htmlContent)});
 
-      mailSender.send(message);
+      String jsonBody = objectMapper.writeValueAsString(payload);
 
-      return ResponseEntity.ok(Map.of(
-          "status", "sent",
-          "to", to,
-          "from", emailProperties.from(),
-          "template", "digest_" + locale));
+      HttpClient client = HttpClient.newBuilder()
+          .connectTimeout(Duration.ofSeconds(10)).build();
+      HttpRequest httpRequest = HttpRequest.newBuilder()
+          .uri(URI.create("https://api.sendgrid.com/v3/mail/send"))
+          .header("Authorization", "Bearer " + apiKey)
+          .header("Content-Type", "application/json")
+          .timeout(Duration.ofSeconds(10))
+          .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
+          .build();
+
+      HttpResponse<String> response = client.send(httpRequest,
+          HttpResponse.BodyHandlers.ofString());
+
+      if (response.statusCode() >= 200 && response.statusCode() < 300) {
+        return ResponseEntity.ok(Map.of(
+            "status", "sent",
+            "httpCode", String.valueOf(response.statusCode()),
+            "to", to,
+            "from", emailProperties.from()));
+      } else {
+        return ResponseEntity.internalServerError()
+            .body(Map.of(
+                "status", "rejected",
+                "httpCode", String.valueOf(response.statusCode()),
+                "error", response.body()));
+      }
     } catch (Exception ex) {
-      log.error("Test email failed: {}", ex.getMessage(), ex);
       return ResponseEntity.internalServerError()
           .body(Map.of(
               "status", "failed",

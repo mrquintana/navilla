@@ -16,24 +16,28 @@
 
 package app.navilla.service;
 
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
 import java.util.Locale;
 import java.util.Map;
 
 import app.navilla.config.EmailProperties;
-import jakarta.mail.internet.InternetAddress;
-import jakarta.mail.internet.MimeMessage;
-import lombok.RequiredArgsConstructor;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 /**
- * Sends templated emails via the configured SMTP provider (SendGrid).
+ * Sends templated emails via SendGrid's HTTP API v3.
+ *
+ * <p>Uses HTTPS (port 443) instead of SMTP, which avoids port-blocking
+ * issues on cloud providers like Railway.
  *
  * <p>When {@code navilla.email.enabled} is {@code false}, all send operations
  * are silently skipped and logged at debug level, allowing safe local
- * development without an SMTP server.
+ * development without credentials.
  *
  * <p>Emails are fire-and-forget: failures are logged but never propagated
  * to callers, so a broken mail server cannot disrupt user-facing operations.
@@ -43,19 +47,35 @@ import org.springframework.stereotype.Service;
  */
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class EmailService {
 
-  private final JavaMailSender mailSender;
+  private static final String SENDGRID_API_URL = "https://api.sendgrid.com/v3/mail/send";
+
   private final EmailProperties emailProperties;
   private final EmailTemplateService emailTemplateService;
+  private final HttpClient httpClient;
+  private final ObjectMapper objectMapper;
 
   /**
-   * Sends a templated email to the specified recipient.
+   * Creates a new EmailService.
    *
-   * <p>The template is resolved and rendered by {@link EmailTemplateService},
-   * using the provided locale for language selection. If email is disabled
-   * via configuration, the method returns immediately.
+   * @param emailProperties      email configuration properties
+   * @param emailTemplateService template rendering service
+   * @param objectMapper         JSON serializer for SendGrid payloads
+   */
+  public EmailService(EmailProperties emailProperties,
+                      EmailTemplateService emailTemplateService,
+                      ObjectMapper objectMapper) {
+    this.emailProperties = emailProperties;
+    this.emailTemplateService = emailTemplateService;
+    this.objectMapper = objectMapper;
+    this.httpClient = HttpClient.newBuilder()
+        .connectTimeout(Duration.ofSeconds(10))
+        .build();
+  }
+
+  /**
+   * Sends a templated email to the specified recipient via SendGrid HTTP API.
    *
    * @param to           the recipient email address
    * @param subject      the email subject line
@@ -72,21 +92,60 @@ public class EmailService {
 
     try {
       String htmlContent = emailTemplateService.render(templateName, variables, locale);
-
-      MimeMessage message = mailSender.createMimeMessage();
-      MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-
-      helper.setFrom(new InternetAddress(emailProperties.from(), emailProperties.fromName()));
-      helper.setReplyTo(emailProperties.replyTo());
-      helper.setTo(to);
-      helper.setSubject(subject);
-      helper.setText(htmlContent, true);
-
-      mailSender.send(message);
+      sendViaHttpApi(to, subject, htmlContent);
       log.info("Email sent to {} (template: {})", to, templateName);
     } catch (Exception ex) {
       log.error("Failed to send email to {} (template: {}): {}",
           to, templateName, ex.getMessage(), ex);
+    }
+  }
+
+  /**
+   * Sends an email via SendGrid's v3 HTTP API.
+   */
+  void sendViaHttpApi(String to, String subject, String htmlContent) throws Exception {
+    String apiKey = emailProperties.sendgridApiKey();
+    if (apiKey == null || apiKey.isBlank()) {
+      log.warn("SendGrid API key not configured, skipping email to {}", to);
+      return;
+    }
+
+    // Build SendGrid v3 mail/send payload
+    Map<String, Object> payload = Map.of(
+        "personalizations", new Object[]{
+            Map.of("to", new Object[]{Map.of("email", to)})
+        },
+        "from", Map.of(
+            "email", emailProperties.from(),
+            "name", emailProperties.fromName()
+        ),
+        "reply_to", Map.of("email", emailProperties.replyTo()),
+        "subject", subject,
+        "content", new Object[]{
+            Map.of("type", "text/html", "value", htmlContent)
+        }
+    );
+
+    String jsonBody = objectMapper.writeValueAsString(payload);
+
+    HttpRequest request = HttpRequest.newBuilder()
+        .uri(URI.create(SENDGRID_API_URL))
+        .header("Authorization", "Bearer " + apiKey)
+        .header("Content-Type", "application/json")
+        .timeout(Duration.ofSeconds(10))
+        .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
+        .build();
+
+    HttpResponse<String> response = httpClient.send(request,
+        HttpResponse.BodyHandlers.ofString());
+
+    if (response.statusCode() >= 200 && response.statusCode() < 300) {
+      log.debug("SendGrid accepted email to {} (HTTP {})", to, response.statusCode());
+    } else {
+      log.error("SendGrid rejected email to {} (HTTP {}): {}",
+          to, response.statusCode(), response.body());
+      throw new RuntimeException("SendGrid HTTP " + response.statusCode()
+          + ": " + response.body());
     }
   }
 }
