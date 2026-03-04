@@ -193,6 +193,39 @@ public class User {
   @Column(name = "avatar_thumb_key", length = 255)
   private String avatarThumbKey;
 
+  // ==================== Reciprocity & Notifications ====================
+
+  /**
+   * Whether the user wants to receive match notifications.
+   */
+  @Column(name = "receive_match_notifications", nullable = false)
+  @Builder.Default
+  private Boolean receiveMatchNotifications = false;
+
+  /**
+   * Whether the user has opted into the exposure network.
+   *
+   * <p>Users must explicitly opt in to participate in exposure matching.
+   * Opting out triggers a cooldown period before re-opting in.
+   */
+  @Column(name = "exposure_opted_in", nullable = false)
+  @Builder.Default
+  private Boolean exposureOptedIn = false;
+
+  /**
+   * Timestamp when the user last opted into the exposure network.
+   */
+  @Column(name = "exposure_opted_in_at")
+  private OffsetDateTime exposureOptedInAt;
+
+  /**
+   * Timestamp when the user last opted out of the exposure network.
+   *
+   * <p>Used to calculate the cooldown period before re-opting in.
+   */
+  @Column(name = "exposure_opted_out_at")
+  private OffsetDateTime exposureOptedOutAt;
+
   // ==================== Timestamps ====================
 
   /**

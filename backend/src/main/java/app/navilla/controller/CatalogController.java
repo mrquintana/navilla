@@ -22,6 +22,10 @@ import java.util.Map;
 
 import app.navilla.config.HealthCatalogProperties;
 import app.navilla.dto.CatalogResponse;
+import app.navilla.dto.ConditionCatalogResponse;
+import app.navilla.dto.NetworkStageResponse;
+import app.navilla.service.ConditionCatalogService;
+import app.navilla.service.NetworkStageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
@@ -45,6 +49,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class CatalogController {
 
   private final HealthCatalogProperties catalogProperties;
+  private final ConditionCatalogService conditionCatalogService;
+  private final NetworkStageService networkStageService;
 
   /**
    * Returns the full health catalog configuration.
@@ -85,5 +91,45 @@ public class CatalogController {
     return ResponseEntity.ok(new CatalogResponse(
         medicationTypes, frequencies, vaccineSeries,
         encounterTypes, protectionMethods));
+  }
+
+  /**
+   * Returns all active conditions from the catalog.
+   *
+   * @return list of active condition catalog entries
+   */
+  @GetMapping("/conditions")
+  public ResponseEntity<List<ConditionCatalogResponse>> listConditions() {
+    List<ConditionCatalogResponse> conditions = conditionCatalogService.listActive().stream()
+        .map(entry -> new ConditionCatalogResponse(
+            entry.getCode(),
+            entry.getDisplayName(),
+            entry.getDisplayNameEs(),
+            entry.getDescription(),
+            entry.getDescriptionEs(),
+            entry.getIcon(),
+            entry.getDisplayOrder()))
+        .toList();
+    return ResponseEntity.ok(conditions);
+  }
+
+  /**
+   * Returns all network constellation stages.
+   *
+   * @return list of network stages
+   */
+  @GetMapping("/stages")
+  public ResponseEntity<List<NetworkStageResponse>> listStages() {
+    List<NetworkStageResponse> stages = networkStageService.listStages().stream()
+        .map(stage -> new NetworkStageResponse(
+            stage.getCode(),
+            stage.getDisplayName(),
+            stage.getDisplayNameEs(),
+            stage.getMinNodes(),
+            stage.getMaxNodes(),
+            stage.getDescription(),
+            stage.getDescriptionEs()))
+        .toList();
+    return ResponseEntity.ok(stages);
   }
 }

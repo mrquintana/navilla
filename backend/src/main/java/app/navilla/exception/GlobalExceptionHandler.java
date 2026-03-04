@@ -102,6 +102,27 @@ public class GlobalExceptionHandler {
   }
 
   /**
+   * Handles cooldown active exceptions (403 Forbidden).
+   */
+  @ExceptionHandler(CooldownActiveException.class)
+  public ResponseEntity<ApiError> handleCooldownActive(
+      CooldownActiveException ex,
+      HttpServletRequest request,
+      Locale locale) {
+
+    String message = messageSource.getMessage(ex.getMessageKey(), null, ex.getMessageKey(), locale);
+    List<String> details = List.of("daysRemaining:" + ex.getDaysRemaining());
+    ApiError error = ApiError.of(
+        HttpStatus.FORBIDDEN.value(),
+        HttpStatus.FORBIDDEN.getReasonPhrase(),
+        message,
+        request.getRequestURI(),
+        details
+    );
+    return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+  }
+
+  /**
    * Handles connection conflict exceptions.
    */
   @ExceptionHandler(ConnectionConflictException.class)

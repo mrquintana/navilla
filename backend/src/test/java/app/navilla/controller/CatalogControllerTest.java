@@ -97,4 +97,44 @@ class CatalogControllerTest {
         .andExpect(jsonPath("$.protectionMethods[5]").value("NONE"))
         .andExpect(jsonPath("$.protectionMethods[6]").value("OTHER"));
   }
+
+  // ---- Condition catalog endpoint ----
+
+  @Test
+  @DisplayName("should return conditions list without authentication")
+  void shouldReturnConditionsWithoutAuth() throws Exception {
+    mockMvc.perform(get("/api/catalog/conditions"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$").isArray());
+  }
+
+  @Test
+  @DisplayName("should return conditions with expected fields")
+  void shouldReturnConditionsWithFields() throws Exception {
+    mockMvc.perform(get("/api/catalog/conditions"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$[0].code").exists())
+        .andExpect(jsonPath("$[0].displayName").exists())
+        .andExpect(jsonPath("$[0].displayOrder").isNumber());
+  }
+
+  // ---- Network stages endpoint ----
+
+  @Test
+  @DisplayName("should return stages list without authentication")
+  void shouldReturnStagesWithoutAuth() throws Exception {
+    mockMvc.perform(get("/api/catalog/stages"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$").isArray());
+  }
+
+  @Test
+  @DisplayName("should return stages with expected fields")
+  void shouldReturnStagesWithFields() throws Exception {
+    mockMvc.perform(get("/api/catalog/stages"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$[0].code").exists())
+        .andExpect(jsonPath("$[0].displayName").exists())
+        .andExpect(jsonPath("$[0].minNodes").isNumber());
+  }
 }
