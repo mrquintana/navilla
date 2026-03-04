@@ -25,7 +25,9 @@ import java.util.Map;
 public record CatalogResponse(
     Map<String, MedicationTypeInfo> medicationTypes,
     Map<String, FrequencyInfo> frequencies,
-    Map<String, VaccineSeriesInfo> vaccineSeries
+    Map<String, VaccineSeriesInfo> vaccineSeries,
+    List<String> encounterTypes,
+    List<String> protectionMethods
 ) {
 
   /** Info about a medication type from the catalog. */

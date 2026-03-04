@@ -5,16 +5,20 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { api } from '../lib/api';
 import { Link } from 'react-router-dom';
 import { DEV_MODE } from '../lib/devMode';
-import { HelpCircle, ExternalLink, Heart, BookOpen, Users } from 'lucide-react';
+import { HelpCircle, ExternalLink, Heart, BookOpen, Users, BarChart3 } from 'lucide-react';
 import { useState } from 'react';
 import { getConditionInfo } from '../lib/conditionInfo';
 import { PageSkeleton, SkeletonBlock } from '../components/ui/LoadingShell';
 import { UpcomingReminders } from '../components/reminders/UpcomingReminders';
+import { OnboardingFlow } from '../components/onboarding/OnboardingFlow';
 
 export function DashboardPage() {
   const { t, i18n } = useTranslation();
   const [showSnapshotNotice, setShowSnapshotNotice] = useState(
     () => localStorage.getItem('navilla_hide_snapshot_notice') !== 'true'
+  );
+  const [showOnboarding, setShowOnboarding] = useState(
+    () => localStorage.getItem('navilla_onboarding_complete') !== 'true'
   );
   const [showExposureHelp, setShowExposureHelp] = useState(false);
   const { user, session, isLoading: authLoading } = useAuth();
@@ -123,7 +127,7 @@ export function DashboardPage() {
         <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--color-muted)' }}>
           {t('dashboard.quickActions')}
         </p>
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <Link
             to="/health-log"
             className="flex items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium transition-colors"
@@ -156,6 +160,17 @@ export function DashboardPage() {
           >
             <Users className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
             <span className="truncate">{t('dashboard.goToConnections')}</span>
+          </Link>
+          <Link
+            to="/insights"
+            className="flex items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium transition-colors"
+            style={{
+              background: 'rgba(99, 102, 241, 0.08)',
+              color: 'var(--color-primary)',
+            }}
+          >
+            <BarChart3 className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
+            <span className="truncate">{t('dashboard.goToInsights')}</span>
           </Link>
         </div>
       </div>
@@ -388,6 +403,10 @@ export function DashboardPage() {
             </button>
           </div>
         </div>
+      )}
+
+      {showOnboarding && (
+        <OnboardingFlow onComplete={() => setShowOnboarding(false)} />
       )}
     </div>
   );

@@ -65,6 +65,12 @@ public class EncounterJournal {
   @Column(name = "custom_fields_encrypted")
   private byte[] customFieldsEncrypted;
 
+  @Column(name = "encounter_types_encrypted")
+  private byte[] encounterTypesEncrypted;
+
+  @Column(name = "protection_methods_encrypted")
+  private byte[] protectionMethodsEncrypted;
+
   @Column(name = "partner_id")
   private UUID partnerId;
 

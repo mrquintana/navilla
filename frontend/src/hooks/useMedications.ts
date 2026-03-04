@@ -8,6 +8,8 @@ import {
   type LogDoseRequest,
   type DoseLogEntry,
   type MedicationAdherence,
+  type PrepStreak,
+  type PrepStreakMilestone,
 } from '../lib/api';
 
 export type {
@@ -17,6 +19,8 @@ export type {
   LogDoseRequest,
   DoseLogEntry,
   MedicationAdherence,
+  PrepStreak,
+  PrepStreakMilestone,
 };
 
 export function useMedications() {
@@ -96,5 +100,15 @@ export function useAdherence(id: string, month: string) {
     queryKey: ['medications', id, 'adherence', month],
     queryFn: () => api.medications.adherence(session!.access_token, id, month),
     enabled: !!session?.access_token && !!id && !!month,
+  });
+}
+
+export function usePrepStreak() {
+  const { session } = useAuth();
+  return useQuery({
+    queryKey: ['medications', 'prep-streak'],
+    queryFn: () => api.medications.prepStreak(session!.access_token),
+    enabled: !!session?.access_token,
+    staleTime: 5 * 60 * 1000,
   });
 }

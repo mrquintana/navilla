@@ -28,6 +28,8 @@ function makeEntry(overrides: Partial<JournalEntry> = {}): JournalEntry {
     partnerEncounterCount: null,
     notes: null,
     customFields: null,
+    encounterTypes: null,
+    protectionMethods: null,
     createdAt: '2026-03-15T10:00:00Z',
     updatedAt: '2026-03-15T10:00:00Z',
     ...overrides,
@@ -212,5 +214,74 @@ describe('JournalEntryCard', () => {
     );
 
     expect(screen.queryByText(/journal\.encountersWith/)).not.toBeInTheDocument();
+  });
+
+  it('renders encounter type badges when encounterTypes is set', () => {
+    render(
+      <JournalEntryCard
+        entry={makeEntry({ encounterTypes: ['ORAL', 'ANAL'] })}
+        onEdit={onEdit}
+        onDelete={onDelete}
+      />
+    );
+
+    expect(screen.getByText('journal.encounterTypes.ORAL')).toBeInTheDocument();
+    expect(screen.getByText('journal.encounterTypes.ANAL')).toBeInTheDocument();
+  });
+
+  it('renders protection method badges when protectionMethods is set', () => {
+    render(
+      <JournalEntryCard
+        entry={makeEntry({ protectionMethods: ['CONDOM', 'PREP'] })}
+        onEdit={onEdit}
+        onDelete={onDelete}
+      />
+    );
+
+    expect(screen.getByText('journal.protectionLabels.CONDOM')).toBeInTheDocument();
+    expect(screen.getByText('journal.protectionLabels.PREP')).toBeInTheDocument();
+  });
+
+  it('renders both encounter type and protection badges together', () => {
+    render(
+      <JournalEntryCard
+        entry={makeEntry({
+          encounterTypes: ['VAGINAL'],
+          protectionMethods: ['CONDOM', 'DENTAL_DAM'],
+        })}
+        onEdit={onEdit}
+        onDelete={onDelete}
+      />
+    );
+
+    expect(screen.getByText('journal.encounterTypes.VAGINAL')).toBeInTheDocument();
+    expect(screen.getByText('journal.protectionLabels.CONDOM')).toBeInTheDocument();
+    expect(screen.getByText('journal.protectionLabels.DENTAL_DAM')).toBeInTheDocument();
+  });
+
+  it('does not render encounter/protection section when both are null', () => {
+    render(
+      <JournalEntryCard
+        entry={makeEntry({ encounterTypes: null, protectionMethods: null })}
+        onEdit={onEdit}
+        onDelete={onDelete}
+      />
+    );
+
+    expect(screen.queryByText(/journal\.encounterTypes\./)).not.toBeInTheDocument();
+    expect(screen.queryByText(/journal\.protectionLabels\./)).not.toBeInTheDocument();
+  });
+
+  it('does not render encounter/protection section when both are empty arrays', () => {
+    render(
+      <JournalEntryCard
+        entry={makeEntry({ encounterTypes: [], protectionMethods: [] })}
+        onEdit={onEdit}
+        onDelete={onDelete}
+      />
+    );
+
+    expect(screen.queryByText(/journal\.encounterTypes\./)).not.toBeInTheDocument();
+    expect(screen.queryByText(/journal\.protectionLabels\./)).not.toBeInTheDocument();
   });
 });

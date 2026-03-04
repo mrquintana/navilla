@@ -71,7 +71,8 @@
     "notifications": "Notifications",
     "settings": "Settings",
     "profile": "Profile",
-    "journal": "Journal"
+    "journal": "Journal",
+    "insights": "Insights"
   },
   "dashboard": {
     "title": "Your Network",
@@ -130,7 +131,38 @@
     "exposureTimeframeHint": {
       "recent": "Reported within the last 30 days",
       "older": "Reported more than 30 days ago"
-    }
+    },
+    "goToInsights": "Insights"
+  },
+  "insights": {
+    "title": "Personal Insights",
+    "subtitle": "Your health data at a glance",
+    "activity": "Activity",
+    "testing": "Testing",
+    "prevention": "Prevention",
+    "encountersThisMonth": "This month",
+    "totalEncounters": "Total encounters",
+    "protectionRate": "Protection rate",
+    "encounterTypes": "Encounter types",
+    "protectionMethods": "Protection methods",
+    "daysSinceTest": "Days since last test",
+    "neverTested": "No tests yet",
+    "testsThisYear": "Tests this year",
+    "conditionCoverage": "Condition coverage",
+    "coverageStatus": "Coverage by condition",
+    "prepAdherence": "PrEP adherence",
+    "noPrepData": "No PrEP medication tracked",
+    "currentStreak": "Current streak",
+    "longestStreak": "Best streak",
+    "days": "{{count}} days",
+    "streakMilestones": "Milestones",
+    "vaccines": "Vaccinations",
+    "vaccinesCompleted": "Completed",
+    "vaccinesPending": "Pending",
+    "activeReminders": "Active reminders",
+    "noEncounters": "No encounters logged yet",
+    "noTests": "No tests recorded yet",
+    "noVaccines": "No vaccinations recorded"
   },
   "connections": {
     "title": "Connections",
@@ -638,7 +670,25 @@
     "partnerAlias": "Partner Name or Alias",
     "createPartner": "Create Partner",
     "createPartnerDescription": "Add someone you see regularly for easy encounter logging.",
-    "createPartnerNotes": "Notes (optional)"
+    "createPartnerNotes": "Notes (optional)",
+    "encounterType": "Type of encounter",
+    "protectionMethods": "Protection used",
+    "encounterTypes": {
+      "ORAL": "Oral",
+      "ANAL": "Anal",
+      "VAGINAL": "Vaginal",
+      "MANUAL": "Manual",
+      "OTHER": "Other"
+    },
+    "protectionLabels": {
+      "CONDOM": "External condom",
+      "INTERNAL_CONDOM": "Internal condom",
+      "PREP": "PrEP",
+      "PEP": "PEP",
+      "DENTAL_DAM": "Dental dam",
+      "NONE": "None",
+      "OTHER": "Other"
+    }
   },
   "healthLog": {
     "title": "Health Log",
@@ -867,5 +917,25 @@
     "emailSecurityBody": "Transactional email is configured with modern domain authentication controls (SPF, DKIM, DMARC) to reduce spoofing risk.",
     "vulnerabilityHeading": "Reporting a vulnerability",
     "vulnerabilityBody": "If you discover a security vulnerability in Navilla, please report it responsibly to contact@navilla.app. We take all reports seriously and will respond promptly."
+  },
+  "onboarding": {
+    "step1Title": "Log your first test",
+    "step1Body": "Keep track of your STI testing history. Recording your tests helps you stay on top of your health and know when it's time for your next check-up.",
+    "step2Title": "Set up reminders",
+    "step2Body": "Never miss a medication dose or testing appointment. Smart reminders help you stay consistent with your health routine.",
+    "step3Title": "Explore your dashboard",
+    "step3Body": "Your personal health insights are ready. View trends, track your progress, and stay informed about your health.",
+    "next": "Next",
+    "skip": "Skip for now",
+    "getStarted": "Get started",
+    "stepOf": "Step {{current}} of {{total}}"
+  },
+  "toast": {
+    "saved": "Saved successfully",
+    "deleted": "Deleted successfully",
+    "error": "Something went wrong. Please try again.",
+    "snoozed": "Reminder snoozed",
+    "completed": "Marked as complete",
+    "copied": "Copied to clipboard"
   }
 }

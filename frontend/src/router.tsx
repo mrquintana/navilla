@@ -1,39 +1,129 @@
+import { lazy, Suspense } from 'react';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { Layout } from './components/layout/Layout';
 import { AuthLayout } from './components/layout/AuthLayout';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
-import { HomePage } from './pages/HomePage';
-import { LoginPage } from './pages/LoginPage';
-import { SignUpPage } from './pages/SignUpPage';
-import { ForgotPasswordPage } from './pages/ForgotPasswordPage';
-import { ResetPasswordPage } from './pages/ResetPasswordPage';
-import { DashboardPage } from './pages/DashboardPage';
-import { ConnectionsPage } from './pages/ConnectionsPage';
-import { ProfilePage } from './pages/ProfilePage';
-import { HealthLogPage } from './pages/HealthLogPage';
-import { ConditionDetailPage } from './pages/ConditionDetailPage';
-import { NotificationsPage } from './pages/NotificationsPage';
-import { HowItWorksPage } from './pages/HowItWorksPage';
-import { ContactPage } from './pages/ContactPage';
-import { AboutPage } from './pages/AboutPage';
-import { CareersPage } from './pages/CareersPage';
-import { PrivacyPage } from './pages/PrivacyPage';
-import { SecurityPage } from './pages/SecurityPage';
-import { TermsPage } from './pages/TermsPage';
-import { PrivacyPolicyPage } from './pages/PrivacyPolicyPage';
-import { CookiePolicyPage } from './pages/CookiePolicyPage';
-import { HelpPage } from './pages/HelpPage';
-import { StatusPage } from './pages/StatusPage';
-import { AccessibilityPage } from './pages/AccessibilityPage';
-import { JournalPage } from './pages/JournalPage';
-import { PartnerDetailPage } from './pages/PartnerDetailPage';
-import { NotFoundPage } from './pages/NotFoundPage';
+import { FullPageLoader } from './components/ui/LoadingShell';
 import { ErrorPage } from './pages/ErrorPage';
-import { WindowPeriodCalculatorPage } from './pages/WindowPeriodCalculatorPage';
-import { GuidesIndexPage } from './pages/GuidesIndexPage';
-import { GuideDetailPage } from './pages/GuideDetailPage';
-import { TestingCostPage } from './pages/TestingCostPage';
-import { MedicationDetailPage } from './pages/MedicationDetailPage';
+
+// --- Lazy-loaded page components (route-level code splitting) ---
+
+const HomePage = lazy(() =>
+  import('./pages/HomePage').then(m => ({ default: m.HomePage })),
+);
+const LoginPage = lazy(() =>
+  import('./pages/LoginPage').then(m => ({ default: m.LoginPage })),
+);
+const SignUpPage = lazy(() =>
+  import('./pages/SignUpPage').then(m => ({ default: m.SignUpPage })),
+);
+const ForgotPasswordPage = lazy(() =>
+  import('./pages/ForgotPasswordPage').then(m => ({
+    default: m.ForgotPasswordPage,
+  })),
+);
+const ResetPasswordPage = lazy(() =>
+  import('./pages/ResetPasswordPage').then(m => ({
+    default: m.ResetPasswordPage,
+  })),
+);
+const DashboardPage = lazy(() =>
+  import('./pages/DashboardPage').then(m => ({ default: m.DashboardPage })),
+);
+const ConnectionsPage = lazy(() =>
+  import('./pages/ConnectionsPage').then(m => ({ default: m.ConnectionsPage })),
+);
+const ProfilePage = lazy(() =>
+  import('./pages/ProfilePage').then(m => ({ default: m.ProfilePage })),
+);
+const HealthLogPage = lazy(() =>
+  import('./pages/HealthLogPage').then(m => ({ default: m.HealthLogPage })),
+);
+const ConditionDetailPage = lazy(() =>
+  import('./pages/ConditionDetailPage').then(m => ({
+    default: m.ConditionDetailPage,
+  })),
+);
+const NotificationsPage = lazy(() =>
+  import('./pages/NotificationsPage').then(m => ({
+    default: m.NotificationsPage,
+  })),
+);
+const HowItWorksPage = lazy(() =>
+  import('./pages/HowItWorksPage').then(m => ({ default: m.HowItWorksPage })),
+);
+const ContactPage = lazy(() =>
+  import('./pages/ContactPage').then(m => ({ default: m.ContactPage })),
+);
+const AboutPage = lazy(() =>
+  import('./pages/AboutPage').then(m => ({ default: m.AboutPage })),
+);
+const CareersPage = lazy(() =>
+  import('./pages/CareersPage').then(m => ({ default: m.CareersPage })),
+);
+const PrivacyPage = lazy(() =>
+  import('./pages/PrivacyPage').then(m => ({ default: m.PrivacyPage })),
+);
+const SecurityPage = lazy(() =>
+  import('./pages/SecurityPage').then(m => ({ default: m.SecurityPage })),
+);
+const TermsPage = lazy(() =>
+  import('./pages/TermsPage').then(m => ({ default: m.TermsPage })),
+);
+const PrivacyPolicyPage = lazy(() =>
+  import('./pages/PrivacyPolicyPage').then(m => ({
+    default: m.PrivacyPolicyPage,
+  })),
+);
+const CookiePolicyPage = lazy(() =>
+  import('./pages/CookiePolicyPage').then(m => ({
+    default: m.CookiePolicyPage,
+  })),
+);
+const HelpPage = lazy(() =>
+  import('./pages/HelpPage').then(m => ({ default: m.HelpPage })),
+);
+const StatusPage = lazy(() =>
+  import('./pages/StatusPage').then(m => ({ default: m.StatusPage })),
+);
+const AccessibilityPage = lazy(() =>
+  import('./pages/AccessibilityPage').then(m => ({
+    default: m.AccessibilityPage,
+  })),
+);
+const JournalPage = lazy(() =>
+  import('./pages/JournalPage').then(m => ({ default: m.JournalPage })),
+);
+const PartnerDetailPage = lazy(() =>
+  import('./pages/PartnerDetailPage').then(m => ({
+    default: m.PartnerDetailPage,
+  })),
+);
+const NotFoundPage = lazy(() =>
+  import('./pages/NotFoundPage').then(m => ({ default: m.NotFoundPage })),
+);
+const WindowPeriodCalculatorPage = lazy(() =>
+  import('./pages/WindowPeriodCalculatorPage').then(m => ({
+    default: m.WindowPeriodCalculatorPage,
+  })),
+);
+const GuidesIndexPage = lazy(() =>
+  import('./pages/GuidesIndexPage').then(m => ({ default: m.GuidesIndexPage })),
+);
+const GuideDetailPage = lazy(() =>
+  import('./pages/GuideDetailPage').then(m => ({ default: m.GuideDetailPage })),
+);
+const TestingCostPage = lazy(() =>
+  import('./pages/TestingCostPage').then(m => ({ default: m.TestingCostPage })),
+);
+const MedicationDetailPage = lazy(() =>
+  import('./pages/MedicationDetailPage').then(m => ({
+    default: m.MedicationDetailPage,
+  })),
+);
+const InsightsPage = lazy(() =>
+  import('./pages/InsightsPage').then(m => ({ default: m.InsightsPage })),
+);
 
 export const router = createBrowserRouter([
   {
@@ -43,13 +133,19 @@ export const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <HomePage />,
+        element: (
+          <Suspense fallback={<FullPageLoader />}>
+            <HomePage />
+          </Suspense>
+        ),
       },
       {
         path: 'dashboard',
         element: (
           <ProtectedRoute>
-            <DashboardPage />
+            <Suspense fallback={<FullPageLoader />}>
+              <DashboardPage />
+            </Suspense>
           </ProtectedRoute>
         ),
       },
@@ -57,7 +153,9 @@ export const router = createBrowserRouter([
         path: 'journal',
         element: (
           <ProtectedRoute>
-            <JournalPage />
+            <Suspense fallback={<FullPageLoader />}>
+              <JournalPage />
+            </Suspense>
           </ProtectedRoute>
         ),
       },
@@ -65,7 +163,9 @@ export const router = createBrowserRouter([
         path: 'journal/partner/:id',
         element: (
           <ProtectedRoute>
-            <PartnerDetailPage />
+            <Suspense fallback={<FullPageLoader />}>
+              <PartnerDetailPage />
+            </Suspense>
           </ProtectedRoute>
         ),
       },
@@ -73,7 +173,9 @@ export const router = createBrowserRouter([
         path: 'connections',
         element: (
           <ProtectedRoute>
-            <ConnectionsPage />
+            <Suspense fallback={<FullPageLoader />}>
+              <ConnectionsPage />
+            </Suspense>
           </ProtectedRoute>
         ),
       },
@@ -81,7 +183,9 @@ export const router = createBrowserRouter([
         path: 'profile',
         element: (
           <ProtectedRoute>
-            <ProfilePage />
+            <Suspense fallback={<FullPageLoader />}>
+              <ProfilePage />
+            </Suspense>
           </ProtectedRoute>
         ),
       },
@@ -89,7 +193,9 @@ export const router = createBrowserRouter([
         path: 'health-log',
         element: (
           <ProtectedRoute>
-            <HealthLogPage />
+            <Suspense fallback={<FullPageLoader />}>
+              <HealthLogPage />
+            </Suspense>
           </ProtectedRoute>
         ),
       },
@@ -97,7 +203,9 @@ export const router = createBrowserRouter([
         path: 'health-log/medication/:id',
         element: (
           <ProtectedRoute>
-            <MedicationDetailPage />
+            <Suspense fallback={<FullPageLoader />}>
+              <MedicationDetailPage />
+            </Suspense>
           </ProtectedRoute>
         ),
       },
@@ -105,7 +213,9 @@ export const router = createBrowserRouter([
         path: 'health-log/:condition',
         element: (
           <ProtectedRoute>
-            <ConditionDetailPage />
+            <Suspense fallback={<FullPageLoader />}>
+              <ConditionDetailPage />
+            </Suspense>
           </ProtectedRoute>
         ),
       },
@@ -117,39 +227,195 @@ export const router = createBrowserRouter([
         path: 'notifications',
         element: (
           <ProtectedRoute>
-            <NotificationsPage />
+            <Suspense fallback={<FullPageLoader />}>
+              <NotificationsPage />
+            </Suspense>
           </ProtectedRoute>
         ),
       },
-      { path: 'calculator', element: <WindowPeriodCalculatorPage /> },
-      { path: 'guides', element: <GuidesIndexPage /> },
-      { path: 'guide/:slug', element: <GuideDetailPage /> },
-      { path: 'testing-cost', element: <TestingCostPage /> },
-      { path: 'how-it-works', element: <HowItWorksPage /> },
-      { path: 'about', element: <AboutPage /> },
-      { path: 'contact', element: <ContactPage /> },
-      { path: 'careers', element: <CareersPage /> },
-      { path: 'privacy', element: <PrivacyPage /> },
-      { path: 'security', element: <SecurityPage /> },
-      { path: 'terms', element: <TermsPage /> },
-      { path: 'privacy-policy', element: <PrivacyPolicyPage /> },
-      { path: 'cookie-policy', element: <CookiePolicyPage /> },
-      { path: 'help', element: <HelpPage /> },
-      { path: 'status', element: <StatusPage /> },
-      { path: 'accessibility', element: <AccessibilityPage /> },
+      {
+        path: 'insights',
+        element: (
+          <ProtectedRoute>
+            <Suspense fallback={<FullPageLoader />}>
+              <InsightsPage />
+            </Suspense>
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'calculator',
+        element: (
+          <Suspense fallback={<FullPageLoader />}>
+            <WindowPeriodCalculatorPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'guides',
+        element: (
+          <Suspense fallback={<FullPageLoader />}>
+            <GuidesIndexPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'guide/:slug',
+        element: (
+          <Suspense fallback={<FullPageLoader />}>
+            <GuideDetailPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'testing-cost',
+        element: (
+          <Suspense fallback={<FullPageLoader />}>
+            <TestingCostPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'how-it-works',
+        element: (
+          <Suspense fallback={<FullPageLoader />}>
+            <HowItWorksPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'about',
+        element: (
+          <Suspense fallback={<FullPageLoader />}>
+            <AboutPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'contact',
+        element: (
+          <Suspense fallback={<FullPageLoader />}>
+            <ContactPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'careers',
+        element: (
+          <Suspense fallback={<FullPageLoader />}>
+            <CareersPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'privacy',
+        element: (
+          <Suspense fallback={<FullPageLoader />}>
+            <PrivacyPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'security',
+        element: (
+          <Suspense fallback={<FullPageLoader />}>
+            <SecurityPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'terms',
+        element: (
+          <Suspense fallback={<FullPageLoader />}>
+            <TermsPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'privacy-policy',
+        element: (
+          <Suspense fallback={<FullPageLoader />}>
+            <PrivacyPolicyPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'cookie-policy',
+        element: (
+          <Suspense fallback={<FullPageLoader />}>
+            <CookiePolicyPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'help',
+        element: (
+          <Suspense fallback={<FullPageLoader />}>
+            <HelpPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'status',
+        element: (
+          <Suspense fallback={<FullPageLoader />}>
+            <StatusPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'accessibility',
+        element: (
+          <Suspense fallback={<FullPageLoader />}>
+            <AccessibilityPage />
+          </Suspense>
+        ),
+      },
       {
         path: '*',
-        element: <NotFoundPage />,
+        element: (
+          <Suspense fallback={<FullPageLoader />}>
+            <NotFoundPage />
+          </Suspense>
+        ),
       },
     ],
   },
   {
     element: <AuthLayout />,
     children: [
-      { path: 'login', element: <LoginPage /> },
-      { path: 'signup', element: <SignUpPage /> },
-      { path: 'forgot-password', element: <ForgotPasswordPage /> },
-      { path: 'reset-password', element: <ResetPasswordPage /> },
+      {
+        path: 'login',
+        element: (
+          <Suspense fallback={<FullPageLoader />}>
+            <LoginPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'signup',
+        element: (
+          <Suspense fallback={<FullPageLoader />}>
+            <SignUpPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'forgot-password',
+        element: (
+          <Suspense fallback={<FullPageLoader />}>
+            <ForgotPasswordPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'reset-password',
+        element: (
+          <Suspense fallback={<FullPageLoader />}>
+            <ResetPasswordPage />
+          </Suspense>
+        ),
+      },
     ],
   },
 ]);

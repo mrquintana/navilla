@@ -48,6 +48,8 @@ const mockEntry: JournalEntry = {
   partnerEncounterCount: null,
   notes: 'A nice evening at a restaurant in Roma Norte.',
   customFields: [{ label: 'Location', value: 'Roma Norte' }],
+  encounterTypes: null,
+  protectionMethods: null,
   createdAt: '2026-03-15T10:00:00Z',
   updatedAt: '2026-03-15T10:00:00Z',
 };
@@ -175,5 +177,75 @@ describe('JournalEntryModal', () => {
     expect(valueInputs).toHaveLength(1);
     expect((labelInputs[0] as HTMLInputElement).value).toBe('Location');
     expect((valueInputs[0] as HTMLInputElement).value).toBe('Roma Norte');
+  });
+
+  it('renders encounter type chips that toggle on/off when clicked', () => {
+    render(
+      <JournalEntryModal isOpen={true} onClose={vi.fn()} entry={null} />
+    );
+
+    const oralChip = screen.getByText('journal.encounterTypes.ORAL');
+    const analChip = screen.getByText('journal.encounterTypes.ANAL');
+
+    // Initially unselected — white bg
+    expect(oralChip.className).toContain('bg-white');
+    expect(analChip.className).toContain('bg-white');
+
+    // Click to select
+    fireEvent.click(oralChip);
+    expect(oralChip.className).toContain('bg-indigo-100');
+
+    // Click again to deselect
+    fireEvent.click(oralChip);
+    expect(oralChip.className).toContain('bg-white');
+  });
+
+  it('renders protection method chips that toggle on/off when clicked', () => {
+    render(
+      <JournalEntryModal isOpen={true} onClose={vi.fn()} entry={null} />
+    );
+
+    const condomChip = screen.getByText('journal.protectionLabels.CONDOM');
+    const prepChip = screen.getByText('journal.protectionLabels.PREP');
+
+    // Initially unselected
+    expect(condomChip.className).toContain('bg-white');
+    expect(prepChip.className).toContain('bg-white');
+
+    // Click to select
+    fireEvent.click(condomChip);
+    expect(condomChip.className).toContain('bg-indigo-100');
+
+    fireEvent.click(prepChip);
+    expect(prepChip.className).toContain('bg-indigo-100');
+
+    // Click condom again to deselect
+    fireEvent.click(condomChip);
+    expect(condomChip.className).toContain('bg-white');
+    // PrEP should stay selected
+    expect(prepChip.className).toContain('bg-indigo-100');
+  });
+
+  it('pre-selects encounter types and protection methods when editing an entry', () => {
+    const entryWithSelections: JournalEntry = {
+      ...mockEntry,
+      encounterTypes: ['ORAL', 'VAGINAL'],
+      protectionMethods: ['CONDOM', 'PREP'],
+    };
+
+    render(
+      <JournalEntryModal isOpen={true} onClose={vi.fn()} entry={entryWithSelections} />
+    );
+
+    // Selected chips should have indigo background
+    expect(screen.getByText('journal.encounterTypes.ORAL').className).toContain('bg-indigo-100');
+    expect(screen.getByText('journal.encounterTypes.VAGINAL').className).toContain('bg-indigo-100');
+    expect(screen.getByText('journal.protectionLabels.CONDOM').className).toContain('bg-indigo-100');
+    expect(screen.getByText('journal.protectionLabels.PREP').className).toContain('bg-indigo-100');
+
+    // Non-selected chips should have white background
+    expect(screen.getByText('journal.encounterTypes.ANAL').className).toContain('bg-white');
+    expect(screen.getByText('journal.encounterTypes.MANUAL').className).toContain('bg-white');
+    expect(screen.getByText('journal.protectionLabels.NONE').className).toContain('bg-white');
   });
 });

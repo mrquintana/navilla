@@ -163,6 +163,8 @@ export interface JournalEntry {
   partnerEncounterCount: number | null;
   notes: string | null;
   customFields: CustomField[] | null;
+  encounterTypes: string[] | null;
+  protectionMethods: string[] | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -174,6 +176,8 @@ export interface CreateJournalEntryRequest {
   partnerId?: string;
   notes?: string;
   customFields?: CustomField[];
+  encounterTypes?: string[];
+  protectionMethods?: string[];
 }
 
 export interface UpdateJournalEntryRequest {
@@ -183,6 +187,8 @@ export interface UpdateJournalEntryRequest {
   partnerId?: string;
   notes?: string;
   customFields?: CustomField[];
+  encounterTypes?: string[];
+  protectionMethods?: string[];
 }
 
 export interface JournalSummary {
@@ -413,7 +419,7 @@ export const api = {
   catalog: {
     get: async (): Promise<CatalogResponse> => {
       if (E2E_MODE) {
-        return { medicationTypes: {}, frequencies: {}, vaccineSeries: {} };
+        return { medicationTypes: {}, frequencies: {}, vaccineSeries: {}, encounterTypes: [], protectionMethods: [] };
       }
       const baseUrl = getApiBaseUrl();
       const response = await fetch(`${baseUrl}/api/catalog`, { method: 'GET' });
@@ -439,6 +445,8 @@ export const api = {
       apiRequest<DoseLogEntry>(`/api/medications/${id}/doses`, token, { method: 'POST', body: data }),
     adherence: (token: string, id: string, month: string) =>
       apiRequest<MedicationAdherence>(`/api/medications/${id}/adherence?month=${month}`, token),
+    prepStreak: (token: string) =>
+      apiRequest<PrepStreak>('/api/medications/prep-streak', token),
   },
   vaccinations: {
     list: (token: string) =>
@@ -469,6 +477,10 @@ export const api = {
       update: (token: string, data: UpdateReminderSettingsRequest) =>
         apiRequest<ReminderSettings>('/api/reminders/settings', token, { method: 'PUT', body: data }),
     },
+  },
+  insights: {
+    get: (token: string) =>
+      apiRequest<InsightsResponse>('/api/insights', token),
   },
 };
 
@@ -702,6 +714,8 @@ export interface CatalogResponse {
   medicationTypes: Record<string, { labelKey: string; defaultFrequency: string; ongoing: boolean }>;
   frequencies: Record<string, { hours?: number; days?: number }>;
   vaccineSeries: Record<string, { labelKey: string; totalDoses: number; doseIntervalsDays: number[] }>;
+  encounterTypes: string[];
+  protectionMethods: string[];
 }
 
 // ── Medications ──
@@ -756,6 +770,18 @@ export interface MedicationAdherence {
   missedCount: number;
   adherenceRate: number;
   logs: DoseLogEntry[];
+}
+
+export interface PrepStreakMilestone {
+  days: number;
+  labelKey: string;
+  achieved: boolean;
+}
+
+export interface PrepStreak {
+  currentStreakDays: number;
+  longestStreakDays: number;
+  milestones: PrepStreakMilestone[];
 }
 
 // ── Vaccinations ──
@@ -816,3 +842,37 @@ export interface ReminderSettings {
 }
 
 export type UpdateReminderSettingsRequest = Partial<ReminderSettings>;
+
+// ── Insights ──
+export interface InsightsActivity {
+  totalEncounters: number;
+  encountersThisMonth: number;
+  encountersByMonth: Record<string, number>;
+  protectionRate: number;
+  encounterTypeCounts: Record<string, number>;
+  protectionMethodCounts: Record<string, number>;
+}
+
+export interface InsightsTesting {
+  daysSinceLastTest: number;
+  testsThisYear: number;
+  conditionsCovered: number;
+  totalStandardConditions: number;
+  lastTestDate: string | null;
+  coverageMap: Record<string, string>;
+}
+
+export interface InsightsPrevention {
+  prepAdherenceRate: number | null;
+  currentPrepStreakDays: number;
+  longestPrepStreakDays: number;
+  completedVaccines: string[];
+  pendingVaccines: string[];
+  activeReminders: number;
+}
+
+export interface InsightsResponse {
+  activity: InsightsActivity;
+  testing: InsightsTesting;
+  prevention: InsightsPrevention;
+}

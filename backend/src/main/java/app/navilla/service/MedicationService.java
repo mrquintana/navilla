@@ -21,6 +21,7 @@ import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.YearMonth;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,6 +31,7 @@ import app.navilla.dto.DoseLogEntry;
 import app.navilla.dto.LogDoseRequest;
 import app.navilla.dto.MedicationAdherenceResponse;
 import app.navilla.dto.MedicationResponse;
+import app.navilla.dto.PrepStreakResponse;
 import app.navilla.dto.UpdateMedicationRequest;
 import app.navilla.entity.Medication;
 import app.navilla.entity.MedicationLog;
@@ -325,6 +327,115 @@ public class MedicationService {
     return new MedicationAdherenceResponse(
         month, totalDays, (int) takenCount, (int) (logCount - takenCount),
         adherenceRate, logEntries);
+  }
+
+  /**
+   * Calculates PrEP adherence streak data including current streak, longest streak,
+   * and milestone achievements.
+   *
+   * @param jwt the authenticated user's JWT
+   * @return streak data with milestones
+   */
+  @Transactional(readOnly = true)
+  public PrepStreakResponse getPrepStreak(Jwt jwt) {
+    String userHash = hashEmail(jwt);
+
+    // Find active PrEP medications (medication type starts with "PREP")
+    List<Medication> prepMeds = medicationRepository
+        .findByUserHashAndMedicationTypeAndActive(userHash, "PREP", true);
+
+    // Also check for PREP_DAILY and PREP_ON_DEMAND
+    List<Medication> prepDailyMeds = medicationRepository
+        .findByUserHashAndMedicationTypeAndActive(userHash, "PREP_DAILY", true);
+    List<Medication> prepOnDemandMeds = medicationRepository
+        .findByUserHashAndMedicationTypeAndActive(userHash, "PREP_ON_DEMAND", true);
+
+    List<Medication> allPrepMeds = new ArrayList<>();
+    allPrepMeds.addAll(prepMeds);
+    allPrepMeds.addAll(prepDailyMeds);
+    allPrepMeds.addAll(prepOnDemandMeds);
+
+    if (allPrepMeds.isEmpty()) {
+      return new PrepStreakResponse(0, 0, buildMilestones(0));
+    }
+
+    // Collect all dose logs across PrEP medications, ordered by date DESC
+    List<MedicationLog> allLogs = new ArrayList<>();
+    for (Medication med : allPrepMeds) {
+      allLogs.addAll(medicationLogRepository
+          .findByMedicationIdOrderByScheduledForDesc(med.getId()));
+    }
+
+    // Sort all logs by scheduledFor descending
+    allLogs.sort((a, b) -> b.getScheduledFor().compareTo(a.getScheduledFor()));
+
+    int currentStreak = calculateCurrentStreak(allLogs);
+    int longestStreak = calculateLongestStreak(allLogs);
+
+    return new PrepStreakResponse(currentStreak, longestStreak,
+        buildMilestones(Math.max(currentStreak, longestStreak)));
+  }
+
+  private int calculateCurrentStreak(List<MedicationLog> logsDesc) {
+    if (logsDesc.isEmpty()) {
+      return 0;
+    }
+
+    int streak = 0;
+    LocalDate expected = LocalDate.now();
+
+    for (MedicationLog log : logsDesc) {
+      if (!log.getScheduledFor().equals(expected)) {
+        break;
+      }
+      if (!Boolean.TRUE.equals(log.getTaken())) {
+        break;
+      }
+      streak++;
+      expected = expected.minusDays(1);
+    }
+    return streak;
+  }
+
+  private int calculateLongestStreak(List<MedicationLog> logsDesc) {
+    if (logsDesc.isEmpty()) {
+      return 0;
+    }
+
+    // Sort ascending for easier consecutive checking
+    List<MedicationLog> logsAsc = new ArrayList<>(logsDesc);
+    logsAsc.sort((a, b) -> a.getScheduledFor().compareTo(b.getScheduledFor()));
+
+    int longest = 0;
+    int current = 0;
+    LocalDate lastDate = null;
+
+    for (MedicationLog log : logsAsc) {
+      if (!Boolean.TRUE.equals(log.getTaken())) {
+        current = 0;
+        lastDate = log.getScheduledFor();
+        continue;
+      }
+
+      if (lastDate == null || log.getScheduledFor().equals(lastDate.plusDays(1))) {
+        current++;
+      } else if (!log.getScheduledFor().equals(lastDate)) {
+        current = 1; // Gap — reset
+      }
+      // If same date as lastDate, skip (duplicate)
+
+      longest = Math.max(longest, current);
+      lastDate = log.getScheduledFor();
+    }
+    return longest;
+  }
+
+  private List<PrepStreakResponse.Milestone> buildMilestones(int bestStreak) {
+    return List.of(
+        new PrepStreakResponse.Milestone(7, "streaks.week", bestStreak >= 7),
+        new PrepStreakResponse.Milestone(30, "streaks.month", bestStreak >= 30),
+        new PrepStreakResponse.Milestone(90, "streaks.quarter", bestStreak >= 90)
+    );
   }
 
   // ---- Private helpers ----

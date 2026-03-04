@@ -193,6 +193,94 @@ class EncounterJournalControllerTest {
   }
 
   @Test
+  @DisplayName("should create entry with encounter types and protection methods")
+  void shouldCreateWithEncounterTypesAndProtection() throws Exception {
+    mockMvc.perform(post("/api/journal")
+            .with(jwt().jwt(builder -> builder
+                .subject("test-subject")
+                .claim("email", USER_EMAIL)))
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("""
+                {
+                  "encounterDate": "2026-02-25",
+                  "encounterTypes": ["ORAL", "ANAL"],
+                  "protectionMethods": ["CONDOM", "PREP"]
+                }
+                """))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.encounterDate").value("2026-02-25"))
+        .andExpect(jsonPath("$.encounterTypes[0]").value("ORAL"))
+        .andExpect(jsonPath("$.encounterTypes[1]").value("ANAL"))
+        .andExpect(jsonPath("$.protectionMethods[0]").value("CONDOM"))
+        .andExpect(jsonPath("$.protectionMethods[1]").value("PREP"));
+  }
+
+  @Test
+  @DisplayName("should create entry without encounter types and protection methods")
+  void shouldCreateWithoutEncounterTypesAndProtection() throws Exception {
+    mockMvc.perform(post("/api/journal")
+            .with(jwt().jwt(builder -> builder
+                .subject("test-subject")
+                .claim("email", USER_EMAIL)))
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("""
+                {
+                  "encounterDate": "2026-02-26",
+                  "partnerAlias": "NoTypes"
+                }
+                """))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.encounterTypes").doesNotExist())
+        .andExpect(jsonPath("$.protectionMethods").doesNotExist());
+  }
+
+  @Test
+  @DisplayName("should update entry with encounter types and protection methods")
+  void shouldUpdateWithEncounterTypesAndProtection() throws Exception {
+    // Create entry first
+    String body = mockMvc.perform(post("/api/journal")
+            .with(jwt().jwt(builder -> builder
+                .subject("test-subject")
+                .claim("email", USER_EMAIL)))
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("""
+                {
+                  "encounterDate": "2026-02-27"
+                }
+                """))
+        .andExpect(status().isOk())
+        .andReturn().getResponse().getContentAsString();
+
+    String id = objectMapper.readTree(body).get("id").asText();
+
+    // Update with encounter types and protection methods
+    mockMvc.perform(put("/api/journal/" + id)
+            .with(jwt().jwt(builder -> builder
+                .subject("test-subject")
+                .claim("email", USER_EMAIL)))
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("""
+                {
+                  "encounterDate": "2026-02-27",
+                  "encounterTypes": ["VAGINAL"],
+                  "protectionMethods": ["CONDOM", "DENTAL_DAM"]
+                }
+                """))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.encounterTypes[0]").value("VAGINAL"))
+        .andExpect(jsonPath("$.protectionMethods[0]").value("CONDOM"))
+        .andExpect(jsonPath("$.protectionMethods[1]").value("DENTAL_DAM"));
+
+    // Verify list includes the new fields
+    mockMvc.perform(get("/api/journal")
+            .with(jwt().jwt(builder -> builder
+                .subject("test-subject")
+                .claim("email", USER_EMAIL))))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$[0].encounterTypes[0]").value("VAGINAL"));
+  }
+
+  @Test
   @DisplayName("should reject create without encounterDate")
   void shouldRejectWithoutDate() throws Exception {
     mockMvc.perform(post("/api/journal")

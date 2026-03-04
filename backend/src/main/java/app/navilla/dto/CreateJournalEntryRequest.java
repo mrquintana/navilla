@@ -49,5 +49,11 @@ public record CreateJournalEntryRequest(
     @Size(max = 3, message = "{journal.error.tooManyCustomFields}")
     List<CustomFieldDto> customFields,
 
-    UUID partnerId
+    UUID partnerId,
+
+    @Size(max = 10, message = "{journal.error.tooManyEncounterTypes}")
+    List<String> encounterTypes,
+
+    @Size(max = 10, message = "{journal.error.tooManyProtectionMethods}")
+    List<String> protectionMethods
 ) {}

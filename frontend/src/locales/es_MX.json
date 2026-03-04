@@ -71,7 +71,8 @@
     "notifications": "Notificaciones",
     "settings": "Configuración",
     "profile": "Perfil",
-    "journal": "Diario"
+    "journal": "Diario",
+    "insights": "Estadísticas"
   },
   "dashboard": {
     "title": "Tu Red",
@@ -130,7 +131,38 @@
     "exposureTimeframeHint": {
       "recent": "Reportado en los ultimos 30 dias",
       "older": "Reportado hace mas de 30 dias"
-    }
+    },
+    "goToInsights": "Perspectivas"
+  },
+  "insights": {
+    "title": "Perspectivas personales",
+    "subtitle": "Tus datos de salud de un vistazo",
+    "activity": "Actividad",
+    "testing": "Pruebas",
+    "prevention": "Prevenci\u00f3n",
+    "encountersThisMonth": "Este mes",
+    "totalEncounters": "Total de encuentros",
+    "protectionRate": "Tasa de protecci\u00f3n",
+    "encounterTypes": "Tipos de encuentro",
+    "protectionMethods": "M\u00e9todos de protecci\u00f3n",
+    "daysSinceTest": "D\u00edas desde la \u00faltima prueba",
+    "neverTested": "Sin pruebas a\u00fan",
+    "testsThisYear": "Pruebas este a\u00f1o",
+    "conditionCoverage": "Cobertura de condiciones",
+    "coverageStatus": "Cobertura por condici\u00f3n",
+    "prepAdherence": "Adherencia a PrEP",
+    "noPrepData": "Sin medicamento PrEP registrado",
+    "currentStreak": "Racha actual",
+    "longestStreak": "Mejor racha",
+    "days": "{{count}} d\u00edas",
+    "streakMilestones": "Hitos",
+    "vaccines": "Vacunas",
+    "vaccinesCompleted": "Completadas",
+    "vaccinesPending": "Pendientes",
+    "activeReminders": "Recordatorios activos",
+    "noEncounters": "Sin encuentros registrados",
+    "noTests": "Sin pruebas registradas",
+    "noVaccines": "Sin vacunas registradas"
   },
   "connections": {
     "title": "Conexiones",
@@ -637,7 +669,25 @@
     "partnerAlias": "Nombre o Alias del Compañero",
     "createPartner": "Crear Compañero",
     "createPartnerDescription": "Agrega a alguien que ves regularmente para facilitar el registro de encuentros.",
-    "createPartnerNotes": "Notas (opcional)"
+    "createPartnerNotes": "Notas (opcional)",
+    "encounterType": "Tipo de encuentro",
+    "protectionMethods": "Protección utilizada",
+    "encounterTypes": {
+      "ORAL": "Oral",
+      "ANAL": "Anal",
+      "VAGINAL": "Vaginal",
+      "MANUAL": "Manual",
+      "OTHER": "Otro"
+    },
+    "protectionLabels": {
+      "CONDOM": "Condón externo",
+      "INTERNAL_CONDOM": "Condón interno",
+      "PREP": "PrEP",
+      "PEP": "PEP",
+      "DENTAL_DAM": "Barrera dental",
+      "NONE": "Ninguno",
+      "OTHER": "Otro"
+    }
   },
   "healthLog": {
     "title": "Registro de Salud",
@@ -866,5 +916,25 @@
     "emailSecurityBody": "El correo transaccional está configurado con controles modernos de autenticación de dominio (SPF, DKIM, DMARC) para reducir el riesgo de suplantación.",
     "vulnerabilityHeading": "Reportar una vulnerabilidad",
     "vulnerabilityBody": "Si descubres una vulnerabilidad de seguridad en Navilla, repórtala responsablemente a contact@navilla.app. Tomamos todos los reportes en serio y responderemos con prontitud."
+  },
+  "onboarding": {
+    "step1Title": "Registra tu primera prueba",
+    "step1Body": "Lleva un registro de tu historial de pruebas de ITS. Registrar tus pruebas te ayuda a mantenerte al tanto de tu salud y saber cuándo es momento de tu próximo chequeo.",
+    "step2Title": "Configura recordatorios",
+    "step2Body": "Nunca te pierdas una dosis de medicamento o una cita de pruebas. Los recordatorios inteligentes te ayudan a mantener tu rutina de salud.",
+    "step3Title": "Explora tu panel",
+    "step3Body": "Tus perspectivas de salud personales están listas. Ve tendencias, sigue tu progreso y mantente informado sobre tu salud.",
+    "next": "Siguiente",
+    "skip": "Omitir por ahora",
+    "getStarted": "Comenzar",
+    "stepOf": "Paso {{current}} de {{total}}"
+  },
+  "toast": {
+    "saved": "Guardado correctamente",
+    "deleted": "Eliminado correctamente",
+    "error": "Algo salió mal. Inténtalo de nuevo.",
+    "snoozed": "Recordatorio pospuesto",
+    "completed": "Marcado como completado",
+    "copied": "Copiado al portapapeles"
   }
 }

@@ -17,6 +17,7 @@
 package app.navilla.controller;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import app.navilla.config.HealthCatalogProperties;
@@ -72,6 +73,15 @@ public class CatalogController {
               config.labelKey(), config.totalDoses(), config.doseIntervalsDays())));
     }
 
-    return ResponseEntity.ok(new CatalogResponse(medicationTypes, frequencies, vaccineSeries));
+    List<String> encounterTypes = List.of(
+        "ORAL", "ANAL", "VAGINAL", "MANUAL", "OTHER");
+
+    List<String> protectionMethods = List.of(
+        "CONDOM", "INTERNAL_CONDOM", "PREP", "PEP",
+        "DENTAL_DAM", "NONE", "OTHER");
+
+    return ResponseEntity.ok(new CatalogResponse(
+        medicationTypes, frequencies, vaccineSeries,
+        encounterTypes, protectionMethods));
   }
 }

@@ -29,4 +29,7 @@ public interface MedicationRepository extends JpaRepository<Medication, UUID> {
   List<Medication> findByUserHashOrderByActiveDescCreatedAtDesc(String userHash);
 
   List<Medication> findByUserHashAndActiveTrue(String userHash);
+
+  List<Medication> findByUserHashAndMedicationTypeAndActive(
+      String userHash, String medicationType, Boolean active);
 }

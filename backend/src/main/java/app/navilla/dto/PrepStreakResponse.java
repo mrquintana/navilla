@@ -16,26 +16,22 @@
 
 package app.navilla.dto;
 
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.UUID;
 
 /**
- * Response DTO for a journal entry.
+ * Response DTO for PrEP adherence streak data with milestone tracking.
  */
-public record JournalEntryResponse(
-    UUID id,
-    LocalDate encounterDate,
-    String partnerAlias,
-    UUID connectionId,
-    String connectionDisplayName,
-    String notes,
-    List<CustomFieldDto> customFields,
-    UUID partnerId,
-    Long partnerEncounterCount,
-    List<String> encounterTypes,
-    List<String> protectionMethods,
-    OffsetDateTime createdAt,
-    OffsetDateTime updatedAt
-) {}
+public record PrepStreakResponse(
+    int currentStreakDays,
+    int longestStreakDays,
+    List<Milestone> milestones
+) {
+  /**
+   * Represents an adherence milestone (e.g., 7 days, 30 days, 90 days).
+   */
+  public record Milestone(
+      int days,
+      String labelKey,
+      boolean achieved
+  ) {}
+}
