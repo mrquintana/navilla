@@ -33,7 +33,7 @@ import java.util.UUID;
 
 import app.navilla.dto.InsightsResponse;
 import app.navilla.dto.PrepStreakResponse;
-import app.navilla.entity.ConditionType;
+import app.navilla.entity.ConditionCatalogEntry;
 import app.navilla.entity.EncounterJournal;
 import app.navilla.entity.TestResult;
 import app.navilla.entity.TestResultStatus;
@@ -96,11 +96,34 @@ class InsightsServiceTest {
   @Mock
   private MedicationService medicationService;
 
+  @Mock
+  private ConditionCatalogService conditionCatalogService;
+
   @InjectMocks
   private InsightsService insightsService;
 
   private static final String USER_EMAIL = "insights@example.com";
   private static final String USER_HASH = "insightshash123";
+
+  private static final List<String> STANDARD_CONDITION_CODES = List.of(
+      "CHLAMYDIA", "GONORRHEA", "SYPHILIS", "HIV", "HSV1",
+      "HSV2", "HPV", "HEPATITIS_B", "HEPATITIS_C", "TRICHOMONIASIS");
+
+  private List<ConditionCatalogEntry> buildCatalogEntries() {
+    return STANDARD_CONDITION_CODES.stream()
+        .map(code -> ConditionCatalogEntry.builder()
+            .id(java.util.UUID.randomUUID())
+            .code(code)
+            .displayName(code)
+            .active(true)
+            .displayOrder(STANDARD_CONDITION_CODES.indexOf(code))
+            .build())
+        .toList();
+  }
+
+  private void stubCatalog() {
+    when(conditionCatalogService.listActive()).thenReturn(buildCatalogEntries());
+  }
 
   private Jwt mockJwt() {
     Jwt jwt = mock(Jwt.class);
@@ -117,6 +140,7 @@ class InsightsServiceTest {
     @DisplayName("should return zeros and defaults when user has no data")
     void shouldReturnZerosWhenNoData() {
       Jwt jwt = mockJwt();
+      stubCatalog();
 
       // No encounters
       when(encounterJournalRepository.findByUserHashOrderByEncounterDateDesc(USER_HASH))
@@ -163,9 +187,9 @@ class InsightsServiceTest {
       assertThat(response.testing().testsThisYear()).isZero();
       assertThat(response.testing().conditionsCovered()).isZero();
       assertThat(response.testing().totalStandardConditions())
-          .isEqualTo(ConditionType.values().length);
+          .isEqualTo(STANDARD_CONDITION_CODES.size());
       assertThat(response.testing().lastTestDate()).isNull();
-      assertThat(response.testing().coverageMap()).hasSize(ConditionType.values().length);
+      assertThat(response.testing().coverageMap()).hasSize(STANDARD_CONDITION_CODES.size());
       assertThat(response.testing().coverageMap().values())
           .allMatch("NOT_TESTED"::equals);
 
@@ -288,6 +312,7 @@ class InsightsServiceTest {
     @DisplayName("should return correct days since last test")
     void shouldReturnCorrectDaysSinceLastTest() {
       Jwt jwt = mockJwt();
+      stubCatalog();
       LocalDate testDate = LocalDate.now().minusDays(15);
       UUID visitId = UUID.randomUUID();
 
@@ -317,6 +342,7 @@ class InsightsServiceTest {
     @DisplayName("should populate coverage map with latest test results")
     void shouldPopulateCoverageMap() {
       Jwt jwt = mockJwt();
+      stubCatalog();
       UUID visitId = UUID.randomUUID();
 
       TestVisit visit = TestVisit.builder()
@@ -328,14 +354,14 @@ class InsightsServiceTest {
       TestResult hivResult = TestResult.builder()
           .id(UUID.randomUUID())
           .visitId(visitId)
-          .conditionType(ConditionType.HIV)
+          .conditionType("HIV")
           .status(TestResultStatus.NEGATIVE)
           .build();
 
       TestResult syphilisResult = TestResult.builder()
           .id(UUID.randomUUID())
           .visitId(visitId)
-          .conditionType(ConditionType.SYPHILIS)
+          .conditionType("SYPHILIS")
           .status(TestResultStatus.NEGATIVE)
           .build();
 
@@ -485,6 +511,7 @@ class InsightsServiceTest {
   // ---- Helper methods ----
 
   private void stubTestingDefaults() {
+    stubCatalog();
     when(testVisitRepository.findByUserHashOrderByTestDateDesc(USER_HASH))
         .thenReturn(Collections.emptyList());
     when(testResultRepository.findAllByUserHash(USER_HASH))

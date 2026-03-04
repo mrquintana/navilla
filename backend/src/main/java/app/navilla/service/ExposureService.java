@@ -178,7 +178,7 @@ public class ExposureService {
       if (degree == null || degree == 0 || degree > maxDepth) {
         continue;
       }
-      String condition = status.getConditionType().name().toLowerCase();
+      String condition = status.getConditionType().toLowerCase();
       aggregates.putIfAbsent(condition, new ExposureAggregate());
       ExposureAggregate agg = aggregates.get(condition);
 

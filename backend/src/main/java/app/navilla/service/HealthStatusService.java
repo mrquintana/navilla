@@ -25,7 +25,6 @@ import java.util.UUID;
 import app.navilla.dto.ClearHealthStatusRequest;
 import app.navilla.dto.HealthStatusRequest;
 import app.navilla.dto.HealthStatusResponse;
-import app.navilla.entity.ConditionType;
 import app.navilla.entity.HealthStatus;
 import app.navilla.entity.HealthStatusValue;
 import app.navilla.exception.ResourceNotFoundException;
@@ -46,6 +45,7 @@ public class HealthStatusService {
   private final HealthStatusRepository healthStatusRepository;
   private final EncryptionService encryptionService;
   private final HealthStatusMetrics healthMetrics;
+  private final ConditionCatalogService conditionCatalogService;
 
   /**
    * Lists the authenticated user's health status records.
@@ -71,7 +71,10 @@ public class HealthStatusService {
   @Transactional
   public HealthStatusResponse reportStatus(Jwt jwt, HealthStatusRequest request) {
     String userHash = encryptionService.hashEmail(jwt.getClaimAsString("email"));
-    ConditionType condition = ConditionType.fromValue(request.condition().trim());
+    String condition = request.condition().trim().toUpperCase();
+    if (!conditionCatalogService.isValidCode(condition)) {
+      throw new IllegalArgumentException("Invalid condition code: " + condition);
+    }
     HealthStatusValue status = HealthStatusValue.fromValue(request.status().trim());
     LocalDate testDate = request.testDate() != null && !request.testDate().isBlank()
         ? LocalDate.parse(request.testDate().trim())
@@ -90,7 +93,7 @@ public class HealthStatusService {
 
     HealthStatus saved = healthStatusRepository.save(record);
     log.info("Health status reported: {} {}", condition, status);
-    healthMetrics.recordReported(condition.name().toLowerCase(), status.name().toLowerCase(), isUpdate);
+    healthMetrics.recordReported(condition.toLowerCase(), status.name().toLowerCase(), isUpdate);
     return toResponse(saved);
   }
 
@@ -120,7 +123,7 @@ public class HealthStatusService {
 
     record.setClearedAt(clearedAt);
     HealthStatus saved = healthStatusRepository.save(record);
-    healthMetrics.recordCleared(saved.getConditionType().name().toLowerCase());
+    healthMetrics.recordCleared(saved.getConditionType().toLowerCase());
     return toResponse(saved);
   }
 
@@ -144,7 +147,7 @@ public class HealthStatusService {
     record.setClearedAt(null);
     HealthStatus saved = healthStatusRepository.save(record);
     log.info("Health status reactivated: {} {}", record.getConditionType(), record.getStatus());
-    healthMetrics.recordActivated(saved.getConditionType().name().toLowerCase());
+    healthMetrics.recordActivated(saved.getConditionType().toLowerCase());
     return toResponse(saved);
   }
 
@@ -165,13 +168,13 @@ public class HealthStatusService {
     }
 
     healthStatusRepository.delete(record);
-    healthMetrics.recordDeleted(record.getConditionType().name().toLowerCase());
+    healthMetrics.recordDeleted(record.getConditionType().toLowerCase());
   }
 
   private HealthStatusResponse toResponse(HealthStatus record) {
     return new HealthStatusResponse(
         record.getId(),
-        record.getConditionType().name().toLowerCase(),
+        record.getConditionType().toLowerCase(),
         record.getStatus().name().toLowerCase(),
         record.getTestDate(),
         record.getReportedAt(),

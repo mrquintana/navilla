@@ -11,6 +11,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -32,9 +33,9 @@ public class TestResult {
   @Column(name = "visit_id", nullable = false)
   private UUID visitId;
 
-  @Enumerated(EnumType.STRING)
-  @Column(name = "condition_type", length = 32)
-  private ConditionType conditionType;
+  @Size(max = 50)
+  @Column(name = "condition_type", length = 50)
+  private String conditionType;
 
   @Column(name = "custom_condition_encrypted")
   private byte[] customConditionEncrypted;

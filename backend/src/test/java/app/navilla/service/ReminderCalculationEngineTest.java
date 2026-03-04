@@ -34,7 +34,6 @@ import java.util.UUID;
 import app.navilla.config.HealthCatalogProperties;
 import app.navilla.config.HealthCatalogProperties.FollowUpRulesConfig;
 import app.navilla.config.HealthCatalogProperties.TestingHeuristicsConfig;
-import app.navilla.entity.ConditionType;
 import app.navilla.entity.EncounterJournal;
 import app.navilla.entity.Reminder;
 import app.navilla.entity.TestResult;
@@ -119,7 +118,7 @@ class ReminderCalculationEngineTest {
         .build();
   }
 
-  private TestResult buildTestResult(UUID visitId, TestResultStatus status, ConditionType condition) {
+  private TestResult buildTestResult(UUID visitId, TestResultStatus status, String condition) {
     return TestResult.builder()
         .id(UUID.randomUUID())
         .visitId(visitId)
@@ -346,7 +345,7 @@ class ReminderCalculationEngineTest {
           .testDate(LocalDate.now().minusDays(5))
           .build();
 
-      TestResult positiveResult = buildTestResult(visitId, TestResultStatus.POSITIVE, ConditionType.CHLAMYDIA);
+      TestResult positiveResult = buildTestResult(visitId, TestResultStatus.POSITIVE, "CHLAMYDIA");
 
       when(testResultRepository.findPositiveByUserHash(USER_HASH))
           .thenReturn(List.of(positiveResult));
@@ -395,7 +394,7 @@ class ReminderCalculationEngineTest {
           .testDate(testDate)
           .build();
 
-      TestResult positiveResult = buildTestResult(visitId, TestResultStatus.POSITIVE, ConditionType.GONORRHEA);
+      TestResult positiveResult = buildTestResult(visitId, TestResultStatus.POSITIVE, "GONORRHEA");
 
       when(testResultRepository.findPositiveByUserHash(USER_HASH))
           .thenReturn(List.of(positiveResult));
@@ -442,7 +441,7 @@ class ReminderCalculationEngineTest {
           .testDate(LocalDate.now().minusDays(10))
           .build();
 
-      TestResult positiveResult = buildTestResult(visitId, TestResultStatus.POSITIVE, ConditionType.SYPHILIS);
+      TestResult positiveResult = buildTestResult(visitId, TestResultStatus.POSITIVE, "SYPHILIS");
 
       when(testResultRepository.findPositiveByUserHash(USER_HASH))
           .thenReturn(List.of(positiveResult));
@@ -484,8 +483,8 @@ class ReminderCalculationEngineTest {
           .testDate(LocalDate.now().minusDays(5))
           .build();
 
-      TestResult result1 = buildTestResult(visitId, TestResultStatus.POSITIVE, ConditionType.CHLAMYDIA);
-      TestResult result2 = buildTestResult(visitId, TestResultStatus.POSITIVE, ConditionType.GONORRHEA);
+      TestResult result1 = buildTestResult(visitId, TestResultStatus.POSITIVE, "CHLAMYDIA");
+      TestResult result2 = buildTestResult(visitId, TestResultStatus.POSITIVE, "GONORRHEA");
 
       when(testResultRepository.findPositiveByUserHash(USER_HASH))
           .thenReturn(List.of(result1, result2));

@@ -29,6 +29,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -58,9 +59,9 @@ public class HealthStatus {
   @Column(name = "user_hash", nullable = false, length = 64)
   private String userHash;
 
-  @Enumerated(EnumType.STRING)
-  @Column(name = "condition_type", nullable = false, length = 32)
-  private ConditionType conditionType;
+  @Size(max = 50)
+  @Column(name = "condition_type", nullable = false, length = 50)
+  private String conditionType;
 
   @Enumerated(EnumType.STRING)
   @Column(name = "status", nullable = false, length = 16)

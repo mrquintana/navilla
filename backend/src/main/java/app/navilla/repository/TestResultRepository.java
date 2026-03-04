@@ -19,7 +19,6 @@ package app.navilla.repository;
 import java.util.List;
 import java.util.UUID;
 
-import app.navilla.entity.ConditionType;
 import app.navilla.entity.TestResult;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -36,7 +35,7 @@ public interface TestResultRepository extends JpaRepository<TestResult, UUID> {
       + "ORDER BY v.testDate DESC")
   List<TestResult> findByUserAndCondition(
       @Param("userHash") String userHash,
-      @Param("conditionType") ConditionType conditionType);
+      @Param("conditionType") String conditionType);
 
   @Query("SELECT r FROM TestResult r JOIN TestVisit v ON r.visitId = v.id "
       + "WHERE v.userHash = :userHash ORDER BY v.testDate DESC")

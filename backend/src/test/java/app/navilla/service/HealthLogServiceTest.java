@@ -38,7 +38,7 @@ import app.navilla.dto.CreateTestVisitRequest.TestResultInput;
 import app.navilla.dto.HealthLogSummaryResponse;
 import app.navilla.dto.TestVisitResponse;
 import app.navilla.dto.UpdateTestVisitRequest;
-import app.navilla.entity.ConditionType;
+import app.navilla.entity.ConditionCatalogEntry;
 import app.navilla.entity.HealthStatus;
 import app.navilla.entity.HealthStatusValue;
 import app.navilla.entity.Lab;
@@ -86,11 +86,35 @@ class HealthLogServiceTest {
   @Mock
   private EncryptionService encryptionService;
 
+  @Mock
+  private ConditionCatalogService conditionCatalogService;
+
   @InjectMocks
   private HealthLogService healthLogService;
 
   private static final String USER_EMAIL = "user@example.com";
   private static final String USER_HASH = "userhash123";
+
+  private static final List<String> STANDARD_CONDITION_CODES = List.of(
+      "CHLAMYDIA", "GONORRHEA", "SYPHILIS", "HIV", "HSV1",
+      "HSV2", "HPV", "HEPATITIS_B", "HEPATITIS_C", "TRICHOMONIASIS");
+
+  private List<ConditionCatalogEntry> buildCatalogEntries() {
+    return STANDARD_CONDITION_CODES.stream()
+        .map(code -> ConditionCatalogEntry.builder()
+            .id(UUID.randomUUID())
+            .code(code)
+            .displayName(code)
+            .active(true)
+            .displayOrder(STANDARD_CONDITION_CODES.indexOf(code))
+            .build())
+        .toList();
+  }
+
+  private void stubCatalog() {
+    when(conditionCatalogService.listActive()).thenReturn(buildCatalogEntries());
+  }
+
   private static final UUID VISIT_ID = UUID.randomUUID();
   private static final UUID LAB_ID = UUID.randomUUID();
   private static final byte[] ENCRYPTED_LAB_REF = new byte[]{1, 2, 3};
@@ -121,7 +145,7 @@ class HealthLogServiceTest {
         .build();
   }
 
-  private TestResult buildResult(UUID visitId, ConditionType conditionType, TestResultStatus status) {
+  private TestResult buildResult(UUID visitId, String conditionType, TestResultStatus status) {
     return TestResult.builder()
         .id(UUID.randomUUID())
         .visitId(visitId)
@@ -171,7 +195,7 @@ class HealthLogServiceTest {
       });
 
       // Write-through: HIV NEGATIVE should create/update health_status
-      when(healthStatusRepository.findByUserHashAndConditionType(USER_HASH, ConditionType.HIV))
+      when(healthStatusRepository.findByUserHashAndConditionType(USER_HASH, "HIV"))
           .thenReturn(Optional.empty());
 
       // Decryption stubs for toResponse
@@ -204,7 +228,7 @@ class HealthLogServiceTest {
       ArgumentCaptor<TestResult> resultCaptor = ArgumentCaptor.forClass(TestResult.class);
       verify(testResultRepository).save(resultCaptor.capture());
       TestResult capturedResult = resultCaptor.getValue();
-      assertThat(capturedResult.getConditionType()).isEqualTo(ConditionType.HIV);
+      assertThat(capturedResult.getConditionType()).isEqualTo("HIV");
       assertThat(capturedResult.getStatus()).isEqualTo(TestResultStatus.NEGATIVE);
       assertThat(capturedResult.getResultValueEncrypted()).isEqualTo(ENCRYPTED_RESULT_VALUE);
       assertThat(capturedResult.getReferenceRange()).isEqualTo("< 1.0");
@@ -251,9 +275,9 @@ class HealthLogServiceTest {
       });
 
       // No existing health_status records
-      when(healthStatusRepository.findByUserHashAndConditionType(USER_HASH, ConditionType.HIV))
+      when(healthStatusRepository.findByUserHashAndConditionType(USER_HASH, "HIV"))
           .thenReturn(Optional.empty());
-      when(healthStatusRepository.findByUserHashAndConditionType(USER_HASH, ConditionType.SYPHILIS))
+      when(healthStatusRepository.findByUserHashAndConditionType(USER_HASH, "SYPHILIS"))
           .thenReturn(Optional.empty());
       when(healthStatusRepository.save(any(HealthStatus.class))).thenAnswer(i -> i.getArgument(0));
 
@@ -266,14 +290,14 @@ class HealthLogServiceTest {
       List<HealthStatus> savedStatuses = captor.getAllValues();
 
       HealthStatus hivStatus = savedStatuses.stream()
-          .filter(hs -> hs.getConditionType() == ConditionType.HIV)
+          .filter(hs -> "HIV".equals(hs.getConditionType()))
           .findFirst().orElseThrow();
       assertThat(hivStatus.getStatus()).isEqualTo(HealthStatusValue.POSITIVE);
       assertThat(hivStatus.getUserHash()).isEqualTo(USER_HASH);
       assertThat(hivStatus.getTestDate()).isEqualTo(LocalDate.of(2026, 2, 15));
 
       HealthStatus syphilisStatus = savedStatuses.stream()
-          .filter(hs -> hs.getConditionType() == ConditionType.SYPHILIS)
+          .filter(hs -> "SYPHILIS".equals(hs.getConditionType()))
           .findFirst().orElseThrow();
       assertThat(syphilisStatus.getStatus()).isEqualTo(HealthStatusValue.NEGATIVE);
     }
@@ -373,7 +397,7 @@ class HealthLogServiceTest {
       visit.setLabReferenceEncrypted(ENCRYPTED_LAB_REF);
       visit.setNotesEncrypted(ENCRYPTED_NOTES);
 
-      TestResult result = buildResult(VISIT_ID, ConditionType.HIV, TestResultStatus.NEGATIVE);
+      TestResult result = buildResult(VISIT_ID, "HIV", TestResultStatus.NEGATIVE);
       result.setResultValueEncrypted(ENCRYPTED_RESULT_VALUE);
       result.setReferenceRange("< 1.0");
 
@@ -434,7 +458,7 @@ class HealthLogServiceTest {
       visit.setNotesEncrypted(ENCRYPTED_NOTES);
 
       // Old result: HIV NEGATIVE
-      TestResult oldResult = buildResult(VISIT_ID, ConditionType.HIV, TestResultStatus.NEGATIVE);
+      TestResult oldResult = buildResult(VISIT_ID, "HIV", TestResultStatus.NEGATIVE);
 
       when(testVisitRepository.findById(VISIT_ID)).thenReturn(Optional.of(visit));
       when(testResultRepository.findByVisitIdOrderByCreatedAt(VISIT_ID))
@@ -459,7 +483,7 @@ class HealthLogServiceTest {
       });
 
       // Write-through for HIV POSITIVE
-      when(healthStatusRepository.findByUserHashAndConditionType(USER_HASH, ConditionType.HIV))
+      when(healthStatusRepository.findByUserHashAndConditionType(USER_HASH, "HIV"))
           .thenReturn(Optional.empty());
       when(healthStatusRepository.save(any(HealthStatus.class))).thenAnswer(i -> i.getArgument(0));
 
@@ -474,7 +498,7 @@ class HealthLogServiceTest {
       // Verify new result was saved
       ArgumentCaptor<TestResult> resultCaptor = ArgumentCaptor.forClass(TestResult.class);
       verify(testResultRepository).save(resultCaptor.capture());
-      assertThat(resultCaptor.getValue().getConditionType()).isEqualTo(ConditionType.HIV);
+      assertThat(resultCaptor.getValue().getConditionType()).isEqualTo("HIV");
       assertThat(resultCaptor.getValue().getStatus()).isEqualTo(TestResultStatus.POSITIVE);
 
       // Verify visit was updated
@@ -484,7 +508,7 @@ class HealthLogServiceTest {
       // Verify health_status write-through
       ArgumentCaptor<HealthStatus> hsCaptor = ArgumentCaptor.forClass(HealthStatus.class);
       verify(healthStatusRepository).save(hsCaptor.capture());
-      assertThat(hsCaptor.getValue().getConditionType()).isEqualTo(ConditionType.HIV);
+      assertThat(hsCaptor.getValue().getConditionType()).isEqualTo("HIV");
       assertThat(hsCaptor.getValue().getStatus()).isEqualTo(HealthStatusValue.POSITIVE);
 
       assertThat(response.notes()).isEqualTo("Updated notes");
@@ -533,23 +557,23 @@ class HealthLogServiceTest {
       Jwt jwt = mockJwt();
 
       TestVisit visit = buildVisit(VISIT_ID, USER_HASH);
-      TestResult hivResult = buildResult(VISIT_ID, ConditionType.HIV, TestResultStatus.POSITIVE);
+      TestResult hivResult = buildResult(VISIT_ID, "HIV", TestResultStatus.POSITIVE);
 
       when(testVisitRepository.findById(VISIT_ID)).thenReturn(Optional.of(visit));
       when(testResultRepository.findByVisitIdOrderByCreatedAt(VISIT_ID))
           .thenReturn(List.of(hivResult));
 
       // Re-derive: no other HIV results exist for this user
-      when(testResultRepository.findByUserAndCondition(USER_HASH, ConditionType.HIV))
+      when(testResultRepository.findByUserAndCondition(USER_HASH, "HIV"))
           .thenReturn(Collections.emptyList());
       // Existing health_status for HIV should be deleted
       HealthStatus existingHs = HealthStatus.builder()
           .id(UUID.randomUUID())
           .userHash(USER_HASH)
-          .conditionType(ConditionType.HIV)
+          .conditionType("HIV")
           .status(HealthStatusValue.POSITIVE)
           .build();
-      when(healthStatusRepository.findByUserHashAndConditionType(USER_HASH, ConditionType.HIV))
+      when(healthStatusRepository.findByUserHashAndConditionType(USER_HASH, "HIV"))
           .thenReturn(Optional.of(existingHs));
 
       healthLogService.deleteVisit(jwt, VISIT_ID);
@@ -567,24 +591,24 @@ class HealthLogServiceTest {
       Jwt jwt = mockJwt();
 
       TestVisit visit = buildVisit(VISIT_ID, USER_HASH);
-      TestResult hivResult = buildResult(VISIT_ID, ConditionType.HIV, TestResultStatus.POSITIVE);
+      TestResult hivResult = buildResult(VISIT_ID, "HIV", TestResultStatus.POSITIVE);
 
       when(testVisitRepository.findById(VISIT_ID)).thenReturn(Optional.of(visit));
       when(testResultRepository.findByVisitIdOrderByCreatedAt(VISIT_ID))
           .thenReturn(List.of(hivResult));
 
       // Re-derive: another HIV NEGATIVE result exists from a different visit
-      TestResult remainingResult = buildResult(UUID.randomUUID(), ConditionType.HIV, TestResultStatus.NEGATIVE);
-      when(testResultRepository.findByUserAndCondition(USER_HASH, ConditionType.HIV))
+      TestResult remainingResult = buildResult(UUID.randomUUID(), "HIV", TestResultStatus.NEGATIVE);
+      when(testResultRepository.findByUserAndCondition(USER_HASH, "HIV"))
           .thenReturn(List.of(remainingResult));
 
       HealthStatus existingHs = HealthStatus.builder()
           .id(UUID.randomUUID())
           .userHash(USER_HASH)
-          .conditionType(ConditionType.HIV)
+          .conditionType("HIV")
           .status(HealthStatusValue.POSITIVE)
           .build();
-      when(healthStatusRepository.findByUserHashAndConditionType(USER_HASH, ConditionType.HIV))
+      when(healthStatusRepository.findByUserHashAndConditionType(USER_HASH, "HIV"))
           .thenReturn(Optional.of(existingHs));
       when(healthStatusRepository.save(any(HealthStatus.class))).thenAnswer(i -> i.getArgument(0));
 
@@ -677,6 +701,7 @@ class HealthLogServiceTest {
     @DisplayName("should return daysSinceLastTest")
     void getSummary_shouldReturnDaysSinceLastTest() {
       Jwt jwt = mockJwt();
+      stubCatalog();
 
       LocalDate tenDaysAgo = LocalDate.now().minusDays(10);
       TestVisit visit = buildVisit(VISIT_ID, USER_HASH);
@@ -696,6 +721,7 @@ class HealthLogServiceTest {
     @DisplayName("should return testsThisYear")
     void getSummary_shouldReturnTestsThisYear() {
       Jwt jwt = mockJwt();
+      stubCatalog();
 
       int currentYear = LocalDate.now().getYear();
 
@@ -722,6 +748,7 @@ class HealthLogServiceTest {
     @DisplayName("should return coverageCount for standard conditions this year")
     void getSummary_shouldReturnCoverageCount() {
       Jwt jwt = mockJwt();
+      stubCatalog();
 
       int currentYear = LocalDate.now().getYear();
       UUID visitId = UUID.randomUUID();
@@ -729,9 +756,9 @@ class HealthLogServiceTest {
       TestVisit visit = buildVisit(visitId, USER_HASH);
       visit.setTestDate(LocalDate.of(currentYear, 2, 1));
 
-      TestResult hivResult = buildResult(visitId, ConditionType.HIV, TestResultStatus.NEGATIVE);
-      TestResult syphilisResult = buildResult(visitId, ConditionType.SYPHILIS, TestResultStatus.NEGATIVE);
-      TestResult chlamydiaResult = buildResult(visitId, ConditionType.CHLAMYDIA, TestResultStatus.NEGATIVE);
+      TestResult hivResult = buildResult(visitId, "HIV", TestResultStatus.NEGATIVE);
+      TestResult syphilisResult = buildResult(visitId, "SYPHILIS", TestResultStatus.NEGATIVE);
+      TestResult chlamydiaResult = buildResult(visitId, "CHLAMYDIA", TestResultStatus.NEGATIVE);
 
       when(testVisitRepository.findByUserHashOrderByTestDateDesc(USER_HASH))
           .thenReturn(List.of(visit));
@@ -749,6 +776,7 @@ class HealthLogServiceTest {
     @DisplayName("should return latest status per condition")
     void getSummary_shouldReturnLatestStatusPerCondition() {
       Jwt jwt = mockJwt();
+      stubCatalog();
 
       int currentYear = LocalDate.now().getYear();
 
@@ -763,8 +791,8 @@ class HealthLogServiceTest {
       olderVisit.setTestDate(LocalDate.of(currentYear, 1, 10));
 
       // Results sorted by testDate DESC (newer first) — matches repository behavior
-      TestResult newerHiv = buildResult(newerVisitId, ConditionType.HIV, TestResultStatus.NEGATIVE);
-      TestResult olderHiv = buildResult(olderVisitId, ConditionType.HIV, TestResultStatus.POSITIVE);
+      TestResult newerHiv = buildResult(newerVisitId, "HIV", TestResultStatus.NEGATIVE);
+      TestResult olderHiv = buildResult(olderVisitId, "HIV", TestResultStatus.POSITIVE);
 
       when(testVisitRepository.findByUserHashOrderByTestDateDesc(USER_HASH))
           .thenReturn(List.of(newerVisit, olderVisit));
@@ -789,6 +817,7 @@ class HealthLogServiceTest {
     @DisplayName("should include custom conditions in summary")
     void getSummary_shouldIncludeCustomConditions() {
       Jwt jwt = mockJwt();
+      stubCatalog();
 
       UUID visitId = UUID.randomUUID();
       TestVisit visit = buildVisit(visitId, USER_HASH);
@@ -827,6 +856,7 @@ class HealthLogServiceTest {
     @DisplayName("should return -1 when no visits exist")
     void getSummary_shouldReturnNegativeOneWhenNoVisits() {
       Jwt jwt = mockJwt();
+      stubCatalog();
 
       when(testVisitRepository.findByUserHashOrderByTestDateDesc(USER_HASH))
           .thenReturn(Collections.emptyList());
@@ -850,6 +880,7 @@ class HealthLogServiceTest {
     @DisplayName("should return all visits for a condition")
     void getConditionHistory_shouldReturnAllVisitsForCondition() {
       Jwt jwt = mockJwt();
+      when(conditionCatalogService.isValidCode("HIV")).thenReturn(true);
 
       UUID visitId1 = UUID.randomUUID();
       UUID visitId2 = UUID.randomUUID();
@@ -862,11 +893,11 @@ class HealthLogServiceTest {
       TestVisit visit3 = buildVisit(visitId3, USER_HASH);
       visit3.setTestDate(LocalDate.of(2025, 12, 1));
 
-      TestResult r1 = buildResult(visitId1, ConditionType.HIV, TestResultStatus.NEGATIVE);
-      TestResult r2 = buildResult(visitId2, ConditionType.HIV, TestResultStatus.NEGATIVE);
-      TestResult r3 = buildResult(visitId3, ConditionType.HIV, TestResultStatus.POSITIVE);
+      TestResult r1 = buildResult(visitId1, "HIV", TestResultStatus.NEGATIVE);
+      TestResult r2 = buildResult(visitId2, "HIV", TestResultStatus.NEGATIVE);
+      TestResult r3 = buildResult(visitId3, "HIV", TestResultStatus.POSITIVE);
 
-      when(testResultRepository.findByUserAndCondition(USER_HASH, ConditionType.HIV))
+      when(testResultRepository.findByUserAndCondition(USER_HASH, "HIV"))
           .thenReturn(List.of(r1, r2, r3));
       when(testVisitRepository.findById(visitId1)).thenReturn(Optional.of(visit1));
       when(testVisitRepository.findById(visitId2)).thenReturn(Optional.of(visit2));
@@ -888,6 +919,7 @@ class HealthLogServiceTest {
     @DisplayName("should include lab info in history entries")
     void getConditionHistory_shouldIncludeLabInfo() {
       Jwt jwt = mockJwt();
+      when(conditionCatalogService.isValidCode("HIV")).thenReturn(true);
 
       UUID visitId = UUID.randomUUID();
       TestVisit visit = buildVisit(visitId, USER_HASH);
@@ -900,11 +932,11 @@ class HealthLogServiceTest {
           .nameEncrypted(ENCRYPTED_LAB_NAME)
           .build();
 
-      TestResult result = buildResult(visitId, ConditionType.HIV, TestResultStatus.NEGATIVE);
+      TestResult result = buildResult(visitId, "HIV", TestResultStatus.NEGATIVE);
       result.setResultValueEncrypted(ENCRYPTED_RESULT_VALUE);
       result.setReferenceRange("< 1.0");
 
-      when(testResultRepository.findByUserAndCondition(USER_HASH, ConditionType.HIV))
+      when(testResultRepository.findByUserAndCondition(USER_HASH, "HIV"))
           .thenReturn(List.of(result));
       when(testVisitRepository.findById(visitId)).thenReturn(Optional.of(visit));
       when(labRepository.findById(LAB_ID)).thenReturn(Optional.of(lab));

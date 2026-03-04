@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import app.navilla.entity.ConditionType;
 import app.navilla.entity.HealthStatus;
 import app.navilla.entity.HealthStatusValue;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -31,7 +30,7 @@ public interface HealthStatusRepository extends JpaRepository<HealthStatus, UUID
 
   List<HealthStatus> findByUserHashOrderByReportedAtDesc(String userHash);
 
-  Optional<HealthStatus> findByUserHashAndConditionType(String userHash, ConditionType conditionType);
+  Optional<HealthStatus> findByUserHashAndConditionType(String userHash, String conditionType);
 
   List<HealthStatus> findByUserHashInAndStatus(List<String> userHashes, HealthStatusValue status);
 }

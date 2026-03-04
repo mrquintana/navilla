@@ -18,7 +18,12 @@ package app.navilla.entity;
 
 /**
  * Supported condition types for health status reporting.
+ *
+ * @deprecated Replaced by condition_catalog database table.
+ * Use ConditionCatalogService.isValidCode() for validation.
+ * Kept temporarily for backward compatibility during migration.
  */
+@Deprecated
 public enum ConditionType {
   CHLAMYDIA,
   GONORRHEA,

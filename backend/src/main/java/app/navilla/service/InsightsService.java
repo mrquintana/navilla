@@ -34,7 +34,7 @@ import app.navilla.dto.InsightsResponse.ActivitySummary;
 import app.navilla.dto.InsightsResponse.PreventionSummary;
 import app.navilla.dto.InsightsResponse.TestingSummary;
 import app.navilla.dto.PrepStreakResponse;
-import app.navilla.entity.ConditionType;
+import app.navilla.entity.ConditionCatalogEntry;
 import app.navilla.entity.EncounterJournal;
 import app.navilla.entity.Medication;
 import app.navilla.entity.TestResult;
@@ -83,6 +83,7 @@ public class InsightsService {
   private final EncryptionService encryptionService;
   private final ObjectMapper objectMapper;
   private final MedicationService medicationService;
+  private final ConditionCatalogService conditionCatalogService;
 
   private static final DateTimeFormatter MONTH_FORMAT =
       DateTimeFormatter.ofPattern("yyyy-MM");
@@ -216,8 +217,8 @@ public class InsightsService {
         .count();
 
     // Condition coverage this year
-    Set<ConditionType> coveredThisYear = new HashSet<>();
-    Map<ConditionType, TestResult> latestResultByCondition = new LinkedHashMap<>();
+    Set<String> coveredThisYear = new HashSet<>();
+    Map<String, TestResult> latestResultByCondition = new LinkedHashMap<>();
 
     for (TestResult result : allResults) {
       if (result.getConditionType() == null) {
@@ -237,13 +238,14 @@ public class InsightsService {
     }
 
     int conditionsCovered = coveredThisYear.size();
-    int totalStandardConditions = ConditionType.values().length;
+    List<ConditionCatalogEntry> activeConditions = conditionCatalogService.listActive();
+    int totalStandardConditions = activeConditions.size();
 
     // Coverage map: condition -> latest status
     Map<String, String> coverageMap = new LinkedHashMap<>();
-    for (ConditionType condition : ConditionType.values()) {
-      TestResult latest = latestResultByCondition.get(condition);
-      coverageMap.put(condition.name(), latest != null ? latest.getStatus().name() : "NOT_TESTED");
+    for (ConditionCatalogEntry condition : activeConditions) {
+      TestResult latest = latestResultByCondition.get(condition.getCode());
+      coverageMap.put(condition.getCode(), latest != null ? latest.getStatus().name() : "NOT_TESTED");
     }
 
     return new TestingSummary(

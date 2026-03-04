@@ -32,7 +32,6 @@ import app.navilla.dto.HealthLogSummaryResponse;
 import app.navilla.dto.TestResultDto;
 import app.navilla.dto.TestVisitResponse;
 import app.navilla.dto.UpdateTestVisitRequest;
-import app.navilla.entity.ConditionType;
 import app.navilla.entity.HealthStatus;
 import app.navilla.entity.HealthStatusValue;
 import app.navilla.entity.Lab;
@@ -77,6 +76,7 @@ public class HealthLogService {
   private final LabRepository labRepository;
   private final HealthStatusRepository healthStatusRepository;
   private final EncryptionService encryptionService;
+  private final ConditionCatalogService conditionCatalogService;
 
   /**
    * Creates a new test visit with results.
@@ -300,7 +300,7 @@ public class HealthLogService {
     for (TestResult result : allResults) {
       String key;
       if (result.getConditionType() != null) {
-        key = result.getConditionType().name();
+        key = result.getConditionType();
       } else {
         String decrypted = encryptionService.decryptFromBytes(
             result.getCustomConditionEncrypted());
@@ -359,7 +359,7 @@ public class HealthLogService {
         .distinct()
         .count();
 
-    int totalStandardConditions = ConditionType.values().length;
+    int totalStandardConditions = conditionCatalogService.listActive().size();
 
     return new HealthLogSummaryResponse(
         daysSinceLastTest, testsThisYear, conditionsCovered,
@@ -379,17 +379,15 @@ public class HealthLogService {
   public ConditionHistoryResponse getConditionHistory(Jwt jwt, String conditionType) {
     String userHash = hashEmail(jwt);
 
-    ConditionType parsedType;
-    try {
-      parsedType = ConditionType.valueOf(conditionType.toUpperCase());
-    } catch (IllegalArgumentException e) {
+    String normalizedType = conditionType.toUpperCase();
+    if (!conditionCatalogService.isValidCode(normalizedType)) {
       throw new ResourceNotFoundException("healthLog.error.conditionNotFound");
     }
-    List<TestResult> results = testResultRepository.findByUserAndCondition(userHash, parsedType);
+    List<TestResult> results = testResultRepository.findByUserAndCondition(userHash, normalizedType);
 
     if (results.isEmpty()) {
       return new ConditionHistoryResponse(
-          parsedType.name(), null, 0, null, List.of());
+          normalizedType, null, 0, null, List.of());
     }
 
     List<ConditionHistoryResponse.HistoryEntry> entries = new ArrayList<>();
@@ -432,7 +430,7 @@ public class HealthLogService {
     LocalDate lastTestDate = entries.getFirst().testDate();
 
     return new ConditionHistoryResponse(
-        parsedType.name(), latestStatus, results.size(),
+        normalizedType, latestStatus, results.size(),
         lastTestDate, entries);
   }
 
@@ -459,7 +457,7 @@ public class HealthLogService {
     return TestResult.builder()
         .visitId(visitId)
         .conditionType(input.conditionType() != null
-            ? ConditionType.valueOf(input.conditionType().toUpperCase()) : null)
+            ? input.conditionType().toUpperCase() : null)
         .customConditionEncrypted(encryptOptional(input.customCondition()))
         .status(TestResultStatus.valueOf(input.status().toUpperCase()))
         .resultValueEncrypted(encryptOptional(input.resultValue()))
@@ -517,7 +515,7 @@ public class HealthLogService {
    * <p>Called after a visit is deleted to ensure health_status accurately
    * reflects the most recent test result for the condition.
    */
-  private void reDeriveHealthStatus(String userHash, ConditionType conditionType) {
+  private void reDeriveHealthStatus(String userHash, String conditionType) {
     List<TestResult> remainingResults =
         testResultRepository.findByUserAndCondition(userHash, conditionType);
 
@@ -621,7 +619,7 @@ public class HealthLogService {
 
     return new TestResultDto(
         result.getId(),
-        result.getConditionType() != null ? result.getConditionType().name() : null,
+        result.getConditionType(),
         customCondition,
         result.getStatus().name(),
         resultValue,
