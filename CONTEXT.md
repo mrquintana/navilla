@@ -127,12 +127,27 @@ A detailed breakdown of the project's directory layout and key files can be foun
 
 ---
 
+## Session Notes (2026-03-04 — Week 9 Continued: Email Delivery Validation)
+
+- ✅ **Email delivery validated end-to-end** — Test email sent and received via SendGrid HTTP API on Railway
+- ✅ **SMTP → SendGrid HTTP API migration** — Railway blocks ALL outbound SMTP ports (587, 2525, 465). Rewrote `EmailService` to use `HttpClient` + SendGrid v3 REST API over HTTPS (port 443). Removed `spring-boot-starter-mail` dependency on SMTP
+- ✅ **EmailProperties updated** — Added `sendgridApiKey` field for HTTP API auth (replaces SMTP password)
+- ✅ **DevTestController** — Kept as permanent dev tool (`/api/dev/email-status`, `/api/dev/test-email`), JWT-protected, uses direct SendGrid HTTP API for clear error reporting
+- ✅ **Email template fix** — "Manage notification preferences" link changed from nonexistent `/settings` to `/notifications`
+- ✅ **Docusaurus updated** — 3 new docs (push-notifications, caching, pwa), 5 updated docs
+- ✅ **Sender address corrected** — `no-reply@navilla.app` (with hyphen), not `noreply@navilla.app`
+- ✅ 299 backend tests passing
+- **Railway env vars set:** `SENDGRID_API_KEY`, `EMAIL_ENABLED=true`
+- **Key lesson:** Railway blocks all outbound SMTP ports — always use HTTP APIs for email on Railway
+
+---
+
 ## Session Notes (2026-03-03 — Week 9: PWA + Push Notifications + Caching + Email)
 
 - ✅ **Caffeine cache setup** — `@EnableCaching` with 4 named caches: catalog (1hr), healthLogSummary (5min), insights (5min), prepStreak (10min). `@Cacheable` on read paths, `@CacheEvict` on write paths
 - ✅ **Push subscription backend** — Migration `013_push_subscriptions.sql`, `PushSubscription` entity with AES-256-GCM encrypted endpoint/p256dh/auth, CRUD controller at `/api/push/*`
 - ✅ **Web Push service (VAPID/RFC 8030)** — jose4j for JWT signing (Java 25 compatible), `WebPushService` sends fire-and-forget push via HttpClient, handles 404/410 stale subscription cleanup
-- ✅ **Email infrastructure** — Spring Mail + SendGrid SMTP, Thymeleaf email templates (en/es), `EmailService` with fire-and-forget delivery, configurable `navilla.email.enabled` flag
+- ✅ **Email infrastructure** — SendGrid HTTP API v3, Thymeleaf email templates (en/es), `EmailService` with fire-and-forget delivery, configurable `navilla.email.enabled` flag
 - ✅ **Email digest job** — `@Scheduled` daily at batch-hour, sends weekly digest with PrEP adherence, testing status, upcoming reminders, vaccine due dates. Day-of-week filtering per user settings
 - ✅ **Push wired into notification system** — `NotificationService.createNotification()` sends push after persisting notification. Single push point (no duplication). Maps all 10 NotificationType values to click URLs
 - ✅ **PWA manifest + icons** — vite-plugin-pwa with `injectManifest` strategy, manifest.webmanifest (theme_color #4f46e5, standalone display), Apple meta tags, generated icons (192/512/512-maskable)
@@ -145,13 +160,14 @@ A detailed breakdown of the project's directory layout and key files can be foun
 - ✅ **Postman collection updated** — Push Notifications folder (4 endpoints: VAPID key, subscribe, list, unsubscribe)
 - ✅ i18n: ~15 new keys in en_US + es_MX (pwa.*, reminders.push*, notifications.*)
 - ✅ Full test suite: 299 backend tests passing, frontend lint + build:full clean
-- **Branch:** `feature/week9-pwa-push-notifications`
+- **Branch:** `feature/week9-pwa-push-notifications` (merged to develop)
 - **Needs manual action:** Run migration `013_push_subscriptions.sql` on Supabase
 - **Railway env vars needed:** `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `SENDGRID_API_KEY`, `EMAIL_ENABLED`
 - **Key architecture decisions:**
   - jose4j instead of webpush-java (Java 25 compatibility)
   - Push sending centralized in NotificationService (not scattered across schedulers)
   - injectManifest strategy for custom service worker (more control than generateSW)
+  - Email delivery uses SendGrid HTTP API v3 (not SMTP — Railway blocks all SMTP ports)
   - Email digest is fire-and-forget with `enabled=false` as safe default
 
 ---
