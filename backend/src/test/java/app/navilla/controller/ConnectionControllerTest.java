@@ -241,6 +241,7 @@ class ConnectionControllerTest {
                   .claim("email", USER_B_EMAIL))))
           .andExpect(status().isOk())
           .andExpect(jsonPath("$.status").value("CONFIRMED"))
+          .andExpect(jsonPath("$.connectionType").value("EXPLICIT"))
           .andExpect(jsonPath("$.confirmedAt").exists());
     }
 

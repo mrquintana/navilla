@@ -440,6 +440,9 @@ public class ConnectionService {
     return new ConnectionResponse(
         connection.getId(),
         connection.getStatus(),
+        connection.getConnectionType() != null
+            ? connection.getConnectionType().name()
+            : null,
         isRequester,
         connection.getRequestedAt(),
         connection.getConfirmedAt(),

@@ -32,6 +32,7 @@ import java.util.UUID;
 
 import app.navilla.entity.Connection;
 import app.navilla.entity.ConnectionPhoneEntry;
+import app.navilla.entity.ConnectionType;
 import app.navilla.exception.RateLimitException;
 import app.navilla.repository.ConnectionPhoneEntryRepository;
 import app.navilla.repository.ConnectionRepository;
@@ -201,6 +202,7 @@ class PhoneMatchServiceTest {
       assertThat(created.getRequesterHash()).isEqualTo(USER_A_HASH);
       assertThat(created.getRecipientHash()).isEqualTo(USER_B_HASH);
       assertThat(created.getStatus().name()).isEqualTo("CONFIRMED");
+      assertThat(created.getConnectionType()).isEqualTo(ConnectionType.PHONE_MATCH);
       assertThat(created.getConfirmedAt()).isNotNull();
 
       // Other entry should be marked as matched

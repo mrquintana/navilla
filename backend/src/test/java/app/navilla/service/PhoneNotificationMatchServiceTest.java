@@ -29,6 +29,7 @@ import java.util.UUID;
 
 import app.navilla.entity.Connection;
 import app.navilla.entity.ConnectionPhoneEntry;
+import app.navilla.entity.ConnectionType;
 import app.navilla.entity.PhoneBlock;
 import app.navilla.entity.PhoneReport;
 import app.navilla.exception.ConnectionConflictException;
@@ -126,6 +127,7 @@ class PhoneNotificationMatchServiceTest {
       assertThat(saved.getRequesterHash()).isEqualTo(OTHER_USER_HASH);
       assertThat(saved.getRecipientHash()).isEqualTo(USER_HASH);
       assertThat(saved.getStatus().name()).isEqualTo("CONFIRMED");
+      assertThat(saved.getConnectionType()).isEqualTo(ConnectionType.NOTIFICATION_MATCH);
       assertThat(saved.getConfirmedAt()).isNotNull();
 
       // Entry should be marked as matched

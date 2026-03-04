@@ -28,6 +28,7 @@ import app.navilla.entity.ConnectionStatus;
  *
  * @param id the connection's unique identifier
  * @param status the current connection status
+ * @param connectionType how the connection was formed (e.g. EXPLICIT, PHONE_MATCH)
  * @param isRequester whether the current user initiated this connection
  * @param requestedAt when the connection request was sent
  * @param confirmedAt when the connection was confirmed (null if not confirmed)
@@ -40,6 +41,7 @@ import app.navilla.entity.ConnectionStatus;
 public record ConnectionResponse(
     UUID id,
     ConnectionStatus status,
+    String connectionType,
     boolean isRequester,
     OffsetDateTime requestedAt,
     OffsetDateTime confirmedAt,

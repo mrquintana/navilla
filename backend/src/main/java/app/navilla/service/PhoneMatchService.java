@@ -24,6 +24,7 @@ import java.util.UUID;
 import app.navilla.entity.Connection;
 import app.navilla.entity.ConnectionPhoneEntry;
 import app.navilla.entity.ConnectionStatus;
+import app.navilla.entity.ConnectionType;
 import app.navilla.exception.RateLimitException;
 import app.navilla.repository.ConnectionPhoneEntryRepository;
 import app.navilla.repository.ConnectionRepository;
@@ -164,6 +165,7 @@ public class PhoneMatchService {
           .requesterHash(userHash)
           .recipientHash(otherUserHash)
           .status(ConnectionStatus.CONFIRMED)
+          .connectionType(ConnectionType.PHONE_MATCH)
           .confirmedAt(OffsetDateTime.now())
           .respondedAt(OffsetDateTime.now())
           .build();

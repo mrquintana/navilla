@@ -67,6 +67,7 @@ public class EncounterJournalService {
   private final JournalFieldTemplateRepository templateRepository;
   private final JournalPartnerRepository partnerRepository;
   private final EncryptionService encryptionService;
+  private final PhoneMatchService phoneMatchService;
   private final ObjectMapper objectMapper;
   private final JournalMetrics journalMetrics;
 
@@ -132,6 +133,17 @@ public class EncounterJournalService {
         .build();
 
     EncounterJournal saved = journalRepository.save(entry);
+
+    // If phone provided, hash it and register for phone matching
+    if (request.phone() != null && !request.phone().isBlank()) {
+      String phoneHash = encryptionService.hashPhone(request.phone());
+      saved.setPhoneHash(phoneHash);
+      saved = journalRepository.save(saved);
+      phoneMatchService.registerPhoneEntry(
+          userHash, request.phone(),
+          request.encounterDate(), saved.getId());
+    }
+
     log.info("Journal entry created for user");
     journalMetrics.recordEntryCreated();
     return toResponse(saved, userHash);
@@ -176,6 +188,14 @@ public class EncounterJournalService {
     entry.setProtectionMethodsEncrypted(
         encryptStringList(request.protectionMethods()));
     entry.setPartnerId(request.partnerId());
+
+    // Handle phone hash update
+    if (request.phone() != null && !request.phone().isBlank()) {
+      String phoneHash = encryptionService.hashPhone(request.phone());
+      entry.setPhoneHash(phoneHash);
+    } else {
+      entry.setPhoneHash(null);
+    }
 
     EncounterJournal saved = journalRepository.save(entry);
     log.info("Journal entry updated: {}", id);

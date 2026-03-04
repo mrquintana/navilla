@@ -22,6 +22,7 @@ import java.util.UUID;
 import app.navilla.entity.Connection;
 import app.navilla.entity.ConnectionPhoneEntry;
 import app.navilla.entity.ConnectionStatus;
+import app.navilla.entity.ConnectionType;
 import app.navilla.entity.PhoneBlock;
 import app.navilla.entity.PhoneReport;
 import app.navilla.exception.ConnectionConflictException;
@@ -113,6 +114,7 @@ public class PhoneNotificationMatchService {
         .requesterHash(otherUserHash)
         .recipientHash(userHash)
         .status(ConnectionStatus.CONFIRMED)
+        .connectionType(ConnectionType.NOTIFICATION_MATCH)
         .confirmedAt(OffsetDateTime.now())
         .respondedAt(OffsetDateTime.now())
         .build();

@@ -74,6 +74,9 @@ public class EncounterJournal {
   @Column(name = "partner_id")
   private UUID partnerId;
 
+  @Column(name = "phone_hash", length = 64)
+  private String phoneHash;
+
   @CreationTimestamp
   @Column(name = "created_at", nullable = false, updatable = false)
   private OffsetDateTime createdAt;

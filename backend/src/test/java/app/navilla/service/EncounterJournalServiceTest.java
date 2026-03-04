@@ -84,6 +84,9 @@ class EncounterJournalServiceTest {
   private ObjectMapper objectMapper;
 
   @Mock
+  private PhoneMatchService phoneMatchService;
+
+  @Mock
   private JournalMetrics journalMetrics;
 
   @Mock
@@ -198,7 +201,7 @@ class EncounterJournalServiceTest {
       stubAuth();
       List<CustomFieldDto> customFields = List.of(new CustomFieldDto("Location", "Home"));
       CreateJournalEntryRequest request = new CreateJournalEntryRequest(
-          LocalDate.of(2026, 3, 15), "Partner A", null, "Some notes", customFields, null, null, null);
+          LocalDate.of(2026, 3, 15), "Partner A", null, "Some notes", customFields, null, null, null, null);
 
       when(encryptionService.encryptToBytes("Partner A")).thenReturn(ENCRYPTED_ALIAS);
       when(encryptionService.encryptToBytes("Some notes")).thenReturn(ENCRYPTED_NOTES);
@@ -237,7 +240,7 @@ class EncounterJournalServiceTest {
     void shouldHandleNullOptionalFields() throws Exception {
       stubAuth();
       CreateJournalEntryRequest request = new CreateJournalEntryRequest(
-          LocalDate.of(2026, 3, 15), null, null, null, null, null, null, null);
+          LocalDate.of(2026, 3, 15), null, null, null, null, null, null, null, null);
 
       when(journalRepository.save(any(EncounterJournal.class))).thenAnswer(invocation -> {
         EncounterJournal saved = invocation.getArgument(0);
@@ -273,7 +276,7 @@ class EncounterJournalServiceTest {
           new CustomFieldDto("Location", "Home"),
           new CustomFieldDto("Mood", "Happy"));
       CreateJournalEntryRequest request = new CreateJournalEntryRequest(
-          LocalDate.of(2026, 3, 15), null, null, null, customFields, null, null, null);
+          LocalDate.of(2026, 3, 15), null, null, null, customFields, null, null, null, null);
 
       String customJson = "[{\"label\":\"Location\",\"value\":\"Home\"},{\"label\":\"Mood\",\"value\":\"Happy\"}]";
       when(objectMapper.writeValueAsString(customFields)).thenReturn(customJson);
@@ -304,7 +307,7 @@ class EncounterJournalServiceTest {
       List<String> encounterTypes = List.of("ORAL", "ANAL");
       List<String> protectionMethods = List.of("CONDOM", "PREP");
       CreateJournalEntryRequest request = new CreateJournalEntryRequest(
-          LocalDate.of(2026, 3, 15), null, null, null, null, null,
+          LocalDate.of(2026, 3, 15), null, null, null, null, null, null,
           encounterTypes, protectionMethods);
 
       byte[] encTypes = new byte[]{50, 51, 52};
@@ -340,6 +343,61 @@ class EncounterJournalServiceTest {
       assertThat(result.encounterTypes()).containsExactly("ORAL", "ANAL");
       assertThat(result.protectionMethods()).containsExactly("CONDOM", "PREP");
     }
+
+    @Test
+    @DisplayName("should hash phone and register phone match when phone provided")
+    void shouldHashPhoneAndRegisterPhoneMatch() throws Exception {
+      stubAuth();
+      String rawPhone = "+52 55 1234 5678";
+      String phoneHash = "phone_hash_abc123";
+      CreateJournalEntryRequest request = new CreateJournalEntryRequest(
+          LocalDate.of(2026, 3, 15), null, null, null, null, null, rawPhone, null, null);
+
+      when(encryptionService.hashPhone(rawPhone)).thenReturn(phoneHash);
+      when(journalRepository.save(any(EncounterJournal.class))).thenAnswer(invocation -> {
+        EncounterJournal saved = invocation.getArgument(0);
+        if (saved.getId() == null) {
+          saved.setId(ENTRY_ID);
+        }
+        saved.setCreatedAt(OffsetDateTime.now());
+        saved.setUpdatedAt(OffsetDateTime.now());
+        return saved;
+      });
+
+      encounterJournalService.createEntry(jwt, request);
+
+      // Verify phone hash was set on the entity
+      ArgumentCaptor<EncounterJournal> captor = ArgumentCaptor.forClass(EncounterJournal.class);
+      verify(journalRepository, org.mockito.Mockito.atLeast(2)).save(captor.capture());
+      EncounterJournal lastSaved = captor.getAllValues().getLast();
+      assertThat(lastSaved.getPhoneHash()).isEqualTo(phoneHash);
+
+      // Verify phone match registration was called
+      verify(phoneMatchService).registerPhoneEntry(
+          eq(USER_HASH), eq(rawPhone),
+          eq(LocalDate.of(2026, 3, 15)), eq(ENTRY_ID));
+    }
+
+    @Test
+    @DisplayName("should not register phone match when phone is null")
+    void shouldNotRegisterPhoneMatchWhenPhoneNull() throws Exception {
+      stubAuth();
+      CreateJournalEntryRequest request = new CreateJournalEntryRequest(
+          LocalDate.of(2026, 3, 15), null, null, null, null, null, null, null, null);
+
+      when(journalRepository.save(any(EncounterJournal.class))).thenAnswer(invocation -> {
+        EncounterJournal saved = invocation.getArgument(0);
+        saved.setId(ENTRY_ID);
+        saved.setCreatedAt(OffsetDateTime.now());
+        saved.setUpdatedAt(OffsetDateTime.now());
+        return saved;
+      });
+
+      encounterJournalService.createEntry(jwt, request);
+
+      verify(phoneMatchService, never()).registerPhoneEntry(any(), any(), any(), any());
+      verify(encryptionService, never()).hashPhone(any());
+    }
   }
 
   @Nested
@@ -363,7 +421,7 @@ class EncounterJournalServiceTest {
       when(encryptionService.decryptFromBytes(newNotes)).thenReturn("Updated notes");
 
       UpdateJournalEntryRequest request = new UpdateJournalEntryRequest(
-          LocalDate.of(2026, 4, 1), "Partner B", null, "Updated notes", null, null, null, null);
+          LocalDate.of(2026, 4, 1), "Partner B", null, "Updated notes", null, null, null, null, null);
 
       JournalEntryResponse result = encounterJournalService.updateEntry(jwt, ENTRY_ID, request);
 
@@ -408,7 +466,7 @@ class EncounterJournalServiceTest {
           .thenReturn(protectionMethods);
 
       UpdateJournalEntryRequest request = new UpdateJournalEntryRequest(
-          LocalDate.of(2026, 4, 1), "Partner B", null, null, null, null,
+          LocalDate.of(2026, 4, 1), "Partner B", null, null, null, null, null,
           encounterTypes, protectionMethods);
 
       JournalEntryResponse result = encounterJournalService.updateEntry(jwt, ENTRY_ID, request);
@@ -430,7 +488,7 @@ class EncounterJournalServiceTest {
       when(journalRepository.findById(ENTRY_ID)).thenReturn(Optional.of(existing));
 
       UpdateJournalEntryRequest request = new UpdateJournalEntryRequest(
-          LocalDate.of(2026, 4, 1), "Partner B", null, "Updated notes", null, null, null, null);
+          LocalDate.of(2026, 4, 1), "Partner B", null, "Updated notes", null, null, null, null, null);
 
       assertThatThrownBy(() -> encounterJournalService.updateEntry(jwt, ENTRY_ID, request))
           .isInstanceOf(IllegalStateException.class)
@@ -446,7 +504,7 @@ class EncounterJournalServiceTest {
       when(journalRepository.findById(ENTRY_ID)).thenReturn(Optional.empty());
 
       UpdateJournalEntryRequest request = new UpdateJournalEntryRequest(
-          LocalDate.of(2026, 4, 1), "Partner B", null, "Updated notes", null, null, null, null);
+          LocalDate.of(2026, 4, 1), "Partner B", null, "Updated notes", null, null, null, null, null);
 
       assertThatThrownBy(() -> encounterJournalService.updateEntry(jwt, ENTRY_ID, request))
           .isInstanceOf(ResourceNotFoundException.class)

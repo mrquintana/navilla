@@ -33,6 +33,7 @@ import app.navilla.dto.ConnectionStatsResponse;
 import app.navilla.dto.CreateConnectionRequest;
 import app.navilla.entity.Connection;
 import app.navilla.entity.ConnectionStatus;
+import app.navilla.entity.ConnectionType;
 import app.navilla.entity.ProfileVisibility;
 import app.navilla.entity.User;
 import app.navilla.exception.ResourceNotFoundException;
@@ -204,6 +205,7 @@ class ConnectionServiceTest {
       ConnectionResponse response = connectionService.acceptConnection(jwt, CONNECTION_ID);
 
       assertThat(response.status()).isEqualTo(ConnectionStatus.CONFIRMED);
+      assertThat(response.connectionType()).isEqualTo(ConnectionType.EXPLICIT.name());
       assertThat(response.confirmedAt()).isNotNull();
     }
 
@@ -356,7 +358,9 @@ class ConnectionServiceTest {
 
       assertThat(connections).hasSize(2);
       assertThat(connections.get(0).isRequester()).isTrue();
+      assertThat(connections.get(0).connectionType()).isEqualTo(ConnectionType.EXPLICIT.name());
       assertThat(connections.get(1).isRequester()).isFalse();
+      assertThat(connections.get(1).connectionType()).isEqualTo(ConnectionType.EXPLICIT.name());
     }
   }
 

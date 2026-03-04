@@ -97,6 +97,14 @@ public class Connection {
   private ConnectionStatus status = ConnectionStatus.PENDING;
 
   /**
+   * How this connection was formed.
+   */
+  @Enumerated(EnumType.STRING)
+  @Column(name = "connection_type", length = 30)
+  @Builder.Default
+  private ConnectionType connectionType = ConnectionType.EXPLICIT;
+
+  /**
    * Timestamp when the connection request was sent.
    */
   @CreationTimestamp

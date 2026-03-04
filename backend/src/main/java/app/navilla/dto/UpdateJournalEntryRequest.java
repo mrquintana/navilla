@@ -51,6 +51,9 @@ public record UpdateJournalEntryRequest(
 
     UUID partnerId,
 
+    @Size(max = 20, message = "{journal.error.phoneTooLong}")
+    String phone,
+
     @Size(max = 10, message = "{journal.error.tooManyEncounterTypes}")
     List<String> encounterTypes,
 
