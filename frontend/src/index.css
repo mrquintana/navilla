@@ -1493,6 +1493,44 @@ section.hero + section {
   justify-content: flex-end;
 }
 
+/* Segmented control (iOS-style toggle) */
+.segmented-control {
+  display: inline-flex;
+  border-radius: 8px;
+  background: var(--color-background-secondary);
+  padding: 3px;
+  gap: 2px;
+}
+
+.segmented-control-item {
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--color-muted);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.segmented-control-item:hover:not(:disabled):not(.segmented-control-item--active) {
+  color: var(--color-foreground);
+}
+
+.segmented-control-item--active {
+  background: #fff;
+  color: var(--color-primary);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.04);
+}
+
+.segmented-control-item:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 /* Navbar - Infima style */
 .navbar {
   background: rgba(250, 250, 249, 0.82);

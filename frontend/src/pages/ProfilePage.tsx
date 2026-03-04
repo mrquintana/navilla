@@ -703,30 +703,37 @@ function PreferencesSection() {
 
             {/* Profile Visibility */}
             <div className="py-4">
-              <div className="flex items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex items-center gap-3 pt-1">
                   <Eye className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--color-primary)' }} aria-hidden="true" />
                   <div>
                     <p className="text-sm font-medium">{t('profile.visibility')}</p>
                   </div>
                 </div>
-                <select
-                  className="input text-sm py-1 px-2 w-auto"
-                  value={profileVisibility}
-                  onChange={(e) => {
-                    const visibility = e.target.value;
-                    visibilityMutation.mutate({
-                      profileVisibility: visibility,
-                      displayNamePublic: visibility === 'PUBLIC' ? (profile?.displayNamePublic ?? false) : false,
-                      searchableByEmail: visibility === 'PUBLIC' ? (profile?.searchableByEmail ?? false) : false,
-                    });
-                  }}
-                  disabled={visibilityMutation.isPending}
-                >
-                  <option value="PRIVATE">{t('profile.visibilityPrivate')}</option>
-                  <option value="CONNECTIONS_ONLY">{t('profile.visibilityConnections')}</option>
-                  <option value="PUBLIC">{t('profile.visibilityPublic')}</option>
-                </select>
+                <div className="segmented-control flex-shrink-0" role="radiogroup" aria-label={t('profile.visibility')}>
+                  {(['PRIVATE', 'CONNECTIONS_ONLY', 'PUBLIC'] as const).map((value) => (
+                    <button
+                      key={value}
+                      type="button"
+                      role="radio"
+                      aria-checked={profileVisibility === value}
+                      className={`segmented-control-item${profileVisibility === value ? ' segmented-control-item--active' : ''}`}
+                      onClick={() => {
+                        if (profileVisibility === value) return;
+                        visibilityMutation.mutate({
+                          profileVisibility: value,
+                          displayNamePublic: value === 'PUBLIC' ? (profile?.displayNamePublic ?? false) : false,
+                          searchableByEmail: value === 'PUBLIC' ? (profile?.searchableByEmail ?? false) : false,
+                        });
+                      }}
+                      disabled={visibilityMutation.isPending}
+                    >
+                      {value === 'PRIVATE' && t('profile.visibilityPrivate')}
+                      {value === 'CONNECTIONS_ONLY' && t('profile.visibilityConnections')}
+                      {value === 'PUBLIC' && t('profile.visibilityPublic')}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
 
