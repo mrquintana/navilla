@@ -38,7 +38,7 @@ spring:
   # Email Configuration (SendGrid SMTP)
   mail:
     host: ${SMTP_HOST:smtp.sendgrid.net}
-    port: ${SMTP_PORT:587}
+    port: ${SMTP_PORT:2525}
     username: ${SMTP_USERNAME:apikey}
     password: ${SMTP_PASSWORD:}
     properties:
