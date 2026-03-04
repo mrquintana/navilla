@@ -19,6 +19,9 @@ Navigation header with auth-aware content:
 Main layout wrapper for authenticated pages:
 - Header component
 - Main content area with `<Outlet />`
+- `OfflineIndicator` (top amber bar when offline)
+- `InstallPrompt` (PWA install banner, auth-only)
+- `PwaUpdatePrompt` (new version available notification)
 
 #### AuthLayout (`components/layout/AuthLayout.tsx`)
 Centered layout for auth pages (login/signup):
@@ -102,18 +105,36 @@ Components access auth via `useAuth` hook:
 const { session, user, signOut, isLoading } = useAuth();
 ```
 
-## Planned Components
+### PWA Components
 
-### UI Components
-- Button
-- Card
-- Input
-- Modal
-- Badge
-- Alert
+#### InstallPrompt (`components/pwa/InstallPrompt.tsx`)
+PWA install banner for authenticated users:
+- Captures `beforeinstallprompt` event via `usePwaInstall` hook
+- Indigo accent, bottom-positioned banner
+- 7-day dismiss stored in localStorage
+
+#### OfflineIndicator (`components/pwa/OfflineIndicator.tsx`)
+Amber top bar when device is offline:
+- Listens to `online`/`offline` events
+- Auto-hides when connection restored
+
+#### PwaUpdatePrompt (`components/pwa/PwaUpdatePrompt.tsx`)
+New version notification:
+- Uses `useRegisterSW` from `virtual:pwa-register/react`
+- Update button sends `SKIP_WAITING` to service worker
+
+### Reminder Settings
+
+#### ReminderSettingsModal (`components/reminders/ReminderSettingsModal.tsx`)
+Modal for configuring notification preferences:
+- Quiet hours (start/end time pickers)
+- Email digest toggle + day-of-week selector
+- Push notifications toggle with permission-denied warning
+- Per-type toggles (testing, medication, vaccination)
+
+## Planned Components
 
 ### Feature Components
 - ExposureCard
 - ConnectionList
 - HealthStatusForm
-- AlertNotification

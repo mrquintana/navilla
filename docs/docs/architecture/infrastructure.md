@@ -69,21 +69,49 @@ The Vite app is built at deploy time (`npm run build`) and served as static file
 
 ## Email
 
-Navilla uses SendGrid for all transactional email (account confirmations, notifications, password resets), authenticated through the `navilla.app` domain.
+Navilla uses SendGrid for all transactional email, authenticated through the `navilla.app` domain.
+
+### Email types
+
+| Type | Description | Sent By |
+|------|-------------|---------|
+| Auth emails | Confirmations, password resets | Supabase Auth (via SendGrid SMTP) |
+| Weekly digest | PrEP adherence, testing status, upcoming reminders, vaccine due dates | `EmailDigestJob` (`@Scheduled`) |
 
 ### Sender address
 
 ```
-no-reply@navilla.app
+noreply@navilla.app
 ```
 
-Configured in **Supabase → Authentication → SMTP Settings**.
+Auth emails configured in **Supabase → Authentication → SMTP Settings**.
+Digest emails configured via `navilla.email.*` properties in `application.yaml`.
+
+### Email infrastructure
+
+| Component | Description |
+|-----------|-------------|
+| `EmailService` | Fire-and-forget sending via `JavaMailSender`. Skips when `navilla.email.enabled=false` |
+| `EmailTemplateService` | Thymeleaf rendering with locale fallback (es → en) |
+| `EmailDigestJob` | `@Scheduled` daily at batch-hour. Checks day-of-week per user settings, gathers digest data, sends |
+| Templates | `templates/email/digest_en.html`, `digest_es.html`, `layout.html` (shared brand header/footer) |
+
+### Environment variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `SMTP_HOST` | `smtp.sendgrid.net` | SMTP server |
+| `SMTP_PORT` | `587` | SMTP port |
+| `SMTP_USERNAME` | `apikey` | SendGrid uses literal "apikey" as username |
+| `SMTP_PASSWORD` | — | Your SendGrid API key (`SG.xxx`) |
+| `EMAIL_ENABLED` | `false` | Set to `true` to enable digest sending |
+| `EMAIL_FROM` | `noreply@navilla.app` | Sender address |
 
 ### SendGrid domain authentication
 
 The `navilla.app` domain is authenticated in SendGrid with DKIM and SPF via the three CNAME records listed in the DNS table above. DMARC (`p=quarantine`) was already provisioned by GoDaddy and covers the policy layer.
 
-> **No mailbox needed.** `no-reply@navilla.app` is a sending-only address. No inbox, no Titan/Google Workspace subscription required.
+> **No mailbox needed.** `noreply@navilla.app` is a sending-only address. No inbox, no Titan/Google Workspace subscription required.
 
 ---
 

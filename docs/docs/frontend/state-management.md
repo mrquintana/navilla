@@ -170,6 +170,33 @@ export function useUser() {
 }
 ```
 
+### Push Notifications
+
+```typescript
+// src/hooks/usePushNotifications.ts
+const {
+  isSupported,  // browser supports Push API
+  permission,   // 'default' | 'granted' | 'denied'
+  isSubscribed, // currently subscribed
+  isLoading,    // operation in progress
+  subscribe,    // subscribe to push
+  unsubscribe,  // unsubscribe from push
+} = usePushNotifications();
+```
+
+### PWA Install
+
+```typescript
+// src/hooks/usePwaInstall.ts
+const {
+  canInstall,      // beforeinstallprompt captured
+  isInstalled,     // already installed as PWA
+  isDismissed,     // user dismissed (7-day cooldown)
+  promptInstall,   // trigger install prompt
+  dismiss,         // dismiss for 7 days
+} = usePwaInstall();
+```
+
 ### Environment Configuration
 
 Set `VITE_API_URL` in your `.env` file:

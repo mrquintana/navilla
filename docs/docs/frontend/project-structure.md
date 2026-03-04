@@ -17,8 +17,12 @@ frontend/
 │   ├── i18n.ts               # i18n configuration (react-i18next)
 │   ├── index.css             # TailwindCSS global styles
 │   │
+│   ├── sw.ts                  # Custom service worker (Workbox + push)
+│   │
 │   ├── lib/
-│   │   └── supabase.ts       # Supabase client initialization
+│   │   ├── supabase.ts       # Supabase client initialization
+│   │   ├── api.ts            # Centralized API client
+│   │   └── pushNotifications.ts # Push subscription utilities
 │   │
 │   ├── contexts/
 │   │   └── AuthContext.tsx   # Auth state management
@@ -26,16 +30,21 @@ frontend/
 │   ├── hooks/
 │   │   ├── useAuth.ts        # Auth hook (re-export)
 │   │   ├── useUser.ts        # User profile query (/api/users/me)
-│   │   ├── useConnections.ts # (planned)
-│   │   └── useExposures.ts   # (planned)
+│   │   ├── usePushNotifications.ts # Push permission + subscribe/unsubscribe
+│   │   ├── usePwaInstall.ts  # PWA install prompt management
+│   │   └── useConnections.ts # (planned)
 │   │
 │   ├── components/
 │   │   ├── auth/
 │   │   │   └── ProtectedRoute.tsx  # Route guard
 │   │   ├── layout/
 │   │   │   ├── Header.tsx          # Nav with auth state
-│   │   │   ├── Layout.tsx          # Main layout wrapper
+│   │   │   ├── Layout.tsx          # Main layout + PWA components
 │   │   │   └── AuthLayout.tsx      # Centered auth pages
+│   │   ├── pwa/
+│   │   │   ├── InstallPrompt.tsx   # PWA install banner
+│   │   │   ├── OfflineIndicator.tsx # Offline status bar
+│   │   │   └── PwaUpdatePrompt.tsx # App update notification
 │   │   ├── ui/               # (planned) Base UI components
 │   │   └── features/         # (planned) Feature components
 │   │

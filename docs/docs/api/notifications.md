@@ -5,7 +5,7 @@ title: Notifications
 
 # Notifications API
 
-Endpoints for viewing in-app notifications.
+Endpoints for viewing in-app notifications. Notifications are automatically pushed to subscribed devices via Web Push — see [Push Notifications API](./push-notifications) for subscription management.
 
 ## List Notifications
 
