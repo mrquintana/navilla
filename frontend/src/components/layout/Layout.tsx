@@ -9,6 +9,9 @@ import { env } from '../../lib/env';
 import { useAuthOptional } from '../../contexts/AuthContext';
 import { useEffect, useRef } from 'react';
 import { CookieNoticeBanner } from '../privacy/CookieNoticeBanner';
+import { InstallPrompt } from '../pwa/InstallPrompt';
+import { OfflineIndicator } from '../pwa/OfflineIndicator';
+import { PwaUpdatePrompt } from '../pwa/PwaUpdatePrompt';
 
 export function Layout() {
   const { t } = useTranslation();
@@ -87,6 +90,9 @@ export function Layout() {
       </main>
       <Footer />
       <CookieNoticeBanner />
+      <OfflineIndicator />
+      {session && <InstallPrompt />}
+      <PwaUpdatePrompt />
     </div>
   );
 }

@@ -936,5 +936,15 @@
     "snoozed": "Recordatorio pospuesto",
     "completed": "Marcado como completado",
     "copied": "Copiado al portapapeles"
+  },
+  "pwa": {
+    "installTitle": "Instalar Navilla",
+    "installDescription": "Agrega Navilla a tu pantalla de inicio para acceso rápido y soporte sin conexión.",
+    "installButton": "Instalar",
+    "installDismiss": "Ahora no",
+    "offlineNotice": "Sin conexión. Algunas funciones pueden no estar disponibles.",
+    "updateAvailable": "Una nueva versión está disponible.",
+    "updateButton": "Actualizar",
+    "updateDismiss": "Después"
   }
 }

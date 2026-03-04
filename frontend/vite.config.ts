@@ -7,7 +7,11 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
+      strategies: 'injectManifest',
+      srcDir: 'src',
+      filename: 'sw.ts',
       registerType: 'prompt',
+      injectRegister: false,
       includeAssets: ['favicon.svg', 'icons/icon-192.png', 'icons/icon-512.png'],
       manifest: {
         name: 'Navilla — Sexual Health Companion',
@@ -36,6 +40,9 @@ export default defineConfig({
             purpose: 'maskable',
           },
         ],
+      },
+      devOptions: {
+        enabled: false,
       },
     }),
   ],

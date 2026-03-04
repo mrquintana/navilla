@@ -937,5 +937,15 @@
     "snoozed": "Reminder snoozed",
     "completed": "Marked as complete",
     "copied": "Copied to clipboard"
+  },
+  "pwa": {
+    "installTitle": "Install Navilla",
+    "installDescription": "Add Navilla to your home screen for quick access and offline support.",
+    "installButton": "Install",
+    "installDismiss": "Not now",
+    "offlineNotice": "You're offline. Some features may be unavailable.",
+    "updateAvailable": "A new version is available.",
+    "updateButton": "Update",
+    "updateDismiss": "Later"
   }
 }
