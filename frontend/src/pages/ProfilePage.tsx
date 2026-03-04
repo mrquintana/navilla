@@ -10,7 +10,7 @@ import { queryClient } from '../queryClient';
 import { LanguageSwitcher } from '../components/LanguageSwitcher';
 import { countries } from '../lib/geolocation';
 import { DEV_MODE } from '../lib/devMode';
-import { AtSign, Bell, BellOff, Calendar, Eye, Globe, LogOut, MapPin, Phone, Settings, Shield, Trash2, User, UserCircle2 } from 'lucide-react';
+import { AtSign, Bell, BellOff, Calendar, Eye, Globe, LogOut, MapPin, Settings, Shield, Trash2, User, UserCircle2 } from 'lucide-react';
 import { PageSkeleton, SkeletonBlock, SkeletonRows } from '../components/ui/LoadingShell';
 import { useReciprocityStatus, useOptIn, useOptOut } from '../hooks/useReciprocity';
 import { useReminderSettings, useUpdateReminderSettings } from '../hooks/useReminders';
@@ -782,24 +782,6 @@ function PreferencesSection() {
                 </div>
               </div>
             )}
-
-            {/* Match Notifications */}
-            <div className="py-4">
-              <div className="flex items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
-                  <Phone className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--color-primary)' }} aria-hidden="true" />
-                  <div>
-                    <p className="text-sm font-medium">{t('preferences.matchNotifications')}</p>
-                    <p className="text-xs" style={{ color: 'var(--color-muted)' }}>
-                      {t('preferences.matchNotificationsDescription')}
-                    </p>
-                  </div>
-                </div>
-                <span className="text-xs px-2 py-1 rounded-full" style={{ background: 'var(--color-background-secondary)', color: 'var(--color-muted)' }}>
-                  {t('common.comingSoon')}
-                </span>
-              </div>
-            </div>
 
             {/* Push Notifications */}
             {pushSupported && (
