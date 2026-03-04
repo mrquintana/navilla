@@ -71,7 +71,8 @@
     "notifications": "Notifications",
     "settings": "Settings",
     "profile": "Profile",
-    "journal": "Journal"
+    "journal": "Journal",
+    "insights": "Insights"
   },
   "dashboard": {
     "title": "Your Network",

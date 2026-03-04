@@ -71,7 +71,8 @@
     "notifications": "Notificaciones",
     "settings": "Configuración",
     "profile": "Perfil",
-    "journal": "Diario"
+    "journal": "Diario",
+    "insights": "Estadísticas"
   },
   "dashboard": {
     "title": "Tu Red",
