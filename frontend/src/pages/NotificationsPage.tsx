@@ -38,7 +38,40 @@ export function NotificationsPage() {
 
   const readMutation = useMutation({
     mutationFn: (id: string) => api.notifications.markRead(token, id),
-    onSuccess: () => {
+    onMutate: async (id: string) => {
+      await queryClient.cancelQueries({ queryKey: ['notifications'] });
+      const previous = queryClient.getQueryData<NotificationItem[]>(['notifications']);
+      queryClient.setQueryData<NotificationItem[]>(['notifications'], (old) =>
+        old?.map((item) => item.id === id ? { ...item, readAt: new Date().toISOString() } : item),
+      );
+      return { previous };
+    },
+    onError: (_err, _id, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(['notifications'], context.previous);
+      }
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+    },
+  });
+  const readAllMutation = useMutation({
+    mutationFn: () => api.notifications.markAllRead(token),
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: ['notifications'] });
+      const previous = queryClient.getQueryData<NotificationItem[]>(['notifications']);
+      const now = new Date().toISOString();
+      queryClient.setQueryData<NotificationItem[]>(['notifications'], (old) =>
+        old?.map((item) => item.readAt ? item : { ...item, readAt: now }),
+      );
+      return { previous };
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(['notifications'], context.previous);
+      }
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
     },
   });
@@ -117,12 +150,8 @@ export function NotificationsPage() {
           <button
             type="button"
             className="btn btn-secondary btn-sm"
-            onClick={async () => {
-              for (const item of unreadItems) {
-                await readMutation.mutateAsync(item.id);
-              }
-            }}
-            disabled={unreadItems.length === 0 || readMutation.isPending}
+            onClick={() => readAllMutation.mutate()}
+            disabled={unreadItems.length === 0 || readAllMutation.isPending}
           >
             <span className="inline-flex items-center gap-1">
               <Check className="nav-icon" aria-hidden="true" />

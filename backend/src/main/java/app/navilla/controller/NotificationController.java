@@ -51,4 +51,10 @@ public class NotificationController {
     notificationService.markRead(jwt, id);
     return ResponseEntity.noContent().build();
   }
+
+  @PostMapping("/read-all")
+  public ResponseEntity<Void> markAllRead(@AuthenticationPrincipal Jwt jwt) {
+    notificationService.markAllRead(jwt);
+    return ResponseEntity.noContent().build();
+  }
 }

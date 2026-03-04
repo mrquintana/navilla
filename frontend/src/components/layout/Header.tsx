@@ -41,7 +41,20 @@ export function Header() {
   });
   const readMutation = useMutation({
     mutationFn: (id: string) => api.notifications.markRead(token, id),
-    onSuccess: () => {
+    onMutate: async (id: string) => {
+      await queryClient.cancelQueries({ queryKey: ['notifications'] });
+      const previous = queryClient.getQueryData<NotificationItem[]>(['notifications']);
+      queryClient.setQueryData<NotificationItem[]>(['notifications'], (old) =>
+        old?.map((item) => item.id === id ? { ...item, readAt: new Date().toISOString() } : item),
+      );
+      return { previous };
+    },
+    onError: (_err, _id, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(['notifications'], context.previous);
+      }
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
     },
   });

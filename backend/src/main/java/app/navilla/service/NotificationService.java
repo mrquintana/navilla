@@ -134,6 +134,31 @@ public class NotificationService {
     }
   }
 
+  /**
+   * Marks all unread notifications as read for the authenticated user.
+   *
+   * @param jwt the JWT token containing user info
+   * @return the number of notifications marked as read
+   */
+  @Transactional
+  public int markAllRead(Jwt jwt) {
+    String userHash = encryptionService.hashEmail(jwt.getClaimAsString("email"));
+    List<Notification> unread = notificationRepository
+        .findByUserHashAndReadAtIsNullOrderByCreatedAtDesc(userHash);
+
+    if (unread.isEmpty()) {
+      return 0;
+    }
+
+    OffsetDateTime now = OffsetDateTime.now();
+    for (Notification notification : unread) {
+      notification.setReadAt(now);
+    }
+    notificationRepository.saveAll(unread);
+    unread.forEach(n -> notificationMetrics.recordRead());
+    return unread.size();
+  }
+
   private void createNotification(String userHash, NotificationType type, NotificationPayload payload) {
     try {
       String json = objectMapper.writeValueAsString(payload);

@@ -321,6 +321,10 @@ export const api = {
       apiRequest<void>(`/api/notifications/${id}/read`, token, {
         method: 'POST',
       }),
+    markAllRead: (token: string) =>
+      apiRequest<void>('/api/notifications/read-all', token, {
+        method: 'POST',
+      }),
   },
   health: {
     list: (token: string) =>
