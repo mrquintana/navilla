@@ -123,6 +123,25 @@ public class GlobalExceptionHandler {
   }
 
   /**
+   * Handles rate limit exceeded exceptions (429 Too Many Requests).
+   */
+  @ExceptionHandler(RateLimitException.class)
+  public ResponseEntity<ApiError> handleRateLimit(
+      RateLimitException ex,
+      HttpServletRequest request,
+      Locale locale) {
+
+    String message = messageSource.getMessage(ex.getMessageKey(), null, ex.getMessageKey(), locale);
+    ApiError error = ApiError.of(
+        429,
+        "Too Many Requests",
+        message,
+        request.getRequestURI()
+    );
+    return ResponseEntity.status(429).body(error);
+  }
+
+  /**
    * Handles connection conflict exceptions.
    */
   @ExceptionHandler(ConnectionConflictException.class)

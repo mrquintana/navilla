@@ -110,6 +110,26 @@ public class EncryptionService {
   }
 
   /**
+   * Hashes a phone number for privacy-preserving lookup.
+   *
+   * <p>Normalizes the phone number by stripping all non-digit characters
+   * before hashing with the pepper.
+   *
+   * @param rawPhone the raw phone number (may contain dashes, spaces, etc.)
+   * @return the hex-encoded hash (64 characters)
+   */
+  public String hashPhone(String rawPhone) {
+    if (rawPhone == null || rawPhone.isBlank()) {
+      throw new IllegalArgumentException("Phone number cannot be null or blank");
+    }
+    String normalized = rawPhone.replaceAll("[^\\d]", "");
+    if (normalized.isEmpty()) {
+      throw new IllegalArgumentException("Phone number must contain at least one digit");
+    }
+    return hash(normalized);
+  }
+
+  /**
    * Hashes a username for privacy-preserving lookup.
    *
    * @param username the username to hash
