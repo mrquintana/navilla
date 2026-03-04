@@ -10,7 +10,7 @@ import { queryClient } from '../queryClient';
 import { LanguageSwitcher } from '../components/LanguageSwitcher';
 import { countries } from '../lib/geolocation';
 import { DEV_MODE } from '../lib/devMode';
-import { AtSign, Bell, BellOff, Calendar, Eye, MapPin, Phone, Settings, Shield, Trash2, User, UserCircle2 } from 'lucide-react';
+import { AtSign, Bell, BellOff, Calendar, Eye, Globe, LogOut, MapPin, Phone, Settings, Shield, Trash2, User, UserCircle2 } from 'lucide-react';
 import { PageSkeleton, SkeletonBlock, SkeletonRows } from '../components/ui/LoadingShell';
 import { useReciprocityStatus, useOptIn, useOptOut } from '../hooks/useReciprocity';
 import { useReminderSettings, useUpdateReminderSettings } from '../hooks/useReminders';
@@ -598,20 +598,18 @@ export function ProfilePage() {
         )}
       </form>
 
-      <div className="card card-elevated space-y-4">
-        <h3 className="font-semibold">{t('settings.title')}</h3>
-        <div>
-          <label className="label" htmlFor="language">{t('settings.language')}</label>
-          <LanguageSwitcher className="flex items-center text-sm mt-1" id="language" />
-        </div>
-        <div className="pt-2">
-          <button className="btn btn-secondary" onClick={() => signOut()}>
-            {t('auth.signOut')}
-          </button>
-        </div>
-      </div>
-
       <PreferencesSection />
+
+      <div className="flex justify-center">
+        <button
+          type="button"
+          className="btn btn-secondary inline-flex items-center gap-2"
+          onClick={() => signOut()}
+        >
+          <LogOut className="w-4 h-4" aria-hidden="true" />
+          {t('auth.signOut')}
+        </button>
+      </div>
 
       <div className="card border-red-200 bg-red-50/50 space-y-4">
         <h3 className="font-semibold text-red-700">{t('settings.dangerZone')}</h3>
@@ -859,7 +857,7 @@ function PreferencesSection() {
             </div>
 
             {/* Reminder Settings */}
-            <div className="py-4 last:pb-0">
+            <div className="py-4">
               <div className="flex items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
                   <Settings className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--color-primary)' }} aria-hidden="true" />
@@ -877,6 +875,19 @@ function PreferencesSection() {
                 >
                   {t('preferences.configure')}
                 </button>
+              </div>
+            </div>
+
+            {/* Language */}
+            <div className="py-4 last:pb-0">
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <Globe className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--color-primary)' }} aria-hidden="true" />
+                  <div>
+                    <p className="text-sm font-medium">{t('settings.language')}</p>
+                  </div>
+                </div>
+                <LanguageSwitcher className="flex items-center text-sm" />
               </div>
             </div>
           </div>
