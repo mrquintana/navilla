@@ -445,6 +445,8 @@ export const api = {
       apiRequest<DoseLogEntry>(`/api/medications/${id}/doses`, token, { method: 'POST', body: data }),
     adherence: (token: string, id: string, month: string) =>
       apiRequest<MedicationAdherence>(`/api/medications/${id}/adherence?month=${month}`, token),
+    prepStreak: (token: string) =>
+      apiRequest<PrepStreak>('/api/medications/prep-streak', token),
   },
   vaccinations: {
     list: (token: string) =>
@@ -768,6 +770,18 @@ export interface MedicationAdherence {
   missedCount: number;
   adherenceRate: number;
   logs: DoseLogEntry[];
+}
+
+export interface PrepStreakMilestone {
+  days: number;
+  labelKey: string;
+  achieved: boolean;
+}
+
+export interface PrepStreak {
+  currentStreakDays: number;
+  longestStreakDays: number;
+  milestones: PrepStreakMilestone[];
 }
 
 // ── Vaccinations ──
