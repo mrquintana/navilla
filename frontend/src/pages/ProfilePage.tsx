@@ -71,7 +71,6 @@ export function ProfilePage() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
   const [deleteError, setDeleteError] = useState<string | null>(null);
-  const isPublic = form.profileVisibility === 'PUBLIC';
 
   const fillRandomProfile = () => {
     const names = ['Ana', 'Luis', 'Carla', 'Mateo', 'Sofia', 'Diego', 'Lucia', 'Javier'];
@@ -373,47 +372,6 @@ export function ProfilePage() {
                 <p className="profile-detail-value">{profile?.location || '—'}</p>
               </div>
             </div>
-            <div className="profile-detail">
-              <Shield className="profile-detail-icon" aria-hidden="true" />
-              <div>
-                <p className="profile-detail-label">{t('profile.visibility')}</p>
-                <p className="profile-detail-value">
-                  {profile?.profileVisibility === 'PUBLIC' && t('profile.visibilityPublic')}
-                  {profile?.profileVisibility === 'CONNECTIONS_ONLY' && t('profile.visibilityConnections')}
-                  {profile?.profileVisibility === 'PRIVATE' && t('profile.visibilityPrivate')}
-                </p>
-              </div>
-            </div>
-            <div className="profile-detail">
-              <Shield className="profile-detail-icon" aria-hidden="true" />
-              <div>
-                <p className="profile-detail-label">{t('profile.searchVisibility')}</p>
-                <div className="flex flex-wrap gap-2">
-                  {profile?.profileVisibility !== 'PUBLIC' ? (
-                    <span className="badge badge-warning text-xs">
-                      {t('profile.searchNotAvailable')}
-                    </span>
-                  ) : profile?.displayNamePublic || profile?.searchableByEmail ? (
-                    <>
-                      {profile?.displayNamePublic && (
-                        <span className="badge badge-success text-xs">
-                          {t('profile.searchBadgeDisplay')}
-                        </span>
-                      )}
-                      {profile?.searchableByEmail && (
-                        <span className="badge badge-success text-xs">
-                          {t('profile.searchBadgeEmail')}
-                        </span>
-                      )}
-                    </>
-                  ) : (
-                    <span className="badge badge-warning text-xs">
-                      {t('profile.searchDisabled')}
-                    </span>
-                  )}
-                </div>
-              </div>
-            </div>
           </div>
         ) : (
           <>
@@ -523,52 +481,6 @@ export function ProfilePage() {
               </div>
             </div>
 
-            <h3 className="font-semibold pt-2">{t('profile.privacy')}</h3>
-            <div className="grid gap-4 md:grid-cols-2">
-              <div>
-                <label className="label" htmlFor="profileVisibility">{t('profile.visibility')}</label>
-                <select
-                  id="profileVisibility"
-                  className="input"
-                  value={form.profileVisibility ?? 'PRIVATE'}
-                  onChange={(e) => {
-                    const visibility = e.target.value;
-                    setForm({
-                      ...form,
-                      profileVisibility: visibility,
-                      displayNamePublic: visibility === 'PUBLIC' ? form.displayNamePublic : false,
-                      searchableByEmail: visibility === 'PUBLIC' ? form.searchableByEmail : false,
-                    });
-                  }}
-                >
-                  <option value="PUBLIC">{t('profile.visibilityPublic')}</option>
-                  <option value="CONNECTIONS_ONLY">{t('profile.visibilityConnections')}</option>
-                  <option value="PRIVATE">{t('profile.visibilityPrivate')}</option>
-                </select>
-              </div>
-              <div className="space-y-2 pt-2">
-                <label className="flex items-center gap-2 text-sm">
-                  <input
-                    id="displayNamePublic"
-                    type="checkbox"
-                    checked={!!form.displayNamePublic && isPublic}
-                    onChange={(e) => setForm({ ...form, displayNamePublic: e.target.checked })}
-                    disabled={!isPublic}
-                  />
-                  <span>{t('profile.displayNamePublic')}</span>
-                </label>
-                <label className="flex items-center gap-2 text-sm">
-                  <input
-                    id="searchableByEmail"
-                    type="checkbox"
-                    checked={!!form.searchableByEmail && isPublic}
-                    onChange={(e) => setForm({ ...form, searchableByEmail: e.target.checked })}
-                    disabled={!isPublic}
-                  />
-                  <span>{t('profile.searchableByEmail')}</span>
-                </label>
-              </div>
-            </div>
           </>
         )}
 
@@ -675,6 +587,9 @@ export function ProfilePage() {
 
 function PreferencesSection() {
   const { t } = useTranslation();
+  const { session } = useAuth();
+  const token = session?.access_token ?? '';
+  const { data: profile } = useUser();
   const { data: reciprocityStatus, isLoading: reciprocityLoading } = useReciprocityStatus();
   const optInMutation = useOptIn();
   const optOutMutation = useOptOut();
@@ -683,6 +598,16 @@ function PreferencesSection() {
   const { isSupported: pushSupported, permission: pushPermission, isSubscribed: pushSubscribed, isLoading: pushLoading, subscribe: pushSubscribe, unsubscribe: pushUnsubscribe } = usePushNotifications();
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
   const [showReminderModal, setShowReminderModal] = useState(false);
+
+  const visibilityMutation = useMutation({
+    mutationFn: (data: UpdateProfileData) => api.users.update(token, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user', 'me'] });
+    },
+  });
+
+  const profileVisibility = profile?.profileVisibility ?? 'PRIVATE';
+  const isPublic = profileVisibility === 'PUBLIC';
 
   const isLoading = reciprocityLoading || reminderLoading;
 
@@ -775,6 +700,81 @@ function PreferencesSection() {
                 )}
               </div>
             </div>
+
+            {/* Profile Visibility */}
+            <div className="py-4">
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <Eye className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--color-primary)' }} aria-hidden="true" />
+                  <div>
+                    <p className="text-sm font-medium">{t('profile.visibility')}</p>
+                  </div>
+                </div>
+                <select
+                  className="input text-sm py-1 px-2 w-auto"
+                  value={profileVisibility}
+                  onChange={(e) => {
+                    const visibility = e.target.value;
+                    visibilityMutation.mutate({
+                      profileVisibility: visibility,
+                      displayNamePublic: visibility === 'PUBLIC' ? (profile?.displayNamePublic ?? false) : false,
+                      searchableByEmail: visibility === 'PUBLIC' ? (profile?.searchableByEmail ?? false) : false,
+                    });
+                  }}
+                  disabled={visibilityMutation.isPending}
+                >
+                  <option value="PRIVATE">{t('profile.visibilityPrivate')}</option>
+                  <option value="CONNECTIONS_ONLY">{t('profile.visibilityConnections')}</option>
+                  <option value="PUBLIC">{t('profile.visibilityPublic')}</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Search Visibility (only when public) */}
+            {isPublic && (
+              <div className="py-4">
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <Shield className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--color-primary)' }} aria-hidden="true" />
+                    <div>
+                      <p className="text-sm font-medium">{t('profile.searchVisibility')}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4 flex-shrink-0">
+                    <label className="flex items-center gap-1.5 text-xs">
+                      <input
+                        type="checkbox"
+                        checked={!!profile?.displayNamePublic}
+                        onChange={(e) => {
+                          visibilityMutation.mutate({
+                            profileVisibility: 'PUBLIC',
+                            displayNamePublic: e.target.checked,
+                          });
+                        }}
+                        disabled={visibilityMutation.isPending}
+                        className="accent-indigo-600"
+                      />
+                      {t('profile.searchBadgeDisplay')}
+                    </label>
+                    <label className="flex items-center gap-1.5 text-xs">
+                      <input
+                        type="checkbox"
+                        checked={!!profile?.searchableByEmail}
+                        onChange={(e) => {
+                          visibilityMutation.mutate({
+                            profileVisibility: 'PUBLIC',
+                            searchableByEmail: e.target.checked,
+                          });
+                        }}
+                        disabled={visibilityMutation.isPending}
+                        className="accent-indigo-600"
+                      />
+                      {t('profile.searchBadgeEmail')}
+                    </label>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Match Notifications */}
             <div className="py-4">
