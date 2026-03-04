@@ -23,6 +23,7 @@ import java.util.Map;
 import app.navilla.config.HealthCatalogProperties;
 import app.navilla.dto.CatalogResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -51,6 +52,7 @@ public class CatalogController {
    * @return the catalog response with medication types, frequencies, and vaccine series
    */
   @GetMapping
+  @Cacheable("catalog")
   public ResponseEntity<CatalogResponse> getCatalog() {
     Map<String, CatalogResponse.MedicationTypeInfo> medicationTypes = new LinkedHashMap<>();
     if (catalogProperties.medicationTypes() != null) {

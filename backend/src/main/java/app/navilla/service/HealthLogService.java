@@ -47,6 +47,9 @@ import app.navilla.repository.TestVisitRepository;
 import app.navilla.security.EncryptionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -86,6 +89,10 @@ public class HealthLogService {
    * @return the created visit response with decrypted fields
    */
   @Transactional
+  @Caching(evict = {
+      @CacheEvict(value = "healthLogSummary", key = "#jwt.subject"),
+      @CacheEvict(value = "insights", key = "#jwt.subject")
+  })
   public TestVisitResponse createVisit(Jwt jwt, CreateTestVisitRequest request) {
     String userHash = hashEmail(jwt);
 
@@ -148,6 +155,10 @@ public class HealthLogService {
    * @throws IllegalStateException     if the visit belongs to another user
    */
   @Transactional
+  @Caching(evict = {
+      @CacheEvict(value = "healthLogSummary", key = "#jwt.subject"),
+      @CacheEvict(value = "insights", key = "#jwt.subject")
+  })
   public TestVisitResponse updateVisit(Jwt jwt, UUID id, UpdateTestVisitRequest request) {
     String userHash = hashEmail(jwt);
 
@@ -206,6 +217,10 @@ public class HealthLogService {
    * @throws IllegalStateException     if the visit belongs to another user
    */
   @Transactional
+  @Caching(evict = {
+      @CacheEvict(value = "healthLogSummary", key = "#jwt.subject"),
+      @CacheEvict(value = "insights", key = "#jwt.subject")
+  })
   public void deleteVisit(Jwt jwt, UUID id) {
     String userHash = hashEmail(jwt);
 
@@ -257,6 +272,7 @@ public class HealthLogService {
    * @return the health log summary response
    */
   @Transactional(readOnly = true)
+  @Cacheable(value = "healthLogSummary", key = "#jwt.subject")
   public HealthLogSummaryResponse getSummary(Jwt jwt) {
     String userHash = hashEmail(jwt);
 

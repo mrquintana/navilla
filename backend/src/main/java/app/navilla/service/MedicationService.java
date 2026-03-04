@@ -43,6 +43,9 @@ import app.navilla.repository.ReminderRepository;
 import app.navilla.security.EncryptionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -248,6 +251,10 @@ public class MedicationService {
    * @throws IllegalStateException     if the medication is inactive or not owned
    */
   @Transactional
+  @Caching(evict = {
+      @CacheEvict(value = "prepStreak", key = "#jwt.subject"),
+      @CacheEvict(value = "insights", key = "#jwt.subject")
+  })
   public DoseLogEntry logDose(Jwt jwt, UUID medicationId, LogDoseRequest request) {
     String userHash = hashEmail(jwt);
 
@@ -337,6 +344,7 @@ public class MedicationService {
    * @return streak data with milestones
    */
   @Transactional(readOnly = true)
+  @Cacheable(value = "prepStreak", key = "#jwt.subject")
   public PrepStreakResponse getPrepStreak(Jwt jwt) {
     String userHash = hashEmail(jwt);
 
