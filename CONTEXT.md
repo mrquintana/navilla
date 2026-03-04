@@ -95,6 +95,22 @@
 - [ ] Landing page polish (deferred — functional but not blocking)
 - [ ] Notification improvements (polling added, more features post-MVP)
 
+### Phase 3: Layer 2 — Network Enhancements
+- [x] Week 10: DB-driven condition catalog (replacing ConditionType enum)
+- [x] Week 10: Runtime app config (AppConfig key-value store)
+- [x] Week 10: Network stage thresholds (configurable via DB)
+- [x] Week 10: Reciprocity opt-in/opt-out system (15-day cooldown)
+- [x] Week 10: Phone matching service (SHA-256 hashing, mutual match detection)
+- [x] Week 10: ConnectionType enum (PHONE_MATCH, NOTIFICATION_MATCH, EXPLICIT, LINK)
+- [x] Week 10: Catalog API endpoints (GET /api/catalog/conditions, GET /api/catalog/stages)
+- [x] Week 10: Reciprocity API (GET status, POST opt-in, POST opt-out)
+- [x] Week 10: Frontend reciprocity opt-in card + dashboard integration
+- [x] Week 10: Frontend phone field in journal entries + catalog-driven dropdowns
+- [ ] Week 11: Verified test badges / Exposure recency buckets
+- [ ] Week 12: Vault + app lock + notification privacy
+- [ ] Week 13: Data retention + connection staleness
+- [ ] Week 14: Network health stats + Layer 2 polish
+
 ### Phase 4-6: Post-MVP
 - [ ] Temporal edges for exposure relevance
 - [ ] Verified test results
@@ -124,6 +140,35 @@ A detailed breakdown of the project's directory layout and key files can be foun
 ## Architecture Decisions Records (ADRs)
 
 ### ADR-001: Documentation Platform
+
+---
+
+## Session Notes (2026-03-04 — Week 10 Phase 3: Network Foundation — Reciprocity, Catalog, Phone Matching)
+
+- ✅ **Migration 014** — `014_network_foundation.sql`: 6 new tables (`condition_catalog`, `network_stages`, `app_config`, `connection_phone_entries`, `phone_blocks`, `phone_reports`) + 3 ALTER TABLE (users: `receive_match_notifications`, `exposure_opted_in`, `exposure_opted_in_at`, `exposure_opted_out_at`; connections: `connection_type`; encounter_journal: `phone_hash_encrypted`)
+- ✅ **DB-driven condition catalog** — `ConditionCatalogEntry` entity + `ConditionCatalogService` replacing hardcoded `ConditionType` enum. All services now use `String` + catalog validation instead of Java enum references. Public API: `GET /api/catalog/conditions`, `GET /api/catalog/stages`
+- ✅ **Runtime configuration** — `AppConfig` entity + `AppConfigService` for key-value runtime config (e.g., reciprocity cooldown days, phone match window days). No redeployment needed to change thresholds
+- ✅ **Network stages** — `NetworkStage` entity + service for configurable constellation stage thresholds (replacing hardcoded constants)
+- ✅ **Reciprocity system** — `ReciprocityService` + `ReciprocityController`: opt-in/opt-out with 15-day configurable cooldown. `GET /api/reciprocity/status`, `POST /api/reciprocity/opt-in`, `POST /api/reciprocity/opt-out`. `ExposureService` now guards with reciprocity check — only opted-in users see exposure data
+- ✅ **Phone matching** — `ConnectionPhoneEntry`, `PhoneBlock`, `PhoneReport` entities. `PhoneMatchService`: phone hashing (SHA-256 + pepper), `registerPhoneEntry` with rate limiting, mutual match detection within configurable date window. `PhoneMatchJob`: scheduled background job for processing unmatched entries. `PhoneNotificationMatchService`: confirm/deny/block/report phone matches
+- ✅ **ConnectionType enum** — `PHONE_MATCH`, `NOTIFICATION_MATCH`, `EXPLICIT`, `LINK` on `Connection` entity for tracking how connections were established
+- ✅ **Journal phone field** — Phone hash + `PhoneMatchService` integration in encounter journal entries
+- ✅ **New exceptions** — `RateLimitException` (429), `CooldownActiveException` (403) for reciprocity cooldown enforcement
+- ✅ **Frontend: Reciprocity** — API client + `useReciprocityStatus`, `useOptIn`, `useOptOut` hooks. `ReciprocityOptInCard` component (3 states: not opted in, cooldown, opted in). DashboardPage shows opt-in card when not opted in
+- ✅ **Frontend: Phone matching** — API client + `usePendingPhoneMatches`, `useConfirmPhoneMatch`, `useDenyPhoneMatch`, `useBlockPhoneNumber` hooks. Phone field (type=tel, maxLength=20) in `JournalEntryModal`
+- ✅ **Frontend: Catalog-driven UI** — `useConditionCatalog`, `useNetworkStages` hooks. `TestVisitModal` condition dropdown now catalog-driven (with hardcoded fallback)
+- ✅ i18n: ~20 new keys in en_US + es_MX (reciprocity, phone matching, catalog)
+- ✅ Full test suite: **370 backend tests passing** (was 299), frontend lint + build clean
+- **Branch:** `feature/phase3-week10`
+- **Design docs:** `docs/plans/2026-03-04-phase3-redesign-design.md`, `docs/plans/2026-03-04-phase3-implementation.md`
+- **Needs manual action:** Run migration `014_network_foundation.sql` on Supabase
+- **Key architecture decisions:**
+  - DB-driven catalog instead of Java enums — conditions, stages, and config are all database-managed for runtime flexibility
+  - Reciprocity cooldown is configurable via `app_config` table (default 15 days) — no redeployment needed
+  - Phone matching uses SHA-256 + application pepper for hashing — phones are never stored in plaintext
+  - Phone match job runs on schedule to detect mutual matches asynchronously
+  - ConnectionType enum tracks provenance of every connection (phone match, notification match, explicit, link)
+- **Next:** Week 11 (Verified Test Badges / Exposure Recency Buckets)
 
 ---
 

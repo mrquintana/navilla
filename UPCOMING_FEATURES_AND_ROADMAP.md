@@ -1663,6 +1663,36 @@ All factual content (symptoms, testing windows, treatment) must be verified agai
   - Email digest sending (toggle stored, sending in Week 9)
   - E2E tests for scheduler
 
+- **Week 8 status:** ✅ Complete
+- **Completed (Week 8 — Personal Insights + Onboarding + Quick Wins):**
+  - Migration `012_encounter_fields.sql`: encounter type + protection fields (encrypted BYTEA columns)
+  - Backend: `InsightsService` (aggregates data from 7 repositories), `InsightsController` at `GET /api/insights` (ActivitySummary, TestingSummary, PreventionSummary)
+  - Backend: PrEP adherence streaks (`MedicationService.getPrepStreak()` — current/longest streak, milestones at 7d/30d/90d)
+  - Backend: Encounter type catalog (5 types) + protection method catalog (7 methods) via `CatalogController`
+  - Frontend: Personal Insights page (3-card layout: Activity, Testing, Prevention), loading skeleton, milestone badges
+  - Frontend: Guided onboarding flow (3-step modal with localStorage persistence)
+  - Frontend: Encounter type + protection multi-select chip UI in `JournalEntryModal`
+  - Frontend: Toast notification system (global `ToastContext`, auto-dismiss, `prefers-reduced-motion`, `aria-live`)
+  - Frontend: Route-level code splitting (31 lazy-loaded pages, 58 JS chunks)
+  - 258 backend + 273 frontend = **531 tests passing**
+  - Full i18n (~50 new keys in en_US + es_MX)
+
+- **Week 9 status:** ✅ Complete
+- **Completed (Week 9 — PWA + Push Notifications + Caching + Email):**
+  - Migration `013_push_subscriptions.sql`: `push_subscriptions` table with AES-256-GCM encrypted endpoint/p256dh/auth
+  - Backend: Caffeine cache setup (`@EnableCaching`, 4 named caches: catalog 1hr, healthLogSummary 5min, insights 5min, prepStreak 10min)
+  - Backend: Web Push service (VAPID/RFC 8030 via jose4j), `PushSubscription` entity + CRUD controller at `/api/push/*`
+  - Backend: Email infrastructure — SendGrid HTTP API v3, Thymeleaf templates (en/es), `EmailService` with fire-and-forget delivery
+  - Backend: Email digest job (`@Scheduled` daily — weekly digest with PrEP adherence, testing status, upcoming reminders, vaccine due dates)
+  - Backend: Push wired into `NotificationService.createNotification()` — single push point for all 10 NotificationType values
+  - Frontend: PWA manifest + icons (vite-plugin-pwa, `injectManifest` strategy, Workbox precaching + runtime caching)
+  - Frontend: Install prompt + offline indicator + update prompt (SKIP_WAITING flow)
+  - Frontend: Push subscription hook (`usePushNotifications`), push toggle in `ReminderSettingsModal`
+  - Frontend: Custom service worker (precaching + NetworkFirst API + StaleWhileRevalidate catalog + CacheFirst fonts/images)
+  - 299 backend tests passing, frontend lint + build clean
+  - Full i18n (~15 new keys in en_US + es_MX)
+  - Email delivery validated end-to-end via SendGrid HTTP API on Railway
+
 ### Phase 3: Layer 2 — Network Enhancements (Weeks 10-14)
 
 | Week | Focus | Deliverables |
@@ -1672,6 +1702,28 @@ All factual content (symptoms, testing windows, treatment) must be verified agai
 | 12 | Vault + app lock + notification privacy | Backend: user_vault, vaulted_items tables. Frontend: vault activation via search phrase, vault/unveil UI, auto-lock timer. App-level PIN lock. Vague notification previews |
 | 13 | Data retention + connection staleness | Backend: retention settings, daily cleanup job. Staleness detection + notification. Frontend: retention settings UI, connection reconfirmation prompts, archive flow |
 | 14 | Network health stats + Layer 2 polish | Backend: aggregated network health calculation. Frontend: network health dashboard (High/Medium/Low testing activity). End-to-end testing for all Layer 2 features. Bug fixes |
+
+#### Progress Snapshot (March 4, 2026)
+
+- **Week 10 status:** ✅ Complete
+- **Completed (Week 10 — Network Foundation: Reciprocity, Catalog, Phone Matching):**
+  - Migration `014_network_foundation.sql`: 6 new tables (`condition_catalog`, `network_stages`, `app_config`, `connection_phone_entries`, `phone_blocks`, `phone_reports`) + 3 ALTER TABLE (users, connections, encounter_journal)
+  - Backend: DB-driven condition catalog (`ConditionCatalogEntry` + service) replacing hardcoded `ConditionType` enum. All services refactored to use `String` + catalog validation
+  - Backend: Runtime app config (`AppConfig` + service) — key-value configuration for reciprocity cooldown, phone match window, etc. No redeployment needed
+  - Backend: Network stages (`NetworkStage` + service) — configurable constellation stage thresholds via DB
+  - Backend: Reciprocity system (`ReciprocityService` + `ReciprocityController`) — opt-in/opt-out with 15-day configurable cooldown. `ExposureService` now guards with reciprocity check
+  - Backend: Phone matching (`PhoneMatchService`) — SHA-256 + pepper hashing, rate-limited entry registration, mutual match detection within configurable date window. `PhoneMatchJob` for async background processing. `PhoneNotificationMatchService` for confirm/deny/block/report
+  - Backend: `ConnectionType` enum (`PHONE_MATCH`, `NOTIFICATION_MATCH`, `EXPLICIT`, `LINK`) on `Connection` entity
+  - Backend: New exceptions — `RateLimitException` (429), `CooldownActiveException` (403)
+  - Frontend: Reciprocity API + hooks (`useReciprocityStatus`, `useOptIn`, `useOptOut`), `ReciprocityOptInCard` (3 states), DashboardPage integration
+  - Frontend: Phone field in `JournalEntryModal` (type=tel, maxLength=20), catalog-driven `TestVisitModal` condition dropdown
+  - Frontend: Phone match hooks (`usePendingPhoneMatches`, `useConfirmPhoneMatch`, `useDenyPhoneMatch`, `useBlockPhoneNumber`)
+  - Frontend: Catalog hooks (`useConditionCatalog`, `useNetworkStages`)
+  - New API endpoints: `GET /api/catalog/conditions`, `GET /api/catalog/stages`, `GET /api/reciprocity/status`, `POST /api/reciprocity/opt-in`, `POST /api/reciprocity/opt-out`
+  - **370 backend tests passing** (was 299), frontend lint + build clean
+  - Full i18n (~20 new keys in en_US + es_MX)
+  - Design docs: `docs/plans/2026-03-04-phase3-redesign-design.md`, `docs/plans/2026-03-04-phase3-implementation.md`
+- **Note:** Week 10 scope diverged from the original roadmap table (which specified shareable connection links + invite landing page). The actual implementation focused on the network foundation layer: reciprocity opt-in, DB-driven catalogs, and phone-based matching — prerequisites for all subsequent Layer 2 features. Shareable connection links will be addressed in a future week.
 
 ### Phase 4: Layer 3 + Launch Prep (Weeks 15-16)
 
