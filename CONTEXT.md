@@ -127,6 +127,23 @@ A detailed breakdown of the project's directory layout and key files can be foun
 
 ---
 
+## Session Notes (2026-03-03 — Week 8: Personal Insights + Onboarding + Quick Wins)
+
+- ✅ **Toast notification system** — global `ToastContext` + `ToastContainer` with auto-dismiss (4s), slide-in animation, `prefers-reduced-motion` support, `aria-live="polite"` accessibility
+- ✅ **Route-level code splitting** — all 31 page components converted to `React.lazy()` with `<Suspense>` wrappers. Build produces 58 JS chunks (down from monolithic bundle)
+- ✅ **Encounter type + protection fields** — Migration `012_encounter_fields.sql` adds encrypted BYTEA columns. Backend: new DTO fields, service encryption, catalog endpoint with 5 encounter types + 7 protection methods. Frontend: multi-select chip UI in JournalEntryModal, badges in JournalEntryCard
+- ✅ **Personal Insights API** — `InsightsService` aggregates data from 7 repositories. `InsightsController` at `GET /api/insights`. Response: ActivitySummary (encounters/month, protection rate, type/method breakdowns), TestingSummary (days since test, coverage map, tests/year), PreventionSummary (PrEP adherence, streaks, vaccines, reminders)
+- ✅ **Personal Insights page** — 3-card layout (Activity, Testing, Prevention) with progress bars, color-coded indicators, milestone badges, loading skeleton
+- ✅ **Guided onboarding flow** — 3-step modal ("Log your first test" → "Set up reminders" → "Explore your dashboard") with indigo gradient header, step dots, localStorage persistence
+- ✅ **PrEP adherence streaks** — Backend: `MedicationService.getPrepStreak()` with current/longest streak calculation, milestones (7d/30d/90d). Frontend: `usePrepStreak()` hook, `PrepStreak` types
+- ✅ **Navigation updated** — Insights link added to mobile + desktop nav with BarChart3 icon
+- ✅ i18n: ~50 new keys in en_US + es_MX (toast, onboarding, insights, encounter types, protection methods, nav)
+- ✅ Full test suite: 258 backend + 273 frontend = **531 tests passing**
+- **Branch:** `feature/week-8-insights-onboarding`
+- **Needs manual action:** Run migration `012_encounter_fields.sql` on Supabase
+
+---
+
 ## Session Notes (2026-03-03 — Week 7: Smart Reminders + Medication Tracking)
 
 - ✅ **Feature 1.3 fully implemented** — smart reminders, medication tracking, vaccination tracking, dashboard redesign
