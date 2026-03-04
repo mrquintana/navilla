@@ -8,6 +8,34 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { api, type NotificationItem } from '../../lib/api';
 import { queryClient } from '../../queryClient';
 import { formatRelativeTime } from '../../lib/notifications';
+const AVATAR_COLORS = [
+  '#4f46e5', // indigo-600
+  '#7c3aed', // violet-600
+  '#2563eb', // blue-600
+  '#0891b2', // cyan-600
+  '#059669', // emerald-600
+  '#d97706', // amber-600
+  '#dc2626', // red-600
+  '#c026d3', // fuchsia-600
+];
+
+function getInitials(name: string): string {
+  const cleaned = name.replace(/@.*$/, '').trim(); // strip email domain
+  const parts = cleaned.split(/[\s._-]+/).filter(Boolean);
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
+  return cleaned.slice(0, 2).toUpperCase();
+}
+
+function getAvatarColor(identifier: string): string {
+  let hash = 0;
+  for (let i = 0; i < identifier.length; i++) {
+    hash = identifier.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
+}
+
 export function Header() {
   const { t, i18n } = useTranslation();
   const auth = useAuthOptional();
@@ -59,11 +87,8 @@ export function Header() {
     },
   });
   const avatarThumb = profile?.avatarThumbUrl || profile?.avatarUrl;
-  const profileLabel = profile?.username
-    ? `(@${profile.username})`
-    : profile?.email
-      ? `(${profile.email})`
-      : '';
+  const initials = getInitials(profile?.displayName || profile?.fullName || profile?.username || profile?.email || '');
+  const avatarBg = getAvatarColor(profile?.username || profile?.email || '');
   const [nowMs] = useState(() => Date.now());
   const unreadCount = notifications?.filter((item) => !item.readAt).length ?? 0;
   const previewItems = (notifications ?? []).slice(0, 5);
@@ -269,12 +294,19 @@ export function Header() {
                   <span className="nav-avatar">
                     {avatarThumb ? (
                       <img src={avatarThumb} alt={t('profile.avatarAlt')} />
+                    ) : initials ? (
+                      <span
+                        className="nav-avatar-initials"
+                        style={{ background: avatarBg }}
+                        aria-hidden="true"
+                      >
+                        {initials}
+                      </span>
                     ) : (
                       <span className="nav-avatar-fallback" aria-hidden="true" />
                     )}
                   </span>
                   {t('nav.profile')}
-                  {profileLabel && <span className="nav-username">{profileLabel}</span>}
                   <ChevronDown className="nav-icon" aria-hidden="true" />
                 </button>
                 {menuOpen && (
