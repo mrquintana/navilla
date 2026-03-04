@@ -102,6 +102,7 @@ public class SecurityConfig {
             .requestMatchers("/actuator/health", "/actuator/info").permitAll()
             .requestMatchers("/api/health").permitAll()
             .requestMatchers("/api/catalog", "/api/catalog/**").permitAll()
+            .requestMatchers("/api/push/vapid-public-key").permitAll()
             .requestMatchers("/error").permitAll()
             // All other API endpoints require authentication
             .requestMatchers("/api/**").authenticated()

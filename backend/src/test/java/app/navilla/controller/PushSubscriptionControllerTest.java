@@ -181,4 +181,20 @@ class PushSubscriptionControllerTest {
                 .claim("email", USER_EMAIL))))
         .andExpect(status().isNotFound());
   }
+
+  @Test
+  @DisplayName("GET /api/push/vapid-public-key should return 200 without authentication")
+  void vapidPublicKeyShouldBePublic() throws Exception {
+    mockMvc.perform(get("/api/push/vapid-public-key"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.publicKey").exists());
+  }
+
+  @Test
+  @DisplayName("GET /api/push/vapid-public-key should return configured key")
+  void vapidPublicKeyShouldReturnConfiguredKey() throws Exception {
+    mockMvc.perform(get("/api/push/vapid-public-key"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.publicKey").value("test-vapid-public-key"));
+  }
 }

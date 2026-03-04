@@ -52,3 +52,8 @@ navilla:
     batch-day: SUNDAY
     batch-hour: 18
     random-delay-hours: 6
+
+  push:
+    vapid-public-key: test-vapid-public-key
+    vapid-private-key: test-vapid-private-key
+    vapid-subject: mailto:test@navilla.app

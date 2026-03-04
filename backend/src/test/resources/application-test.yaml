@@ -30,6 +30,10 @@ navilla:
   exposure:
     max-depth: 3
     snapshot-ttl-days: 1
+  push:
+    vapid-public-key: test-vapid-public-key
+    vapid-private-key: test-vapid-private-key
+    vapid-subject: mailto:test@navilla.app
   storage:
     public-base-url: https://test.supabase.co/storage/v1/object/public
     avatar-bucket: avatars

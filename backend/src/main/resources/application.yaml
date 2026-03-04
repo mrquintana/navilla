@@ -188,6 +188,12 @@ navilla:
       test-of-cure-days: 21
       window-period-default-days: 14
 
+  # Web Push Configuration (VAPID / RFC 8292)
+  push:
+    vapid-public-key: ${VAPID_PUBLIC_KEY:}
+    vapid-private-key: ${VAPID_PRIVATE_KEY:}
+    vapid-subject: ${VAPID_SUBJECT:mailto:contact@navilla.app}
+
   # Dev-only features
   dev-mode: ${NAVILLA_DEV_MODE:false}
 

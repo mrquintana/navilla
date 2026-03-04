@@ -17,8 +17,10 @@
 package app.navilla.controller;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
+import app.navilla.config.PushProperties;
 import app.navilla.dto.PushSubscriptionRequest;
 import app.navilla.dto.PushSubscriptionResponse;
 import app.navilla.service.PushSubscriptionService;
@@ -51,6 +53,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class PushSubscriptionController {
 
   private final PushSubscriptionService pushSubscriptionService;
+  private final PushProperties pushProperties;
 
   /**
    * Registers a new push subscription for the authenticated user.
@@ -92,5 +95,23 @@ public class PushSubscriptionController {
   public ResponseEntity<List<PushSubscriptionResponse>> listSubscriptions(
       @AuthenticationPrincipal Jwt jwt) {
     return ResponseEntity.ok(pushSubscriptionService.listForUser(jwt));
+  }
+
+  /**
+   * Returns the VAPID public key for client-side push subscription registration.
+   *
+   * <p>This endpoint is <strong>public</strong> (no authentication required)
+   * because the client needs the VAPID public key before the user is authenticated,
+   * e.g. to call {@code PushManager.subscribe()} in the service worker.
+   *
+   * @return the VAPID public key as a JSON object (200 OK)
+   */
+  @GetMapping("/vapid-public-key")
+  public ResponseEntity<Map<String, String>> getVapidPublicKey() {
+    String publicKey = pushProperties.vapidPublicKey();
+    if (publicKey == null || publicKey.isBlank()) {
+      return ResponseEntity.ok(Map.of("publicKey", ""));
+    }
+    return ResponseEntity.ok(Map.of("publicKey", publicKey));
   }
 }

@@ -18,6 +18,7 @@ package app.navilla;
 
 import app.navilla.config.EmailProperties;
 import app.navilla.config.HealthCatalogProperties;
+import app.navilla.config.PushProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -42,7 +43,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  */
 @SpringBootApplication
 @EnableScheduling
-@EnableConfigurationProperties({HealthCatalogProperties.class, EmailProperties.class})
+@EnableConfigurationProperties({HealthCatalogProperties.class, EmailProperties.class,
+    PushProperties.class})
 @SuppressWarnings("checkstyle:HideUtilityClassConstructor")
 public class NavillaBackendApplication {
   private static final Logger log = LoggerFactory.getLogger(NavillaBackendApplication.class);

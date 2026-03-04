@@ -122,6 +122,13 @@
             <version>${bouncycastle.version}</version>
         </dependency>
 
+        <!-- VAPID JWT signing for Web Push (RFC 8292) -->
+        <dependency>
+            <groupId>org.bitbucket.b_c</groupId>
+            <artifactId>jose4j</artifactId>
+            <version>0.9.6</version>
+        </dependency>
+
         <!-- Lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
