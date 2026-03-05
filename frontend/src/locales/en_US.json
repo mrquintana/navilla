@@ -73,7 +73,8 @@
     "settings": "Settings",
     "profile": "Profile",
     "journal": "Journal",
-    "insights": "Insights"
+    "insights": "Insights",
+    "network": "Network"
   },
   "dashboard": {
     "title": "Your Network",
@@ -133,7 +134,9 @@
       "recent": "Reported within the last 30 days",
       "older": "Reported more than 30 days ago"
     },
-    "goToInsights": "Insights"
+    "goToInsights": "Insights",
+    "constellation": "Your Constellation",
+    "viewConstellation": "View your constellation"
   },
   "insights": {
     "title": "Personal Insights",

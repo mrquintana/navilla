@@ -73,7 +73,8 @@
     "settings": "Configuración",
     "profile": "Perfil",
     "journal": "Diario",
-    "insights": "Estadísticas"
+    "insights": "Estadísticas",
+    "network": "Red"
   },
   "dashboard": {
     "title": "Tu Red",
@@ -133,7 +134,9 @@
       "recent": "Reportado en los ultimos 30 dias",
       "older": "Reportado hace mas de 30 dias"
     },
-    "goToInsights": "Perspectivas"
+    "goToInsights": "Perspectivas",
+    "constellation": "Tu Constelación",
+    "viewConstellation": "Ver tu constelación"
   },
   "insights": {
     "title": "Perspectivas personales",
