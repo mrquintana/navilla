@@ -2,7 +2,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuthOptional } from '../../contexts/AuthContext';
 import { useUser } from '../../hooks/useUser';
-import { BarChart3, Bell, BookOpen, ChevronDown, HeartPulse, LayoutDashboard, LogOut, Menu, UserCircle2, Users } from 'lucide-react';
+import { BarChart3, Bell, BookOpen, ChevronDown, HeartPulse, LayoutDashboard, LogOut, Menu, Sparkles, UserCircle2, Users } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { api, type NotificationItem } from '../../lib/api';
@@ -169,6 +169,10 @@ export function Header() {
                       <BarChart3 className="nav-icon" aria-hidden="true" />
                       {t('nav.insights')}
                     </Link>
+                    <Link to="/network" className={`nav-dropdown-item${pathname === '/network' ? ' nav-dropdown-item-active' : ''}`} role="menuitem">
+                      <Sparkles className="nav-icon" aria-hidden="true" />
+                      {t('nav.network')}
+                    </Link>
                     <Link to="/notifications" className={`nav-dropdown-item${pathname === '/notifications' ? ' nav-dropdown-item-active' : ''}`} role="menuitem">
                       <Bell className="nav-icon" aria-hidden="true" />
                       {t('nav.notifications')}
@@ -228,6 +232,10 @@ export function Header() {
                 <Link to="/insights" className={`nav-link${pathname === '/insights' ? ' nav-link-active' : ''}`}>
                   <BarChart3 className="nav-icon" aria-hidden="true" />
                   {t('nav.insights')}
+                </Link>
+                <Link to="/network" className={`nav-link${pathname === '/network' ? ' nav-link-active' : ''}`}>
+                  <Sparkles className="nav-icon" aria-hidden="true" />
+                  {t('nav.network')}
                 </Link>
                 <div className="nav-menu" ref={notificationsRef}>
                   <button

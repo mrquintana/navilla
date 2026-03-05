@@ -124,6 +124,9 @@ const MedicationDetailPage = lazy(() =>
 const InsightsPage = lazy(() =>
   import('./pages/InsightsPage').then(m => ({ default: m.InsightsPage })),
 );
+const NetworkPage = lazy(() =>
+  import('./pages/NetworkPage').then(m => ({ default: m.NetworkPage })),
+);
 
 export const router = createBrowserRouter([
   {
@@ -239,6 +242,16 @@ export const router = createBrowserRouter([
           <ProtectedRoute>
             <Suspense fallback={<FullPageLoader />}>
               <InsightsPage />
+            </Suspense>
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'network',
+        element: (
+          <ProtectedRoute>
+            <Suspense fallback={<FullPageLoader />}>
+              <NetworkPage />
             </Suspense>
           </ProtectedRoute>
         ),
