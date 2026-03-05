@@ -177,6 +177,9 @@ A detailed breakdown of the project's directory layout and key files can be foun
 - Share card uses **profile fields only** (no free text) — card is a credibility artifact, must show verified data
 - Pluggable engine = **full replacement** (technology, algorithm, style), not just skin swap
 
+**Nice-to-have / Future consideration:**
+- **Journal partners in constellation** — optional toggle to include encounter journal partners as a distinct visual layer (amber-toned stars, no constellation lines). Personal view only — share card and stage progression remain network-only to preserve credibility. Prevents empty-sky discouragement for users who track encounters but haven't connected via the network yet
+
 ### Key Commits
 - `8446ad6` feat: implement Canvas2D visualization engine
 - `ff90a46` feat: add useNetworkVisualization hook
