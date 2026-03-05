@@ -987,5 +987,17 @@
     "deny": "No soy yo",
     "block": "Bloquear este número",
     "report": "Reportar abuso"
+  },
+  "network": {
+    "shareModalTitle": "Comparte tu constelación",
+    "shareIdentity": "¿Cómo te gustaría ser identificado/a?",
+    "identityDisplayName": "Nombre para mostrar",
+    "identityUsername": "Nombre de usuario",
+    "identityFullName": "Nombre completo",
+    "identityAnonymous": "Anónimo/a",
+    "share": "Compartir",
+    "download": "Descargar",
+    "stats": "{{direct}} directos · {{extended}} extendidos · {{total}} total",
+    "shareError": "Ocurrió un error al exportar tu constelación. Inténtalo de nuevo."
   }
 }
