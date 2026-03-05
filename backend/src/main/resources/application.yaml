@@ -186,6 +186,31 @@ navilla:
     vapid-private-key: ${VAPID_PRIVATE_KEY:}
     vapid-subject: ${VAPID_SUBJECT:mailto:contact@navilla.app}
 
+  # Lab Integration Configuration
+  labs:
+    providers:
+      - code: MOCK_DEMO_MX
+        name: "Lab Demo MX"
+        name-es: "Lab Demo MX"
+        enabled: ${NAVILLA_DEV_MODE:false}
+        base-url: "http://localhost:${server.port:8080}/api/dev/mock-labs/demo-mx"
+        required-fields:
+          - key: orderId
+            label: "Order ID"
+            label-es: "Número de orden"
+          - key: patientId
+            label: "Patient ID"
+            label-es: "ID del paciente"
+      - code: MOCK_EXPRESS
+        name: "Lab Express"
+        name-es: "Lab Express"
+        enabled: ${NAVILLA_DEV_MODE:false}
+        base-url: "http://localhost:${server.port:8080}/api/dev/mock-labs/express"
+        required-fields:
+          - key: orderId
+            label: "Order ID"
+            label-es: "Número de orden"
+
   # Dev-only features
   dev-mode: ${NAVILLA_DEV_MODE:false}
 
