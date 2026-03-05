@@ -106,6 +106,8 @@
 - [x] Week 10: Reciprocity API (GET status, POST opt-in, POST opt-out)
 - [x] Week 10: Frontend reciprocity opt-in card + dashboard integration
 - [x] Week 10: Frontend phone field in journal entries + catalog-driven dropdowns
+- [x] Week 10: Network Constellation Visualization (pluggable engine + Canvas 2D + share card)
+- [x] Week 10: Profile page consolidation (Settings → Preferences, segmented visibility control)
 - [ ] Week 11: Verified test badges / Exposure recency buckets
 - [ ] Week 12: Vault + app lock + notification privacy
 - [ ] Week 13: Data retention + connection staleness
@@ -140,6 +142,58 @@ A detailed breakdown of the project's directory layout and key files can be foun
 ## Architecture Decisions Records (ADRs)
 
 ### ADR-001: Documentation Platform
+
+---
+
+## Session Notes (2026-03-04 — Week 10 Phase 3: Network Constellation + Profile Polish)
+
+### Accomplished
+
+**Network Constellation Visualization (16 files, 1279 insertions):**
+- ✅ **Pluggable visualization engine** — `VisualizationEngine` interface in `lib/visualization/types.ts` decouples rendering from app code. Entire engine replaceable by implementing interface + changing one import in `index.ts`
+- ✅ **Canvas 2D engine** — `Canvas2DEngine.ts` (~440 lines): seeded PRNG for deterministic star positions, 3-layer rendering (1st/2nd/3rd degree at different radii/brightness), constellation lines, twinkle animation, deep space gradient background, stardust particles. PNG export at 1080×1920 with Fraunces + Plus Jakarta Sans overlays
+- ✅ **useNetworkVisualization hook** — composes `/api/exposures` + `/api/catalog/stages` into `NetworkData`, resolves stage client-side, i18n-aware (`displayNameEs` when language starts with 'es')
+- ✅ **NetworkVisualizationHost** — React wrapper bridging imperative engine to declarative lifecycle
+- ✅ **ShareConstellationModal** — identity picker (Display name, @Username, Full name, Anonymous) with disabled options for empty profile fields. Web Share API with download fallback
+- ✅ **NetworkPage** — full-screen immersive dark page, reciprocity gate, overlay UI (stage badge, stats, share button), cold start message for 0 nodes
+- ✅ **Dashboard preview card** — 200px tall canvas preview with stage badge + "View constellation" link
+- ✅ **Navigation** — "Network" link (Sparkles icon) in header nav between Insights and Notifications
+- ✅ **Routing** — `/network` lazy-loaded ProtectedRoute
+- ✅ **i18n** — 14 locale keys in both en_US and es_MX
+- ✅ **Docusaurus** — `docs/docs/frontend/visualization-engine.md` documenting the pluggable engine contract
+- ✅ **Engine README** — `engines/canvas2d/README.md` documenting internals
+
+**Profile Page Consolidation:**
+- ✅ Moved Language switcher from Settings → Preferences (with Globe icon)
+- ✅ Removed old Settings card entirely
+- ✅ Sign Out button placed between Preferences and Danger Zone
+- ✅ Moved Profile Visibility + Search Visibility from About You → Preferences
+- ✅ Replaced plain `<select>` with segmented control (`.segmented-control` CSS) for visibility
+- ✅ Removed redundant Match Notifications "Coming soon" row
+- ✅ Header initials avatar CSS completed (`.nav-avatar-initials`)
+
+**Decisions:**
+- Verified Test Badges **deferred** — needs 1-2 weeks of lab website analysis (Chopo, Salud Digna) before implementation
+- Share card uses **profile fields only** (no free text) — card is a credibility artifact, must show verified data
+- Pluggable engine = **full replacement** (technology, algorithm, style), not just skin swap
+
+### Key Commits
+- `8446ad6` feat: implement Canvas2D visualization engine
+- `ff90a46` feat: add useNetworkVisualization hook
+- `36f0709` feat: add NetworkVisualizationHost wrapper component
+- `25832b6` feat: add ShareConstellationModal with identity picker and export
+- `9f92c6e` feat: add immersive /network page with constellation visualization
+- `7770cf3` feat: add constellation preview card to dashboard
+- `63c14b4` feat: add /network route, nav link, and i18n keys
+- `03eea09` docs: add Visualization Engine guide to Docusaurus
+- `6313cea` merge: Network Constellation Visualization feature
+
+### Next Steps
+- [ ] Shareable Connection Links (growth engine)
+- [ ] Exposure Recency Buckets
+- [ ] Vault + App Lock
+- [ ] Data Retention + Connection Staleness
+- [ ] Cold Start / Estimated Network
 
 ---
 
