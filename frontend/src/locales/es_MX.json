@@ -998,6 +998,8 @@
     "share": "Compartir",
     "download": "Descargar",
     "stats": "{{direct}} directos · {{extended}} extendidos · {{total}} total",
-    "shareError": "Ocurrió un error al exportar tu constelación. Inténtalo de nuevo."
+    "shareError": "Ocurrió un error al exportar tu constelación. Inténtalo de nuevo.",
+    "coldStartMessage": "Tu cielo te espera. Agrega tu primera conexión para iluminarlo.",
+    "coldStartLink": "Agregar una conexión"
   }
 }

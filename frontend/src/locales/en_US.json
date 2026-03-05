@@ -999,6 +999,8 @@
     "share": "Share",
     "download": "Download",
     "stats": "{{direct}} direct · {{extended}} extended · {{total}} total",
-    "shareError": "Something went wrong while exporting your constellation. Please try again."
+    "shareError": "Something went wrong while exporting your constellation. Please try again.",
+    "coldStartMessage": "Your sky is waiting. Add your first connection to light it up.",
+    "coldStartLink": "Add a connection"
   }
 }

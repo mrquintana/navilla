@@ -3493,6 +3493,95 @@ section.hero + section {
   color: var(--color-primary);
 }
 
+/* Network constellation page */
+.network-page {
+  min-height: calc(100vh - 60px);
+  background: linear-gradient(180deg, #1e1b4b 0%, #0a0a0f 100%);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.network-page-canvas {
+  flex: 1;
+  position: relative;
+}
+
+.network-page-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.network-page-overlay > * {
+  pointer-events: auto;
+}
+
+.network-stage-badge {
+  display: inline-flex;
+  align-self: flex-start;
+  padding: 0.375rem 1rem;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  color: #e0e7ff;
+  font-family: var(--font-display);
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+}
+
+.network-stats {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.8125rem;
+}
+
+.network-share-btn {
+  align-self: flex-end;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.25rem;
+  border-radius: 9999px;
+  background: rgba(79, 70, 229, 0.8);
+  backdrop-filter: blur(8px);
+  color: #fff;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.network-share-btn:hover {
+  background: rgba(79, 70, 229, 1);
+}
+
+.network-cold-start {
+  text-align: center;
+  padding: 1rem;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.8125rem;
+}
+
+.network-cold-start a {
+  color: #a5b4fc;
+  font-weight: 500;
+}
+
+.network-locked {
+  min-height: calc(100vh - 60px);
+  background: linear-gradient(180deg, #1e1b4b 0%, #0a0a0f 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
 /* Mobile: tighten price rows */
 @media (max-width: 640px) {
   .cost-price-row {
