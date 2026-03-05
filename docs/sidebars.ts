@@ -65,6 +65,7 @@ const sidebars: SidebarsConfig = {
         'frontend/state-management',
         'frontend/styling',
         'frontend/i18n',
+        'frontend/visualization-engine',
       ],
     },
     {

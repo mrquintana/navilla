@@ -73,7 +73,8 @@
     "settings": "Configuración",
     "profile": "Perfil",
     "journal": "Diario",
-    "insights": "Estadísticas"
+    "insights": "Estadísticas",
+    "network": "Red"
   },
   "dashboard": {
     "title": "Tu Red",
@@ -133,7 +134,9 @@
       "recent": "Reportado en los ultimos 30 dias",
       "older": "Reportado hace mas de 30 dias"
     },
-    "goToInsights": "Perspectivas"
+    "goToInsights": "Perspectivas",
+    "constellation": "Tu Constelación",
+    "viewConstellation": "Ver tu constelación"
   },
   "insights": {
     "title": "Perspectivas personales",
@@ -987,5 +990,19 @@
     "deny": "No soy yo",
     "block": "Bloquear este número",
     "report": "Reportar abuso"
+  },
+  "network": {
+    "shareModalTitle": "Comparte tu constelación",
+    "shareIdentity": "¿Cómo te gustaría ser identificado/a?",
+    "identityDisplayName": "Nombre para mostrar",
+    "identityUsername": "Nombre de usuario",
+    "identityFullName": "Nombre completo",
+    "identityAnonymous": "Anónimo/a",
+    "share": "Compartir",
+    "download": "Descargar",
+    "stats": "{{direct}} directos · {{extended}} extendidos · {{total}} total",
+    "shareError": "Ocurrió un error al exportar tu constelación. Inténtalo de nuevo.",
+    "coldStartMessage": "Tu cielo te espera. Agrega tu primera conexión para iluminarlo.",
+    "coldStartLink": "Agregar una conexión"
   }
 }

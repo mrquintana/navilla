@@ -5,14 +5,17 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { api } from '../lib/api';
 import { Link } from 'react-router-dom';
 import { DEV_MODE } from '../lib/devMode';
-import { HelpCircle, ExternalLink, Heart, BookOpen, Users, BarChart3 } from 'lucide-react';
-import { useState } from 'react';
+import { HelpCircle, ExternalLink, Heart, BookOpen, Users, BarChart3, Sparkles } from 'lucide-react';
+import { useMemo, useState } from 'react';
 import { getConditionInfo } from '../lib/conditionInfo';
 import { PageSkeleton, SkeletonBlock } from '../components/ui/LoadingShell';
 import { UpcomingReminders } from '../components/reminders/UpcomingReminders';
 import { OnboardingFlow } from '../components/onboarding/OnboardingFlow';
 import { useReciprocityStatus } from '../hooks/useReciprocity';
 import { ReciprocityOptInCard } from '../components/reciprocity/ReciprocityOptInCard';
+import { useNetworkVisualization } from '../hooks/useNetworkVisualization';
+import { NetworkVisualizationHost } from '../components/network/NetworkVisualizationHost';
+import { ActiveEngine } from '../lib/visualization';
 
 export function DashboardPage() {
   const { t, i18n } = useTranslation();
@@ -47,6 +50,9 @@ export function DashboardPage() {
 
   const reciprocityQuery = useReciprocityStatus();
   const isOptedIn = reciprocityQuery.data?.optedIn ?? false;
+
+  const { data: networkData } = useNetworkVisualization();
+  const constellationEngine = useMemo(() => new ActiveEngine(), []);
 
   const hasPositiveStatus = (healthQuery.data ?? []).some(
     (status) => status.status === 'positive' && !status.clearedAt
@@ -387,6 +393,27 @@ export function DashboardPage() {
           </div>
         </div>
       </div>
+
+      {/* Constellation Preview — only for opted-in users with data */}
+      {isOptedIn && networkData && (
+        <div className="card card-elevated">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: 'rgba(99, 102, 241, 0.08)' }}>
+                <Sparkles className="w-5 h-5" style={{ color: 'var(--color-primary)' }} aria-hidden="true" />
+              </div>
+              <h3 className="text-sm font-semibold uppercase tracking-wider">{t('dashboard.constellation')}</h3>
+            </div>
+            <span className="badge badge-primary text-xs">{networkData.stageDisplayName}</span>
+          </div>
+          <div className="rounded-lg overflow-hidden" style={{ height: 200, background: 'linear-gradient(180deg, #1e1b4b 0%, #0a0a0f 100%)' }}>
+            <NetworkVisualizationHost engine={constellationEngine} data={networkData} className="w-full h-full" />
+          </div>
+          <Link to="/network" className="text-sm font-medium mt-3 inline-block" style={{ color: 'var(--color-primary)' }}>
+            {t('dashboard.viewConstellation')} &rarr;
+          </Link>
+        </div>
+      )}
 
       {/* Snapshot notice — bottom, dismissible */}
       {showSnapshotNotice && (

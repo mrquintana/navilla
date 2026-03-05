@@ -73,7 +73,8 @@
     "settings": "Settings",
     "profile": "Profile",
     "journal": "Journal",
-    "insights": "Insights"
+    "insights": "Insights",
+    "network": "Network"
   },
   "dashboard": {
     "title": "Your Network",
@@ -133,7 +134,9 @@
       "recent": "Reported within the last 30 days",
       "older": "Reported more than 30 days ago"
     },
-    "goToInsights": "Insights"
+    "goToInsights": "Insights",
+    "constellation": "Your Constellation",
+    "viewConstellation": "View your constellation"
   },
   "insights": {
     "title": "Personal Insights",
@@ -988,5 +991,19 @@
     "deny": "Not me",
     "block": "Block this number",
     "report": "Report abuse"
+  },
+  "network": {
+    "shareModalTitle": "Share Your Constellation",
+    "shareIdentity": "How would you like to be identified?",
+    "identityDisplayName": "Display name",
+    "identityUsername": "Username",
+    "identityFullName": "Full name",
+    "identityAnonymous": "Anonymous",
+    "share": "Share",
+    "download": "Download",
+    "stats": "{{direct}} direct · {{extended}} extended · {{total}} total",
+    "shareError": "Something went wrong while exporting your constellation. Please try again.",
+    "coldStartMessage": "Your sky is waiting. Add your first connection to light it up.",
+    "coldStartLink": "Add a connection"
   }
 }
