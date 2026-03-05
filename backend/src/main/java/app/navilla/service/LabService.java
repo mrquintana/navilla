@@ -25,7 +25,6 @@ import app.navilla.dto.LabResponse;
 import app.navilla.dto.UpdateLabRequest;
 import app.navilla.entity.Lab;
 import app.navilla.entity.LabCredential;
-import app.navilla.entity.LabProvider;
 import app.navilla.exception.ResourceNotFoundException;
 import app.navilla.repository.LabCredentialRepository;
 import app.navilla.repository.LabRepository;
@@ -66,12 +65,7 @@ public class LabService {
   public LabResponse createLab(Jwt jwt, CreateLabRequest request) {
     String userHash = hashEmail(jwt);
 
-    LabProvider provider;
-    try {
-      provider = LabProvider.fromValue(request.provider());
-    } catch (IllegalArgumentException ex) {
-      throw new IllegalStateException("healthLog.error.invalidProvider");
-    }
+    String provider = request.provider().toUpperCase();
 
     Lab lab = Lab.builder()
         .userHash(userHash)
@@ -196,7 +190,7 @@ public class LabService {
 
     return new LabResponse(
         lab.getId(),
-        lab.getProvider().name(),
+        lab.getProvider(),
         encryptionService.decryptFromBytes(lab.getNameEncrypted()),
         credentialDtos,
         lab.getCreatedAt()

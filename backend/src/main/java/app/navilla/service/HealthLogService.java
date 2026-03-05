@@ -405,7 +405,7 @@ public class HealthLogService {
         if (labOpt.isPresent()) {
           Lab lab = labOpt.get();
           labName = encryptionService.decryptFromBytes(lab.getNameEncrypted());
-          labProvider = lab.getProvider().name();
+          labProvider = lab.getProvider();
         }
       }
 
@@ -573,7 +573,7 @@ public class HealthLogService {
       if (labOpt.isPresent()) {
         Lab lab = labOpt.get();
         labName = encryptionService.decryptFromBytes(lab.getNameEncrypted());
-        labProvider = lab.getProvider().name();
+        labProvider = lab.getProvider();
       }
     }
 

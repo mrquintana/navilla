@@ -37,7 +37,6 @@ import app.navilla.dto.LabResponse;
 import app.navilla.dto.UpdateLabRequest;
 import app.navilla.entity.Lab;
 import app.navilla.entity.LabCredential;
-import app.navilla.entity.LabProvider;
 import app.navilla.exception.ResourceNotFoundException;
 import app.navilla.repository.LabCredentialRepository;
 import app.navilla.repository.LabRepository;
@@ -91,7 +90,7 @@ class LabServiceTest {
     return Lab.builder()
         .id(id)
         .userHash(userHash)
-        .provider(LabProvider.CHOPO)
+        .provider("CHOPO")
         .nameEncrypted(ENCRYPTED_NAME)
         .createdAt(OffsetDateTime.now())
         .build();
@@ -144,7 +143,7 @@ class LabServiceTest {
       verify(labRepository).save(labCaptor.capture());
       Lab capturedLab = labCaptor.getValue();
       assertThat(capturedLab.getUserHash()).isEqualTo(USER_HASH);
-      assertThat(capturedLab.getProvider()).isEqualTo(LabProvider.CHOPO);
+      assertThat(capturedLab.getProvider()).isEqualTo("CHOPO");
       assertThat(capturedLab.getNameEncrypted()).isEqualTo(ENCRYPTED_NAME);
 
       // Verify credentials were saved encrypted
@@ -158,19 +157,6 @@ class LabServiceTest {
       assertThat(result.credentials()).hasSize(2);
       assertThat(result.credentials().get(0).key()).isEqualTo("username");
       assertThat(result.credentials().get(0).value()).isEqualTo("myuser");
-    }
-
-    @Test
-    @DisplayName("should reject invalid provider")
-    void createLab_shouldRejectInvalidProvider() {
-      Jwt jwt = mockJwt();
-      CreateLabRequest request = new CreateLabRequest("INVALID", "Some Lab", null);
-
-      assertThatThrownBy(() -> labService.createLab(jwt, request))
-          .isInstanceOf(IllegalStateException.class)
-          .hasMessage("healthLog.error.invalidProvider");
-
-      verify(labRepository, never()).save(any());
     }
 
     @Test

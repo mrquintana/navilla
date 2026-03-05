@@ -43,6 +43,9 @@ public class TestVisit {
   @Column(name = "notes_encrypted")
   private byte[] notesEncrypted;
 
+  @Column(name = "raw_lab_response_encrypted")
+  private byte[] rawLabResponseEncrypted;
+
   @Column(name = "verified", nullable = false)
   @Builder.Default
   private Boolean verified = false;

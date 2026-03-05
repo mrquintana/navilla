@@ -42,7 +42,6 @@ import app.navilla.entity.ConditionCatalogEntry;
 import app.navilla.entity.HealthStatus;
 import app.navilla.entity.HealthStatusValue;
 import app.navilla.entity.Lab;
-import app.navilla.entity.LabProvider;
 import app.navilla.entity.TestResult;
 import app.navilla.entity.TestResultStatus;
 import app.navilla.entity.TestVisit;
@@ -206,7 +205,7 @@ class HealthLogServiceTest {
       // Lab lookup for toResponse
       Lab lab = Lab.builder()
           .id(LAB_ID)
-          .provider(LabProvider.CHOPO)
+          .provider("CHOPO")
           .nameEncrypted(ENCRYPTED_LAB_NAME)
           .build();
       when(labRepository.findById(LAB_ID)).thenReturn(Optional.of(lab));
@@ -928,7 +927,7 @@ class HealthLogServiceTest {
 
       Lab lab = Lab.builder()
           .id(LAB_ID)
-          .provider(LabProvider.CHOPO)
+          .provider("CHOPO")
           .nameEncrypted(ENCRYPTED_LAB_NAME)
           .build();
 

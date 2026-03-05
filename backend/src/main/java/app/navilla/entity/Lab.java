@@ -21,8 +21,6 @@ import java.util.UUID;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -47,9 +45,8 @@ public class Lab {
   @Column(name = "user_hash", nullable = false, length = 64)
   private String userHash;
 
-  @Enumerated(EnumType.STRING)
-  @Column(name = "provider", nullable = false, length = 32)
-  private LabProvider provider;
+  @Column(name = "provider", nullable = false, length = 50)
+  private String provider;
 
   @Column(name = "name_encrypted", nullable = false)
   private byte[] nameEncrypted;
