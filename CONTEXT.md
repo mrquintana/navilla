@@ -145,6 +145,39 @@ A detailed breakdown of the project's directory layout and key files can be foun
 
 ---
 
+## Session Notes (2026-03-05 — Lab Integration Framework)
+
+### Accomplished
+
+**Lab Integration Framework (41 files, 2496 insertions):**
+- ✅ **Pluggable LabProvider interface** — `app.navilla.lab.LabProvider` with `getProviderCode()`, `validateInput()`, `verify()`. Same strategy pattern as visualization engine
+- ✅ **LabProviderRegistry** — Spring auto-discovers all `@Component` LabProvider implementations, routes by provider code
+- ✅ **LabVerificationService** — two-step flow: `verify()` calls lab API (no DB writes), `confirm()` saves results + syncs health_status
+- ✅ **MockDemoMxProvider** — mock lab with orderId + patientId, returns 4 conditions (deterministic results)
+- ✅ **MockExpressProvider** — mock lab with orderId only, returns 2 conditions
+- ✅ **MockLabController** — dev-only endpoints at `/api/dev/mock-labs/` simulating external lab APIs
+- ✅ **LabProviderController** — `GET /api/labs/providers`, `POST /api/labs/verify`, `POST /api/labs/confirm`
+- ✅ **Configuration** — `application.yml` lab provider config with required fields per lab
+- ✅ **Migration 015** — `raw_lab_response_encrypted` column on test_visits, widened labs.provider to varchar(50)
+- ✅ **Lab.provider refactored** — from enum (`LabProvider.CHOPO`) to plain String for pluggable architecture
+- ✅ **Frontend** — types, API hooks (`useLabProviders`, `useLabVerify`, `useLabConfirm`), LabVerificationModal (3-step: select lab → credentials → review results)
+- ✅ **i18n** — 20 locale keys in both en_US and es_MX
+- ✅ **Documentation** — `docs/docs/architecture/lab-integration.md` + `docs/docs/api/lab-verification.md`
+- ✅ **395 backend tests passing** (26 new tests)
+
+**Decisions:**
+- Exposure Recency Buckets **deferred** — no value without verified lab data
+- Lab integration framework built now so real Chopo/Salud Digna integration = one class + one YAML entry
+- No separate ResultParser interface — each provider owns its own parsing (every lab's response format is different)
+
+### Next Steps
+- [ ] Run migration 015 on Supabase
+- [ ] Test verification flow end-to-end with dev mode enabled
+- [ ] Begin Chopo/Salud Digna partnership analysis
+- [ ] Implement recency buckets once verified data flows through
+
+---
+
 ## Session Notes (2026-03-04 — Week 10 Phase 3: Network Constellation + Profile Polish)
 
 ### Accomplished
