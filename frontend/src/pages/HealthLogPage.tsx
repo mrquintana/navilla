@@ -17,6 +17,7 @@ import { VaccinationSeriesCard } from '../components/reminders/VaccinationSeries
 import { VaccinationModal } from '../components/reminders/VaccinationModal';
 import { UpcomingReminders } from '../components/reminders/UpcomingReminders';
 import { SkeletonBlock, SkeletonRows } from '../components/ui/LoadingShell';
+import { LabVerificationModal } from '../components/health/LabVerificationModal';
 import type { VaccineSeries } from '../lib/api';
 
 type HealthTab = 'tests' | 'medications' | 'vaccines';
@@ -85,6 +86,7 @@ function TestsTabContent() {
   const [modalOpen, setModalOpen] = useState(false);
   const [showAllExposures, setShowAllExposures] = useState(false);
   const [showExposureInfo, setShowExposureInfo] = useState(false);
+  const [verifyVisitId, setVerifyVisitId] = useState<string | null>(null);
 
   const summaryQuery = useHealthLogSummary();
   const exposureQuery = useQuery({
@@ -261,6 +263,18 @@ function TestsTabContent() {
           </div>
         )}
       </div>
+
+      {/* Lab Verification Modal */}
+      {verifyVisitId && (
+        <LabVerificationModal
+          visitId={verifyVisitId}
+          onClose={() => setVerifyVisitId(null)}
+          onVerified={() => {
+            summaryQuery.refetch();
+            setVerifyVisitId(null);
+          }}
+        />
+      )}
 
       {/* Coverage text */}
       {summary && summary.conditionsCovered > 0 && (

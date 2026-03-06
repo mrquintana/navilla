@@ -7,6 +7,7 @@ import { env } from './env';
 import type { ReciprocityStatus } from '../types/reciprocity';
 import type { ConditionCatalogItem, NetworkStage } from '../types/catalog';
 import type { PhoneMatchNotification } from '../types/phoneMatch';
+import type { LabProviderConfig, LabVerifyRequest, LabVerifyResponse, LabConfirmRequest } from '../types/lab';
 
 const RAW_API_URL = env.get('VITE_API_URL') ?? '';
 const NORMALIZED_API_URL = RAW_API_URL.replace(/\/+$/, '');
@@ -549,6 +550,14 @@ export const api = {
       apiRequest<ReciprocityStatus>('/api/reciprocity/opt-in', token, { method: 'POST' }),
     optOut: (token: string) =>
       apiRequest<ReciprocityStatus>('/api/reciprocity/opt-out', token, { method: 'POST' }),
+  },
+  labs: {
+    providers: (token: string) =>
+      apiRequest<LabProviderConfig[]>('/api/labs/providers', token, { method: 'GET' }),
+    verify: (token: string, data: LabVerifyRequest) =>
+      apiRequest<LabVerifyResponse>('/api/labs/verify', token, { method: 'POST', body: data }),
+    confirm: (token: string, data: LabConfirmRequest) =>
+      apiRequest<{ success: boolean }>('/api/labs/confirm', token, { method: 'POST', body: data }),
   },
   phoneMatch: {
     pending: (token: string) =>

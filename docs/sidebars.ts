@@ -22,6 +22,7 @@ const sidebars: SidebarsConfig = {
         'architecture/privacy-model',
         'architecture/security',
         'architecture/infrastructure',
+        'architecture/lab-integration',
       ],
     },
     {
@@ -121,6 +122,7 @@ const sidebars: SidebarsConfig = {
         'api/catalog',
         'api/reciprocity',
         'api/phone-matching',
+        'api/lab-verification',
       ],
     },
   ],
