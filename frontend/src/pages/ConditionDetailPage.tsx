@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, BadgeCheck } from 'lucide-react';
+import { ArrowLeft, BadgeCheck, ShieldCheck } from 'lucide-react';
 import { useConditionHistory } from '../hooks/useHealthLog';
+import { LabVerificationModal } from '../components/health/LabVerificationModal';
 import { PageSkeleton, SkeletonBlock, SkeletonRows } from '../components/ui/LoadingShell';
 
 function statusBadgeClass(status: string): string {
@@ -23,6 +25,7 @@ export function ConditionDetailPage() {
   const { t, i18n } = useTranslation();
   const { condition } = useParams<{ condition: string }>();
   const locale = i18n.language.replace('_', '-');
+  const [verifyVisitId, setVerifyVisitId] = useState<string | null>(null);
 
   const historyQuery = useConditionHistory(condition ?? '');
   const history = historyQuery.data;
@@ -171,11 +174,21 @@ export function ConditionDetailPage() {
                         })}
                       </span>
                     )}
-                    {entry.verified && (
+                    {entry.verified ? (
                       <span className="inline-flex items-center gap-0.5 text-green-600 font-medium">
                         <BadgeCheck className="w-3.5 h-3.5" aria-hidden="true" />
                         {t('healthLog.verified')}
                       </span>
+                    ) : (
+                      <button
+                        type="button"
+                        className="inline-flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-lg transition-colors hover:bg-[var(--color-secondary)]"
+                        style={{ color: 'var(--color-primary)' }}
+                        onClick={() => setVerifyVisitId(entry.visitId)}
+                      >
+                        <ShieldCheck className="w-3.5 h-3.5" aria-hidden="true" />
+                        {t('labVerification.verifyButton')}
+                      </button>
                     )}
                   </div>
                 </div>
@@ -185,6 +198,18 @@ export function ConditionDetailPage() {
         </div>
       ) : (
         <p className="text-sm text-muted">{t('healthLog.noTests')}</p>
+      )}
+
+      {/* Lab Verification Modal */}
+      {verifyVisitId && (
+        <LabVerificationModal
+          visitId={verifyVisitId}
+          onClose={() => setVerifyVisitId(null)}
+          onVerified={() => {
+            historyQuery.refetch();
+            setVerifyVisitId(null);
+          }}
+        />
       )}
     </div>
   );
