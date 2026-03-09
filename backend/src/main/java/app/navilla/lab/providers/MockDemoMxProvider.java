@@ -75,7 +75,7 @@ public class MockDemoMxProvider implements LabProvider {
     String patientId = visitCredentials.getOrDefault("patientId", "");
 
     String baseUrl = resolveBaseUrl();
-    String url = baseUrl + "/api/dev/mock-labs/demo-mx/results"
+    String url = baseUrl + "/results"
         + "?orderId=" + URLEncoder.encode(orderId, StandardCharsets.UTF_8)
         + "&patientId=" + URLEncoder.encode(patientId, StandardCharsets.UTF_8);
 

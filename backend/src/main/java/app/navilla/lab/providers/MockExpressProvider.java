@@ -74,7 +74,7 @@ public class MockExpressProvider implements LabProvider {
     String orderId = visitCredentials.getOrDefault("orderId", "");
 
     String baseUrl = resolveBaseUrl();
-    String url = baseUrl + "/api/dev/mock-labs/express/results"
+    String url = baseUrl + "/results"
         + "?orderId=" + URLEncoder.encode(orderId, StandardCharsets.UTF_8);
 
     try {
