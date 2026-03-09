@@ -24,7 +24,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * Configuration properties for lab providers.
  */
 @ConfigurationProperties(prefix = "navilla.labs")
-public record LabProviderProperties(List<LabConfig> providers) {
+public record LabProviderProperties(String mockBaseUrl, List<LabConfig> providers) {
 
   /**
    * Configuration for a single lab provider.

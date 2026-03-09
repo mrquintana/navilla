@@ -26,7 +26,7 @@ class LabProviderPropertiesTest {
 
   @Test
   void defaultNull() {
-    assertThat(new LabProviderProperties(null).providers()).isEmpty();
+    assertThat(new LabProviderProperties(null, null).providers()).isEmpty();
   }
 
   @Test
@@ -35,7 +35,7 @@ class LabProviderPropertiesTest {
         "orderId", "Order ID", "Número de orden");
     var config = new LabProviderProperties.LabConfig(
         "MOCK", "Mock", "Mock", true, "http://localhost", List.of(field));
-    var props = new LabProviderProperties(List.of(config));
+    var props = new LabProviderProperties(null, List.of(config));
 
     assertThat(props.providers()).hasSize(1);
     assertThat(props.providers().getFirst().code()).isEqualTo("MOCK");

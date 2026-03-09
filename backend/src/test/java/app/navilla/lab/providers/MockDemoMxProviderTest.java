@@ -33,7 +33,7 @@ class MockDemoMxProviderTest {
 
   @BeforeEach
   void setUp() {
-    LabProviderProperties props = new LabProviderProperties(List.of());
+    LabProviderProperties props = new LabProviderProperties(null, List.of());
     provider = new MockDemoMxProvider(props, new ObjectMapper());
   }
 

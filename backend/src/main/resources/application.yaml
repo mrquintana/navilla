@@ -187,13 +187,16 @@ navilla:
     vapid-subject: ${VAPID_SUBJECT:mailto:contact@navilla.app}
 
   # Lab Integration Configuration
+  # MOCK_LAB_BASE_URL: on Railway, set to https://api.navilla.app
+  # Locally, defaults to http://localhost:8080
   labs:
+    mock-base-url: ${MOCK_LAB_BASE_URL:http://localhost:${server.port:8080}}
     providers:
       - code: MOCK_DEMO_MX
         name: "Lab Demo MX"
         name-es: "Lab Demo MX"
         enabled: ${NAVILLA_DEV_MODE:false}
-        base-url: "http://localhost:${server.port:8080}/api/dev/mock-labs/demo-mx"
+        base-url: "${navilla.labs.mock-base-url}/api/dev/mock-labs/demo-mx"
         required-fields:
           - key: orderId
             label: "Order ID"
@@ -205,7 +208,7 @@ navilla:
         name: "Lab Express"
         name-es: "Lab Express"
         enabled: ${NAVILLA_DEV_MODE:false}
-        base-url: "http://localhost:${server.port:8080}/api/dev/mock-labs/express"
+        base-url: "${navilla.labs.mock-base-url}/api/dev/mock-labs/express"
         required-fields:
           - key: orderId
             label: "Order ID"

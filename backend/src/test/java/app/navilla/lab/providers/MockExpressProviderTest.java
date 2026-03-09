@@ -33,7 +33,7 @@ class MockExpressProviderTest {
 
   @BeforeEach
   void setUp() {
-    LabProviderProperties props = new LabProviderProperties(List.of());
+    LabProviderProperties props = new LabProviderProperties(null, List.of());
     provider = new MockExpressProvider(props, new ObjectMapper());
   }
 
