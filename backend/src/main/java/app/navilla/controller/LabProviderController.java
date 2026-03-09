@@ -139,13 +139,14 @@ public class LabProviderController {
             "visitId", resolvedVisitId.toString(),
             "results", result.results()));
       } else {
-        return ResponseEntity.badRequest().body(Map.of(
+        // Return 200 with success=false so frontend can read error details
+        return ResponseEntity.ok(Map.of(
             "success", false,
             "errorCode", result.errorCode(),
             "errorMessage", result.errorMessage()));
       }
     } catch (IllegalArgumentException e) {
-      return ResponseEntity.badRequest().body(Map.of(
+      return ResponseEntity.ok(Map.of(
           "success", false,
           "errorCode", "INVALID_REQUEST",
           "errorMessage", e.getMessage()));
