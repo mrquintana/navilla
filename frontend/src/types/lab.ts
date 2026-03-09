@@ -23,13 +23,15 @@ export interface LabTestResultDto {
 
 export interface LabVerifyResponse {
   success: boolean;
+  visitId?: string;
   results?: LabTestResultDto[];
   errorCode?: string;
   errorMessage?: string;
 }
 
 export interface LabVerifyRequest {
-  visitId: string;
+  visitId?: string;
+  testDate?: string;
   labCode: string;
   visitCredentials: Record<string, string>;
   labCredentials?: Record<string, string>;

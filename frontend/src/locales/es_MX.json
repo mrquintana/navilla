@@ -787,7 +787,14 @@
       "deleteFailed": "Error al eliminar la visita"
     },
     "exposureOverview": "Resumen de Exposición",
-    "backToHealthLog": "Registro de Salud"
+    "backToHealthLog": "Registro de Salud",
+    "pathChooser": {
+      "title": "¿Cómo quieres registrar esta visita?",
+      "labConnect": "Conectar con Laboratorio",
+      "labConnectDescription": "Importa resultados verificados directamente de tu laboratorio",
+      "manualEntry": "Ingresar Manualmente",
+      "manualEntryDescription": "Reporta tus resultados de pruebas"
+    }
   },
   "myHealth": {
     "title": "Mi Salud",

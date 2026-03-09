@@ -788,7 +788,14 @@
       "deleteFailed": "Failed to delete test visit"
     },
     "exposureOverview": "Exposure Overview",
-    "backToHealthLog": "Health Log"
+    "backToHealthLog": "Health Log",
+    "pathChooser": {
+      "title": "How would you like to log this visit?",
+      "labConnect": "Connect to Lab",
+      "labConnectDescription": "Import verified results directly from your lab",
+      "manualEntry": "Enter Manually",
+      "manualEntryDescription": "Self-report your test results"
+    }
   },
   "myHealth": {
     "title": "My Health",
