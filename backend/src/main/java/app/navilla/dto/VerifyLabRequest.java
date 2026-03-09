@@ -21,16 +21,22 @@ import java.util.UUID;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 /**
  * Request DTO for initiating lab verification.
+ *
+ * <p>Either {@code visitId} or {@code testDate} must be provided.
+ * When {@code visitId} is null, a shell visit is created from {@code testDate}.
  */
 public record VerifyLabRequest(
-    @NotNull UUID visitId,
+    UUID visitId,
     @NotBlank @Size(max = 50) String labCode,
     @NotNull Map<String, String> visitCredentials,
-    Map<String, String> labCredentials) {
+    Map<String, String> labCredentials,
+    @Size(max = 10) @Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2}$", message = "must be yyyy-MM-dd")
+    String testDate) {
 
   /**
    * Compact constructor that defaults labCredentials to empty map if null.

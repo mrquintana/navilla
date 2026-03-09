@@ -68,29 +68,49 @@ public class LabVerificationService {
 
   /**
    * Step 1: Call the lab provider and return results for review.
-   * Does NOT save anything to the database.
+   *
+   * <p>When {@code visitId} is provided, validates ownership and uses it.
+   * When {@code visitId} is null, creates a shell visit from {@code testDate}.
    *
    * @param userHash         the hashed user identifier
-   * @param visitId          the test visit ID to verify
+   * @param visitId          the test visit ID to verify (nullable)
+   * @param testDate         the test date for creating a shell visit (nullable, used when visitId is null)
    * @param labCode          the lab provider code
    * @param visitCredentials credentials for the visit (e.g., order number)
    * @param labCredentials   credentials for the lab provider (e.g., patient ID)
-   * @return the verification result from the lab provider
+   * @return a wrapper containing the resolved visitId and verification result
    * @throws IllegalArgumentException if the visit is not found, belongs to another user,
    *                                  or the lab provider is unknown
    */
-  public LabVerificationResult verify(
+  @Transactional
+  public LabVerifyServiceResponse verify(
       String userHash,
       UUID visitId,
+      java.time.LocalDate testDate,
       String labCode,
       Map<String, String> visitCredentials,
       Map<String, String> labCredentials) {
 
-    TestVisit visit = testVisitRepository.findById(visitId)
-        .orElseThrow(() -> new IllegalArgumentException("Visit not found"));
+    UUID resolvedVisitId;
 
-    if (!visit.getUserHash().equals(userHash)) {
-      throw new IllegalArgumentException("Visit does not belong to user");
+    if (visitId != null) {
+      // Existing visit — validate ownership
+      TestVisit visit = testVisitRepository.findById(visitId)
+          .orElseThrow(() -> new IllegalArgumentException("Visit not found"));
+      if (!visit.getUserHash().equals(userHash)) {
+        throw new IllegalArgumentException("Visit does not belong to user");
+      }
+      resolvedVisitId = visitId;
+    } else {
+      // No visit — create a shell visit
+      TestVisit shell = TestVisit.builder()
+          .userHash(userHash)
+          .testDate(testDate != null ? testDate : java.time.LocalDate.now())
+          .verified(false)
+          .build();
+      shell = testVisitRepository.save(shell);
+      resolvedVisitId = shell.getId();
+      log.info("Created shell visit {} for lab verification", resolvedVisitId);
     }
 
     LabProvider provider = labProviderRegistry.getProvider(labCode)
@@ -98,11 +118,13 @@ public class LabVerificationService {
 
     ValidationResult validation = provider.validateInput(visitCredentials);
     if (!validation.valid()) {
-      return LabVerificationResult.failure("VALIDATION_ERROR",
-          "Invalid input: " + validation.fieldErrors());
+      return new LabVerifyServiceResponse(resolvedVisitId,
+          LabVerificationResult.failure("VALIDATION_ERROR",
+              "Invalid input: " + validation.fieldErrors()));
     }
 
-    return provider.verify(visitCredentials, labCredentials);
+    LabVerificationResult result = provider.verify(visitCredentials, labCredentials);
+    return new LabVerifyServiceResponse(resolvedVisitId, result);
   }
 
   /**

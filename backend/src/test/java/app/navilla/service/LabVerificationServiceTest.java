@@ -103,7 +103,7 @@ class LabVerificationServiceTest {
   class Verify {
 
     @Test
-    @DisplayName("should return results on successful verification")
+    @DisplayName("should return results on successful verification with existing visit")
     void verify_success() {
       TestVisit visit = buildVisit(VISIT_ID, USER_HASH);
       when(testVisitRepository.findById(VISIT_ID)).thenReturn(Optional.of(visit));
@@ -119,12 +119,50 @@ class LabVerificationServiceTest {
           new byte[]{1, 2, 3}, "application/json", labResults);
       when(mockProvider.verify(any(), any())).thenReturn(expected);
 
-      LabVerificationResult result = labVerificationService.verify(
-          USER_HASH, VISIT_ID, "CHOPO", Map.of("orderNumber", "123"), Map.of());
+      LabVerifyServiceResponse response = labVerificationService.verify(
+          USER_HASH, VISIT_ID, null, "CHOPO", Map.of("orderNumber", "123"), Map.of());
 
-      assertThat(result.success()).isTrue();
-      assertThat(result.results()).hasSize(1);
-      assertThat(result.results().getFirst().conditionCode()).isEqualTo("HIV");
+      assertThat(response.visitId()).isEqualTo(VISIT_ID);
+      assertThat(response.result().success()).isTrue();
+      assertThat(response.result().results()).hasSize(1);
+      assertThat(response.result().results().getFirst().conditionCode()).isEqualTo("HIV");
+    }
+
+    @Test
+    @DisplayName("should create shell visit when visitId is null")
+    void verify_createsShellVisit() {
+      UUID shellId = UUID.randomUUID();
+      when(testVisitRepository.save(any(TestVisit.class))).thenAnswer(invocation -> {
+        TestVisit saved = invocation.getArgument(0);
+        saved.setId(shellId);
+        return saved;
+      });
+
+      LabProvider mockProvider = org.mockito.Mockito.mock(LabProvider.class);
+      when(labProviderRegistry.getProvider("CHOPO")).thenReturn(Optional.of(mockProvider));
+      when(mockProvider.validateInput(any())).thenReturn(ValidationResult.ok());
+
+      List<LabTestResult> labResults = List.of(
+          new LabTestResult("Test User", LocalDate.of(2026, 3, 1),
+              "HIV", "NEGATIVE", "non-reactive", "< 1.0", "REF-001"));
+      LabVerificationResult expected = LabVerificationResult.success(
+          new byte[]{1, 2, 3}, "application/json", labResults);
+      when(mockProvider.verify(any(), any())).thenReturn(expected);
+
+      LocalDate testDate = LocalDate.of(2026, 3, 5);
+      LabVerifyServiceResponse response = labVerificationService.verify(
+          USER_HASH, null, testDate, "CHOPO", Map.of("orderNumber", "123"), Map.of());
+
+      assertThat(response.visitId()).isEqualTo(shellId);
+      assertThat(response.result().success()).isTrue();
+
+      // Verify shell visit was saved with correct fields
+      ArgumentCaptor<TestVisit> captor = ArgumentCaptor.forClass(TestVisit.class);
+      verify(testVisitRepository).save(captor.capture());
+      TestVisit shell = captor.getValue();
+      assertThat(shell.getUserHash()).isEqualTo(USER_HASH);
+      assertThat(shell.getTestDate()).isEqualTo(testDate);
+      assertThat(shell.getVerified()).isFalse();
     }
 
     @Test
@@ -135,7 +173,7 @@ class LabVerificationServiceTest {
       when(labProviderRegistry.getProvider("UNKNOWN")).thenReturn(Optional.empty());
 
       assertThatThrownBy(() -> labVerificationService.verify(
-          USER_HASH, VISIT_ID, "UNKNOWN", Map.of(), Map.of()))
+          USER_HASH, VISIT_ID, null, "UNKNOWN", Map.of(), Map.of()))
           .isInstanceOf(IllegalArgumentException.class)
           .hasMessageContaining("Unknown lab provider");
     }
@@ -146,7 +184,7 @@ class LabVerificationServiceTest {
       when(testVisitRepository.findById(VISIT_ID)).thenReturn(Optional.empty());
 
       assertThatThrownBy(() -> labVerificationService.verify(
-          USER_HASH, VISIT_ID, "CHOPO", Map.of(), Map.of()))
+          USER_HASH, VISIT_ID, null, "CHOPO", Map.of(), Map.of()))
           .isInstanceOf(IllegalArgumentException.class)
           .hasMessageContaining("Visit not found");
     }
@@ -158,7 +196,7 @@ class LabVerificationServiceTest {
       when(testVisitRepository.findById(VISIT_ID)).thenReturn(Optional.of(visit));
 
       assertThatThrownBy(() -> labVerificationService.verify(
-          USER_HASH, VISIT_ID, "CHOPO", Map.of(), Map.of()))
+          USER_HASH, VISIT_ID, null, "CHOPO", Map.of(), Map.of()))
           .isInstanceOf(IllegalArgumentException.class)
           .hasMessageContaining("does not belong to user");
     }
@@ -174,11 +212,11 @@ class LabVerificationServiceTest {
       when(mockProvider.validateInput(any())).thenReturn(
           ValidationResult.invalid(Map.of("orderNumber", "required")));
 
-      LabVerificationResult result = labVerificationService.verify(
-          USER_HASH, VISIT_ID, "CHOPO", Map.of(), Map.of());
+      LabVerifyServiceResponse response = labVerificationService.verify(
+          USER_HASH, VISIT_ID, null, "CHOPO", Map.of(), Map.of());
 
-      assertThat(result.success()).isFalse();
-      assertThat(result.errorCode()).isEqualTo("VALIDATION_ERROR");
+      assertThat(response.result().success()).isFalse();
+      assertThat(response.result().errorCode()).isEqualTo("VALIDATION_ERROR");
     }
   }
 

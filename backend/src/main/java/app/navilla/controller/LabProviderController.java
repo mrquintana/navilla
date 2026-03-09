@@ -16,8 +16,11 @@
 
 package app.navilla.controller;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import app.navilla.dto.ConfirmLabRequest;
@@ -27,6 +30,7 @@ import app.navilla.lab.LabProviderProperties;
 import app.navilla.lab.LabVerificationResult;
 import app.navilla.security.EncryptionService;
 import app.navilla.service.LabVerificationService;
+import app.navilla.service.LabVerifyServiceResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -93,21 +97,46 @@ public class LabProviderController {
       @AuthenticationPrincipal Jwt jwt,
       @Valid @RequestBody VerifyLabRequest request) {
 
+    // Validate: either visitId or testDate must be provided
+    if (request.visitId() == null && request.testDate() == null) {
+      return ResponseEntity.badRequest().body(Map.of(
+          "success", false,
+          "errorCode", "INVALID_REQUEST",
+          "errorMessage", "Either visitId or testDate must be provided"));
+    }
+
     String userHash = encryptionService.hashEmail(jwt.getClaimAsString("email"));
 
+    // Parse testDate if provided
+    LocalDate parsedDate = null;
+    if (request.testDate() != null) {
+      try {
+        parsedDate = LocalDate.parse(request.testDate());
+      } catch (DateTimeParseException e) {
+        return ResponseEntity.badRequest().body(Map.of(
+            "success", false,
+            "errorCode", "INVALID_REQUEST",
+            "errorMessage", "Invalid test date format"));
+      }
+    }
+
     try {
-      LabVerificationResult result = labVerificationService.verify(
-          userHash, request.visitId(), request.labCode(),
+      LabVerifyServiceResponse response = labVerificationService.verify(
+          userHash, request.visitId(), parsedDate, request.labCode(),
           request.visitCredentials(), request.labCredentials());
 
+      UUID resolvedVisitId = response.visitId();
+      LabVerificationResult result = response.result();
+
       if (result.success()) {
-        // Cache for the confirm step
-        String cacheKey = userHash + ":" + request.visitId();
+        // Cache for the confirm step using resolved visitId
+        String cacheKey = userHash + ":" + resolvedVisitId;
         pendingResults.put(cacheKey, result);
-        log.info("Lab verification successful, cached for confirmation: {}", request.visitId());
+        log.info("Lab verification successful, cached for confirmation: {}", resolvedVisitId);
 
         return ResponseEntity.ok(Map.of(
             "success", true,
+            "visitId", resolvedVisitId.toString(),
             "results", result.results()));
       } else {
         return ResponseEntity.badRequest().body(Map.of(
