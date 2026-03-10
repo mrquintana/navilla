@@ -288,7 +288,7 @@ function TestsTabContent() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium">
-                    {new Date(visit.testDate + 'T00:00:00').toLocaleDateString(i18n.language, {
+                    {new Date(visit.testDate + 'T00:00:00').toLocaleDateString(i18n.language.replace('_', '-'), {
                       year: 'numeric',
                       month: 'short',
                       day: 'numeric',
