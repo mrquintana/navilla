@@ -58,6 +58,36 @@
       "value": "",
       "type": "string",
       "description": "Push subscription ID for unsubscribe operations"
+    },
+    {
+      "key": "healthStatusId",
+      "value": "",
+      "type": "string",
+      "description": "Health status ID for clear/activate/delete operations"
+    },
+    {
+      "key": "notificationId",
+      "value": "",
+      "type": "string",
+      "description": "Notification ID for mark-read operations"
+    },
+    {
+      "key": "medicationId",
+      "value": "",
+      "type": "string",
+      "description": "Medication ID for update/delete/log/adherence operations"
+    },
+    {
+      "key": "vaccinationId",
+      "value": "",
+      "type": "string",
+      "description": "Vaccination dose ID for update/delete operations"
+    },
+    {
+      "key": "reminderId",
+      "value": "",
+      "type": "string",
+      "description": "Reminder ID for snooze/complete/toggle/delete operations"
     }
   ],
   "auth": {
@@ -600,6 +630,2102 @@
       ]
     },
     {
+      "name": "Health Status",
+      "description": "Health status management endpoints for reporting, clearing, reactivating, and deleting condition statuses",
+      "item": [
+        {
+          "name": "List Health Statuses",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/health-status",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "health-status"]
+            },
+            "description": "Get all health status records for the authenticated user"
+          }
+        },
+        {
+          "name": "Report Health Status",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"condition\": \"chlamydia\",\n  \"status\": \"positive\",\n  \"testDate\": \"2026-01-28\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/health-status",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "health-status"]
+            },
+            "description": "Report or update a health status"
+          }
+        },
+        {
+          "name": "Clear Health Status",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clearedDate\": \"2026-02-15\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/health-status/{{healthStatusId}}/clear",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "health-status", "{{healthStatusId}}", "clear"]
+            },
+            "description": "Mark a health status as cleared (e.g., condition treated and resolved). Optionally provide a cleared date."
+          }
+        },
+        {
+          "name": "Activate Health Status",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/health-status/{{healthStatusId}}/activate",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "health-status", "{{healthStatusId}}", "activate"]
+            },
+            "description": "Reactivate a previously cleared health status record."
+          }
+        },
+        {
+          "name": "Delete Health Status",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/health-status/{{healthStatusId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "health-status", "{{healthStatusId}}"]
+            },
+            "description": "Permanently delete a health status record."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Exposures",
+      "description": "Exposure snapshot endpoint",
+      "item": [
+        {
+          "name": "Get Exposure Snapshot",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/exposures",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "exposures"]
+            },
+            "description": "Get exposure snapshot for the authenticated user"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "description": "In-app notifications endpoints",
+      "item": [
+        {
+          "name": "List Notifications",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/notifications",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "notifications"]
+            },
+            "description": "Get all notifications for the authenticated user"
+          }
+        },
+        {
+          "name": "Mark Notification Read",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/notifications/{{notificationId}}/read",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "notifications", "{{notificationId}}", "read"]
+            },
+            "description": "Mark a single notification as read by its ID. Returns 204 No Content."
+          }
+        },
+        {
+          "name": "Mark All Notifications Read",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/notifications/read-all",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "notifications", "read-all"]
+            },
+            "description": "Mark all notifications as read for the authenticated user. Returns 204 No Content."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Encounter Journal",
+      "description": "Encounter journal endpoints for managing private journal entries with encrypted data",
+      "item": [
+        {
+          "name": "List Journal Entries",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is an array', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('Each entry has required fields', function() {",
+                  "    const json = pm.response.json();",
+                  "    json.forEach(function(entry) {",
+                  "        pm.expect(entry).to.have.property('id');",
+                  "        pm.expect(entry).to.have.property('encounterDate');",
+                  "        pm.expect(entry).to.have.property('createdAt');",
+                  "    });",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/journal",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "journal"]
+            },
+            "description": "Get all journal entries for the authenticated user. Returns entries sorted by encounter date descending."
+          }
+        },
+        {
+          "name": "List Journal Entries by Month",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is an array', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('All entries are within requested month', function() {",
+                  "    const json = pm.response.json();",
+                  "    json.forEach(function(entry) {",
+                  "        pm.expect(entry.encounterDate).to.match(/^2026-03/);",
+                  "    });",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/journal?month=2026-03",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "journal"],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "2026-03",
+                  "description": "Filter entries by month (YYYY-MM format)"
+                }
+              ]
+            },
+            "description": "Get journal entries filtered by a specific month. Use YYYY-MM format for the month parameter."
+          }
+        },
+        {
+          "name": "Create Journal Entry",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has entry ID', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('id');",
+                  "    pm.expect(json.id).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);",
+                  "});",
+                  "",
+                  "pm.test('Response has encounter date and alias', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('encounterDate');",
+                  "    pm.expect(json.encounterDate).to.equal('2026-03-15');",
+                  "    pm.expect(json).to.have.property('partnerAlias');",
+                  "    pm.expect(json.partnerAlias).to.equal('Alex');",
+                  "});",
+                  "",
+                  "// Store entry ID for subsequent requests",
+                  "if (pm.response.code === 200) {",
+                  "    const json = pm.response.json();",
+                  "    pm.collectionVariables.set('journalEntryId', json.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"encounterDate\": \"2026-03-15\",\n  \"partnerAlias\": \"Alex\",\n  \"notes\": \"A nice evening in Roma Norte\",\n  \"encounterTypes\": [\"oral\", \"anal\"],\n  \"protectionMethods\": [\"condom\"],\n  \"customFields\": [\n    {\"label\": \"Location\", \"value\": \"Roma Norte\"},\n    {\"label\": \"Mood\", \"value\": \"Great\"}\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/journal",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "journal"]
+            },
+            "description": "Create a new journal entry. All sensitive fields (partnerAlias, notes, customFields) are encrypted server-side with AES-256-GCM. Maximum 3 custom fields per entry."
+          }
+        },
+        {
+          "name": "Update Journal Entry",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has updated fields', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('id');",
+                  "    pm.expect(json).to.have.property('encounterDate');",
+                  "    pm.expect(json.partnerAlias).to.equal('Alex');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"encounterDate\": \"2026-03-15\",\n  \"partnerAlias\": \"Alex\",\n  \"notes\": \"Updated notes\",\n  \"encounterTypes\": [\"oral\"],\n  \"protectionMethods\": [\"condom\", \"prep\"],\n  \"customFields\": [\n    {\"label\": \"Location\", \"value\": \"Roma Norte\"},\n    {\"label\": \"Mood\", \"value\": \"Great\"}\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/journal/{{journalEntryId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "journal", "{{journalEntryId}}"]
+            },
+            "description": "Update an existing journal entry. Only the entry owner can update. All sensitive fields re-encrypted on save."
+          }
+        },
+        {
+          "name": "Delete Journal Entry",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 204', function() {",
+                  "    pm.response.to.have.status(204);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/journal/{{journalEntryId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "journal", "{{journalEntryId}}"]
+            },
+            "description": "Delete a journal entry. Only the entry owner can delete. This is a hard delete."
+          }
+        },
+        {
+          "name": "Get Custom Field Templates",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has labels array', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('labels');",
+                  "    pm.expect(json.labels).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/journal/templates",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "journal", "templates"]
+            },
+            "description": "Get the user's saved custom field label templates."
+          }
+        },
+        {
+          "name": "Save Custom Field Templates",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has saved labels', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('labels');",
+                  "    pm.expect(json.labels).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"labels\": [\"Location\", \"Mood\", \"Protection\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/journal/templates",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "journal", "templates"]
+            },
+            "description": "Save or update the user's custom field label templates. Maximum 3 labels, each max 100 chars."
+          }
+        },
+        {
+          "name": "Get Journal Summary",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has summary fields', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('year');",
+                  "    pm.expect(json).to.have.property('monthlyCounts');",
+                  "    pm.expect(json).to.have.property('yearTotal');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/journal/summary?year=2026",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "journal", "summary"],
+              "query": [
+                {
+                  "key": "year",
+                  "value": "2026",
+                  "description": "Year to get summary for (YYYY format)"
+                }
+              ]
+            },
+            "description": "Get a summary of journal entries for a given year, including monthly counts and year total."
+          }
+        },
+        {
+          "name": "Get Recent Aliases",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is an array of strings', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/journal/recent-aliases",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "journal", "recent-aliases"]
+            },
+            "description": "Get up to 8 recent distinct aliases from entries not linked to a partner. Used for autocomplete."
+          }
+        },
+        {
+          "name": "Journal Partners",
+          "description": "Manage saved partners (regulars) in the encounter journal",
+          "item": [
+            {
+              "name": "List Partners",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 200', function() {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "pm.test('Response is an array', function() {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json).to.be.an('array');",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/journal/partners",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "journal", "partners"]
+                },
+                "description": "List all saved partners for the authenticated user with encounter statistics."
+              }
+            },
+            {
+              "name": "Create Partner",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 200', function() {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "pm.test('Response has partner fields', function() {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json).to.have.property('id');",
+                      "    pm.expect(json).to.have.property('alias');",
+                      "});",
+                      "",
+                      "if (pm.response.code === 200) {",
+                      "    const json = pm.response.json();",
+                      "    pm.collectionVariables.set('partnerId', json.id);",
+                      "}"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"alias\": \"Alex\",\n  \"notes\": \"Met through mutual friends\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/journal/partners",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "journal", "partners"]
+                },
+                "description": "Create a new saved partner. Alias max 200 chars, notes max 5000 chars."
+              }
+            },
+            {
+              "name": "Promote Alias to Partner",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 200', function() {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "pm.test('Response has new partner', function() {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json).to.have.property('id');",
+                      "    pm.expect(json).to.have.property('alias');",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"alias\": \"Alex\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/journal/partners/promote",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "journal", "partners", "promote"]
+                },
+                "description": "Promote a freeform alias into a partner record, backfilling all matching journal entries."
+              }
+            },
+            {
+              "name": "Get Partner Detail",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 200', function() {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "pm.test('Response has detail fields', function() {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json).to.have.property('id');",
+                      "    pm.expect(json).to.have.property('alias');",
+                      "    pm.expect(json).to.have.property('encounterCount');",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/journal/partners/{{partnerId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "journal", "partners", "{{partnerId}}"]
+                },
+                "description": "Get detailed information about a specific partner, including notes and encounter stats."
+              }
+            },
+            {
+              "name": "Update Partner",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 200', function() {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "pm.test('Response has updated fields', function() {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json).to.have.property('id');",
+                      "    pm.expect(json).to.have.property('alias');",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"alias\": \"Alexander\",\n  \"notes\": \"Updated notes\",\n  \"unlinkConnection\": false\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/journal/partners/{{partnerId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "journal", "partners", "{{partnerId}}"]
+                },
+                "description": "Update a saved partner's alias, notes, or connection link."
+              }
+            },
+            {
+              "name": "Delete Partner (Unlink Entries)",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/journal/partners/{{partnerId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "journal", "partners", "{{partnerId}}"]
+                },
+                "description": "Delete a partner. Linked journal entries are preserved with partnerId set to null."
+              }
+            },
+            {
+              "name": "Delete Partner (Delete Entries)",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/journal/partners/{{partnerId}}?deleteEntries=true",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "journal", "partners", "{{partnerId}}"],
+                  "query": [
+                    {
+                      "key": "deleteEntries",
+                      "value": "true",
+                      "description": "Also delete all journal entries linked to this partner"
+                    }
+                  ]
+                },
+                "description": "Destructive delete: removes the partner AND all associated journal entries."
+              }
+            },
+            {
+              "name": "List Partner Entries",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 200', function() {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "pm.test('Response is an array', function() {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json).to.be.an('array');",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/journal/partners/{{partnerId}}/entries",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "journal", "partners", "{{partnerId}}", "entries"]
+                },
+                "description": "Get all journal entries linked to a specific partner."
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Health Log",
+      "description": "Test visit management, health summary, condition history, and lab connections",
+      "item": [
+        {
+          "name": "Visits",
+          "description": "CRUD operations for test visits and their results",
+          "item": [
+            {
+              "name": "List Visits",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/health-log/visits",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "health-log", "visits"]
+                },
+                "description": "List all test visits for the authenticated user, newest first. Each visit includes its test results."
+              }
+            },
+            {
+              "name": "Create Visit",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"testDate\": \"2026-03-01\",\n  \"labId\": null,\n  \"labReference\": \"REF-2026-001\",\n  \"notes\": \"Routine screening\",\n  \"results\": [\n    {\n      \"conditionType\": \"hiv\",\n      \"status\": \"NEGATIVE\",\n      \"resultValue\": \"Non-reactive\",\n      \"referenceRange\": \"Non-reactive\"\n    },\n    {\n      \"conditionType\": \"chlamydia\",\n      \"status\": \"NEGATIVE\",\n      \"resultValue\": null,\n      \"referenceRange\": null\n    }\n  ]\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/health-log/visits",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "health-log", "visits"]
+                },
+                "description": "Create a new test visit with one or more results. Results are encrypted at rest."
+              }
+            },
+            {
+              "name": "Get Visit",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/health-log/visits/{{visitId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "health-log", "visits", "{{visitId}}"]
+                },
+                "description": "Get a specific test visit with all its results."
+              }
+            },
+            {
+              "name": "Update Visit",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"testDate\": \"2026-03-02\",\n  \"labReference\": \"REF-2026-002\",\n  \"notes\": \"Updated notes\",\n  \"results\": [\n    {\n      \"conditionType\": \"hiv\",\n      \"status\": \"NEGATIVE\",\n      \"resultValue\": \"Non-reactive\"\n    }\n  ]\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/health-log/visits/{{visitId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "health-log", "visits", "{{visitId}}"]
+                },
+                "description": "Update an existing test visit and its results."
+              }
+            },
+            {
+              "name": "Delete Visit",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/health-log/visits/{{visitId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "health-log", "visits", "{{visitId}}"]
+                },
+                "description": "Delete a test visit and all its results."
+              }
+            }
+          ]
+        },
+        {
+          "name": "Summary & History",
+          "description": "Dashboard summary and per-condition history",
+          "item": [
+            {
+              "name": "Get Summary",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/health-log/summary",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "health-log", "summary"]
+                },
+                "description": "Get health log dashboard stats: days since last test, tests this year, coverage count, latest status per condition."
+              }
+            },
+            {
+              "name": "Get Condition History",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/health-log/condition/hiv",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "health-log", "condition", "hiv"]
+                },
+                "description": "Get full testing history for a specific condition type. Replace 'hiv' with any condition type (chlamydia, gonorrhea, syphilis, etc.)."
+              }
+            }
+          ]
+        },
+        {
+          "name": "Labs",
+          "description": "Saved lab connections with encrypted credentials",
+          "item": [
+            {
+              "name": "List Labs",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/health-log/labs",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "health-log", "labs"]
+                },
+                "description": "List saved lab connections with their credentials for the authenticated user."
+              }
+            },
+            {
+              "name": "Create Lab",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"provider\": \"chopo\",\n  \"name\": \"Chopo Downtown\",\n  \"credentials\": [\n    {\"key\": \"patientId\", \"value\": \"CH-12345\"}\n  ]\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/health-log/labs",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "health-log", "labs"]
+                },
+                "description": "Create a new lab connection with optional encrypted credentials."
+              }
+            },
+            {
+              "name": "Update Lab",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Chopo Roma Norte\",\n  \"credentials\": [\n    {\"key\": \"patientId\", \"value\": \"CH-12345-new\"}\n  ]\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/health-log/labs/{{labId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "health-log", "labs", "{{labId}}"]
+                },
+                "description": "Update an existing lab connection's name and credentials."
+              }
+            },
+            {
+              "name": "Delete Lab",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/health-log/labs/{{labId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "health-log", "labs", "{{labId}}"]
+                },
+                "description": "Delete a lab connection and all its credentials."
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Medications",
+      "description": "Medication management, dose logging, adherence tracking, and PrEP streak",
+      "item": [
+        {
+          "name": "List Medications",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is an array', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/medications",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "medications"]
+            },
+            "description": "List all medications for the authenticated user, both active and inactive."
+          }
+        },
+        {
+          "name": "Create Medication",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has medication fields', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('id');",
+                  "    pm.expect(json).to.have.property('name');",
+                  "    pm.expect(json).to.have.property('medicationType');",
+                  "});",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "    const json = pm.response.json();",
+                  "    pm.collectionVariables.set('medicationId', json.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"medicationType\": \"PREP_DAILY\",\n  \"name\": \"Truvada\",\n  \"dosage\": \"200mg/300mg\",\n  \"startDate\": \"2026-01-01\",\n  \"endDate\": null,\n  \"frequency\": \"DAILY\",\n  \"reminderTime\": \"09:00\",\n  \"notes\": \"Take with food\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/medications",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "medications"]
+            },
+            "description": "Create a new medication. Name and dosage are encrypted at rest. Medication types come from the catalog."
+          }
+        },
+        {
+          "name": "Get Medication",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/medications/{{medicationId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "medications", "{{medicationId}}"]
+            },
+            "description": "Get a single medication by ID with all fields."
+          }
+        },
+        {
+          "name": "Update Medication",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"medicationType\": \"PREP_DAILY\",\n  \"name\": \"Descovy\",\n  \"dosage\": \"200mg/25mg\",\n  \"startDate\": \"2026-02-01\",\n  \"endDate\": null,\n  \"frequency\": \"DAILY\",\n  \"reminderTime\": \"08:00\",\n  \"notes\": \"Switched from Truvada\",\n  \"active\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/medications/{{medicationId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "medications", "{{medicationId}}"]
+            },
+            "description": "Update an existing medication. All fields are optional (partial update)."
+          }
+        },
+        {
+          "name": "Deactivate Medication",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/medications/{{medicationId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "medications", "{{medicationId}}"]
+            },
+            "description": "Deactivate a medication (soft delete). The medication and its dose logs are preserved but marked inactive."
+          }
+        },
+        {
+          "name": "Log Dose",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has dose log fields', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('id');",
+                  "    pm.expect(json).to.have.property('scheduledFor');",
+                  "    pm.expect(json).to.have.property('taken');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"scheduledFor\": \"2026-03-09\",\n  \"taken\": true,\n  \"notes\": \"Took at 9:15am\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/medications/{{medicationId}}/log",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "medications", "{{medicationId}}", "log"]
+            },
+            "description": "Log a dose for a medication. scheduledFor is the date the dose was scheduled, taken indicates whether it was actually taken."
+          }
+        },
+        {
+          "name": "Get Adherence",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has adherence fields', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('month');",
+                  "    pm.expect(json).to.have.property('totalDays');",
+                  "    pm.expect(json).to.have.property('takenCount');",
+                  "    pm.expect(json).to.have.property('missedCount');",
+                  "    pm.expect(json).to.have.property('adherenceRate');",
+                  "    pm.expect(json).to.have.property('logs');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/medications/{{medicationId}}/adherence?month=2026-03",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "medications", "{{medicationId}}", "adherence"],
+              "query": [
+                {
+                  "key": "month",
+                  "value": "2026-03",
+                  "description": "Month in YYYY-MM format"
+                }
+              ]
+            },
+            "description": "Get adherence statistics for a medication over a given month, including daily logs and adherence rate."
+          }
+        },
+        {
+          "name": "Get PrEP Streak",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has streak fields', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('currentStreakDays');",
+                  "    pm.expect(json).to.have.property('longestStreakDays');",
+                  "    pm.expect(json).to.have.property('milestones');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/medications/prep-streak",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "medications", "prep-streak"]
+            },
+            "description": "Get PrEP adherence streak data with current streak, longest streak, and milestone achievements."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Vaccinations",
+      "description": "Vaccination dose recording and vaccine series tracking",
+      "item": [
+        {
+          "name": "List Vaccine Series",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is an array', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('Each series has required fields', function() {",
+                  "    const json = pm.response.json();",
+                  "    json.forEach(function(series) {",
+                  "        pm.expect(series).to.have.property('vaccineType');",
+                  "        pm.expect(series).to.have.property('totalDoses');",
+                  "        pm.expect(series).to.have.property('completedDoses');",
+                  "        pm.expect(series).to.have.property('complete');",
+                  "        pm.expect(series).to.have.property('doses');",
+                  "    });",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/vaccinations",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "vaccinations"]
+            },
+            "description": "List all vaccination series for the authenticated user, grouped by vaccine type with completion status and doses."
+          }
+        },
+        {
+          "name": "Record Vaccination Dose",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has vaccination fields', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('id');",
+                  "    pm.expect(json).to.have.property('vaccineType');",
+                  "    pm.expect(json).to.have.property('doseNumber');",
+                  "});",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "    const json = pm.response.json();",
+                  "    pm.collectionVariables.set('vaccinationId', json.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vaccineType\": \"HPV\",\n  \"doseNumber\": 1,\n  \"administeredDate\": \"2026-03-01\",\n  \"location\": \"Clinic Roma Norte\",\n  \"notes\": \"No side effects\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/vaccinations",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "vaccinations"]
+            },
+            "description": "Record a new vaccination dose. Vaccine types: HPV, MPOX, HEP_A, HEP_B. Location and notes are encrypted."
+          }
+        },
+        {
+          "name": "Update Vaccination Dose",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vaccineType\": \"HPV\",\n  \"doseNumber\": 1,\n  \"administeredDate\": \"2026-03-02\",\n  \"location\": \"Updated clinic name\",\n  \"notes\": \"Updated notes\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/vaccinations/{{vaccinationId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "vaccinations", "{{vaccinationId}}"]
+            },
+            "description": "Update an existing vaccination dose record. All fields are optional (partial update)."
+          }
+        },
+        {
+          "name": "Delete Vaccination Dose",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/vaccinations/{{vaccinationId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "vaccinations", "{{vaccinationId}}"]
+            },
+            "description": "Delete a vaccination dose record."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reminders",
+      "description": "Health reminder management: testing, medication, and vaccination reminders with snooze, complete, and settings",
+      "item": [
+        {
+          "name": "List Reminders",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is an array', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('Each reminder has required fields', function() {",
+                  "    const json = pm.response.json();",
+                  "    json.forEach(function(r) {",
+                  "        pm.expect(r).to.have.property('id');",
+                  "        pm.expect(r).to.have.property('reminderType');",
+                  "        pm.expect(r).to.have.property('title');",
+                  "        pm.expect(r).to.have.property('scheduledFor');",
+                  "        pm.expect(r).to.have.property('active');",
+                  "    });",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/reminders",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reminders"]
+            },
+            "description": "List all active, incomplete reminders for the authenticated user. Types: TESTING, MEDICATION, VACCINATION."
+          }
+        },
+        {
+          "name": "Get Upcoming Reminders",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is an array', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/reminders/upcoming?days=7",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reminders", "upcoming"],
+              "query": [
+                {
+                  "key": "days",
+                  "value": "7",
+                  "description": "Number of days ahead to look (default: 7)"
+                }
+              ]
+            },
+            "description": "Get reminders due within a specified number of days."
+          }
+        },
+        {
+          "name": "Snooze Reminder",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Reminder has snoozedUntil set', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('snoozedUntil');",
+                  "    pm.expect(json.snoozedUntil).to.not.be.null;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"until\": \"2026-03-10T09:00:00Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/reminders/{{reminderId}}/snooze",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reminders", "{{reminderId}}", "snooze"]
+            },
+            "description": "Snooze a reminder until a specified ISO-8601 datetime."
+          }
+        },
+        {
+          "name": "Complete Reminder",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Reminder has completedAt set', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('completedAt');",
+                  "    pm.expect(json.completedAt).to.not.be.null;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/reminders/{{reminderId}}/complete",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reminders", "{{reminderId}}", "complete"]
+            },
+            "description": "Mark a reminder as completed. Sets completedAt to the current timestamp."
+          }
+        },
+        {
+          "name": "Toggle Reminder",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Reminder active state changed', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('active');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/reminders/{{reminderId}}/toggle",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reminders", "{{reminderId}}", "toggle"]
+            },
+            "description": "Toggle the active/inactive state of a reminder."
+          }
+        },
+        {
+          "name": "Delete Reminder",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/reminders/{{reminderId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reminders", "{{reminderId}}"]
+            },
+            "description": "Permanently delete a reminder."
+          }
+        },
+        {
+          "name": "Get Reminder Settings",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has settings fields', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('quietHoursStart');",
+                  "    pm.expect(json).to.have.property('quietHoursEnd');",
+                  "    pm.expect(json).to.have.property('emailDigestEnabled');",
+                  "    pm.expect(json).to.have.property('testingRemindersEnabled');",
+                  "    pm.expect(json).to.have.property('medicationRemindersEnabled');",
+                  "    pm.expect(json).to.have.property('vaccinationRemindersEnabled');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/reminders/settings",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reminders", "settings"]
+            },
+            "description": "Get the reminder settings for the authenticated user: quiet hours, email digest, and per-type toggles."
+          }
+        },
+        {
+          "name": "Update Reminder Settings",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Settings were updated', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('quietHoursStart');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quietHoursStart\": \"23:00\",\n  \"quietHoursEnd\": \"07:00\",\n  \"emailDigestEnabled\": false,\n  \"emailDigestDay\": \"FRIDAY\",\n  \"testingRemindersEnabled\": true,\n  \"medicationRemindersEnabled\": true,\n  \"vaccinationRemindersEnabled\": false\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/reminders/settings",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reminders", "settings"]
+            },
+            "description": "Update reminder settings. All fields are optional (partial update)."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Insights",
+      "description": "Aggregated personal insights dashboard combining activity, testing, and prevention data",
+      "item": [
+        {
+          "name": "Get Insights",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has all three sections', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('activity');",
+                  "    pm.expect(json).to.have.property('testing');",
+                  "    pm.expect(json).to.have.property('prevention');",
+                  "});",
+                  "",
+                  "pm.test('Activity section has required fields', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.activity).to.have.property('totalEncounters');",
+                  "    pm.expect(json.activity).to.have.property('protectionRate');",
+                  "});",
+                  "",
+                  "pm.test('Testing section has required fields', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.testing).to.have.property('daysSinceLastTest');",
+                  "    pm.expect(json.testing).to.have.property('coverageMap');",
+                  "});",
+                  "",
+                  "pm.test('Prevention section has required fields', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.prevention).to.have.property('completedVaccines');",
+                  "    pm.expect(json.prevention).to.have.property('activeReminders');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/insights",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "insights"]
+            },
+            "description": "Get aggregated personal insights across activity (encounters), testing (health log), and prevention (medications, vaccinations, reminders). Cached for 5 minutes per user."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Catalog",
+      "description": "Public health catalog endpoints - no authentication required. Provides medication types, frequencies, vaccine series, conditions, and network stages.",
+      "item": [
+        {
+          "name": "Get Health Catalog",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has catalog sections', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('medicationTypes');",
+                  "    pm.expect(json).to.have.property('frequencies');",
+                  "    pm.expect(json).to.have.property('vaccineSeries');",
+                  "    pm.expect(json).to.have.property('encounterTypes');",
+                  "    pm.expect(json).to.have.property('protectionMethods');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/catalog",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "catalog"]
+            },
+            "description": "Get the full health catalog: medication types, dosing frequencies, vaccine series, encounter types, and protection methods. Public endpoint, cached for 1 hour."
+          }
+        },
+        {
+          "name": "List Conditions",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is an array', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('Each condition has required fields', function() {",
+                  "    const json = pm.response.json();",
+                  "    json.forEach(function(c) {",
+                  "        pm.expect(c).to.have.property('code');",
+                  "        pm.expect(c).to.have.property('displayName');",
+                  "    });",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/catalog/conditions",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "catalog", "conditions"]
+            },
+            "description": "List all active conditions from the condition catalog. Includes English and Spanish display names, descriptions, icons, and display order."
+          }
+        },
+        {
+          "name": "List Network Stages",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is an array', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('Each stage has required fields', function() {",
+                  "    const json = pm.response.json();",
+                  "    json.forEach(function(s) {",
+                  "        pm.expect(s).to.have.property('code');",
+                  "        pm.expect(s).to.have.property('displayName');",
+                  "        pm.expect(s).to.have.property('minNodes');",
+                  "        pm.expect(s).to.have.property('maxNodes');",
+                  "    });",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/catalog/stages",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "catalog", "stages"]
+            },
+            "description": "List all network constellation stages with English and Spanish names, node thresholds, and descriptions."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reciprocity",
+      "description": "Exposure network opt-in/opt-out lifecycle. Soft opt-in with 15-day cooldown.",
+      "item": [
+        {
+          "name": "Get Reciprocity Status",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/reciprocity/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reciprocity", "status"]
+            },
+            "description": "Get the current reciprocity status for the authenticated user. Returns opted-in state, cooldown info, and timestamps."
+          }
+        },
+        {
+          "name": "Opt In",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/reciprocity/opt-in",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reciprocity", "opt-in"]
+            },
+            "description": "Opt into the exposure network. Contribute test data to see exposure data. Subject to 15-day cooldown after opt-out."
+          }
+        },
+        {
+          "name": "Opt Out",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/reciprocity/opt-out",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reciprocity", "opt-out"]
+            },
+            "description": "Opt out of the exposure network. You lose access to exposure data. 15-day cooldown before you can re-opt-in."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Lab Verification",
+      "description": "Lab provider listing and two-step verification flow (verify then confirm)",
+      "item": [
+        {
+          "name": "List Lab Providers",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is an array', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/labs/providers",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "labs", "providers"]
+            },
+            "description": "List all enabled lab providers with their required credential fields. Public endpoint (no auth required)."
+          }
+        },
+        {
+          "name": "Verify Lab Results",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has success field', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('success');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"visitId\": \"{{visitId}}\",\n  \"labCode\": \"chopo\",\n  \"visitCredentials\": {\n    \"orderNumber\": \"ORD-12345\"\n  },\n  \"labCredentials\": {\n    \"patientId\": \"CH-12345\"\n  },\n  \"testDate\": null\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/labs/verify",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "labs", "verify"]
+            },
+            "description": "Step 1: Initiate lab verification for a test visit. Calls the lab provider API and caches results for the confirm step. Either visitId or testDate must be provided."
+          }
+        },
+        {
+          "name": "Confirm Lab Results",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has success field', function() {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('success');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"visitId\": \"{{visitId}}\",\n  \"notes\": \"Results confirmed and saved\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/labs/confirm",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "labs", "confirm"]
+            },
+            "description": "Step 2: Confirm and save lab verification results. Must be called after a successful verify step. Retrieves cached results and persists them to the visit."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Push Notifications",
+      "description": "Web Push subscription management for PWA notifications",
+      "item": [
+        {
+          "name": "Get VAPID Public Key",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/push/vapid-public-key",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "push", "vapid-public-key"]
+            },
+            "description": "Get the server's VAPID public key for push subscription. Public endpoint (no auth required)."
+          }
+        },
+        {
+          "name": "Subscribe to Push",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"endpoint\": \"https://fcm.googleapis.com/fcm/send/example\",\n  \"p256dh\": \"BNcRdreALRFXTkOOUHK1EtK2wtaz5Ry4YfYCA_0QTpQtUbVlUls0VJXg7A8u-Ts1XbjhazAkj7I99e8p8REfWRs\",\n  \"auth\": \"tBHItJI5svbpC7htfNMaRw\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/push/subscribe",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "push", "subscribe"]
+            },
+            "description": "Register a Web Push subscription. The endpoint, p256dh, and auth values come from the browser's PushManager.subscribe() result."
+          }
+        },
+        {
+          "name": "List Push Subscriptions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/push/subscriptions",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "push", "subscriptions"]
+            },
+            "description": "List all push subscriptions for the authenticated user."
+          }
+        },
+        {
+          "name": "Unsubscribe from Push",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/push/subscriptions/{{pushSubscriptionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "push", "subscriptions", "{{pushSubscriptionId}}"]
+            },
+            "description": "Delete a push subscription by ID."
+          }
+        }
+      ]
+    },
+    {
       "name": "Error Cases",
       "description": "Test error handling for various scenarios",
       "item": [
@@ -696,1051 +2822,6 @@
               "path": ["api", "connections"]
             },
             "description": "Test that missing identifier returns 400"
-          }
-        }
-      ]
-    },
-    {
-      "name": "Health Status",
-      "description": "Health status management endpoints",
-      "item": [
-        {
-          "name": "List Health Statuses",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/api/health-status",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "health-status"]
-            },
-            "description": "Get all health status records for the authenticated user"
-          }
-        },
-        {
-          "name": "Report Health Status",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"condition\": \"chlamydia\",\n  \"status\": \"positive\",\n  \"testDate\": \"2026-01-28\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/health-status",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "health-status"]
-            },
-            "description": "Report or update a health status"
-          }
-        }
-      ]
-    },
-    {
-      "name": "Exposures",
-      "description": "Exposure snapshot endpoint",
-      "item": [
-        {
-          "name": "Get Exposure Snapshot",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/api/exposures",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "exposures"]
-            },
-            "description": "Get exposure snapshot for the authenticated user"
-          }
-        }
-      ]
-    },
-    {
-      "name": "Notifications",
-      "description": "In-app notifications endpoints",
-      "item": [
-        {
-          "name": "List Notifications",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/api/notifications",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "notifications"]
-            },
-            "description": "Get notifications for the authenticated user"
-          }
-        }
-      ]
-    },
-    {
-      "name": "Journal",
-      "description": "Encounter journal endpoints for managing private journal entries with encrypted data",
-      "item": [
-        {
-          "name": "List Journal Entries",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status code is 200', function() {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test('Response is an array', function() {",
-                  "    const json = pm.response.json();",
-                  "    pm.expect(json).to.be.an('array');",
-                  "});",
-                  "",
-                  "pm.test('Each entry has required fields', function() {",
-                  "    const json = pm.response.json();",
-                  "    json.forEach(function(entry) {",
-                  "        pm.expect(entry).to.have.property('id');",
-                  "        pm.expect(entry).to.have.property('encounterDate');",
-                  "        pm.expect(entry).to.have.property('createdAt');",
-                  "    });",
-                  "});"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/api/journal",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "journal"]
-            },
-            "description": "Get all journal entries for the authenticated user. Returns entries sorted by encounter date descending."
-          }
-        },
-        {
-          "name": "List Journal Entries by Month",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status code is 200', function() {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test('Response is an array', function() {",
-                  "    const json = pm.response.json();",
-                  "    pm.expect(json).to.be.an('array');",
-                  "});",
-                  "",
-                  "pm.test('All entries are within requested month', function() {",
-                  "    const json = pm.response.json();",
-                  "    json.forEach(function(entry) {",
-                  "        pm.expect(entry.encounterDate).to.match(/^2026-03/);",
-                  "    });",
-                  "});"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/api/journal?month=2026-03",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "journal"],
-              "query": [
-                {
-                  "key": "month",
-                  "value": "2026-03",
-                  "description": "Filter entries by month (YYYY-MM format)"
-                }
-              ]
-            },
-            "description": "Get journal entries filtered by a specific month. Use YYYY-MM format for the month parameter."
-          }
-        },
-        {
-          "name": "Create Journal Entry",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status code is 201', function() {",
-                  "    pm.response.to.have.status(201);",
-                  "});",
-                  "",
-                  "pm.test('Response has entry ID', function() {",
-                  "    const json = pm.response.json();",
-                  "    pm.expect(json).to.have.property('id');",
-                  "    pm.expect(json.id).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);",
-                  "});",
-                  "",
-                  "pm.test('Response has encounter date and alias', function() {",
-                  "    const json = pm.response.json();",
-                  "    pm.expect(json).to.have.property('encounterDate');",
-                  "    pm.expect(json.encounterDate).to.equal('2026-03-15');",
-                  "    pm.expect(json).to.have.property('partnerAlias');",
-                  "    pm.expect(json.partnerAlias).to.equal('Alex');",
-                  "});",
-                  "",
-                  "pm.test('Response has custom fields', function() {",
-                  "    const json = pm.response.json();",
-                  "    pm.expect(json).to.have.property('customFields');",
-                  "    pm.expect(json.customFields).to.be.an('array');",
-                  "    pm.expect(json.customFields).to.have.lengthOf(2);",
-                  "});",
-                  "",
-                  "// Store entry ID for subsequent requests",
-                  "if (pm.response.code === 201) {",
-                  "    const json = pm.response.json();",
-                  "    pm.collectionVariables.set('journalEntryId', json.id);",
-                  "}"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"encounterDate\": \"2026-03-15\",\n  \"partnerAlias\": \"Alex\",\n  \"notes\": \"A nice evening in Roma Norte\",\n  \"customFields\": [\n    {\"label\": \"Location\", \"value\": \"Roma Norte\"},\n    {\"label\": \"Mood\", \"value\": \"Great\"}\n  ]\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/journal",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "journal"]
-            },
-            "description": "Create a new journal entry. All sensitive fields (partnerAlias, notes, customFields) are encrypted server-side with AES-256-GCM. Maximum 3 custom fields per entry."
-          }
-        },
-        {
-          "name": "Update Journal Entry",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status code is 200', function() {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test('Response has updated fields', function() {",
-                  "    const json = pm.response.json();",
-                  "    pm.expect(json).to.have.property('id');",
-                  "    pm.expect(json).to.have.property('encounterDate');",
-                  "    pm.expect(json.partnerAlias).to.equal('Alex');",
-                  "});",
-                  "",
-                  "pm.test('Custom fields were updated', function() {",
-                  "    const json = pm.response.json();",
-                  "    pm.expect(json.customFields).to.be.an('array');",
-                  "});"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"encounterDate\": \"2026-03-15\",\n  \"partnerAlias\": \"Alex\",\n  \"notes\": \"A nice evening in Roma Norte\",\n  \"customFields\": [\n    {\"label\": \"Location\", \"value\": \"Roma Norte\"},\n    {\"label\": \"Mood\", \"value\": \"Great\"}\n  ]\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/journal/{{journalEntryId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "journal", "{{journalEntryId}}"]
-            },
-            "description": "Update an existing journal entry. Only the entry owner can update. All sensitive fields re-encrypted on save."
-          }
-        },
-        {
-          "name": "Delete Journal Entry",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status code is 204', function() {",
-                  "    pm.response.to.have.status(204);",
-                  "});"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "method": "DELETE",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/api/journal/{{journalEntryId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "journal", "{{journalEntryId}}"]
-            },
-            "description": "Delete a journal entry. Only the entry owner can delete. This is a hard delete — the entry and its encrypted data are permanently removed."
-          }
-        },
-        {
-          "name": "Get Custom Field Templates",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status code is 200', function() {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test('Response has labels array', function() {",
-                  "    const json = pm.response.json();",
-                  "    pm.expect(json).to.have.property('labels');",
-                  "    pm.expect(json.labels).to.be.an('array');",
-                  "});"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/api/journal/templates",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "journal", "templates"]
-            },
-            "description": "Get the user's saved custom field label templates. These are reusable labels that appear as suggestions when creating new journal entries."
-          }
-        },
-        {
-          "name": "Save Custom Field Templates",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status code is 200', function() {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test('Response has saved labels', function() {",
-                  "    const json = pm.response.json();",
-                  "    pm.expect(json).to.have.property('labels');",
-                  "    pm.expect(json.labels).to.be.an('array');",
-                  "    pm.expect(json.labels).to.include('Location');",
-                  "    pm.expect(json.labels).to.include('Mood');",
-                  "    pm.expect(json.labels).to.include('Protection');",
-                  "});"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"labels\": [\"Location\", \"Mood\", \"Protection\"]\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/journal/templates",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "journal", "templates"]
-            },
-            "description": "Save or update the user's custom field label templates. These labels are suggested when creating new entries. Maximum 10 labels."
-          }
-        },
-        {
-          "name": "Get Journal Summary",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status code is 200', function() {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test('Response has summary fields', function() {",
-                  "    const json = pm.response.json();",
-                  "    pm.expect(json).to.have.property('totalEntries');",
-                  "    pm.expect(json).to.have.property('monthlyBreakdown');",
-                  "    pm.expect(json.totalEntries).to.be.a('number');",
-                  "    pm.expect(json.totalEntries).to.be.at.least(0);",
-                  "});",
-                  "",
-                  "pm.test('Monthly breakdown is an array', function() {",
-                  "    const json = pm.response.json();",
-                  "    pm.expect(json.monthlyBreakdown).to.be.an('array');",
-                  "});"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/api/journal/summary?year=2026",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "journal", "summary"],
-              "query": [
-                {
-                  "key": "year",
-                  "value": "2026",
-                  "description": "Year to get summary for (YYYY format)"
-                }
-              ]
-            },
-            "description": "Get a summary of journal entries for a given year, including total count and monthly breakdown."
-          }
-        },
-        {
-          "name": "Journal Partners",
-          "description": "Manage saved partners (regulars) in the encounter journal. Partners aggregate encounters under a named alias with notes and statistics.",
-          "item": [
-            {
-              "name": "List Partners",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "exec": [
-                      "pm.test('Status code is 200', function() {",
-                      "    pm.response.to.have.status(200);",
-                      "});",
-                      "",
-                      "pm.test('Response is an array', function() {",
-                      "    const json = pm.response.json();",
-                      "    pm.expect(json).to.be.an('array');",
-                      "});",
-                      "",
-                      "pm.test('Each partner has required fields', function() {",
-                      "    const json = pm.response.json();",
-                      "    json.forEach(function(p) {",
-                      "        pm.expect(p).to.have.property('id');",
-                      "        pm.expect(p).to.have.property('alias');",
-                      "        pm.expect(p).to.have.property('encounterCount');",
-                      "    });",
-                      "});"
-                    ],
-                    "type": "text/javascript"
-                  }
-                }
-              ],
-              "request": {
-                "method": "GET",
-                "header": [],
-                "url": {
-                  "raw": "{{baseUrl}}/api/journal/partners",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["api", "journal", "partners"]
-                },
-                "description": "List all saved partners for the authenticated user. Returns partners sorted by most recent encounter date descending."
-              }
-            },
-            {
-              "name": "Create Partner",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "exec": [
-                      "pm.test('Status code is 201', function() {",
-                      "    pm.response.to.have.status(201);",
-                      "});",
-                      "",
-                      "pm.test('Response has partner fields', function() {",
-                      "    const json = pm.response.json();",
-                      "    pm.expect(json).to.have.property('id');",
-                      "    pm.expect(json).to.have.property('alias');",
-                      "    pm.expect(json.alias).to.equal('Alex');",
-                      "});",
-                      "",
-                      "// Store partner ID for subsequent requests",
-                      "if (pm.response.code === 201) {",
-                      "    const json = pm.response.json();",
-                      "    pm.collectionVariables.set('partnerId', json.id);",
-                      "}"
-                    ],
-                    "type": "text/javascript"
-                  }
-                }
-              ],
-              "request": {
-                "method": "POST",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"alias\": \"Alex\",\n  \"notes\": \"Optional notes about this partner\"\n}"
-                },
-                "url": {
-                  "raw": "{{baseUrl}}/api/journal/partners",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["api", "journal", "partners"]
-                },
-                "description": "Create a new saved partner. The alias must be unique per user."
-              }
-            },
-            {
-              "name": "Get Partner",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "exec": [
-                      "pm.test('Status code is 200', function() {",
-                      "    pm.response.to.have.status(200);",
-                      "});",
-                      "",
-                      "pm.test('Response has detail fields', function() {",
-                      "    const json = pm.response.json();",
-                      "    pm.expect(json).to.have.property('id');",
-                      "    pm.expect(json).to.have.property('alias');",
-                      "    pm.expect(json).to.have.property('notes');",
-                      "    pm.expect(json).to.have.property('encounterCount');",
-                      "    pm.expect(json).to.have.property('firstEncounterDate');",
-                      "    pm.expect(json).to.have.property('mostRecentEncounterDate');",
-                      "    pm.expect(json).to.have.property('createdAt');",
-                      "    pm.expect(json).to.have.property('updatedAt');",
-                      "});"
-                    ],
-                    "type": "text/javascript"
-                  }
-                }
-              ],
-              "request": {
-                "method": "GET",
-                "header": [],
-                "url": {
-                  "raw": "{{baseUrl}}/api/journal/partners/{{partnerId}}",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["api", "journal", "partners", "{{partnerId}}"]
-                },
-                "description": "Get detailed information about a saved partner, including notes, encounter count, and date range."
-              }
-            },
-            {
-              "name": "Update Partner",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "exec": [
-                      "pm.test('Status code is 200', function() {",
-                      "    pm.response.to.have.status(200);",
-                      "});",
-                      "",
-                      "pm.test('Response has updated fields', function() {",
-                      "    const json = pm.response.json();",
-                      "    pm.expect(json).to.have.property('id');",
-                      "    pm.expect(json).to.have.property('alias');",
-                      "    pm.expect(json.alias).to.equal('Updated Name');",
-                      "});"
-                    ],
-                    "type": "text/javascript"
-                  }
-                }
-              ],
-              "request": {
-                "method": "PUT",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"alias\": \"Updated Name\",\n  \"notes\": \"Updated notes\",\n  \"unlinkConnection\": false\n}"
-                },
-                "url": {
-                  "raw": "{{baseUrl}}/api/journal/partners/{{partnerId}}",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["api", "journal", "partners", "{{partnerId}}"]
-                },
-                "description": "Update a saved partner's alias, notes, or connection link. Set unlinkConnection to true to remove the connected user link."
-              }
-            },
-            {
-              "name": "Delete Partner (Soft)",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "exec": [
-                      "pm.test('Status code is 204', function() {",
-                      "    pm.response.to.have.status(204);",
-                      "});"
-                    ],
-                    "type": "text/javascript"
-                  }
-                }
-              ],
-              "request": {
-                "method": "DELETE",
-                "header": [],
-                "url": {
-                  "raw": "{{baseUrl}}/api/journal/partners/{{partnerId}}",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["api", "journal", "partners", "{{partnerId}}"]
-                },
-                "description": "Soft delete a partner. The partner is removed but their journal entries are preserved (partner_id set to null)."
-              }
-            },
-            {
-              "name": "Delete Partner (Destructive)",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "exec": [
-                      "pm.test('Status code is 204', function() {",
-                      "    pm.response.to.have.status(204);",
-                      "});"
-                    ],
-                    "type": "text/javascript"
-                  }
-                }
-              ],
-              "request": {
-                "method": "DELETE",
-                "header": [],
-                "url": {
-                  "raw": "{{baseUrl}}/api/journal/partners/{{partnerId}}?deleteEntries=true",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["api", "journal", "partners", "{{partnerId}}"],
-                  "query": [
-                    {
-                      "key": "deleteEntries",
-                      "value": "true",
-                      "description": "When true, also deletes all journal entries associated with this partner"
-                    }
-                  ]
-                },
-                "description": "Destructive delete — removes the partner AND all their associated journal entries. Requires explicit deleteEntries=true parameter."
-              }
-            },
-            {
-              "name": "Promote Alias to Partner",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "exec": [
-                      "pm.test('Status code is 201', function() {",
-                      "    pm.response.to.have.status(201);",
-                      "});",
-                      "",
-                      "pm.test('Response has new partner', function() {",
-                      "    const json = pm.response.json();",
-                      "    pm.expect(json).to.have.property('id');",
-                      "    pm.expect(json).to.have.property('alias');",
-                      "    pm.expect(json.alias).to.equal('Alex');",
-                      "});"
-                    ],
-                    "type": "text/javascript"
-                  }
-                }
-              ],
-              "request": {
-                "method": "POST",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"alias\": \"Alex\"\n}"
-                },
-                "url": {
-                  "raw": "{{baseUrl}}/api/journal/partners/promote",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["api", "journal", "partners", "promote"]
-                },
-                "description": "Promote a recurring alias to a saved partner. Creates the partner and links all existing journal entries with that alias. Typically triggered after the 3rd encounter with the same alias."
-              }
-            },
-            {
-              "name": "Recent Aliases",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "exec": [
-                      "pm.test('Status code is 200', function() {",
-                      "    pm.response.to.have.status(200);",
-                      "});",
-                      "",
-                      "pm.test('Response is an array of strings', function() {",
-                      "    const json = pm.response.json();",
-                      "    pm.expect(json).to.be.an('array');",
-                      "    json.forEach(function(alias) {",
-                      "        pm.expect(alias).to.be.a('string');",
-                      "    });",
-                      "});"
-                    ],
-                    "type": "text/javascript"
-                  }
-                }
-              ],
-              "request": {
-                "method": "GET",
-                "header": [],
-                "url": {
-                  "raw": "{{baseUrl}}/api/journal/recent-aliases",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["api", "journal", "recent-aliases"]
-                },
-                "description": "Get recent partner aliases from journal entries that are not yet linked to a saved partner. Used for the autocomplete partner picker in the entry modal."
-              }
-            },
-            {
-              "name": "Partner Entries",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "exec": [
-                      "pm.test('Status code is 200', function() {",
-                      "    pm.response.to.have.status(200);",
-                      "});",
-                      "",
-                      "pm.test('Response is an array', function() {",
-                      "    const json = pm.response.json();",
-                      "    pm.expect(json).to.be.an('array');",
-                      "});",
-                      "",
-                      "pm.test('All entries belong to the partner', function() {",
-                      "    const json = pm.response.json();",
-                      "    const partnerId = pm.collectionVariables.get('partnerId');",
-                      "    json.forEach(function(entry) {",
-                      "        pm.expect(entry).to.have.property('partnerId');",
-                      "        pm.expect(entry.partnerId).to.equal(partnerId);",
-                      "    });",
-                      "});"
-                    ],
-                    "type": "text/javascript"
-                  }
-                }
-              ],
-              "request": {
-                "method": "GET",
-                "header": [],
-                "url": {
-                  "raw": "{{baseUrl}}/api/journal/partners/{{partnerId}}/entries",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["api", "journal", "partners", "{{partnerId}}", "entries"]
-                },
-                "description": "Get all journal entries associated with a specific partner. Returns entries sorted by encounter date descending."
-              }
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "name": "Health Log",
-      "item": [
-        {
-          "name": "Visits",
-          "item": [
-            {
-              "name": "List Visits",
-              "request": {
-                "method": "GET",
-                "header": [],
-                "url": {
-                  "raw": "{{baseUrl}}/api/health-log/visits",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["api", "health-log", "visits"]
-                },
-                "description": "List all test visits for the authenticated user, newest first. Each visit includes its test results."
-              }
-            },
-            {
-              "name": "Create Visit",
-              "request": {
-                "method": "POST",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"testDate\": \"2026-02-27\",\n  \"labId\": null,\n  \"labReference\": \"Order #12345\",\n  \"notes\": \"Routine quarterly testing\",\n  \"results\": [\n    {\n      \"conditionType\": \"HIV\",\n      \"status\": \"NEGATIVE\",\n      \"resultValue\": null,\n      \"referenceRange\": null\n    },\n    {\n      \"conditionType\": \"SYPHILIS\",\n      \"status\": \"POSITIVE\",\n      \"resultValue\": \"1:4\",\n      \"referenceRange\": \"<1:1\"\n    }\n  ]\n}"
-                },
-                "url": {
-                  "raw": "{{baseUrl}}/api/health-log/visits",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["api", "health-log", "visits"]
-                },
-                "description": "Log a new test visit with results. Automatically syncs positive/negative results to health_status for exposure calculation."
-              }
-            },
-            {
-              "name": "Get Visit",
-              "request": {
-                "method": "GET",
-                "header": [],
-                "url": {
-                  "raw": "{{baseUrl}}/api/health-log/visits/{{visitId}}",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["api", "health-log", "visits", "{{visitId}}"]
-                },
-                "description": "Get a specific test visit with all its results."
-              }
-            },
-            {
-              "name": "Update Visit",
-              "request": {
-                "method": "PUT",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"testDate\": \"2026-02-27\",\n  \"labId\": null,\n  \"labReference\": \"Updated order #12345\",\n  \"notes\": \"Updated notes\",\n  \"results\": [\n    {\n      \"conditionType\": \"HIV\",\n      \"status\": \"NEGATIVE\"\n    }\n  ]\n}"
-                },
-                "url": {
-                  "raw": "{{baseUrl}}/api/health-log/visits/{{visitId}}",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["api", "health-log", "visits", "{{visitId}}"]
-                },
-                "description": "Update an existing test visit and its results. Re-syncs health_status."
-              }
-            },
-            {
-              "name": "Delete Visit",
-              "request": {
-                "method": "DELETE",
-                "header": [],
-                "url": {
-                  "raw": "{{baseUrl}}/api/health-log/visits/{{visitId}}",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["api", "health-log", "visits", "{{visitId}}"]
-                },
-                "description": "Delete a test visit and all its results. Re-derives health_status from remaining results."
-              }
-            }
-          ]
-        },
-        {
-          "name": "Summary & History",
-          "item": [
-            {
-              "name": "Get Summary",
-              "request": {
-                "method": "GET",
-                "header": [],
-                "url": {
-                  "raw": "{{baseUrl}}/api/health-log/summary",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["api", "health-log", "summary"]
-                },
-                "description": "Get health log dashboard stats: days since last test, tests this year, coverage count, latest status per condition."
-              }
-            },
-            {
-              "name": "Get Condition History",
-              "request": {
-                "method": "GET",
-                "header": [],
-                "url": {
-                  "raw": "{{baseUrl}}/api/health-log/condition/HIV",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["api", "health-log", "condition", "HIV"]
-                },
-                "description": "Get per-condition testing history across all visits. Replace 'HIV' with any condition type (CHLAMYDIA, GONORRHEA, SYPHILIS, etc.)."
-              }
-            }
-          ]
-        },
-        {
-          "name": "Labs",
-          "item": [
-            {
-              "name": "List Labs",
-              "request": {
-                "method": "GET",
-                "header": [],
-                "url": {
-                  "raw": "{{baseUrl}}/api/health-log/labs",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["api", "health-log", "labs"]
-                },
-                "description": "List saved labs with their credentials for the authenticated user."
-              }
-            },
-            {
-              "name": "Create Lab",
-              "request": {
-                "method": "POST",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"provider\": \"CHOPO\",\n  \"name\": \"Chopo Polanco\",\n  \"credentials\": [\n    {\n      \"key\": \"patient_id\",\n      \"value\": \"12345678\"\n    }\n  ]\n}"
-                },
-                "url": {
-                  "raw": "{{baseUrl}}/api/health-log/labs",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["api", "health-log", "labs"]
-                },
-                "description": "Create a new saved lab with optional credentials. Providers: CHOPO, SALUD_DIGNA, OTHER."
-              }
-            },
-            {
-              "name": "Update Lab",
-              "request": {
-                "method": "PUT",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"provider\": \"CHOPO\",\n  \"name\": \"Chopo Roma\",\n  \"credentials\": [\n    {\n      \"key\": \"patient_id\",\n      \"value\": \"87654321\"\n    }\n  ]\n}"
-                },
-                "url": {
-                  "raw": "{{baseUrl}}/api/health-log/labs/{{labId}}",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["api", "health-log", "labs", "{{labId}}"]
-                },
-                "description": "Update an existing lab's name, provider, and credentials."
-              }
-            },
-            {
-              "name": "Delete Lab",
-              "request": {
-                "method": "DELETE",
-                "header": [],
-                "url": {
-                  "raw": "{{baseUrl}}/api/health-log/labs/{{labId}}",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["api", "health-log", "labs", "{{labId}}"]
-                },
-                "description": "Delete a saved lab and all its credentials."
-              }
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "name": "Push Notifications",
-      "description": "Web Push subscription management for PWA notifications",
-      "item": [
-        {
-          "name": "Get VAPID Public Key",
-          "request": {
-            "auth": {
-              "type": "noauth"
-            },
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/api/push/vapid-public-key",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "push", "vapid-public-key"]
-            },
-            "description": "Get the server's VAPID public key for push subscription. Public endpoint (no auth required)."
-          }
-        },
-        {
-          "name": "Subscribe to Push",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"endpoint\": \"https://fcm.googleapis.com/fcm/send/example\",\n  \"p256dh\": \"BNcRdreALRFXTkOOUHK1EtK2wtaz5Ry4YfYCA_0QTpQtUbVlUls0VJXg7A8u-Ts1XbjhazAkj7I99e8p8REfWRs\",\n  \"auth\": \"tBHItJI5svbpC7htfNMaRw\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/push/subscribe",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "push", "subscribe"]
-            },
-            "description": "Register a Web Push subscription. The endpoint, p256dh, and auth values come from the browser's PushManager.subscribe() result."
-          }
-        },
-        {
-          "name": "List Push Subscriptions",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/api/push/subscriptions",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "push", "subscriptions"]
-            },
-            "description": "List all push subscriptions for the authenticated user."
-          }
-        },
-        {
-          "name": "Unsubscribe from Push",
-          "request": {
-            "method": "DELETE",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/api/push/subscriptions/{{pushSubscriptionId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "push", "subscriptions", "{{pushSubscriptionId}}"]
-            },
-            "description": "Delete a push subscription by ID."
           }
         }
       ]
