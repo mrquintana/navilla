@@ -8,7 +8,7 @@
 
 CREATE TABLE verification_cards (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_hash TEXT NOT NULL REFERENCES users(user_hash) ON DELETE CASCADE,
+  user_hash TEXT NOT NULL REFERENCES users(email_hash) ON DELETE CASCADE,
   display_name_encrypted BYTEA,
   included_conditions TEXT[] NOT NULL DEFAULT '{}',
   show_test_dates BOOLEAN NOT NULL DEFAULT false,
