@@ -108,7 +108,7 @@
 - [x] Week 10: Frontend phone field in journal entries + catalog-driven dropdowns
 - [x] Week 10: Network Constellation Visualization (pluggable engine + Canvas 2D + share card)
 - [x] Week 10: Profile page consolidation (Settings → Preferences, segmented visibility control)
-- [ ] Week 11: Verified test badges / Exposure recency buckets
+- [x] Week 11: Verified test badges / Exposure recency buckets
 - [ ] Week 12: Vault + app lock + notification privacy
 - [ ] Week 13: Data retention + connection staleness
 - [ ] Week 14: Network health stats + Layer 2 polish
@@ -144,6 +144,30 @@ A detailed breakdown of the project's directory layout and key files can be foun
 ### ADR-001: Documentation Platform
 
 ---
+
+## Session Notes (2026-03-10 — Week 11: Exposure Recency Buckets + Verification Cards)
+
+### What was done
+- **Exposure Recency Buckets**: Changed binary recent/older timeframes to 4 buckets (0-30d, 31-90d, 91-365d, 365d+) with visual opacity de-emphasis on Dashboard, HealthLog, and HealthStatus pages
+- **Migration 016**: `verification_cards` table with encrypted display names, share tokens, view tracking, expiry
+- **Verification Card Backend**: Entity, repository, service (CRUD + public endpoint), controller at `/api/verification-cards` and `/api/public/cards/{shareToken}`
+- **Verification Card Builder Page**: `/verification-card` with card list, create/edit modal, condition checkboxes, view limits, expiry, QR code display, copy/share actions
+- **Public Card View Page**: `/v/:shareToken` with indigo header, trust footer, expired state handling, verification badges
+- **QR Code**: Installed `qrcode` package for real scannable SVG QR codes
+- **Navigation**: Added "Verification" link with ShieldCheck icon to header
+- **Tests**: 8 recency bucket boundary tests, 17 VerificationCardService unit tests, 7 controller integration tests, 11 card builder tests, 6 public card view tests — 429 backend + 17 new frontend tests pass
+- **i18n**: Full en_US + es_MX locale coverage for all new features
+
+### Key files created
+- `database/migrations/016_verification_cards.sql`
+- `backend/.../entity/VerificationCard.java`, `repository/VerificationCardRepository.java`
+- `backend/.../service/VerificationCardService.java`, `controller/VerificationCardController.java`
+- `backend/.../dto/Create|Update|VerificationCardResponse.java`, `PublicVerificationCardResponse.java`
+- `frontend/src/pages/VerificationCardPage.tsx`, `PublicVerificationCardPage.tsx`
+- `frontend/src/hooks/useVerificationCards.ts`
+
+### Next Steps
+- Week 12: Check `UPCOMING_FEATURES_AND_ROADMAP.md` for next milestone
 
 ## Session Notes (2026-03-09 — Visit History List + Lab Review Improvements)
 
