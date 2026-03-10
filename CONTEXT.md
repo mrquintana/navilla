@@ -145,6 +145,35 @@ A detailed breakdown of the project's directory layout and key files can be foun
 
 ---
 
+## Session Notes (2026-03-09 — Visit History List + Lab Review Improvements)
+
+### Accomplished
+
+**Backend — Lab confirm notes (1 commit, 4 files):**
+- ✅ `ConfirmLabRequest` now accepts optional `@Size(max = 5000) String notes`
+- ✅ `LabVerificationService.confirm()` encrypts and saves notes on the visit (uses existing `notes_encrypted` column)
+- ✅ Controller passes notes through to service
+- ✅ 397 backend tests passing (1 new test for blank notes)
+
+**Frontend — Visit History + Review enhancements (3 commits, 5 files):**
+- ✅ **Visit History section** on Health Log page, positioned below stats bar
+  - Uses existing `useHealthLogVisits()` hook (was unused)
+  - Reverse chronological cards: date, lab name, result count badge, verified checkmark, edit button
+  - Shows last 5 with "Show all" expandable toggle
+  - Edit button opens TestVisitModal in edit mode
+- ✅ **Lab review step enhanced** — "What will change" impact summary (indigo-tinted box showing per-condition status updates) + notes textarea
+- ✅ `LabConfirmRequest` type updated with optional `notes`
+- ✅ 7 new i18n keys in both en_US and es_MX
+- ✅ Fixed `toLocaleDateString()` crash — `en_US` → `en-US` (BCP 47 format)
+
+### Next Steps
+- [ ] Run migration 015 on Supabase (carried over)
+- [ ] Test verification flow end-to-end with dev mode enabled
+- [ ] Begin Chopo/Salud Digna partnership analysis
+- [ ] Implement recency buckets once verified data flows through
+
+---
+
 ## Session Notes (2026-03-05 — Lab Integration Framework)
 
 ### Accomplished
