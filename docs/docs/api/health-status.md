@@ -125,6 +125,30 @@ POST /api/health-status/{id}/clear
 Cleared statuses are marked as "resolved" in partners' exposure alerts. Historical exposure alerts remain for reference.
 :::
 
+## Activate Status
+
+Reactivate a previously cleared health status record.
+
+```
+POST /api/health-status/{id}/activate
+```
+
+### Response (200 OK)
+
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440012",
+  "condition": "chlamydia",
+  "status": "positive",
+  "testDate": "2026-01-28",
+  "reportedAt": "2026-01-30T10:00:00Z"
+}
+```
+
+:::note
+The `clearedAt` field is removed when a status is reactivated. This will re-trigger exposure calculations for connected users.
+:::
+
 ## Delete Status
 
 Delete a health status record.

@@ -39,3 +39,17 @@ POST /api/notifications/{id}/read
 ```
 204 No Content
 ```
+
+## Mark All Notifications Read
+
+Mark all unread notifications as read for the authenticated user.
+
+```
+POST /api/notifications/read-all
+```
+
+### Response
+
+```
+204 No Content
+```

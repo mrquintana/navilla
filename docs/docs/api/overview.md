@@ -62,3 +62,9 @@ Responses return plain JSON objects or arrays. Error responses use the standard 
 | [Catalog](./catalog) | Conditions, network stages, health catalog |
 | [Reciprocity](./reciprocity) | Exposure network opt-in/out |
 | [Phone Matching](./phone-matching) | Phone-based connection matching |
+| [Encounter Journal](./journal) | Encounter entries, partners, templates |
+| [Health Log](./health-log) | Visits, labs, condition history |
+| [Medications](./medications) | Medication tracking, doses, adherence |
+| [Vaccinations](./vaccinations) | Vaccination series and doses |
+| [Reminders](./reminders) | Reminder management and settings |
+| [Insights](./insights) | Personal health insights |
