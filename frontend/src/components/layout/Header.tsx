@@ -2,7 +2,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuthOptional } from '../../contexts/AuthContext';
 import { useUser } from '../../hooks/useUser';
-import { BarChart3, Bell, BookOpen, ChevronDown, HeartPulse, LayoutDashboard, LogOut, Menu, ShieldCheck, Sparkles, UserCircle2, Users } from 'lucide-react';
+import { BarChart3, Bell, BookOpen, ChevronDown, HeartPulse, LayoutDashboard, LogOut, Menu, Sparkles, UserCircle2 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { api, type NotificationItem } from '../../lib/api';
@@ -157,10 +157,6 @@ export function Header() {
                       <BookOpen className="nav-icon" aria-hidden="true" />
                       {t('nav.journal')}
                     </Link>
-                    <Link to="/connections" className={`nav-dropdown-item${pathname === '/connections' ? ' nav-dropdown-item-active' : ''}`} role="menuitem">
-                      <Users className="nav-icon" aria-hidden="true" />
-                      {t('nav.connections')}
-                    </Link>
                     <Link to="/health-log" className={`nav-dropdown-item${pathname === '/health-log' || pathname.startsWith('/health-log/') ? ' nav-dropdown-item-active' : ''}`} role="menuitem">
                       <HeartPulse className="nav-icon" aria-hidden="true" />
                       {t('nav.health')}
@@ -172,10 +168,6 @@ export function Header() {
                     <Link to="/network" className={`nav-dropdown-item${pathname === '/network' ? ' nav-dropdown-item-active' : ''}`} role="menuitem">
                       <Sparkles className="nav-icon" aria-hidden="true" />
                       {t('nav.network')}
-                    </Link>
-                    <Link to="/verification-card" className={`nav-dropdown-item${pathname === '/verification-card' ? ' nav-dropdown-item-active' : ''}`} role="menuitem">
-                      <ShieldCheck className="nav-icon" aria-hidden="true" />
-                      {t('nav.verificationCard')}
                     </Link>
                     <Link to="/notifications" className={`nav-dropdown-item${pathname === '/notifications' ? ' nav-dropdown-item-active' : ''}`} role="menuitem">
                       <Bell className="nav-icon" aria-hidden="true" />
@@ -225,10 +217,6 @@ export function Header() {
                   <BookOpen className="nav-icon" aria-hidden="true" />
                   {t('nav.journal')}
                 </Link>
-                <Link to="/connections" className={`nav-link${pathname === '/connections' ? ' nav-link-active' : ''}`}>
-                  <Users className="nav-icon" aria-hidden="true" />
-                  {t('nav.connections')}
-                </Link>
                 <Link to="/health-log" className={`nav-link${pathname === '/health-log' || pathname.startsWith('/health-log/') ? ' nav-link-active' : ''}`}>
                   <HeartPulse className="nav-icon" aria-hidden="true" />
                   {t('nav.health')}
@@ -240,10 +228,6 @@ export function Header() {
                 <Link to="/network" className={`nav-link${pathname === '/network' ? ' nav-link-active' : ''}`}>
                   <Sparkles className="nav-icon" aria-hidden="true" />
                   {t('nav.network')}
-                </Link>
-                <Link to="/verification-card" className={`nav-link${pathname === '/verification-card' ? ' nav-link-active' : ''}`}>
-                  <ShieldCheck className="nav-icon" aria-hidden="true" />
-                  {t('nav.verificationCard')}
                 </Link>
                 <div className="nav-menu" ref={notificationsRef}>
                   <button

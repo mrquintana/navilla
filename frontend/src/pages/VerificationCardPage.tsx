@@ -71,7 +71,7 @@ export function VerificationCardPage() {
   const cards = cardsQuery.data ?? [];
 
   return (
-    <div className="page-container">
+    <div className="page-container" style={{ maxWidth: '640px', margin: '0 auto' }}>
       <div className="page-header mb-6">
         <div className="flex items-center gap-3">
           <ShieldCheck className="w-6 h-6 text-primary" aria-hidden="true" />
