@@ -251,7 +251,7 @@ class LabVerificationServiceTest {
           new LabTestResult("Test User", LocalDate.of(2026, 3, 1),
               "HIV", "NEGATIVE", "non-reactive", "< 1.0", "REF-001"));
 
-      labVerificationService.confirm(USER_HASH, VISIT_ID, labResults, new byte[]{10, 20});
+      labVerificationService.confirm(USER_HASH, VISIT_ID, labResults, new byte[]{10, 20}, "Some notes");
 
       // Verify visit was marked as verified
       ArgumentCaptor<TestVisit> visitCaptor = ArgumentCaptor.forClass(TestVisit.class);
@@ -260,6 +260,7 @@ class LabVerificationServiceTest {
       assertThat(savedVisit.getVerified()).isTrue();
       assertThat(savedVisit.getVerifiedAt()).isNotNull();
       assertThat(savedVisit.getRawLabResponseEncrypted()).isNotNull();
+      assertThat(savedVisit.getNotesEncrypted()).isNotNull();
 
       // Verify test result was saved
       ArgumentCaptor<TestResult> resultCaptor = ArgumentCaptor.forClass(TestResult.class);
@@ -282,7 +283,7 @@ class LabVerificationServiceTest {
       when(testVisitRepository.findById(VISIT_ID)).thenReturn(Optional.empty());
 
       assertThatThrownBy(() -> labVerificationService.confirm(
-          USER_HASH, VISIT_ID, List.of(), null))
+          USER_HASH, VISIT_ID, List.of(), null, null))
           .isInstanceOf(IllegalArgumentException.class)
           .hasMessageContaining("Visit not found");
     }
@@ -294,7 +295,7 @@ class LabVerificationServiceTest {
       when(testVisitRepository.findById(VISIT_ID)).thenReturn(Optional.of(visit));
 
       assertThatThrownBy(() -> labVerificationService.confirm(
-          USER_HASH, VISIT_ID, List.of(), null))
+          USER_HASH, VISIT_ID, List.of(), null, null))
           .isInstanceOf(IllegalArgumentException.class)
           .hasMessageContaining("does not belong to user");
     }
@@ -318,9 +319,25 @@ class LabVerificationServiceTest {
       List<LabTestResult> labResults = List.of(
           new LabTestResult("User", null, "unknown_condition", "NEGATIVE", null, null, null));
 
-      labVerificationService.confirm(USER_HASH, VISIT_ID, labResults, null);
+      labVerificationService.confirm(USER_HASH, VISIT_ID, labResults, null, null);
 
       verify(healthStatusRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("should not encrypt notes when null or blank")
+    void confirm_noNotesWhenBlank() {
+      TestVisit visit = buildVisit(VISIT_ID, USER_HASH);
+      when(testVisitRepository.findById(VISIT_ID)).thenReturn(Optional.of(visit));
+      when(testVisitRepository.save(any(TestVisit.class))).thenAnswer(i -> i.getArgument(0));
+      when(testResultRepository.findByVisitIdOrderByCreatedAt(VISIT_ID))
+          .thenReturn(Collections.emptyList());
+
+      labVerificationService.confirm(USER_HASH, VISIT_ID, List.of(), null, "   ");
+
+      ArgumentCaptor<TestVisit> captor = ArgumentCaptor.forClass(TestVisit.class);
+      verify(testVisitRepository).save(captor.capture());
+      assertThat(captor.getValue().getNotesEncrypted()).isNull();
     }
   }
 }

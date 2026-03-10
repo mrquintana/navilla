@@ -19,9 +19,12 @@ package app.navilla.dto;
 import java.util.UUID;
 
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 /**
  * Request DTO for confirming lab verification results.
  */
-public record ConfirmLabRequest(@NotNull UUID visitId) {
+public record ConfirmLabRequest(
+    @NotNull UUID visitId,
+    @Size(max = 5000) String notes) {
 }

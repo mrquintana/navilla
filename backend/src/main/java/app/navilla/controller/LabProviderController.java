@@ -179,7 +179,7 @@ public class LabProviderController {
 
     try {
       labVerificationService.confirm(
-          userHash, request.visitId(), cached.results(), cached.rawResponse());
+          userHash, request.visitId(), cached.results(), cached.rawResponse(), request.notes());
 
       log.info("Lab verification confirmed and saved: {}", request.visitId());
       return ResponseEntity.ok(Map.of("success", true));

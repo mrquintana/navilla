@@ -137,13 +137,15 @@ public class LabVerificationService {
    * @param visitId     the test visit ID to confirm
    * @param labResults  the lab test results to save
    * @param rawResponse the raw response bytes from the lab provider
+   * @param notes       optional user notes to encrypt and store on the visit
    */
   @Transactional
   public void confirm(
       String userHash,
       UUID visitId,
       List<LabTestResult> labResults,
-      byte[] rawResponse) {
+      byte[] rawResponse,
+      String notes) {
 
     TestVisit visit = testVisitRepository.findById(visitId)
         .orElseThrow(() -> new IllegalArgumentException("Visit not found"));
@@ -160,6 +162,11 @@ public class LabVerificationService {
     if (rawResponse != null) {
       String base64Response = Base64.getEncoder().encodeToString(rawResponse);
       visit.setRawLabResponseEncrypted(encryptionService.encryptToBytes(base64Response));
+    }
+
+    // Encrypt and store user notes
+    if (notes != null && !notes.isBlank()) {
+      visit.setNotesEncrypted(encryptionService.encryptToBytes(notes.trim()));
     }
 
     // Update test date from lab results if available
