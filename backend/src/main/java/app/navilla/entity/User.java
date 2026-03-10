@@ -41,7 +41,7 @@ import org.hibernate.annotations.UpdateTimestamp;
  * <p>This entity stores user information with privacy-preserving measures:
  * <ul>
  *   <li>Email is stored both hashed (for lookups) and encrypted (for recovery)</li>
- *   <li>Display name and date of birth are encrypted</li>
+ *   <li>First name, last name, and date of birth are encrypted</li>
  *   <li>Supabase ID links to authentication provider</li>
  *   <li>Privacy settings control profile visibility</li>
  * </ul>
@@ -93,16 +93,16 @@ public class User {
   private byte[] emailEncrypted;
 
   /**
-   * AES-256-GCM encrypted display name (optional).
+   * AES-256-GCM encrypted first name (optional).
    */
-  @Column(name = "display_name_encrypted")
-  private byte[] displayNameEncrypted;
+  @Column(name = "first_name_encrypted")
+  private byte[] firstNameEncrypted;
 
   /**
-   * AES-256-GCM encrypted full name (optional).
+   * AES-256-GCM encrypted last name (optional).
    */
-  @Column(name = "full_name_encrypted")
-  private byte[] fullNameEncrypted;
+  @Column(name = "last_name_encrypted")
+  private byte[] lastNameEncrypted;
 
   /**
    * AES-256-GCM encrypted date of birth for age verification (optional).
@@ -147,13 +147,6 @@ public class User {
   @Column(name = "profile_visibility", nullable = false, length = 20)
   @Builder.Default
   private ProfileVisibility profileVisibility = ProfileVisibility.PRIVATE;
-
-  /**
-   * Whether the display name is shown in search results (for public profiles).
-   */
-  @Column(name = "display_name_public", nullable = false)
-  @Builder.Default
-  private Boolean displayNamePublic = false;
 
   /**
    * Whether the user can be found by email search (requires PUBLIC visibility).

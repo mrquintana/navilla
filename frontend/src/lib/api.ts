@@ -141,8 +141,8 @@ function mockUserProfile(user: E2eUser): UserProfile {
   return {
     id: user.id,
     email: user.email,
-    displayName: user.displayName,
-    fullName: user.displayName,
+    firstName: user.firstName,
+    lastName: user.lastName,
     username: user.username,
     createdAt: new Date().toISOString(),
   };
@@ -577,6 +577,12 @@ export const api = {
       }
       return response.json();
     },
+    verify: async (shareToken: string): Promise<CardVerificationResponse> => {
+      const baseUrl = getApiBaseUrl();
+      const response = await fetch(`${baseUrl}/api/public/cards/${shareToken}/verify`);
+      if (!response.ok) throw new ApiError('Verification failed', response.status);
+      return response.json();
+    },
   },
   phoneMatch: {
     pending: (token: string) =>
@@ -594,8 +600,8 @@ export const api = {
 export interface UserProfile {
   id: string;
   email: string;
-  displayName?: string;
-  fullName?: string;
+  firstName?: string;
+  lastName?: string;
   username?: string;
   sex?: string;
   dateOfBirth?: string;
@@ -604,7 +610,6 @@ export interface UserProfile {
   country?: string;
   location?: string;
   profileVisibility?: string;
-  displayNamePublic?: boolean;
   searchableByEmail?: boolean;
   avatarUrl?: string;
   avatarThumbUrl?: string;
@@ -612,8 +617,8 @@ export interface UserProfile {
 }
 
 export interface UpdateProfileData {
-  displayName?: string;
-  fullName?: string;
+  firstName?: string;
+  lastName?: string;
   username?: string;
   sex?: string;
   dateOfBirth?: string;
@@ -621,7 +626,6 @@ export interface UpdateProfileData {
   country?: string;
   location?: string;
   profileVisibility?: string;
-  displayNamePublic?: boolean;
   searchableByEmail?: boolean;
   avatarKey?: string;
   avatarThumbKey?: string;
@@ -650,7 +654,8 @@ export interface ConnectionStats {
 
 export interface UserSearchResult {
   username: string;
-  displayName?: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
   avatarThumbUrl?: string | null;
 }
 
@@ -670,6 +675,7 @@ export interface HealthStatus {
   testDate?: string | null;
   reportedAt: string;
   clearedAt?: string | null;
+  verified?: boolean;
 }
 
 export interface HealthStatusRequest {
@@ -985,18 +991,14 @@ export interface InsightsResponse {
 
 // ── Verification Cards ──
 export interface CreateVerificationCardRequest {
-  displayName?: string;
   includedConditions: string[];
-  showTestDates?: boolean;
   showVerificationLevel?: boolean;
   maxViews?: number;
   expiresAt?: string;
 }
 
 export interface UpdateVerificationCardRequest {
-  displayName?: string;
   includedConditions?: string[];
-  showTestDates?: boolean;
   showVerificationLevel?: boolean;
   privacyMode?: string;
   maxViews?: number;
@@ -1006,8 +1008,8 @@ export interface UpdateVerificationCardRequest {
 export interface VerificationCardResponse {
   id: string;
   displayName: string | null;
+  username: string | null;
   includedConditions: string[];
-  showTestDates: boolean;
   showVerificationLevel: boolean;
   shareToken: string;
   shareUrl: string;
@@ -1028,9 +1030,16 @@ export interface PublicConditionStatus {
 
 export interface PublicVerificationCardResponse {
   displayName: string;
+  username: string;
   conditions: PublicConditionStatus[];
   expiresAt: string | null;
   viewsRemaining: number | null;
+}
+
+export interface CardVerificationResponse {
+  valid: boolean;
+  verifiedAt: string;
+  signature: string;
 }
 
 // ── Push Subscriptions ──

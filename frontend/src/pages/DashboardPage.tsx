@@ -82,8 +82,9 @@ export function DashboardPage() {
     || exposureInitialLoading
     || healthInitialLoading;
 
-  const displayName = profile?.displayName
-    || profile?.fullName
+  const displayName = (profile?.firstName && profile?.lastName
+    ? `${profile.firstName} ${profile.lastName}`
+    : profile?.firstName || profile?.lastName)
     || profile?.username
     || user?.user_metadata?.full_name
     || user?.user_metadata?.username

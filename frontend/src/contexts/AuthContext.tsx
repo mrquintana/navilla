@@ -11,7 +11,8 @@ import {
 
 export interface UserMetadata {
   username: string;
-  fullName?: string;
+  firstName?: string;
+  lastName?: string;
   dateOfBirth: string;
   sex: 'male' | 'female' | 'other';
   country?: string;
@@ -93,8 +94,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!error && data.session) {
       try {
         await api.users.update(data.session.access_token, {
-          displayName: metadata.fullName ?? metadata.username,
-          fullName: metadata.fullName,
+          firstName: metadata.firstName,
+          lastName: metadata.lastName,
           username: metadata.username,
           sex: metadata.sex,
           dateOfBirth: metadata.dateOfBirth,
@@ -150,7 +151,7 @@ function buildE2eSession(email: string, metadata?: UserMetadata): Session {
       email: email.toLowerCase(),
       app_metadata: {},
       user_metadata: {
-        full_name: metadata?.fullName ?? user?.displayName,
+        full_name: metadata ? [metadata.firstName, metadata.lastName].filter(Boolean).join(' ') : [user?.firstName, user?.lastName].filter(Boolean).join(' '),
         username: metadata?.username ?? user?.username,
       },
       created_at: new Date().toISOString(),

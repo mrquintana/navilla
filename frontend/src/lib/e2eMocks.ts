@@ -4,7 +4,8 @@ export const E2E_MODE = env.get('VITE_E2E_MODE') === 'true';
 export interface E2eUser {
   id: string;
   email: string;
-  displayName: string;
+  firstName: string;
+  lastName: string;
   username: string;
   confirmedCount: number;
 }
@@ -14,21 +15,24 @@ const E2E_USERS: E2eUser[] = [
   {
     id: 'e2e-user-1',
     email: 'testuser1@navilla.app',
-    displayName: 'Test User 1',
+    firstName: 'Test',
+    lastName: 'User 1',
     username: 'testuser1',
     confirmedCount: 1,
   },
   {
     id: 'e2e-user-2',
     email: 'testuser2@navilla.app',
-    displayName: 'Test User 2',
+    firstName: 'Test',
+    lastName: 'User 2',
     username: 'testuser2',
     confirmedCount: 3,
   },
   {
     id: 'e2e-user-7',
     email: 'testuser7@navilla.app',
-    displayName: 'Test User 7',
+    firstName: 'Test',
+    lastName: 'User 7',
     username: 'testuser7',
     confirmedCount: 0,
   },

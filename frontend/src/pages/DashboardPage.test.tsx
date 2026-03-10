@@ -92,7 +92,7 @@ describe('DashboardPage loading behavior', () => {
 
     useUserMock.mockReturnValue({
       data: {
-        displayName: 'Migue',
+        firstName: 'Migue',
         email: 'migue1990@example.com',
         profileVisibility: 'PRIVATE',
       },
@@ -143,7 +143,7 @@ describe('DashboardPage loading behavior', () => {
 
     useUserMock.mockReturnValue({
       data: {
-        displayName: 'Migue',
+        firstName: 'Migue',
         email: 'migue1990@example.com',
         profileVisibility: 'PRIVATE',
       },

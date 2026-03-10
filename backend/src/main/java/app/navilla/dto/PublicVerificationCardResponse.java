@@ -24,6 +24,7 @@ import java.util.List;
  */
 public record PublicVerificationCardResponse(
     String displayName,
+    String username,
     List<PublicConditionStatus> conditions,
     OffsetDateTime expiresAt,
     Integer viewsRemaining

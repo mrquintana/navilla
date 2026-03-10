@@ -29,5 +29,6 @@ public record HealthStatusResponse(
     String status,
     LocalDate testDate,
     OffsetDateTime reportedAt,
-    OffsetDateTime clearedAt
+    OffsetDateTime clearedAt,
+    boolean verified
 ) {}

@@ -87,7 +87,7 @@ export function Header() {
     },
   });
   const avatarThumb = profile?.avatarThumbUrl || profile?.avatarUrl;
-  const initials = getInitials(profile?.displayName || profile?.fullName || profile?.username || profile?.email || '');
+  const initials = getInitials(profile?.firstName ? `${profile.firstName} ${profile.lastName ?? ''}`.trim() : (profile?.username || profile?.email || ''));
   const avatarBg = getAvatarColor(profile?.username || profile?.email || '');
   const [nowMs] = useState(() => Date.now());
   const unreadCount = notifications?.filter((item) => !item.readAt).length ?? 0;

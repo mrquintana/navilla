@@ -18,7 +18,8 @@ export function SignUpPage() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [username, setUsername] = useState('');
-  const [fullName, setFullName] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [dateOfBirth, setDateOfBirth] = useState('');
   const [sex, setSex] = useState<Sex | ''>('');
   const [country, setCountry] = useState(() => detectCountry()?.countryCode ?? '');
@@ -35,7 +36,6 @@ export function SignUpPage() {
     const surnames = ['Lopez', 'Garcia', 'Hernandez', 'Perez', 'Martinez', 'Santos', 'Diaz'];
     const name = names[Math.floor(Math.random() * names.length)];
     const surname = surnames[Math.floor(Math.random() * surnames.length)];
-    const fullNameValue = `${name} ${surname}`;
     const usernameValue = `${name}${surname}`.toLowerCase();
     const randomEmail = `${name}.${surname}${Math.floor(Math.random() * 900 + 100)}@navilla.app`.toLowerCase();
     const sexes: Sex[] = ['male', 'female', 'other'];
@@ -45,7 +45,8 @@ export function SignUpPage() {
     setPassword('Test1234');
     setConfirmPassword('Test1234');
     setUsername(usernameValue.replace(/[^a-z0-9_]/g, ''));
-    setFullName(fullNameValue);
+    setFirstName(name);
+    setLastName(surname);
     setDateOfBirth(`19${80 + Math.floor(Math.random() * 20)}-${String(1 + Math.floor(Math.random() * 12)).padStart(2, '0')}-${String(1 + Math.floor(Math.random() * 28)).padStart(2, '0')}`);
     setSex(sexes[Math.floor(Math.random() * sexes.length)]);
     setCountry(randomCountry);
@@ -134,7 +135,8 @@ export function SignUpPage() {
 
     const metadata: UserMetadata = {
       username,
-      fullName: fullName || undefined,
+      firstName: firstName || undefined,
+      lastName: lastName || undefined,
       dateOfBirth: dateOfBirth,
       sex: sex as Sex,
       country: country || undefined,
@@ -282,19 +284,35 @@ export function SignUpPage() {
               <p className="text-xs text-muted mt-1">{t('auth.usernameHint')}</p>
             </div>
 
-            <div className="mb-4">
-              <label htmlFor="fullName" className="label">
-                {t('auth.fullName')}
-              </label>
-              <input
-                id="fullName"
-                type="text"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                className="input"
-                autoComplete="name"
-                maxLength={200}
-              />
+            <div className="flex gap-3 mb-4">
+              <div className="flex-1">
+                <label htmlFor="firstName" className="label">
+                  {t('auth.firstName')}
+                </label>
+                <input
+                  id="firstName"
+                  type="text"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  className="input"
+                  autoComplete="given-name"
+                  maxLength={200}
+                />
+              </div>
+              <div className="flex-1">
+                <label htmlFor="lastName" className="label">
+                  {t('auth.lastName')}
+                </label>
+                <input
+                  id="lastName"
+                  type="text"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  className="input"
+                  autoComplete="family-name"
+                  maxLength={200}
+                />
+              </div>
             </div>
 
             <div className="mb-4">

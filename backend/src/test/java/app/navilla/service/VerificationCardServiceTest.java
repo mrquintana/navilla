@@ -20,7 +20,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -30,14 +29,17 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import app.navilla.dto.CardVerificationResponse;
 import app.navilla.dto.CreateVerificationCardRequest;
 import app.navilla.dto.PublicVerificationCardResponse;
 import app.navilla.dto.UpdateVerificationCardRequest;
 import app.navilla.dto.VerificationCardResponse;
 import app.navilla.entity.HealthStatus;
 import app.navilla.entity.HealthStatusValue;
+import app.navilla.entity.User;
 import app.navilla.entity.VerificationCard;
 import app.navilla.repository.HealthStatusRepository;
+import app.navilla.repository.UserRepository;
 import app.navilla.repository.VerificationCardRepository;
 import app.navilla.security.EncryptionService;
 import org.junit.jupiter.api.DisplayName;
@@ -68,11 +70,40 @@ class VerificationCardServiceTest {
   @Mock
   private EncryptionService encryptionService;
 
+  @Mock
+  private UserRepository userRepository;
+
   @InjectMocks
   private VerificationCardService verificationCardService;
 
   private static final String USER_HASH = "hashed-user-email";
-  private static final String OTHER_USER_HASH = "hashed-other-user";
+
+  private User buildUser(String firstName, String lastName, String username) {
+    User user = User.builder()
+        .id(UUID.randomUUID())
+        .emailHash(USER_HASH)
+        .emailEncrypted(new byte[]{1})
+        .username(username)
+        .build();
+    if (firstName != null) {
+      user.setFirstNameEncrypted(new byte[]{10, 20});
+    }
+    if (lastName != null) {
+      user.setLastNameEncrypted(new byte[]{30, 40});
+    }
+    return user;
+  }
+
+  private void setupUserMock(String firstName, String lastName, String username) {
+    User user = buildUser(firstName, lastName, username);
+    when(userRepository.findByEmailHash(USER_HASH)).thenReturn(Optional.of(user));
+    if (firstName != null) {
+      when(encryptionService.decryptFromBytes(user.getFirstNameEncrypted())).thenReturn(firstName);
+    }
+    if (lastName != null) {
+      when(encryptionService.decryptFromBytes(user.getLastNameEncrypted())).thenReturn(lastName);
+    }
+  }
 
   @Nested
   @DisplayName("createCard")
@@ -81,9 +112,17 @@ class VerificationCardServiceTest {
     @Test
     @DisplayName("generates a unique 64-character hex share token")
     void createCard_generatesUniqueShareToken() {
-      CreateVerificationCardRequest req = new CreateVerificationCardRequest(
-          "Test User", List.of("hiv", "chlamydia"), true, true, null, null);
+      setupUserMock("John", "Doe", "johndoe");
 
+      CreateVerificationCardRequest req = new CreateVerificationCardRequest(
+          List.of("hiv"), true, null, null);
+
+      HealthStatus hs = HealthStatus.builder()
+          .userHash(USER_HASH).conditionType("hiv")
+          .status(HealthStatusValue.NEGATIVE).verified(true)
+          .testDate(LocalDate.of(2026, 1, 15)).build();
+      when(healthStatusRepository.findByUserHashOrderByReportedAtDesc(USER_HASH))
+          .thenReturn(List.of(hs));
       when(encryptionService.encryptToBytes(anyString())).thenReturn(new byte[]{1, 2, 3});
       when(verificationCardRepository.save(any(VerificationCard.class)))
           .thenAnswer(invocation -> {
@@ -93,9 +132,8 @@ class VerificationCardServiceTest {
             card.setUpdatedAt(OffsetDateTime.now());
             return card;
           });
-      when(encryptionService.decryptFromBytes(any(byte[].class))).thenReturn("Test User");
 
-      ReflectionTestUtils.setField(verificationCardService, "appBaseUrl", "https://navilla.app");
+      ReflectionTestUtils.setField(verificationCardService, "appBaseUrl", "https://www.navilla.app");
 
       VerificationCardResponse response = verificationCardService.createCard(USER_HASH, req);
 
@@ -104,12 +142,21 @@ class VerificationCardServiceTest {
     }
 
     @Test
-    @DisplayName("encrypts display name via encryptionService")
-    void createCard_encryptsDisplayName() {
-      CreateVerificationCardRequest req = new CreateVerificationCardRequest(
-          "My Name", List.of("hiv"), false, true, null, null);
+    @DisplayName("auto-resolves display name from profile firstName + lastName")
+    void createCard_autoResolvesDisplayName() {
+      setupUserMock("Alice", "Smith", "alicesmith");
 
-      when(encryptionService.encryptToBytes("My Name")).thenReturn(new byte[]{10, 20, 30});
+      CreateVerificationCardRequest req = new CreateVerificationCardRequest(
+          List.of("hiv"), true, null, null);
+
+      HealthStatus hs = HealthStatus.builder()
+          .userHash(USER_HASH).conditionType("hiv")
+          .status(HealthStatusValue.NEGATIVE).verified(true)
+          .testDate(LocalDate.of(2026, 1, 15)).build();
+      when(healthStatusRepository.findByUserHashOrderByReportedAtDesc(USER_HASH))
+          .thenReturn(List.of(hs));
+      when(encryptionService.encryptToBytes("Alice Smith")).thenReturn(new byte[]{10, 20, 30});
+      when(encryptionService.decryptFromBytes(new byte[]{10, 20, 30})).thenReturn("Alice Smith");
       when(verificationCardRepository.save(any(VerificationCard.class)))
           .thenAnswer(invocation -> {
             VerificationCard card = invocation.getArgument(0);
@@ -118,51 +165,76 @@ class VerificationCardServiceTest {
             card.setUpdatedAt(OffsetDateTime.now());
             return card;
           });
-      when(encryptionService.decryptFromBytes(any(byte[].class))).thenReturn("My Name");
 
-      ReflectionTestUtils.setField(verificationCardService, "appBaseUrl", "https://navilla.app");
+      ReflectionTestUtils.setField(verificationCardService, "appBaseUrl", "https://www.navilla.app");
 
-      verificationCardService.createCard(USER_HASH, req);
+      VerificationCardResponse response = verificationCardService.createCard(USER_HASH, req);
 
-      verify(encryptionService).encryptToBytes("My Name");
-
-      ArgumentCaptor<VerificationCard> captor = ArgumentCaptor.forClass(VerificationCard.class);
-      verify(verificationCardRepository).save(captor.capture());
-      assertThat(captor.getValue().getDisplayNameEncrypted()).isEqualTo(new byte[]{10, 20, 30});
+      verify(encryptionService).encryptToBytes("Alice Smith");
+      assertThat(response.displayName()).isEqualTo("Alice Smith");
+      assertThat(response.username()).isEqualTo("alicesmith");
     }
 
     @Test
-    @DisplayName("null display name does not trigger encryption")
-    void createCard_withoutDisplayName_noEncryption_null() {
+    @DisplayName("throws when user not found")
+    void createCard_userNotFound_throws() {
+      when(userRepository.findByEmailHash(USER_HASH)).thenReturn(Optional.empty());
+
       CreateVerificationCardRequest req = new CreateVerificationCardRequest(
-          null, List.of("hiv"), false, true, null, null);
+          List.of("hiv"), true, null, null);
 
-      when(verificationCardRepository.save(any(VerificationCard.class)))
-          .thenAnswer(invocation -> {
-            VerificationCard card = invocation.getArgument(0);
-            card.setId(UUID.randomUUID());
-            card.setCreatedAt(OffsetDateTime.now());
-            card.setUpdatedAt(OffsetDateTime.now());
-            return card;
-          });
-
-      ReflectionTestUtils.setField(verificationCardService, "appBaseUrl", "https://navilla.app");
-
-      verificationCardService.createCard(USER_HASH, req);
-
-      verify(encryptionService, never()).encryptToBytes(anyString());
-
-      ArgumentCaptor<VerificationCard> captor = ArgumentCaptor.forClass(VerificationCard.class);
-      verify(verificationCardRepository).save(captor.capture());
-      assertThat(captor.getValue().getDisplayNameEncrypted()).isNull();
+      assertThatThrownBy(() -> verificationCardService.createCard(USER_HASH, req))
+          .isInstanceOf(IllegalStateException.class)
+          .hasMessage("User not found");
     }
 
     @Test
-    @DisplayName("blank display name does not trigger encryption")
-    void createCard_withoutDisplayName_noEncryption_blank() {
-      CreateVerificationCardRequest req = new CreateVerificationCardRequest(
-          "   ", List.of("hiv"), false, true, null, null);
+    @DisplayName("throws when profile fields are incomplete")
+    void createCard_incompleteProfile_throws() {
+      // User with no firstName
+      User user = buildUser(null, null, "johndoe");
+      when(userRepository.findByEmailHash(USER_HASH)).thenReturn(Optional.of(user));
 
+      CreateVerificationCardRequest req = new CreateVerificationCardRequest(
+          List.of("hiv"), true, null, null);
+
+      assertThatThrownBy(() -> verificationCardService.createCard(USER_HASH, req))
+          .isInstanceOf(IllegalStateException.class)
+          .hasMessage("First name, last name, and username must be set");
+    }
+
+    @Test
+    @DisplayName("filters out non-verified conditions")
+    void createCard_filtersNonVerifiedConditions() {
+      // Inline user setup to avoid conflicting Mockito stubs
+      User user = User.builder()
+          .id(UUID.randomUUID())
+          .emailHash(USER_HASH)
+          .emailEncrypted(new byte[]{1})
+          .firstNameEncrypted(new byte[]{10, 20})
+          .lastNameEncrypted(new byte[]{30, 40})
+          .username("johndoe")
+          .build();
+      when(userRepository.findByEmailHash(USER_HASH)).thenReturn(Optional.of(user));
+
+      CreateVerificationCardRequest req = new CreateVerificationCardRequest(
+          List.of("hiv", "chlamydia"), true, null, null);
+
+      HealthStatus hivVerified = HealthStatus.builder()
+          .userHash(USER_HASH).conditionType("hiv")
+          .status(HealthStatusValue.NEGATIVE).verified(true)
+          .testDate(LocalDate.of(2026, 1, 15)).build();
+      HealthStatus chlamydiaSelfReported = HealthStatus.builder()
+          .userHash(USER_HASH).conditionType("chlamydia")
+          .status(HealthStatusValue.NEGATIVE).verified(false)
+          .testDate(LocalDate.of(2026, 1, 10)).build();
+
+      when(healthStatusRepository.findByUserHashOrderByReportedAtDesc(USER_HASH))
+          .thenReturn(List.of(hivVerified, chlamydiaSelfReported));
+      when(encryptionService.decryptFromBytes(new byte[]{10, 20})).thenReturn("John");
+      when(encryptionService.decryptFromBytes(new byte[]{30, 40})).thenReturn("Doe");
+      when(encryptionService.encryptToBytes("John Doe")).thenReturn(new byte[]{50, 60});
+      when(encryptionService.decryptFromBytes(new byte[]{50, 60})).thenReturn("John Doe");
       when(verificationCardRepository.save(any(VerificationCard.class)))
           .thenAnswer(invocation -> {
             VerificationCard card = invocation.getArgument(0);
@@ -172,15 +244,12 @@ class VerificationCardServiceTest {
             return card;
           });
 
-      ReflectionTestUtils.setField(verificationCardService, "appBaseUrl", "https://navilla.app");
+      ReflectionTestUtils.setField(verificationCardService, "appBaseUrl", "https://www.navilla.app");
 
-      verificationCardService.createCard(USER_HASH, req);
+      VerificationCardResponse response = verificationCardService.createCard(USER_HASH, req);
 
-      verify(encryptionService, never()).encryptToBytes(anyString());
-
-      ArgumentCaptor<VerificationCard> captor = ArgumentCaptor.forClass(VerificationCard.class);
-      verify(verificationCardRepository).save(captor.capture());
-      assertThat(captor.getValue().getDisplayNameEncrypted()).isNull();
+      // Only hiv should be included (verified=true + testDate), not chlamydia (verified=false)
+      assertThat(response.includedConditions()).containsExactly("hiv");
     }
   }
 
@@ -189,14 +258,17 @@ class VerificationCardServiceTest {
   class GetUserCardsTests {
 
     @Test
-    @DisplayName("returns decrypted display names")
-    void getUserCards_returnsDecryptedNames() {
+    @DisplayName("returns decrypted display names with username")
+    void getUserCards_returnsDecryptedNamesWithUsername() {
+      User user = buildUser("Alice", "Smith", "alicesmith");
+      when(userRepository.findByEmailHash(USER_HASH)).thenReturn(Optional.of(user));
+
       VerificationCard card1 = VerificationCard.builder()
           .id(UUID.randomUUID())
           .userHash(USER_HASH)
           .displayNameEncrypted(new byte[]{1, 2, 3})
           .includedConditions(new String[]{"hiv"})
-          .showTestDates(false)
+          .showTestDates(true)
           .showVerificationLevel(true)
           .shareToken("abc123")
           .privacyMode("PRIVATE")
@@ -205,37 +277,23 @@ class VerificationCardServiceTest {
           .updatedAt(OffsetDateTime.now())
           .build();
 
-      VerificationCard card2 = VerificationCard.builder()
-          .id(UUID.randomUUID())
-          .userHash(USER_HASH)
-          .displayNameEncrypted(new byte[]{4, 5, 6})
-          .includedConditions(new String[]{"chlamydia"})
-          .showTestDates(true)
-          .showVerificationLevel(false)
-          .shareToken("def456")
-          .privacyMode("PUBLIC")
-          .currentViews(5)
-          .createdAt(OffsetDateTime.now())
-          .updatedAt(OffsetDateTime.now())
-          .build();
-
       when(verificationCardRepository.findByUserHashOrderByCreatedAtDesc(USER_HASH))
-          .thenReturn(List.of(card1, card2));
-      when(encryptionService.decryptFromBytes(new byte[]{1, 2, 3})).thenReturn("Alice");
-      when(encryptionService.decryptFromBytes(new byte[]{4, 5, 6})).thenReturn("Bob");
+          .thenReturn(List.of(card1));
+      when(encryptionService.decryptFromBytes(new byte[]{1, 2, 3})).thenReturn("Alice Smith");
 
-      ReflectionTestUtils.setField(verificationCardService, "appBaseUrl", "https://navilla.app");
+      ReflectionTestUtils.setField(verificationCardService, "appBaseUrl", "https://www.navilla.app");
 
       List<VerificationCardResponse> results = verificationCardService.getUserCards(USER_HASH);
 
-      assertThat(results).hasSize(2);
-      assertThat(results.get(0).displayName()).isEqualTo("Alice");
-      assertThat(results.get(1).displayName()).isEqualTo("Bob");
+      assertThat(results).hasSize(1);
+      assertThat(results.get(0).displayName()).isEqualTo("Alice Smith");
+      assertThat(results.get(0).username()).isEqualTo("alicesmith");
     }
 
     @Test
     @DisplayName("returns empty list when user has no cards")
     void getUserCards_emptyList() {
+      when(userRepository.findByEmailHash(USER_HASH)).thenReturn(Optional.empty());
       when(verificationCardRepository.findByUserHashOrderByCreatedAtDesc(USER_HASH))
           .thenReturn(List.of());
 
@@ -250,15 +308,15 @@ class VerificationCardServiceTest {
   class UpdateCardTests {
 
     @Test
-    @DisplayName("updates fields when card belongs to user")
-    void updateCard_updatesFields() {
+    @DisplayName("re-resolves name from profile and validates conditions")
+    void updateCard_reResolvesNameAndValidatesConditions() {
       UUID cardId = UUID.randomUUID();
       VerificationCard existing = VerificationCard.builder()
           .id(cardId)
           .userHash(USER_HASH)
           .displayNameEncrypted(new byte[]{1, 2, 3})
           .includedConditions(new String[]{"hiv"})
-          .showTestDates(false)
+          .showTestDates(true)
           .showVerificationLevel(true)
           .shareToken("token123")
           .privacyMode("PRIVATE")
@@ -267,25 +325,36 @@ class VerificationCardServiceTest {
           .updatedAt(OffsetDateTime.now())
           .build();
 
+      setupUserMock("Updated", "Name", "updatedname");
+
       UpdateVerificationCardRequest req = new UpdateVerificationCardRequest(
-          "Updated Name", List.of("hiv", "chlamydia"), true, false, "PUBLIC", 10,
+          List.of("hiv", "chlamydia"), false, "PUBLIC", 10,
           OffsetDateTime.now().plusDays(7));
 
       when(verificationCardRepository.findByIdAndUserHash(cardId, USER_HASH))
           .thenReturn(Optional.of(existing));
+
+      HealthStatus hivVerified = HealthStatus.builder()
+          .userHash(USER_HASH).conditionType("hiv")
+          .status(HealthStatusValue.NEGATIVE).verified(true)
+          .testDate(LocalDate.of(2026, 1, 15)).build();
+      when(healthStatusRepository.findByUserHashOrderByReportedAtDesc(USER_HASH))
+          .thenReturn(List.of(hivVerified));
+
       when(encryptionService.encryptToBytes("Updated Name")).thenReturn(new byte[]{7, 8, 9});
       when(verificationCardRepository.save(any(VerificationCard.class)))
           .thenAnswer(invocation -> invocation.getArgument(0));
       when(encryptionService.decryptFromBytes(new byte[]{7, 8, 9})).thenReturn("Updated Name");
 
-      ReflectionTestUtils.setField(verificationCardService, "appBaseUrl", "https://navilla.app");
+      ReflectionTestUtils.setField(verificationCardService, "appBaseUrl", "https://www.navilla.app");
 
       VerificationCardResponse response = verificationCardService.updateCard(
           USER_HASH, cardId.toString(), req);
 
       assertThat(response.displayName()).isEqualTo("Updated Name");
-      assertThat(response.includedConditions()).containsExactly("hiv", "chlamydia");
-      assertThat(response.showTestDates()).isTrue();
+      assertThat(response.username()).isEqualTo("updatedname");
+      // Only hiv is verified, chlamydia gets filtered out
+      assertThat(response.includedConditions()).containsExactly("hiv");
       assertThat(response.showVerificationLevel()).isFalse();
       assertThat(response.privacyMode()).isEqualTo("PUBLIC");
       assertThat(response.maxViews()).isEqualTo(10);
@@ -300,7 +369,7 @@ class VerificationCardServiceTest {
           .thenReturn(Optional.empty());
 
       UpdateVerificationCardRequest req = new UpdateVerificationCardRequest(
-          "Name", null, null, null, null, null, null);
+          null, null, null, null, null);
 
       assertThatThrownBy(() ->
           verificationCardService.updateCard(USER_HASH, cardId.toString(), req))
@@ -368,23 +437,32 @@ class VerificationCardServiceTest {
     }
 
     @Test
-    @DisplayName("valid token returns public card with conditions")
-    void getPublicCard_validToken_returnsCard() {
+    @DisplayName("valid token returns public card with verified conditions only")
+    void getPublicCard_validToken_returnsVerifiedConditionsOnly() {
       VerificationCard card = buildCard("valid-token", USER_HASH);
 
       when(verificationCardRepository.findByShareToken("valid-token"))
           .thenReturn(Optional.of(card));
       when(encryptionService.decryptFromBytes(any(byte[].class))).thenReturn("Public User");
+      when(userRepository.findByEmailHash(USER_HASH))
+          .thenReturn(Optional.of(buildUser("Public", "User", "publicuser")));
 
-      HealthStatus hs = HealthStatus.builder()
+      HealthStatus hivVerified = HealthStatus.builder()
           .userHash(USER_HASH)
           .conditionType("hiv")
-          .status(HealthStatusValue.POSITIVE)
+          .status(HealthStatusValue.NEGATIVE)
           .verified(true)
           .testDate(LocalDate.of(2026, 1, 15))
           .build();
+      HealthStatus chlamydiaNotVerified = HealthStatus.builder()
+          .userHash(USER_HASH)
+          .conditionType("chlamydia")
+          .status(HealthStatusValue.NEGATIVE)
+          .verified(false)
+          .testDate(LocalDate.of(2026, 1, 10))
+          .build();
       when(healthStatusRepository.findByUserHashOrderByReportedAtDesc(USER_HASH))
-          .thenReturn(List.of(hs));
+          .thenReturn(List.of(hivVerified, chlamydiaNotVerified));
       when(verificationCardRepository.save(any(VerificationCard.class)))
           .thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -392,9 +470,11 @@ class VerificationCardServiceTest {
           verificationCardService.getPublicCard("valid-token");
 
       assertThat(response.displayName()).isEqualTo("Public User");
+      assertThat(response.username()).isEqualTo("publicuser");
+      // Only hiv (verified=true) should be present, chlamydia (verified=false) filtered out
       assertThat(response.conditions()).hasSize(1);
       assertThat(response.conditions().get(0).condition()).isEqualTo("hiv");
-      assertThat(response.conditions().get(0).status()).isEqualTo("POSITIVE");
+      assertThat(response.conditions().get(0).status()).isEqualTo("NEGATIVE");
       assertThat(response.conditions().get(0).verificationLevel()).isEqualTo("LAB_VERIFIED");
       assertThat(response.conditions().get(0).testDate()).isEqualTo("2026-01-15");
     }
@@ -409,6 +489,7 @@ class VerificationCardServiceTest {
       when(verificationCardRepository.findByShareToken("view-token"))
           .thenReturn(Optional.of(card));
       when(encryptionService.decryptFromBytes(any(byte[].class))).thenReturn("User");
+      when(userRepository.findByEmailHash(USER_HASH)).thenReturn(Optional.empty());
       when(healthStatusRepository.findByUserHashOrderByReportedAtDesc(USER_HASH))
           .thenReturn(List.of());
 
@@ -453,61 +534,41 @@ class VerificationCardServiceTest {
     }
 
     @Test
-    @DisplayName("conditions are joined from HealthStatus records")
-    void getPublicCard_joinsHealthStatuses() {
-      VerificationCard card = buildCard("join-token", USER_HASH);
+    @DisplayName("only verified conditions with test dates are included")
+    void getPublicCard_filtersToVerifiedWithTestDates() {
+      VerificationCard card = buildCard("filter-token", USER_HASH);
       card.setIncludedConditions(new String[]{"hiv", "chlamydia", "gonorrhea"});
 
-      when(verificationCardRepository.findByShareToken("join-token"))
+      when(verificationCardRepository.findByShareToken("filter-token"))
           .thenReturn(Optional.of(card));
       when(encryptionService.decryptFromBytes(any(byte[].class))).thenReturn("User");
+      when(userRepository.findByEmailHash(USER_HASH)).thenReturn(Optional.empty());
 
-      HealthStatus hiv = HealthStatus.builder()
-          .userHash(USER_HASH)
-          .conditionType("hiv")
-          .status(HealthStatusValue.NEGATIVE)
-          .verified(true)
-          .testDate(LocalDate.of(2026, 2, 1))
-          .build();
-      HealthStatus chlamydia = HealthStatus.builder()
-          .userHash(USER_HASH)
-          .conditionType("chlamydia")
-          .status(HealthStatusValue.POSITIVE)
-          .verified(false)
-          .testDate(LocalDate.of(2026, 1, 20))
-          .build();
-      HealthStatus syphilis = HealthStatus.builder()
-          .userHash(USER_HASH)
-          .conditionType("syphilis")
-          .status(HealthStatusValue.NEGATIVE)
-          .verified(true)
-          .testDate(LocalDate.of(2026, 1, 10))
-          .build();
+      HealthStatus hivVerified = HealthStatus.builder()
+          .userHash(USER_HASH).conditionType("hiv")
+          .status(HealthStatusValue.NEGATIVE).verified(true)
+          .testDate(LocalDate.of(2026, 2, 1)).build();
+      HealthStatus chlamydiaNoTestDate = HealthStatus.builder()
+          .userHash(USER_HASH).conditionType("chlamydia")
+          .status(HealthStatusValue.POSITIVE).verified(true)
+          .testDate(null).build();
+      HealthStatus gonorrheaNotVerified = HealthStatus.builder()
+          .userHash(USER_HASH).conditionType("gonorrhea")
+          .status(HealthStatusValue.NEGATIVE).verified(false)
+          .testDate(LocalDate.of(2026, 1, 10)).build();
 
       when(healthStatusRepository.findByUserHashOrderByReportedAtDesc(USER_HASH))
-          .thenReturn(List.of(hiv, chlamydia, syphilis));
+          .thenReturn(List.of(hivVerified, chlamydiaNoTestDate, gonorrheaNotVerified));
       when(verificationCardRepository.save(any(VerificationCard.class)))
           .thenAnswer(invocation -> invocation.getArgument(0));
 
       PublicVerificationCardResponse response =
-          verificationCardService.getPublicCard("join-token");
+          verificationCardService.getPublicCard("filter-token");
 
-      // Only hiv and chlamydia match included conditions; syphilis is excluded
-      assertThat(response.conditions()).hasSize(2);
-      assertThat(response.conditions())
-          .extracting(PublicVerificationCardResponse.PublicConditionStatus::condition)
-          .containsExactlyInAnyOrder("hiv", "chlamydia");
-
-      // Verify verification levels: hiv is verified → LAB_VERIFIED, chlamydia is not → SELF_REPORTED
-      PublicVerificationCardResponse.PublicConditionStatus hivStatus = response.conditions()
-          .stream().filter(c -> "hiv".equals(c.condition())).findFirst().orElseThrow();
-      assertThat(hivStatus.verificationLevel()).isEqualTo("LAB_VERIFIED");
-      assertThat(hivStatus.testDate()).isEqualTo("2026-02-01");
-
-      PublicVerificationCardResponse.PublicConditionStatus chlamydiaStatus = response.conditions()
-          .stream().filter(c -> "chlamydia".equals(c.condition())).findFirst().orElseThrow();
-      assertThat(chlamydiaStatus.verificationLevel()).isEqualTo("SELF_REPORTED");
-      assertThat(chlamydiaStatus.testDate()).isEqualTo("2026-01-20");
+      // Only hiv: verified=true AND testDate!=null
+      assertThat(response.conditions()).hasSize(1);
+      assertThat(response.conditions().get(0).condition()).isEqualTo("hiv");
+      assertThat(response.conditions().get(0).testDate()).isEqualTo("2026-02-01");
     }
 
     @Test
@@ -530,6 +591,7 @@ class VerificationCardServiceTest {
 
       when(verificationCardRepository.findByShareToken("anon-token"))
           .thenReturn(Optional.of(card));
+      when(userRepository.findByEmailHash(USER_HASH)).thenReturn(Optional.empty());
       when(healthStatusRepository.findByUserHashOrderByReportedAtDesc(USER_HASH))
           .thenReturn(List.of());
       when(verificationCardRepository.save(any(VerificationCard.class)))
@@ -539,6 +601,86 @@ class VerificationCardServiceTest {
           verificationCardService.getPublicCard("anon-token");
 
       assertThat(response.displayName()).isEqualTo("Anonymous");
+    }
+  }
+
+  @Nested
+  @DisplayName("verifyCard")
+  class VerifyCardTests {
+
+    @Test
+    @DisplayName("valid card returns valid=true with signature")
+    void verifyCard_validCard_returnsTrue() {
+      VerificationCard card = VerificationCard.builder()
+          .id(UUID.randomUUID())
+          .userHash(USER_HASH)
+          .includedConditions(new String[]{"hiv"})
+          .shareToken("verify-token")
+          .currentViews(0)
+          .build();
+
+      when(verificationCardRepository.findByShareToken("verify-token"))
+          .thenReturn(Optional.of(card));
+      when(encryptionService.hmacSign(anyString())).thenReturn("hmac-signature");
+
+      CardVerificationResponse response = verificationCardService.verifyCard("verify-token");
+
+      assertThat(response.valid()).isTrue();
+      assertThat(response.verifiedAt()).isNotNull();
+      assertThat(response.signature()).isEqualTo("hmac-signature");
+    }
+
+    @Test
+    @DisplayName("expired card returns valid=false")
+    void verifyCard_expiredCard_returnsFalse() {
+      VerificationCard card = VerificationCard.builder()
+          .id(UUID.randomUUID())
+          .userHash(USER_HASH)
+          .includedConditions(new String[]{"hiv"})
+          .shareToken("expired-verify")
+          .currentViews(0)
+          .expiresAt(OffsetDateTime.now().minusDays(1))
+          .build();
+
+      when(verificationCardRepository.findByShareToken("expired-verify"))
+          .thenReturn(Optional.of(card));
+
+      CardVerificationResponse response = verificationCardService.verifyCard("expired-verify");
+
+      assertThat(response.valid()).isFalse();
+      assertThat(response.verifiedAt()).isNull();
+      assertThat(response.signature()).isNull();
+    }
+
+    @Test
+    @DisplayName("view-limited card returns valid=false")
+    void verifyCard_viewLimited_returnsFalse() {
+      VerificationCard card = VerificationCard.builder()
+          .id(UUID.randomUUID())
+          .userHash(USER_HASH)
+          .includedConditions(new String[]{"hiv"})
+          .shareToken("limited-verify")
+          .currentViews(10)
+          .maxViews(10)
+          .build();
+
+      when(verificationCardRepository.findByShareToken("limited-verify"))
+          .thenReturn(Optional.of(card));
+
+      CardVerificationResponse response = verificationCardService.verifyCard("limited-verify");
+
+      assertThat(response.valid()).isFalse();
+    }
+
+    @Test
+    @DisplayName("nonexistent token throws IllegalArgumentException")
+    void verifyCard_invalidToken_throws() {
+      when(verificationCardRepository.findByShareToken("nonexistent"))
+          .thenReturn(Optional.empty());
+
+      assertThatThrownBy(() -> verificationCardService.verifyCard("nonexistent"))
+          .isInstanceOf(IllegalArgumentException.class)
+          .hasMessage("Card not found");
     }
   }
 }

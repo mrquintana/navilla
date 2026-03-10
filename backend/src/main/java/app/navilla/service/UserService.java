@@ -154,10 +154,13 @@ public class UserService {
       }
     }
 
-    String displayName = null;
-    if (Boolean.TRUE.equals(user.getDisplayNamePublic()) && user.getDisplayNameEncrypted() != null) {
-      displayName = encryptionService.decryptFromBytes(user.getDisplayNameEncrypted());
-    }
+    String firstName = user.getFirstNameEncrypted() != null
+        ? encryptionService.decryptFromBytes(user.getFirstNameEncrypted()) : null;
+    String lastName = user.getLastNameEncrypted() != null
+        ? encryptionService.decryptFromBytes(user.getLastNameEncrypted()) : null;
+    String displayName = firstName != null || lastName != null
+        ? ((firstName != null ? firstName : "") + " " + (lastName != null ? lastName : "")).trim()
+        : null;
 
     return new UserSearchResult(
         user.getUsername(),
@@ -182,21 +185,21 @@ public class UserService {
     User user = userRepository.findBySupabaseId(supabaseId)
         .orElseGet(() -> createUserEntityFromJwt(supabaseId, email, userMetadata));
 
-    if (request.displayName() != null) {
-      if (request.displayName().isBlank()) {
-        user.setDisplayNameEncrypted(null);
+    if (request.firstName() != null) {
+      if (request.firstName().isBlank()) {
+        user.setFirstNameEncrypted(null);
       } else {
-        user.setDisplayNameEncrypted(
-            encryptionService.encryptToBytes(request.displayName().trim()));
+        user.setFirstNameEncrypted(
+            encryptionService.encryptToBytes(request.firstName().trim()));
       }
     }
 
-    if (request.fullName() != null) {
-      if (request.fullName().isBlank()) {
-        user.setFullNameEncrypted(null);
+    if (request.lastName() != null) {
+      if (request.lastName().isBlank()) {
+        user.setLastNameEncrypted(null);
       } else {
-        user.setFullNameEncrypted(
-            encryptionService.encryptToBytes(request.fullName().trim()));
+        user.setLastNameEncrypted(
+            encryptionService.encryptToBytes(request.lastName().trim()));
       }
     }
 
@@ -251,15 +254,10 @@ public class UserService {
         user.setProfileVisibility(visibility);
         if (visibility != ProfileVisibility.PUBLIC) {
           user.setSearchableByEmail(false);
-          user.setDisplayNamePublic(false);
         }
       } catch (IllegalArgumentException ex) {
         throw new IllegalArgumentException("user.error.invalidVisibility");
       }
-    }
-
-    if (request.displayNamePublic() != null) {
-      user.setDisplayNamePublic(request.displayNamePublic());
     }
 
     if (request.searchableByEmail() != null) {
@@ -321,7 +319,6 @@ public class UserService {
         .emailEncrypted(encryptionService.encryptToBytes(email))
         .verified(false)
         .profileVisibility(ProfileVisibility.PRIVATE)
-        .displayNamePublic(false)
         .searchableByEmail(false)
         .showAge(false)
         .build();
@@ -354,10 +351,11 @@ public class UserService {
     String location = readMetadata(userMetadata, "location", null);
 
     if (fullName != null && !fullName.isBlank()) {
-      user.setFullNameEncrypted(encryptionService.encryptToBytes(fullName.trim()));
-      user.setDisplayNameEncrypted(encryptionService.encryptToBytes(fullName.trim()));
-    } else if (username != null && !username.isBlank()) {
-      user.setDisplayNameEncrypted(encryptionService.encryptToBytes(username.trim()));
+      String[] parts = fullName.trim().split("\\s+", 2);
+      user.setFirstNameEncrypted(encryptionService.encryptToBytes(parts[0]));
+      if (parts.length > 1) {
+        user.setLastNameEncrypted(encryptionService.encryptToBytes(parts[1]));
+      }
     }
 
     if (username != null && !username.isBlank()) {
@@ -408,11 +406,11 @@ public class UserService {
    */
   private UserResponse toUserResponse(User user) {
     String email = encryptionService.decryptFromBytes(user.getEmailEncrypted());
-    String displayName = user.getDisplayNameEncrypted() != null
-        ? encryptionService.decryptFromBytes(user.getDisplayNameEncrypted())
+    String firstName = user.getFirstNameEncrypted() != null
+        ? encryptionService.decryptFromBytes(user.getFirstNameEncrypted())
         : null;
-    String fullName = user.getFullNameEncrypted() != null
-        ? encryptionService.decryptFromBytes(user.getFullNameEncrypted())
+    String lastName = user.getLastNameEncrypted() != null
+        ? encryptionService.decryptFromBytes(user.getLastNameEncrypted())
         : null;
     String location = user.getLocationEncrypted() != null
         ? encryptionService.decryptFromBytes(user.getLocationEncrypted())
@@ -430,8 +428,8 @@ public class UserService {
     return new UserResponse(
         user.getId(),
         email,
-        displayName,
-        fullName,
+        firstName,
+        lastName,
         user.getUsername(),
         user.getSex(),
         dateOfBirth,
@@ -440,7 +438,6 @@ public class UserService {
         user.getCountry(),
         location,
         user.getProfileVisibility().name(),
-        user.getDisplayNamePublic(),
         user.getSearchableByEmail(),
         avatarUrl,
         avatarThumbUrl,

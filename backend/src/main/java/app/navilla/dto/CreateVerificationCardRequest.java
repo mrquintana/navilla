@@ -23,11 +23,12 @@ import jakarta.validation.constraints.Size;
 
 /**
  * Request DTO for creating a new verification card.
+ *
+ * <p>Display name is auto-resolved from the user's profile (firstName + lastName).
+ * Test dates are always shown on verification cards.
  */
 public record CreateVerificationCardRequest(
-    @Size(max = 200) String displayName,
     List<@Size(max = 50) String> includedConditions,
-    Boolean showTestDates,
     Boolean showVerificationLevel,
     Integer maxViews,
     OffsetDateTime expiresAt

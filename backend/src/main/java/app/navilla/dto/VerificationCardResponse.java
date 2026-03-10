@@ -25,8 +25,8 @@ import java.util.List;
 public record VerificationCardResponse(
     String id,
     String displayName,
+    String username,
     List<String> includedConditions,
-    boolean showTestDates,
     boolean showVerificationLevel,
     String shareToken,
     String shareUrl,

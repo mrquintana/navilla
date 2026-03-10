@@ -22,8 +22,8 @@ import jakarta.validation.constraints.Size;
 /**
  * Request DTO for updating user profile.
  *
- * @param displayName the user's display name (optional, max 100 characters)
- * @param fullName the user's full name (optional, max 120 characters)
+ * @param firstName the user's first name (optional, max 50 characters)
+ * @param lastName the user's last name (optional, max 50 characters)
  * @param username the public username (optional, 3-30, alphanumeric/underscore)
  * @param sex self-reported sex (optional)
  * @param dateOfBirth date of birth in YYYY-MM-DD (optional)
@@ -31,17 +31,16 @@ import jakarta.validation.constraints.Size;
  * @param country ISO 3166-1 alpha-2 country code (optional)
  * @param location user location (optional, max 120 characters)
  * @param profileVisibility profile visibility setting (optional)
- * @param displayNamePublic whether to show display name publicly (optional)
  * @param searchableByEmail whether to allow email search (optional)
  * @param avatarKey storage key for profile avatar (optional)
  * @param avatarThumbKey storage key for avatar thumbnail (optional)
  */
 public record UpdateProfileRequest(
-    @Size(max = 100, message = "{validation.size.max}")
-    String displayName,
+    @Size(max = 50, message = "{validation.size.max}")
+    String firstName,
 
-    @Size(max = 120, message = "{validation.size.max}")
-    String fullName,
+    @Size(max = 50, message = "{validation.size.max}")
+    String lastName,
 
     @Size(min = 3, max = 30, message = "{validation.size.range}")
     @Pattern(regexp = "^[a-zA-Z0-9_]+$", message = "{validation.username.invalid}")
@@ -62,7 +61,6 @@ public record UpdateProfileRequest(
     String location,
 
     @Size(max = 20) String profileVisibility,
-    Boolean displayNamePublic,
     Boolean searchableByEmail,
     @Size(max = 500) String avatarKey,
     @Size(max = 500) String avatarThumbKey

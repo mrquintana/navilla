@@ -12,7 +12,7 @@ interface Props {
   data: NetworkData;
 }
 
-type IdentityOption = 'displayName' | 'username' | 'fullName' | 'anonymous';
+type IdentityOption = 'name' | 'username' | 'anonymous';
 
 export function ShareConstellationModal({ isOpen, onClose, engine, data }: Props) {
   if (!isOpen) return null;
@@ -35,22 +35,16 @@ function ShareConstellationContent({
   const identityOptions = useMemo(() => {
     const options: { key: IdentityOption; label: string; value: string | null; enabled: boolean }[] = [
       {
-        key: 'displayName',
-        label: t('network.identityDisplayName'),
-        value: profile?.displayName ?? null,
-        enabled: !!profile?.displayName,
+        key: 'name',
+        label: t('network.identityName'),
+        value: profile?.firstName ? `${profile.firstName} ${profile.lastName ?? ''}`.trim() : null,
+        enabled: !!profile?.firstName,
       },
       {
         key: 'username',
         label: t('network.identityUsername'),
         value: profile?.username ? `@${profile.username}` : null,
         enabled: !!profile?.username,
-      },
-      {
-        key: 'fullName',
-        label: t('network.identityFullName'),
-        value: profile?.fullName ?? null,
-        enabled: !!profile?.fullName,
       },
       {
         key: 'anonymous',

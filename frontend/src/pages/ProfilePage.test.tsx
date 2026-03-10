@@ -91,8 +91,8 @@ describe('ProfilePage loading behavior', () => {
     useUserMock.mockReturnValue({
       data: {
         email: 'user@example.com',
-        displayName: 'Migue',
-        fullName: 'Migue Example',
+        firstName: 'Migue',
+        lastName: 'Example',
         username: 'migue',
         sex: 'male',
         dateOfBirth: '1990-01-01',

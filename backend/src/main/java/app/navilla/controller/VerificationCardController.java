@@ -18,6 +18,7 @@ package app.navilla.controller;
 
 import java.util.List;
 
+import app.navilla.dto.CardVerificationResponse;
 import app.navilla.dto.CreateVerificationCardRequest;
 import app.navilla.dto.PublicVerificationCardResponse;
 import app.navilla.dto.UpdateVerificationCardRequest;
@@ -83,5 +84,11 @@ public class VerificationCardController {
   public ResponseEntity<PublicVerificationCardResponse> getPublicCard(
       @PathVariable String shareToken) {
     return ResponseEntity.ok(verificationCardService.getPublicCard(shareToken));
+  }
+
+  @GetMapping("/api/public/cards/{shareToken}/verify")
+  public ResponseEntity<CardVerificationResponse> verifyCard(
+      @PathVariable String shareToken) {
+    return ResponseEntity.ok(verificationCardService.verifyCard(shareToken));
   }
 }

@@ -27,8 +27,8 @@ import java.util.UUID;
  *
  * @param id the user's unique identifier
  * @param email the user's email (only included for own profile)
- * @param displayName the user's display name (optional)
- * @param fullName the user's full name (optional)
+ * @param firstName the user's first name (optional)
+ * @param lastName the user's last name (optional)
  * @param username the user's public username (optional)
  * @param sex the user's self-reported sex (optional)
  * @param dateOfBirth the user's date of birth (optional)
@@ -37,7 +37,6 @@ import java.util.UUID;
  * @param country the user's country (optional)
  * @param location the user's location (optional)
  * @param profileVisibility profile visibility setting
- * @param displayNamePublic whether display name is public
  * @param searchableByEmail whether email search is allowed
  * @param avatarUrl public URL for avatar (optional)
  * @param avatarThumbUrl public URL for avatar thumbnail (optional)
@@ -47,8 +46,8 @@ import java.util.UUID;
 public record UserResponse(
     UUID id,
     String email,
-    String displayName,
-    String fullName,
+    String firstName,
+    String lastName,
     String username,
     String sex,
     String dateOfBirth,
@@ -57,7 +56,6 @@ public record UserResponse(
     String country,
     String location,
     String profileVisibility,
-    Boolean displayNamePublic,
     Boolean searchableByEmail,
     String avatarUrl,
     String avatarThumbUrl,

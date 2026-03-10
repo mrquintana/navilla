@@ -32,6 +32,21 @@ vi.mock('@tanstack/react-query', async () => {
   };
 });
 
+// Mock the verify API to prevent real network calls
+vi.mock('../lib/api', async () => {
+  const actual = await vi.importActual<typeof import('../lib/api')>('../lib/api');
+  return {
+    ...actual,
+    api: {
+      ...actual.api,
+      verificationCards: {
+        ...actual.api.verificationCards,
+        verify: vi.fn().mockResolvedValue({ valid: true, verifiedAt: '2026-03-10T00:00:00Z', signature: 'sig' }),
+      },
+    },
+  };
+});
+
 describe('PublicVerificationCardPage', () => {
   beforeEach(() => {
     useQueryMock.mockReset();
@@ -58,6 +73,7 @@ describe('PublicVerificationCardPage', () => {
     useQueryMock.mockReturnValue({
       data: {
         displayName: 'Miguel',
+        username: 'miguel123',
         conditions: [
           {
             condition: 'HIV',
@@ -85,14 +101,17 @@ describe('PublicVerificationCardPage', () => {
     expect(screen.getByText('publicCard.title')).toBeInTheDocument();
     // Display name
     expect(screen.getByText('Miguel')).toBeInTheDocument();
+    // Username
+    expect(screen.getByText('@miguel123')).toBeInTheDocument();
     // Conditions rendered
     expect(screen.getByText('healthLog.conditions.HIV')).toBeInTheDocument();
     expect(screen.getByText('healthLog.conditions.SYPHILIS')).toBeInTheDocument();
     // Status badges
     const negBadges = screen.getAllByText('NEGATIVE');
     expect(negBadges).toHaveLength(2);
-    // Verified-by footer
-    expect(screen.getByText('publicCard.verifiedBy')).toBeInTheDocument();
+    // Verified-by footer (now uses verifiedByPrefix + Navilla)
+    expect(screen.getByText('publicCard.verifiedByPrefix')).toBeInTheDocument();
+    expect(screen.getByText('Navilla')).toBeInTheDocument();
     // No expired message
     expect(screen.queryByText('publicCard.expired')).not.toBeInTheDocument();
   });
@@ -110,10 +129,11 @@ describe('PublicVerificationCardPage', () => {
     expect(screen.getByText('publicCard.expiredHint')).toBeInTheDocument();
   });
 
-  it('displays verification badges for lab-verified conditions', () => {
+  it('displays lab-verified badge and metadata', () => {
     useQueryMock.mockReturnValue({
       data: {
         displayName: 'Lab Verified User',
+        username: 'labuser',
         conditions: [
           {
             condition: 'HIV',
@@ -137,10 +157,8 @@ describe('PublicVerificationCardPage', () => {
 
     render(<PublicVerificationCardPage />);
 
-    // Lab verified badge
-    expect(screen.getByTitle('verificationLevel.LAB_VERIFIED')).toBeInTheDocument();
-    // Document verified badge
-    expect(screen.getByTitle('verificationLevel.DOCUMENT_VERIFIED')).toBeInTheDocument();
+    // Lab verified badge text (only shown for LAB_VERIFIED)
+    expect(screen.getByText('publicCard.labVerified')).toBeInTheDocument();
     // Test dates shown
     expect(screen.getAllByText(/publicCard\.testDate/).length).toBe(2);
     // Expiry info
@@ -153,6 +171,7 @@ describe('PublicVerificationCardPage', () => {
     useQueryMock.mockReturnValue({
       data: {
         displayName: 'Simple Card',
+        username: 'simpleuser',
         conditions: [
           {
             condition: 'CHLAMYDIA',
@@ -171,14 +190,15 @@ describe('PublicVerificationCardPage', () => {
     render(<PublicVerificationCardPage />);
 
     expect(screen.getByText('healthLog.conditions.CHLAMYDIA')).toBeInTheDocument();
-    // No verification badge title attributes should be present
-    expect(screen.queryByTitle(/verificationLevel\./)).not.toBeInTheDocument();
+    // No lab verified badge
+    expect(screen.queryByText('publicCard.labVerified')).not.toBeInTheDocument();
   });
 
   it('shows empty conditions message when card has no conditions', () => {
     useQueryMock.mockReturnValue({
       data: {
         displayName: 'Empty Card',
+        username: 'emptyuser',
         conditions: [],
         expiresAt: null,
         viewsRemaining: null,

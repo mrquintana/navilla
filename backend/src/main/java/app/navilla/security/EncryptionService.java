@@ -249,6 +249,25 @@ public class EncryptionService {
   }
 
   /**
+   * Signs data using HMAC-SHA256 with the encryption key.
+   *
+   * <p>Used for anti-forgery verification of card data.
+   *
+   * @param data the data to sign
+   * @return the hex-encoded HMAC signature
+   */
+  public String hmacSign(String data) {
+    try {
+      javax.crypto.Mac mac = javax.crypto.Mac.getInstance("HmacSHA256");
+      mac.init(encryptionKey);
+      byte[] hmacBytes = mac.doFinal(data.getBytes(StandardCharsets.UTF_8));
+      return bytesToHex(hmacBytes);
+    } catch (Exception ex) {
+      throw new RuntimeException("HMAC signing failed", ex);
+    }
+  }
+
+  /**
    * Converts byte array to hex string.
    */
   private static String bytesToHex(byte[] bytes) {

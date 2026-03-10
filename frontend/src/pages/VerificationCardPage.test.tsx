@@ -32,6 +32,13 @@ vi.mock('../hooks/useAuth', () => ({
   }),
 }));
 
+vi.mock('../hooks/useUser', () => ({
+  useUser: () => ({
+    data: { firstName: 'Test', lastName: 'User', username: 'testuser' },
+    isLoading: false,
+  }),
+}));
+
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string, opts?: Record<string, unknown>) => {
@@ -61,11 +68,11 @@ function makeCard(overrides: Partial<VerificationCardResponse> = {}): Verificati
   return {
     id: 'card-1',
     displayName: 'Test User',
+    username: 'testuser',
     includedConditions: ['HIV', 'SYPHILIS'],
-    showTestDates: true,
     showVerificationLevel: true,
     shareToken: 'abc123',
-    shareUrl: 'https://navilla.app/verify/abc123',
+    shareUrl: 'https://www.navilla.app/verify/abc123',
     privacyMode: 'PUBLIC',
     maxViews: null,
     currentViews: 5,
@@ -161,15 +168,13 @@ describe('VerificationCardPage', () => {
     // Modal should now be open
     expect(screen.getByRole('dialog')).toBeInTheDocument();
     // Modal shows the form fields
-    expect(screen.getByText('verificationCard.displayName')).toBeInTheDocument();
     expect(screen.getByText('verificationCard.includedConditions')).toBeInTheDocument();
-    expect(screen.getByText('verificationCard.showTestDates')).toBeInTheDocument();
     expect(screen.getByText('verificationCard.showVerificationLevel')).toBeInTheDocument();
     expect(screen.getByText('verificationCard.viewLimit')).toBeInTheDocument();
   });
 
   it('copy link button copies shareUrl to clipboard', async () => {
-    const card = makeCard({ shareUrl: 'https://navilla.app/verify/xyz789' });
+    const card = makeCard({ shareUrl: 'https://www.navilla.app/verify/xyz789' });
     useVerificationCardsMock.mockReturnValue({
       data: [card],
       isLoading: false,
@@ -186,7 +191,7 @@ describe('VerificationCardPage', () => {
     fireEvent.click(copyButton);
 
     await waitFor(() => {
-      expect(writeTextMock).toHaveBeenCalledWith('https://navilla.app/verify/xyz789');
+      expect(writeTextMock).toHaveBeenCalledWith('https://www.navilla.app/verify/xyz789');
     });
 
     // Shows "copied" confirmation text

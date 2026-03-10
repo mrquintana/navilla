@@ -32,10 +32,12 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import app.navilla.dto.CardVerificationResponse;
 import app.navilla.dto.CreateVerificationCardRequest;
 import app.navilla.dto.PublicVerificationCardResponse;
 import app.navilla.dto.UpdateVerificationCardRequest;
 import app.navilla.dto.VerificationCardResponse;
+import app.navilla.repository.UserRepository;
 import app.navilla.security.EncryptionService;
 import app.navilla.service.VerificationCardService;
 import org.junit.jupiter.api.DisplayName;
@@ -71,6 +73,9 @@ class VerificationCardControllerTest {
   @MockitoBean
   private EncryptionService encryptionService;
 
+  @MockitoBean
+  private UserRepository userRepository;
+
   private static final String USER_EMAIL = "verification-card@example.com";
   private static final String USER_HASH = "hashed-verification-card";
   private static final String CARD_ID = UUID.randomUUID().toString();
@@ -80,11 +85,11 @@ class VerificationCardControllerTest {
     return new VerificationCardResponse(
         CARD_ID,
         "Test User",
+        "testuser",
         List.of("hiv", "chlamydia"),
         true,
-        true,
         SHARE_TOKEN,
-        "https://navilla.app/v/" + SHARE_TOKEN,
+        "https://www.navilla.app/v/" + SHARE_TOKEN,
         "PRIVATE",
         50,
         0,
@@ -108,9 +113,7 @@ class VerificationCardControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content("""
                 {
-                  "displayName": "Test User",
                   "includedConditions": ["hiv", "chlamydia"],
-                  "showTestDates": true,
                   "showVerificationLevel": true,
                   "maxViews": 50
                 }
@@ -119,9 +122,9 @@ class VerificationCardControllerTest {
         .andExpect(jsonPath("$.id").value(CARD_ID))
         .andExpect(jsonPath("$.shareToken").value(SHARE_TOKEN))
         .andExpect(jsonPath("$.shareUrl").exists())
+        .andExpect(jsonPath("$.username").value("testuser"))
         .andExpect(jsonPath("$.includedConditions[0]").value("hiv"))
         .andExpect(jsonPath("$.includedConditions[1]").value("chlamydia"))
-        .andExpect(jsonPath("$.showTestDates").value(true))
         .andExpect(jsonPath("$.showVerificationLevel").value(true))
         .andExpect(jsonPath("$.maxViews").value(50))
         .andExpect(jsonPath("$.currentViews").value(0));
@@ -141,7 +144,8 @@ class VerificationCardControllerTest {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$").isArray())
         .andExpect(jsonPath("$[0].id").value(CARD_ID))
-        .andExpect(jsonPath("$[0].shareToken").value(SHARE_TOKEN));
+        .andExpect(jsonPath("$[0].shareToken").value(SHARE_TOKEN))
+        .andExpect(jsonPath("$[0].username").value("testuser"));
   }
 
   @Test
@@ -150,11 +154,11 @@ class VerificationCardControllerTest {
     VerificationCardResponse updatedResponse = new VerificationCardResponse(
         CARD_ID,
         "Updated Name",
+        "updateduser",
         List.of("hiv", "chlamydia"),
         true,
-        true,
         SHARE_TOKEN,
-        "https://navilla.app/v/" + SHARE_TOKEN,
+        "https://www.navilla.app/v/" + SHARE_TOKEN,
         "PRIVATE",
         25,
         0,
@@ -175,14 +179,13 @@ class VerificationCardControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content("""
                 {
-                  "displayName": "Updated Name",
-                  "showTestDates": true,
+                  "includedConditions": ["hiv", "chlamydia"],
                   "maxViews": 25
                 }
                 """))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.displayName").value("Updated Name"))
-        .andExpect(jsonPath("$.showTestDates").value(true))
+        .andExpect(jsonPath("$.username").value("updateduser"))
         .andExpect(jsonPath("$.maxViews").value(25));
   }
 
@@ -204,6 +207,7 @@ class VerificationCardControllerTest {
   void getPublicCard_validToken_shouldReturn200() throws Exception {
     PublicVerificationCardResponse publicResponse = new PublicVerificationCardResponse(
         "Public User",
+        "publicuser",
         List.of(new PublicVerificationCardResponse.PublicConditionStatus(
             "hiv", "NEGATIVE", "LAB_VERIFIED", "2026-01-15")),
         null,
@@ -215,6 +219,7 @@ class VerificationCardControllerTest {
     mockMvc.perform(get("/api/public/cards/" + SHARE_TOKEN))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.displayName").value("Public User"))
+        .andExpect(jsonPath("$.username").value("publicuser"))
         .andExpect(jsonPath("$.conditions").isArray())
         .andExpect(jsonPath("$.conditions[0].condition").value("hiv"))
         .andExpect(jsonPath("$.conditions[0].status").value("NEGATIVE"))
@@ -230,6 +235,35 @@ class VerificationCardControllerTest {
     mockMvc.perform(get("/api/public/cards/nonexistent-token-abc123"))
         .andExpect(status().isBadRequest())
         .andExpect(jsonPath("$.status").value(400));
+  }
+
+  @Test
+  @DisplayName("GET /api/public/cards/{shareToken}/verify should return verification result")
+  void verifyCard_shouldReturn200() throws Exception {
+    CardVerificationResponse verifyResponse = new CardVerificationResponse(
+        true, "2026-03-10T12:00:00Z", "hmac-signature-abc123");
+
+    when(verificationCardService.verifyCard(SHARE_TOKEN)).thenReturn(verifyResponse);
+
+    mockMvc.perform(get("/api/public/cards/" + SHARE_TOKEN + "/verify"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.valid").value(true))
+        .andExpect(jsonPath("$.verifiedAt").value("2026-03-10T12:00:00Z"))
+        .andExpect(jsonPath("$.signature").value("hmac-signature-abc123"));
+  }
+
+  @Test
+  @DisplayName("GET /api/public/cards/{shareToken}/verify should return false for expired card")
+  void verifyCard_expired_shouldReturnFalse() throws Exception {
+    CardVerificationResponse verifyResponse = new CardVerificationResponse(false, null, null);
+
+    when(verificationCardService.verifyCard("expired-token")).thenReturn(verifyResponse);
+
+    mockMvc.perform(get("/api/public/cards/expired-token/verify"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.valid").value(false))
+        .andExpect(jsonPath("$.verifiedAt").doesNotExist())
+        .andExpect(jsonPath("$.signature").doesNotExist());
   }
 
   @Test

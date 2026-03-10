@@ -178,7 +178,8 @@ public class HealthStatusService {
         record.getStatus().name().toLowerCase(),
         record.getTestDate(),
         record.getReportedAt(),
-        record.getClearedAt()
+        record.getClearedAt(),
+        Boolean.TRUE.equals(record.getVerified())
     );
   }
 }

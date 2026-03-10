@@ -16,21 +16,15 @@
 
 package app.navilla.dto;
 
-import java.time.OffsetDateTime;
-import java.util.List;
-
-import jakarta.validation.constraints.Size;
-
 /**
- * Request DTO for updating an existing verification card.
+ * Response DTO for card verification (anti-forgery check).
  *
- * <p>Display name is auto-resolved from the user's profile (firstName + lastName).
- * Test dates are always shown on verification cards.
+ * <p>Returns whether a verification card is currently valid,
+ * when the verification was performed, and an HMAC signature
+ * to prove the response came from Navilla's servers.
  */
-public record UpdateVerificationCardRequest(
-    List<@Size(max = 50) String> includedConditions,
-    Boolean showVerificationLevel,
-    String privacyMode,
-    Integer maxViews,
-    OffsetDateTime expiresAt
+public record CardVerificationResponse(
+    boolean valid,
+    String verifiedAt,
+    String signature
 ) {}

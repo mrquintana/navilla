@@ -430,9 +430,15 @@ public class ConnectionService {
     String partnerAvatarThumbUrl = null;
 
     if (partner != null) {
-      partnerDisplayName = partner.getDisplayNameEncrypted() != null
-          ? encryptionService.decryptFromBytes(partner.getDisplayNameEncrypted())
-          : null;
+      String firstName = partner.getFirstNameEncrypted() != null
+          ? encryptionService.decryptFromBytes(partner.getFirstNameEncrypted()) : null;
+      String lastName = partner.getLastNameEncrypted() != null
+          ? encryptionService.decryptFromBytes(partner.getLastNameEncrypted()) : null;
+      if (firstName != null && lastName != null) {
+        partnerDisplayName = firstName + " " + lastName;
+      } else if (firstName != null) {
+        partnerDisplayName = firstName;
+      }
       partnerUsername = partner.getUsername();
       partnerAvatarThumbUrl = buildPublicUrl(partner.getAvatarThumbKey());
     }

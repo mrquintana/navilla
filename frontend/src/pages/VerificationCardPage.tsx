@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { ShieldCheck, Copy, Check, Trash2, Pencil, QrCode, Share2, Plus, X, Loader2 } from 'lucide-react';
 import { api, type HealthStatus, type VerificationCardResponse } from '../lib/api';
 import { useAuth } from '../hooks/useAuth';
+import { useUser } from '../hooks/useUser';
 import {
   useVerificationCards,
   useCreateVerificationCard,
@@ -113,6 +114,7 @@ export function VerificationCardPage() {
                     <ShieldCheck className="w-4 h-4 text-primary flex-shrink-0" aria-hidden="true" />
                     <span className="font-semibold text-sm truncate">
                       {card.displayName || t('publicCard.anonymous')}
+                      {card.username && <span className="text-muted font-normal ml-1">@{card.username}</span>}
                     </span>
                   </div>
                   <div className="flex flex-wrap items-center gap-2 text-xs text-muted">
@@ -235,12 +237,14 @@ interface CardFormModalProps {
 
 function CardFormModal({ onClose, editingCard, healthStatuses, createMutation, updateMutation }: CardFormModalProps) {
   const { t } = useTranslation();
+  const userQuery = useUser();
+  const profile = userQuery.data;
 
-  const [displayName, setDisplayName] = useState(editingCard?.displayName ?? '');
+  const profileComplete = !!(profile?.firstName && profile?.lastName && profile?.username);
+
   const [selectedConditions, setSelectedConditions] = useState<Set<string>>(
     new Set(editingCard?.includedConditions ?? [])
   );
-  const [showTestDates, setShowTestDates] = useState(editingCard?.showTestDates ?? false);
   const [showVerificationLevel, setShowVerificationLevel] = useState(editingCard?.showVerificationLevel ?? true);
   const [maxViews, setMaxViews] = useState<string>(editingCard?.maxViews?.toString() ?? '');
   const [expiresAt, setExpiresAt] = useState(editingCard?.expiresAt?.split('T')[0] ?? '');
@@ -259,9 +263,7 @@ function CardFormModal({ onClose, editingCard, healthStatuses, createMutation, u
 
   const handleSave = () => {
     const data = {
-      displayName: displayName.trim() || undefined,
       includedConditions: Array.from(selectedConditions),
-      showTestDates,
       showVerificationLevel,
       maxViews: maxViews ? parseInt(maxViews, 10) : undefined,
       expiresAt: expiresAt ? new Date(expiresAt + 'T23:59:59Z').toISOString() : undefined,
@@ -281,10 +283,11 @@ function CardFormModal({ onClose, editingCard, healthStatuses, createMutation, u
     return () => document.removeEventListener('keydown', handler);
   }, [onClose]);
 
-  const uniqueConditions = useMemo(() => {
+  const verifiedConditions = useMemo(() => {
     const seen = new Set<string>();
     return healthStatuses.filter(hs => {
       if (seen.has(hs.condition)) return false;
+      if (!hs.verified || !hs.testDate) return false;
       seen.add(hs.condition);
       return true;
     });
@@ -301,29 +304,35 @@ function CardFormModal({ onClose, editingCard, healthStatuses, createMutation, u
         </div>
 
         <div className="space-y-4">
-          {/* Display name */}
+          {/* Identity section (read-only) */}
           <div>
-            <label className="label mb-1">{t('verificationCard.displayName')}</label>
-            <input
-              type="text"
-              className="input"
-              value={displayName}
-              onChange={(e) => setDisplayName(e.target.value)}
-              placeholder={t('publicCard.anonymous')}
-              maxLength={200}
-            />
-            <p className="text-xs text-muted mt-1">{t('verificationCard.displayNameHint')}</p>
+            {profileComplete ? (
+              <div className="p-3 rounded-lg" style={{ background: 'var(--color-background-secondary)' }}>
+                <p className="text-sm">
+                  {t('verificationCard.cardWillDisplay')}{' '}
+                  <strong>{profile!.firstName} {profile!.lastName}</strong>{' '}
+                  <span className="text-muted">@{profile!.username}</span>
+                </p>
+              </div>
+            ) : (
+              <div className="p-3 rounded-lg border" style={{ borderColor: 'var(--color-warning)', background: '#fffbeb' }}>
+                <p className="text-sm">
+                  {t('verificationCard.profileRequired')}{' '}
+                  <a href="/profile" className="text-primary underline">{t('nav.profile')}</a>
+                </p>
+              </div>
+            )}
           </div>
 
-          {/* Condition checkboxes */}
+          {/* Condition checkboxes — only verified with testDate */}
           <fieldset>
             <legend className="label mb-1">{t('verificationCard.includedConditions')}</legend>
             <p className="text-xs text-muted mb-2">{t('verificationCard.includedConditionsHint')}</p>
             <div className="space-y-2 max-h-48 overflow-y-auto">
-              {uniqueConditions.length === 0 ? (
-                <p className="text-xs text-muted">{t('health.noStatus')}</p>
+              {verifiedConditions.length === 0 ? (
+                <p className="text-xs text-muted">{t('verificationCard.noVerifiedConditions')}</p>
               ) : (
-                uniqueConditions.map((hs) => (
+                verifiedConditions.map((hs) => (
                   <label key={hs.condition} className="flex items-center gap-3 p-2 rounded-lg cursor-pointer hover:bg-stone-50">
                     <input
                       type="checkbox"
@@ -345,15 +354,6 @@ function CardFormModal({ onClose, editingCard, healthStatuses, createMutation, u
 
           {/* Toggles */}
           <div className="space-y-3">
-            <label className="flex items-center gap-3 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={showTestDates}
-                onChange={(e) => setShowTestDates(e.target.checked)}
-                className="accent-indigo-600 w-4 h-4"
-              />
-              <span className="text-sm">{t('verificationCard.showTestDates')}</span>
-            </label>
             <label className="flex items-center gap-3 cursor-pointer">
               <input
                 type="checkbox"
@@ -403,7 +403,7 @@ function CardFormModal({ onClose, editingCard, healthStatuses, createMutation, u
             type="button"
             className="btn btn-primary"
             onClick={handleSave}
-            disabled={isSaving || selectedConditions.size === 0}
+            disabled={isSaving || selectedConditions.size === 0 || !profileComplete}
           >
             {isSaving ? (
               <span className="inline-flex items-center gap-2">

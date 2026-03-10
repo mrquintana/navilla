@@ -48,8 +48,8 @@ export function ProfilePage() {
   const authUserId = session?.user?.id;
 
   const [form, setForm] = useState<UpdateProfileData>({
-    displayName: '',
-    fullName: '',
+    firstName: '',
+    lastName: '',
     username: '',
     sex: '',
     dateOfBirth: '',
@@ -57,7 +57,6 @@ export function ProfilePage() {
     country: '',
     location: '',
     profileVisibility: 'PRIVATE',
-    displayNamePublic: false,
     searchableByEmail: false,
     avatarKey: undefined,
     avatarThumbKey: undefined,
@@ -75,11 +74,9 @@ export function ProfilePage() {
   const fillRandomProfile = () => {
     const names = ['Ana', 'Luis', 'Carla', 'Mateo', 'Sofia', 'Diego', 'Lucia', 'Javier'];
     const surnames = ['Lopez', 'Garcia', 'Hernandez', 'Perez', 'Martinez', 'Santos', 'Diaz'];
-    const name = names[Math.floor(Math.random() * names.length)];
-    const surname = surnames[Math.floor(Math.random() * surnames.length)];
-    const fullName = `${name} ${surname}`;
-    const displayName = `${name} ${surname.charAt(0)}.`;
-    const username = `${name}${surname}`.toLowerCase();
+    const firstName = names[Math.floor(Math.random() * names.length)];
+    const lastName = surnames[Math.floor(Math.random() * surnames.length)];
+    const username = `${firstName}${lastName}`.toLowerCase();
     const sexes = ['male', 'female', 'other'];
     const visibilityOptions: UpdateProfileData['profileVisibility'][] = [
       'PRIVATE',
@@ -90,8 +87,8 @@ export function ProfilePage() {
 
     setForm({
       ...form,
-      displayName,
-      fullName,
+      firstName,
+      lastName,
       username: username.replace(/[^a-z0-9_]/g, ''),
       sex: sexes[Math.floor(Math.random() * sexes.length)],
       dateOfBirth: `19${80 + Math.floor(Math.random() * 20)}-${String(1 + Math.floor(Math.random() * 12)).padStart(2, '0')}-${String(1 + Math.floor(Math.random() * 28)).padStart(2, '0')}`,
@@ -99,7 +96,6 @@ export function ProfilePage() {
       country: randomCountry,
       location: Math.random() > 0.5 ? 'Mexico City' : 'Austin, TX',
       profileVisibility: visibilityOptions[Math.floor(Math.random() * visibilityOptions.length)],
-      displayNamePublic: Math.random() > 0.5,
       searchableByEmail: Math.random() > 0.5,
     });
   };
@@ -109,8 +105,8 @@ export function ProfilePage() {
       return;
     }
     setForm({
-      displayName: profile.displayName ?? '',
-      fullName: profile.fullName ?? '',
+      firstName: profile.firstName ?? '',
+      lastName: profile.lastName ?? '',
       username: profile.username ?? '',
       sex: profile.sex ?? '',
       dateOfBirth: profile.dateOfBirth ?? '',
@@ -118,7 +114,6 @@ export function ProfilePage() {
       country: profile.country ?? '',
       location: profile.location ?? '',
       profileVisibility: profile.profileVisibility ?? 'PRIVATE',
-      displayNamePublic: profile.displayNamePublic ?? false,
       searchableByEmail: profile.searchableByEmail ?? false,
       avatarKey: undefined,
       avatarThumbKey: undefined,
@@ -266,8 +261,8 @@ export function ProfilePage() {
           e.preventDefault();
           const cleaned: UpdateProfileData = {
             ...form,
-            displayName: form.displayName?.trim() || undefined,
-            fullName: form.fullName?.trim() || undefined,
+            firstName: form.firstName?.trim() || undefined,
+            lastName: form.lastName?.trim() || undefined,
             username: form.username?.trim() || undefined,
             sex: form.sex?.trim() || undefined,
             dateOfBirth: form.dateOfBirth?.trim() || undefined,
@@ -319,15 +314,15 @@ export function ProfilePage() {
             <div className="profile-detail">
               <UserCircle2 className="profile-detail-icon" aria-hidden="true" />
               <div>
-                <p className="profile-detail-label">{t('auth.displayName')}</p>
-                <p className="profile-detail-value">{profile?.displayName || '—'}</p>
+                <p className="profile-detail-label">{t('auth.firstName')}</p>
+                <p className="profile-detail-value">{profile?.firstName || '—'}</p>
               </div>
             </div>
             <div className="profile-detail">
               <User className="profile-detail-icon" aria-hidden="true" />
               <div>
-                <p className="profile-detail-label">{t('auth.fullName')}</p>
-                <p className="profile-detail-value">{profile?.fullName || '—'}</p>
+                <p className="profile-detail-label">{t('auth.lastName')}</p>
+                <p className="profile-detail-value">{profile?.lastName || '—'}</p>
               </div>
             </div>
             <div className="profile-detail">
@@ -377,23 +372,23 @@ export function ProfilePage() {
           <>
             <div className="grid gap-4 md:grid-cols-2">
               <div>
-                <label className="label" htmlFor="displayName">{t('auth.displayName')}</label>
+                <label className="label" htmlFor="firstName">{t('auth.firstName')}</label>
                 <input
-                  id="displayName"
+                  id="firstName"
                   className="input"
-                  value={form.displayName ?? ''}
-                  onChange={(e) => setForm({ ...form, displayName: e.target.value })}
-                  maxLength={100}
+                  value={form.firstName ?? ''}
+                  onChange={(e) => setForm({ ...form, firstName: e.target.value })}
+                  maxLength={50}
                 />
               </div>
               <div>
-                <label className="label" htmlFor="fullName">{t('auth.fullName')}</label>
+                <label className="label" htmlFor="lastName">{t('auth.lastName')}</label>
                 <input
-                  id="fullName"
+                  id="lastName"
                   className="input"
-                  value={form.fullName ?? ''}
-                  onChange={(e) => setForm({ ...form, fullName: e.target.value })}
-                  maxLength={200}
+                  value={form.lastName ?? ''}
+                  onChange={(e) => setForm({ ...form, lastName: e.target.value })}
+                  maxLength={50}
                 />
               </div>
             </div>
@@ -722,7 +717,6 @@ function PreferencesSection() {
                         if (profileVisibility === value) return;
                         visibilityMutation.mutate({
                           profileVisibility: value,
-                          displayNamePublic: value === 'PUBLIC' ? (profile?.displayNamePublic ?? false) : false,
                           searchableByEmail: value === 'PUBLIC' ? (profile?.searchableByEmail ?? false) : false,
                         });
                       }}
@@ -748,21 +742,6 @@ function PreferencesSection() {
                     </div>
                   </div>
                   <div className="flex items-center gap-4 flex-shrink-0">
-                    <label className="flex items-center gap-1.5 text-xs">
-                      <input
-                        type="checkbox"
-                        checked={!!profile?.displayNamePublic}
-                        onChange={(e) => {
-                          visibilityMutation.mutate({
-                            profileVisibility: 'PUBLIC',
-                            displayNamePublic: e.target.checked,
-                          });
-                        }}
-                        disabled={visibilityMutation.isPending}
-                        className="accent-indigo-600"
-                      />
-                      {t('profile.searchBadgeDisplay')}
-                    </label>
                     <label className="flex items-center gap-1.5 text-xs">
                       <input
                         type="checkbox"
