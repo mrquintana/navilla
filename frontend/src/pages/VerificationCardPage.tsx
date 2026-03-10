@@ -158,7 +158,7 @@ export function VerificationCardPage() {
                   <QrCode className="w-3.5 h-3.5" aria-hidden="true" />
                   {t('verificationCard.showQR')}
                 </button>
-                {typeof navigator !== 'undefined' && navigator.share && (
+                {typeof navigator !== 'undefined' && typeof navigator.share === 'function' && (
                   <button
                     type="button"
                     className="btn btn-secondary btn-sm"
