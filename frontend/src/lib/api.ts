@@ -559,6 +559,25 @@ export const api = {
     confirm: (token: string, data: LabConfirmRequest) =>
       apiRequest<{ success: boolean }>('/api/labs/confirm', token, { method: 'POST', body: data }),
   },
+  verificationCards: {
+    list: (token: string) =>
+      apiRequest<VerificationCardResponse[]>('/api/verification-cards', token),
+    create: (token: string, data: CreateVerificationCardRequest) =>
+      apiRequest<VerificationCardResponse>('/api/verification-cards', token, { method: 'POST', body: data }),
+    update: (token: string, id: string, data: UpdateVerificationCardRequest) =>
+      apiRequest<VerificationCardResponse>(`/api/verification-cards/${id}`, token, { method: 'PUT', body: data }),
+    delete: (token: string, id: string) =>
+      apiRequest<void>(`/api/verification-cards/${id}`, token, { method: 'DELETE' }),
+    getPublic: async (shareToken: string): Promise<PublicVerificationCardResponse> => {
+      const baseUrl = getApiBaseUrl();
+      const response = await fetch(`${baseUrl}/api/public/cards/${shareToken}`);
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
+        throw new ApiError(error.message || 'Card not available', response.status, error);
+      }
+      return response.json();
+    },
+  },
   phoneMatch: {
     pending: (token: string) =>
       apiRequest<PhoneMatchNotification[]>('/api/phone-match/pending', token),
@@ -962,6 +981,56 @@ export interface InsightsResponse {
   activity: InsightsActivity;
   testing: InsightsTesting;
   prevention: InsightsPrevention;
+}
+
+// ── Verification Cards ──
+export interface CreateVerificationCardRequest {
+  displayName?: string;
+  includedConditions: string[];
+  showTestDates?: boolean;
+  showVerificationLevel?: boolean;
+  maxViews?: number;
+  expiresAt?: string;
+}
+
+export interface UpdateVerificationCardRequest {
+  displayName?: string;
+  includedConditions?: string[];
+  showTestDates?: boolean;
+  showVerificationLevel?: boolean;
+  privacyMode?: string;
+  maxViews?: number;
+  expiresAt?: string;
+}
+
+export interface VerificationCardResponse {
+  id: string;
+  displayName: string | null;
+  includedConditions: string[];
+  showTestDates: boolean;
+  showVerificationLevel: boolean;
+  shareToken: string;
+  shareUrl: string;
+  privacyMode: string;
+  maxViews: number | null;
+  currentViews: number;
+  expiresAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PublicConditionStatus {
+  condition: string;
+  status: string;
+  verificationLevel: string | null;
+  testDate: string | null;
+}
+
+export interface PublicVerificationCardResponse {
+  displayName: string;
+  conditions: PublicConditionStatus[];
+  expiresAt: string | null;
+  viewsRemaining: number | null;
 }
 
 // ── Push Subscriptions ──

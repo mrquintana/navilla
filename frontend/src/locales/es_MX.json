@@ -74,7 +74,8 @@
     "profile": "Perfil",
     "journal": "Diario",
     "insights": "Estadísticas",
-    "network": "Red"
+    "network": "Red",
+    "verificationCard": "Verificación"
   },
   "dashboard": {
     "title": "Tu Red",
@@ -1048,5 +1049,58 @@
     "result": "Resultado",
     "testDate": "Fecha de prueba",
     "patientName": "Nombre del paciente"
+  },
+  "verificationCard": {
+    "title": "Tarjeta de Verificación",
+    "subtitle": "Comparte tu estado de salud verificado de forma segura",
+    "createCard": "Crear Tarjeta",
+    "editCard": "Editar Tarjeta",
+    "savedCards": "Tus Tarjetas",
+    "noCards": "Sin tarjetas de verificación",
+    "noCardsHint": "Crea una tarjeta para compartir tu estado de salud verificado",
+    "displayName": "Nombre",
+    "displayNameHint": "Nombre que aparece en la tarjeta (o Anónimo)",
+    "includedConditions": "Condiciones Incluidas",
+    "includedConditionsHint": "Selecciona qué condiciones mostrar",
+    "showTestDates": "Mostrar Fechas de Prueba",
+    "showVerificationLevel": "Mostrar Nivel de Verificación",
+    "viewLimit": "Límite de Vistas",
+    "viewLimitHint": "Número máximo de veces que se puede ver esta tarjeta",
+    "unlimited": "Sin límite",
+    "expiresAt": "Expira",
+    "expiresAtHint": "La tarjeta dejará de estar disponible después de esta fecha",
+    "noExpiry": "Sin expiración",
+    "shareLink": "Enlace para Compartir",
+    "copyLink": "Copiar Enlace",
+    "linkCopied": "¡Enlace copiado!",
+    "showQR": "Mostrar Código QR",
+    "nativeShare": "Compartir",
+    "views": "{{count}} vistas",
+    "viewsRemaining": "{{count}} vistas restantes",
+    "deleteCard": "Eliminar Tarjeta",
+    "deleteConfirm": "¿Estás seguro de que quieres eliminar esta tarjeta?",
+    "cardCreated": "Tarjeta creada exitosamente",
+    "cardUpdated": "Tarjeta actualizada",
+    "cardDeleted": "Tarjeta eliminada",
+    "preview": "Vista Previa",
+    "qrTitle": "Escanea para Ver",
+    "qrClose": "Cerrar"
+  },
+  "verificationLevel": {
+    "SELF_REPORTED": "Auto-reportado",
+    "LAB_VERIFIED": "Verificado por laboratorio"
+  },
+  "publicCard": {
+    "title": "Verificación de Salud",
+    "verifiedBy": "Verificado por Navilla",
+    "anonymous": "Anónimo",
+    "expired": "Esta tarjeta ya no está disponible",
+    "expiredHint": "La tarjeta pudo haber expirado o alcanzado su límite de vistas",
+    "condition": "Condición",
+    "status": "Estado",
+    "verification": "Verificación",
+    "testDate": "Fecha de Prueba",
+    "expiresOn": "Expira el {{date}}",
+    "viewsLeft": "{{count}} vistas restantes"
   }
 }

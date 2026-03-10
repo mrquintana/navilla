@@ -127,6 +127,12 @@ const InsightsPage = lazy(() =>
 const NetworkPage = lazy(() =>
   import('./pages/NetworkPage').then(m => ({ default: m.NetworkPage })),
 );
+const VerificationCardPage = lazy(() =>
+  import('./pages/VerificationCardPage').then(m => ({ default: m.VerificationCardPage })),
+);
+const PublicVerificationCardPage = lazy(() =>
+  import('./pages/PublicVerificationCardPage').then(m => ({ default: m.PublicVerificationCardPage })),
+);
 
 export const router = createBrowserRouter([
   {
@@ -254,6 +260,24 @@ export const router = createBrowserRouter([
               <NetworkPage />
             </Suspense>
           </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'verification-card',
+        element: (
+          <ProtectedRoute>
+            <Suspense fallback={<FullPageLoader />}>
+              <VerificationCardPage />
+            </Suspense>
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'v/:shareToken',
+        element: (
+          <Suspense fallback={<FullPageLoader />}>
+            <PublicVerificationCardPage />
+          </Suspense>
         ),
       },
       {

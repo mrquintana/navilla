@@ -74,7 +74,8 @@
     "profile": "Profile",
     "journal": "Journal",
     "insights": "Insights",
-    "network": "Network"
+    "network": "Network",
+    "verificationCard": "Verification"
   },
   "dashboard": {
     "title": "Your Network",
@@ -1049,5 +1050,58 @@
     "result": "Result",
     "testDate": "Test Date",
     "patientName": "Patient Name"
+  },
+  "verificationCard": {
+    "title": "Verification Card",
+    "subtitle": "Share your verified health status securely",
+    "createCard": "Create Card",
+    "editCard": "Edit Card",
+    "savedCards": "Your Cards",
+    "noCards": "No verification cards yet",
+    "noCardsHint": "Create a card to share your verified health status",
+    "displayName": "Display Name",
+    "displayNameHint": "Name shown on the card (or Anonymous)",
+    "includedConditions": "Included Conditions",
+    "includedConditionsHint": "Select which conditions to show",
+    "showTestDates": "Show Test Dates",
+    "showVerificationLevel": "Show Verification Level",
+    "viewLimit": "View Limit",
+    "viewLimitHint": "Maximum number of times this card can be viewed",
+    "unlimited": "Unlimited",
+    "expiresAt": "Expires",
+    "expiresAtHint": "Card will no longer be accessible after this date",
+    "noExpiry": "No expiry",
+    "shareLink": "Share Link",
+    "copyLink": "Copy Link",
+    "linkCopied": "Link copied!",
+    "showQR": "Show QR Code",
+    "nativeShare": "Share",
+    "views": "{{count}} views",
+    "viewsRemaining": "{{count}} views remaining",
+    "deleteCard": "Delete Card",
+    "deleteConfirm": "Are you sure you want to delete this card?",
+    "cardCreated": "Card created successfully",
+    "cardUpdated": "Card updated",
+    "cardDeleted": "Card deleted",
+    "preview": "Preview",
+    "qrTitle": "Scan to View",
+    "qrClose": "Close"
+  },
+  "verificationLevel": {
+    "SELF_REPORTED": "Self-reported",
+    "LAB_VERIFIED": "Lab verified"
+  },
+  "publicCard": {
+    "title": "Health Verification",
+    "verifiedBy": "Verified by Navilla",
+    "anonymous": "Anonymous",
+    "expired": "This card is no longer available",
+    "expiredHint": "The card may have expired or reached its view limit",
+    "condition": "Condition",
+    "status": "Status",
+    "verification": "Verification",
+    "testDate": "Test Date",
+    "expiresOn": "Expires on {{date}}",
+    "viewsLeft": "{{count}} views remaining"
   }
 }
