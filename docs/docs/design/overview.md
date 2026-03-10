@@ -15,7 +15,7 @@ This section documents Navilla's design decisions, visual identity, and componen
 
 The interactive design reference page shows all evaluated styles side by side, with every component and dark mode support:
 
-👉 **[Open Design Reference](/design-reference.html)**
+<!-- Design reference page planned for future -->
 
 ## Design Principles
 

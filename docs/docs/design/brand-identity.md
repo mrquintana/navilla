@@ -173,7 +173,7 @@ The color and typography system should be reinforced by the tone of all UI text:
 
 The full interactive design reference — showing all 14 explored directions, all components, and dark mode for each — is available here:
 
-👉 **[Open Design Reference](/design-reference.html)**
+<!-- Design reference page planned for future -->
 
 Use the dropdown in the top-right corner to switch between styles, and the toggle to compare light and dark modes.
 
