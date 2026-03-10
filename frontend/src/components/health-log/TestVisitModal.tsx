@@ -262,6 +262,7 @@ function LabVerifyFlow({ onClose, onBack }: { onClose: () => void; onBack: () =>
   const [verifyResult, setVerifyResult] = useState<LabVerifyResponse | null>(null);
   const [resolvedVisitId, setResolvedVisitId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [confirmNotes, setConfirmNotes] = useState('');
 
   const { data: providers, isLoading: providersLoading } = useLabProviders();
   const verifyMutation = useLabVerify();
@@ -300,7 +301,10 @@ function LabVerifyFlow({ onClose, onBack }: { onClose: () => void; onBack: () =>
   const handleConfirm = async () => {
     if (!resolvedVisitId) return;
     try {
-      await confirmMutation.mutateAsync({ visitId: resolvedVisitId });
+      await confirmMutation.mutateAsync({
+        visitId: resolvedVisitId,
+        notes: confirmNotes.trim() || undefined,
+      });
       onClose();
     } catch {
       setError(t('labVerification.errorGeneric'));
@@ -491,6 +495,43 @@ function LabVerifyFlow({ onClose, onBack }: { onClose: () => void; onBack: () =>
               {t('labVerification.patientName')}: {verifyResult.results[0].patientName}
             </p>
           )}
+
+          {/* Impact summary */}
+          <div
+            className="rounded-lg p-3 space-y-1"
+            style={{ backgroundColor: 'rgba(79, 70, 229, 0.06)' }}
+          >
+            <p className="text-xs font-medium" style={{ color: 'var(--color-primary)' }}>
+              {t('labVerification.impactSummary')}
+            </p>
+            {verifyResult.results.map((r, i) => (
+              <p key={i} className="text-xs text-muted">
+                {t('labVerification.willBeUpdated', {
+                  condition: r.conditionCode,
+                  status: r.result === 'NEGATIVE'
+                    ? t('labVerification.resultNegative')
+                    : t('labVerification.resultPositive'),
+                })}
+              </p>
+            ))}
+          </div>
+
+          {/* Notes textarea */}
+          <div>
+            <label className="label" htmlFor="lab-confirm-notes">
+              {t('healthLog.notes')}
+            </label>
+            <textarea
+              id="lab-confirm-notes"
+              className="input w-full"
+              rows={2}
+              value={confirmNotes}
+              placeholder={t('labVerification.notesPlaceholder')}
+              maxLength={5000}
+              onChange={(e) => setConfirmNotes(e.target.value)}
+            />
+          </div>
+
           <div className="flex items-center justify-between pt-2">
             <button type="button" className="btn btn-secondary btn-sm" onClick={handleBack}>
               {t('labVerification.back')}

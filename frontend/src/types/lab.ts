@@ -39,4 +39,5 @@ export interface LabVerifyRequest {
 
 export interface LabConfirmRequest {
   visitId: string;
+  notes?: string;
 }

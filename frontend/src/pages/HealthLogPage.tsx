@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
-import { Lock, Plus, HelpCircle, ExternalLink, Pill, Syringe, ChevronDown } from 'lucide-react';
+import { Lock, Plus, HelpCircle, ExternalLink, Pill, Syringe, ChevronDown, Calendar, Edit3, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
-import { useHealthLogSummary } from '../hooks/useHealthLog';
+import { useHealthLogSummary, useHealthLogVisits } from '../hooks/useHealthLog';
 import { useMedications } from '../hooks/useMedications';
 import { useVaccinations } from '../hooks/useVaccinations';
 import { api } from '../lib/api';
@@ -84,11 +84,14 @@ function TestsTabContent() {
   const token = session?.access_token ?? '';
 
   const [modalOpen, setModalOpen] = useState(false);
+  const [editingVisit, setEditingVisit] = useState<import('../lib/api').TestVisit | null>(null);
   const [showAllExposures, setShowAllExposures] = useState(false);
+  const [showAllVisits, setShowAllVisits] = useState(false);
   const [showExposureInfo, setShowExposureInfo] = useState(false);
   const [verifyVisitId, setVerifyVisitId] = useState<string | null>(null);
 
   const summaryQuery = useHealthLogSummary();
+  const visitsQuery = useHealthLogVisits();
   const exposureQuery = useQuery({
     queryKey: ['exposures'],
     queryFn: () => api.exposures.get(token),
@@ -264,6 +267,78 @@ function TestsTabContent() {
         )}
       </div>
 
+      {/* Visit History section */}
+      {visitsQuery.data && visitsQuery.data.length > 0 && (
+        <div className="space-y-3">
+          <h3 className="font-semibold">{t('healthLog.visitHistory.title')}</h3>
+          <div className="space-y-2">
+            {(showAllVisits
+              ? [...visitsQuery.data].sort((a, b) => b.testDate.localeCompare(a.testDate))
+              : [...visitsQuery.data].sort((a, b) => b.testDate.localeCompare(a.testDate)).slice(0, 5)
+            ).map((visit) => (
+              <div
+                key={visit.id}
+                className="card card-elevated flex items-center gap-3 p-3"
+              >
+                <div
+                  className="flex items-center justify-center w-9 h-9 rounded-lg shrink-0"
+                  style={{ backgroundColor: 'rgba(79, 70, 229, 0.08)' }}
+                >
+                  <Calendar className="w-4 h-4" style={{ color: 'var(--color-primary)' }} aria-hidden="true" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium">
+                    {new Date(visit.testDate + 'T00:00:00').toLocaleDateString(i18n.language, {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric',
+                    })}
+                  </p>
+                  <div className="flex items-center gap-2 text-xs text-muted">
+                    {visit.labName && <span>{visit.labName}</span>}
+                    {visit.labName && visit.results.length > 0 && <span>&bull;</span>}
+                    <span>
+                      {t('healthLog.visitHistory.resultCount', { count: visit.results.length })}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  {visit.verified && (
+                    <CheckCircle2
+                      className="w-4 h-4"
+                      style={{ color: 'var(--color-success)' }}
+                      aria-label={t('healthLog.verified')}
+                    />
+                  )}
+                  <button
+                    type="button"
+                    className="btn btn-secondary btn-sm p-1.5"
+                    onClick={() => {
+                      setEditingVisit(visit);
+                      setModalOpen(true);
+                    }}
+                    aria-label={t('healthLog.editVisit')}
+                  >
+                    <Edit3 className="w-3.5 h-3.5" aria-hidden="true" />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+          {visitsQuery.data.length > 5 && (
+            <button
+              type="button"
+              className="btn btn-secondary btn-sm"
+              onClick={() => setShowAllVisits((v) => !v)}
+            >
+              {showAllVisits
+                ? t('healthLog.visitHistory.showLess')
+                : t('healthLog.visitHistory.showAll')}
+            </button>
+          )}
+        </div>
+      )}
+
       {/* Lab Verification Modal */}
       {verifyVisitId && (
         <LabVerificationModal
@@ -289,7 +364,11 @@ function TestsTabContent() {
       {/* Test Visit Modal */}
       <TestVisitModal
         isOpen={modalOpen}
-        onClose={() => setModalOpen(false)}
+        onClose={() => {
+          setModalOpen(false);
+          setEditingVisit(null);
+        }}
+        editVisit={editingVisit}
       />
 
       {/* Exposure Info Modal */}

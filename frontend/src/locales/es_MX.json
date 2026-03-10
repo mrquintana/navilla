@@ -794,6 +794,14 @@
       "labConnectDescription": "Importa resultados verificados directamente de tu laboratorio",
       "manualEntry": "Ingresar Manualmente",
       "manualEntryDescription": "Reporta tus resultados de pruebas"
+    },
+    "visitHistory": {
+      "title": "Historial de Visitas",
+      "showAll": "Ver todas las visitas",
+      "showLess": "Ver menos",
+      "resultCount_one": "{{count}} resultado",
+      "resultCount_other": "{{count}} resultados",
+      "noVisits": "Aún no hay visitas registradas"
     }
   },
   "myHealth": {
@@ -1018,6 +1026,9 @@
     "verifying": "Consultando con el laboratorio...",
     "reviewResults": "Revisa tus resultados",
     "confirmResults": "Confirmar y guardar",
+    "notesPlaceholder": "Agrega notas sobre esta visita...",
+    "impactSummary": "Qué cambiará",
+    "willBeUpdated": "{{condition}} → {{status}} (verificado)",
     "cancel": "Cancelar",
     "back": "Atrás",
     "saveCredentials": "Guardar para futuras consultas",

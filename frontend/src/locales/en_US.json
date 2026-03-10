@@ -795,6 +795,14 @@
       "labConnectDescription": "Import verified results directly from your lab",
       "manualEntry": "Enter Manually",
       "manualEntryDescription": "Self-report your test results"
+    },
+    "visitHistory": {
+      "title": "Visit History",
+      "showAll": "Show all visits",
+      "showLess": "Show less",
+      "resultCount_one": "{{count}} result",
+      "resultCount_other": "{{count}} results",
+      "noVisits": "No visits recorded yet"
     }
   },
   "myHealth": {
@@ -1019,6 +1027,9 @@
     "verifying": "Checking with lab...",
     "reviewResults": "Review your results",
     "confirmResults": "Confirm & Save",
+    "notesPlaceholder": "Add any notes about this visit...",
+    "impactSummary": "What will change",
+    "willBeUpdated": "{{condition}} → {{status}} (verified)",
     "cancel": "Cancel",
     "back": "Back",
     "saveCredentials": "Save for future visits",
