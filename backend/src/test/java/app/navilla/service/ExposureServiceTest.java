@@ -22,6 +22,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -29,6 +30,8 @@ import java.util.UUID;
 import app.navilla.dto.ExposureResponse;
 import app.navilla.entity.Connection;
 import app.navilla.entity.ConnectionStatus;
+import app.navilla.entity.HealthStatus;
+import app.navilla.entity.HealthStatusValue;
 import app.navilla.entity.User;
 import app.navilla.metrics.ExposureMetrics;
 import app.navilla.repository.ConnectionRepository;
@@ -290,6 +293,111 @@ class ExposureServiceTest {
 
       // Health statuses should be queried for opted-in users
       verify(healthStatusRepository).findByUserHashInAndStatus(any(), any());
+    }
+  }
+
+  @Nested
+  @DisplayName("computeRecencyBucket - 4-bucket boundary tests")
+  class RecencyBucketTests {
+
+    /**
+     * Helper to set up a full exposure computation with a single POSITIVE health status
+     * whose reportedAt is set to the given value, then return the resulting timeframe bucket.
+     */
+    private String computeBucketForReportedAt(OffsetDateTime reportedAt) {
+      // Use minimumConnections = 1 for these tests so one connection suffices
+      ReflectionTestUtils.setField(exposureService, "minimumConnections", 1);
+
+      String partnerHash = "partner-hash-recency";
+      User partnerUser = User.builder().emailHash(partnerHash).exposureOptedIn(true).build();
+
+      when(encryptionService.hashEmail(USER_EMAIL)).thenReturn(USER_HASH);
+      when(userRepository.findByEmailHash(USER_HASH)).thenReturn(Optional.of(optedInUser));
+      when(exposureSnapshotRepository.findByUserHash(USER_HASH)).thenReturn(Optional.empty());
+
+      Connection conn = Connection.builder()
+          .requesterHash(USER_HASH).recipientHash(partnerHash)
+          .status(ConnectionStatus.CONFIRMED).build();
+      when(connectionRepository.findByStatus(ConnectionStatus.CONFIRMED))
+          .thenReturn(List.of(conn));
+
+      when(userRepository.findByEmailHashIn(any()))
+          .thenReturn(List.of(partnerUser));
+
+      HealthStatus hs = HealthStatus.builder()
+          .userHash(partnerHash)
+          .conditionType("chlamydia")
+          .status(HealthStatusValue.POSITIVE)
+          .reportedAt(reportedAt)
+          .build();
+      when(healthStatusRepository.findByUserHashInAndStatus(any(), any()))
+          .thenReturn(List.of(hs));
+
+      when(exposureMetrics.timeComputation(any())).thenAnswer(invocation -> {
+        var supplier = invocation.getArgument(0, java.util.function.Supplier.class);
+        return supplier.get();
+      });
+
+      ExposureResponse response = exposureService.getExposureSnapshot(jwt);
+
+      assertThat(response.exposures()).hasSize(1);
+      return response.exposures().get(0).timeframe();
+    }
+
+    @Test
+    @DisplayName("reportedAt 29 days ago -> bucket 0_30d")
+    void reportedAt_29daysAgo_bucket0_30d() {
+      String bucket = computeBucketForReportedAt(OffsetDateTime.now().minusDays(29));
+      assertThat(bucket).isEqualTo("0_30d");
+    }
+
+    @Test
+    @DisplayName("reportedAt 30 days ago -> bucket 0_30d (boundary: <=30)")
+    void reportedAt_30daysAgo_bucket0_30d_boundary() {
+      String bucket = computeBucketForReportedAt(OffsetDateTime.now().minusDays(30));
+      assertThat(bucket).isEqualTo("0_30d");
+    }
+
+    @Test
+    @DisplayName("reportedAt 31 days ago -> bucket 31_90d")
+    void reportedAt_31daysAgo_bucket31_90d() {
+      String bucket = computeBucketForReportedAt(OffsetDateTime.now().minusDays(31));
+      assertThat(bucket).isEqualTo("31_90d");
+    }
+
+    @Test
+    @DisplayName("reportedAt 90 days ago -> bucket 31_90d (boundary: <=90)")
+    void reportedAt_90daysAgo_bucket31_90d_boundary() {
+      String bucket = computeBucketForReportedAt(OffsetDateTime.now().minusDays(90));
+      assertThat(bucket).isEqualTo("31_90d");
+    }
+
+    @Test
+    @DisplayName("reportedAt 91 days ago -> bucket 91_365d")
+    void reportedAt_91daysAgo_bucket91_365d() {
+      String bucket = computeBucketForReportedAt(OffsetDateTime.now().minusDays(91));
+      assertThat(bucket).isEqualTo("91_365d");
+    }
+
+    @Test
+    @DisplayName("reportedAt 365 days ago -> bucket 91_365d (boundary: <=365)")
+    void reportedAt_365daysAgo_bucket91_365d_boundary() {
+      String bucket = computeBucketForReportedAt(OffsetDateTime.now().minusDays(365));
+      assertThat(bucket).isEqualTo("91_365d");
+    }
+
+    @Test
+    @DisplayName("reportedAt 366 days ago -> bucket 365d_plus")
+    void reportedAt_366daysAgo_bucket365d_plus() {
+      String bucket = computeBucketForReportedAt(OffsetDateTime.now().minusDays(366));
+      assertThat(bucket).isEqualTo("365d_plus");
+    }
+
+    @Test
+    @DisplayName("null reportedAt -> bucket 365d_plus")
+    void reportedAt_null_bucket365d_plus() {
+      String bucket = computeBucketForReportedAt(null);
+      assertThat(bucket).isEqualTo("365d_plus");
     }
   }
 }
