@@ -268,7 +268,7 @@ export function DashboardPage() {
                     return (
                       <div
                         key={item.condition}
-                        className="exposure-item"
+                        className={"exposure-item" + (item.timeframe === "31_90d" ? " opacity-85" : item.timeframe === "91_365d" ? " opacity-70" : item.timeframe === "365d_plus" ? " opacity-55" : "")}
                       >
                         <div className="text-xs font-semibold uppercase tracking-wide text-foreground">
                           <a

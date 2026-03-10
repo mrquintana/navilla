@@ -206,8 +206,8 @@ public class ExposureService {
         agg.hasActive = true;
       }
       if (status.getReportedAt() != null
-          && status.getReportedAt().isAfter(now.minus(30, ChronoUnit.DAYS))) {
-        agg.hasRecent = true;
+          && (agg.mostRecentReport == null || status.getReportedAt().isAfter(agg.mostRecentReport))) {
+        agg.mostRecentReport = status.getReportedAt();
       }
     }
 
@@ -218,7 +218,7 @@ public class ExposureService {
               entry.getKey(),
               agg.userHashes.size(),
               agg.closestDegree == Integer.MAX_VALUE ? maxDepth : agg.closestDegree,
-              agg.hasRecent ? "recent" : "older",
+              computeRecencyBucket(agg.mostRecentReport, now),
               agg.hasActive ? "active" : "resolved"
           );
         })
@@ -351,10 +351,27 @@ public class ExposureService {
         .toList();
   }
 
+  private String computeRecencyBucket(OffsetDateTime mostRecentReport, OffsetDateTime now) {
+    if (mostRecentReport == null) {
+      return "365d_plus";
+    }
+    long daysSince = ChronoUnit.DAYS.between(mostRecentReport, now);
+    if (daysSince <= 30) {
+      return "0_30d";
+    }
+    if (daysSince <= 90) {
+      return "31_90d";
+    }
+    if (daysSince <= 365) {
+      return "91_365d";
+    }
+    return "365d_plus";
+  }
+
   private static final class ExposureAggregate {
     private final Set<String> userHashes = new HashSet<>();
     private int closestDegree = Integer.MAX_VALUE;
-    private boolean hasRecent = false;
+    private OffsetDateTime mostRecentReport = null;
     private boolean hasActive = false;
   }
 }

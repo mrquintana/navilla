@@ -123,16 +123,20 @@
       "resolved": "Resuelto"
     },
     "exposureTimeframe": {
-      "recent": "Reciente",
-      "older": "Anterior"
+      "0_30d": "Últimos 30 días",
+      "31_90d": "1–3 meses",
+      "91_365d": "3–12 meses",
+      "365d_plus": "Más de un año"
     },
     "exposureStatusHint": {
       "active": "Al menos una persona en tu red tiene actualmente esta condicion",
       "resolved": "Todos los reportes de esta condicion en tu red han sido resueltos"
     },
     "exposureTimeframeHint": {
-      "recent": "Reportado en los ultimos 30 dias",
-      "older": "Reportado hace mas de 30 dias"
+      "0_30d": "Reportado en los últimos 30 días",
+      "31_90d": "Reportado hace 1 a 3 meses",
+      "91_365d": "Reportado hace 3 a 12 meses",
+      "365d_plus": "Reportado hace más de un año"
     },
     "goToInsights": "Perspectivas",
     "constellation": "Tu Constelación",

@@ -246,7 +246,7 @@ function TestsTabContent() {
             </div>
             {(showAllExposures ? exposureItems : exposureItems.slice(0, 6)).map(
               (item) => (
-                <div key={item.condition} className="exposure-item">
+                <div key={item.condition} className={"exposure-item" + (item.timeframe === "31_90d" ? " opacity-85" : item.timeframe === "91_365d" ? " opacity-70" : item.timeframe === "365d_plus" ? " opacity-55" : "")}>
                   <div className="text-xs font-semibold uppercase tracking-wide text-foreground">
                     <a
                       className="health-condition-link"

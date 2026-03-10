@@ -123,16 +123,20 @@
       "resolved": "Resolved"
     },
     "exposureTimeframe": {
-      "recent": "Recent",
-      "older": "Older"
+      "0_30d": "Last 30 days",
+      "31_90d": "1–3 months",
+      "91_365d": "3–12 months",
+      "365d_plus": "Over a year"
     },
     "exposureStatusHint": {
       "active": "At least one person in your network currently has this condition",
       "resolved": "All reports of this condition in your network have been cleared"
     },
     "exposureTimeframeHint": {
-      "recent": "Reported within the last 30 days",
-      "older": "Reported more than 30 days ago"
+      "0_30d": "Reported within the last 30 days",
+      "31_90d": "Reported 1 to 3 months ago",
+      "91_365d": "Reported 3 to 12 months ago",
+      "365d_plus": "Reported over a year ago"
     },
     "goToInsights": "Insights",
     "constellation": "Your Constellation",
