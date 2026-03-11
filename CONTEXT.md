@@ -169,6 +169,25 @@ A detailed breakdown of the project's directory layout and key files can be foun
 ### Next Steps
 - Week 12: Check `UPCOMING_FEATURES_AND_ROADMAP.md` for next milestone
 
+## Session Notes (2026-03-10 continued — Verification Card Redesign + Profile Refactor)
+
+### What was done
+- **Profile refactor**: Replaced displayName/fullName with firstName/lastName across entire stack (migration 017, entity, DTOs, services, frontend)
+- **Verification card hardening**: Identity auto-resolved from profile (no free-text), lab-verified conditions only (verified=true + testDate required), HMAC verification endpoint, showTestDates always true
+- **Card builder redesign**: Read-only identity display, verified-only condition picker, profile-incomplete guard blocks card creation
+- **Anti-forgery public card**: Holographic shimmer CSS, animated gradient border, watermark overlay, live server verification badge (60s polling), mouse-tracking effects
+- **Nav bar**: Added verification card link to header navigation
+- Migration 017: first_name_encrypted, last_name_encrypted replacing display_name_encrypted, full_name_encrypted, display_name_public dropped
+- 436 backend tests, 285 frontend tests passing
+- Next migration: 018
+
+### Key decisions
+- **No free-text names on cards** — identity always auto-resolved from profile firstName + lastName + @username
+- **Lab-verified only** — self-reported conditions excluded from verification cards entirely
+- **showTestDates always true** — removed toggle, test dates are always shown for trust
+- **HMAC verification** — public cards call `/verify` endpoint on load + every 60s, returns cryptographic signature
+- **Holographic CSS** — five visual anti-forgery layers make screenshots immediately distinguishable from live cards
+
 ## Session Notes (2026-03-09 — Visit History List + Lab Review Improvements)
 
 ### Accomplished
