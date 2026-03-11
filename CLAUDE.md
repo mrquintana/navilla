@@ -98,12 +98,14 @@ gh issue create --title "Title" --body "Description"
 
 ## Project Context
 - Main tracking file: `/CONTEXT.md`
-- Product roadmap: `/UPCOMING_FEATURES_AND_ROADMAP.md` (source of truth for what to build)
+- Roadmap summary (loaded at session start): `/ROADMAP_SUMMARY.md`
+- Full roadmap with detailed feature specs (read on-demand): `docs/plans/full-roadmap.md`
+- Session history archive: `docs/session-archive.md`
 - Documentation site: `/docs` (Docusaurus)
 - Backend: Java 25 + Spring Boot 4.0.2
 - Frontend: React 19 + Vite + TypeScript + TailwindCSS
 - Auth: Supabase Auth
-- Email: SendGrid (SMTP via Supabase)
+- Email: SendGrid HTTP API v3 (NOT SMTP — Railway blocks SMTP ports)
 - Hosting: Railway (backend + frontend)
 - i18n: react-i18next (en_US, es_MX)
 - Primary language: English (en_US)
@@ -114,8 +116,8 @@ gh issue create --title "Title" --body "Description"
 ### How Sessions Work
 - The user is the **product owner** — they review, test, and provide design direction
 - The agent does implementation, testing, documentation, and code review
-- Always read `UPCOMING_FEATURES_AND_ROADMAP.md` at session start to understand current priorities
-- When the user says "Build [feature]" or "Start Week X", find the relevant section in the roadmap
+- Always read `ROADMAP_SUMMARY.md` at session start to understand current priorities
+- When the user says "Build [feature]" or "Start Week X", read `docs/plans/full-roadmap.md` for the detailed spec
 
 ### Be a Proactive Partner (Non-negotiable)
 - **Don't just fix what the user reports** — when fixing a bug on one page, check ALL similar pages for the same issue. If you fix the login page, check signup, forgot-password, and reset-password too
