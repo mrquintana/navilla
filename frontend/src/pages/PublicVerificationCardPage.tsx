@@ -5,6 +5,9 @@ import { useQuery } from '@tanstack/react-query';
 import { ShieldCheck, ShieldAlert, Clock, Eye } from 'lucide-react';
 import { api, type PublicVerificationCardResponse, type CardVerificationResponse } from '../lib/api';
 
+const VERIFY_INTERVAL_MS = 30_000; // Re-verify every 30s
+const STALE_THRESHOLD_MS = 60_000; // Badge degrades after 60s without successful verification
+
 export function PublicVerificationCardPage() {
   const { shareToken } = useParams<{ shareToken: string }>();
   const { t, i18n } = useTranslation();
@@ -19,7 +22,15 @@ export function PublicVerificationCardPage() {
 
   const [verification, setVerification] = useState<CardVerificationResponse | null>(null);
   const [verifyFailed, setVerifyFailed] = useState(false);
+  const [lastVerifiedAt, setLastVerifiedAt] = useState<number | null>(null);
+  const [now, setNow] = useState(0);
   const [mousePos, setMousePos] = useState({ x: 50, y: 50 });
+
+  // Tick every second for live relative-time display
+  useEffect(() => {
+    const tick = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(tick);
+  }, []);
 
   const runVerification = useCallback(async () => {
     if (!shareToken) return;
@@ -27,6 +38,7 @@ export function PublicVerificationCardPage() {
       const result = await api.verificationCards.verify(shareToken);
       setVerification(result);
       setVerifyFailed(false);
+      setLastVerifiedAt(Date.now());
     } catch {
       setVerifyFailed(true);
     }
@@ -34,12 +46,19 @@ export function PublicVerificationCardPage() {
 
   useEffect(() => {
     if (cardQuery.data) {
-      // Defer initial verification to avoid synchronous setState in effect body
       const timeout = setTimeout(runVerification, 0);
-      const interval = setInterval(runVerification, 60000);
+      const interval = setInterval(runVerification, VERIFY_INTERVAL_MS);
       return () => { clearTimeout(timeout); clearInterval(interval); };
     }
   }, [cardQuery.data, runVerification]);
+
+  // Freshness computation — independent of polling (now=0 means ticker not yet initialized)
+  const secondsAgo = (lastVerifiedAt && now > 0) ? Math.floor((now - lastVerifiedAt) / 1000) : null;
+  const isStale = secondsAgo !== null && secondsAgo * 1000 >= STALE_THRESHOLD_MS;
+  const isFresh = secondsAgo !== null && !isStale && verification?.valid;
+  const timeAgo = secondsAgo !== null
+    ? secondsAgo < 60 ? `${secondsAgo}s` : `${Math.floor(secondsAgo / 60)}m`
+    : null;
 
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -106,12 +125,16 @@ export function PublicVerificationCardPage() {
                 {card.username && (
                   <p className="text-sm mt-0.5" style={{ color: 'var(--color-primary)' }}>@{card.username}</p>
                 )}
-                {/* Live verification badge */}
+                {/* Live verification badge — 3 states: fresh / stale / failed */}
                 <div className="mt-3">
-                  {verification?.valid ? (
+                  {isFresh ? (
                     <span className="verification-badge-live verification-badge-live--valid">
                       <span className="pulse-dot" />
-                      {t('publicCard.liveVerified')}
+                      {t('publicCard.verifiedAgo', { time: timeAgo })}
+                    </span>
+                  ) : isStale ? (
+                    <span className="verification-badge-live verification-badge-live--stale">
+                      {t('publicCard.staleAgo', { time: timeAgo })}
                     </span>
                   ) : verifyFailed ? (
                     <span className="verification-badge-live verification-badge-live--invalid">

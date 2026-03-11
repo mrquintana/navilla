@@ -3711,6 +3711,12 @@ section.hero + section {
   border: 1px solid rgba(22, 163, 74, 0.2);
 }
 
+.verification-badge-live--stale {
+  background: rgba(227, 160, 8, 0.1);
+  color: #b45309;
+  border: 1px solid rgba(227, 160, 8, 0.2);
+}
+
 .verification-badge-live--invalid {
   background: rgba(220, 53, 69, 0.1);
   color: #dc3545;

@@ -1094,6 +1094,8 @@
     "title": "Health Verification",
     "verifiedBy": "Verified by Navilla",
     "liveVerified": "Server Verified",
+    "verifiedAgo": "Verified · {{time}} ago",
+    "staleAgo": "Last verified {{time}} ago",
     "verificationFailed": "Could not verify",
     "labVerified": "Lab Verified",
     "verifiedByPrefix": "Verified by ",

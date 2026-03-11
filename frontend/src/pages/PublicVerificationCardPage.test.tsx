@@ -16,6 +16,7 @@ vi.mock('react-i18next', () => ({
     t: (key: string, opts?: Record<string, unknown>) => {
       if (opts && 'count' in opts) return `${key}:${opts.count}`;
       if (opts && 'date' in opts) return `${key}:${opts.date}`;
+      if (opts && 'time' in opts) return `${key}:${opts.time}`;
       return key;
     },
     i18n: { language: 'en_US' },

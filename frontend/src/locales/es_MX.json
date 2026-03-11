@@ -1093,6 +1093,8 @@
     "title": "Verificación de Salud",
     "verifiedBy": "Verificado por Navilla",
     "liveVerified": "Verificado por servidor",
+    "verifiedAgo": "Verificado · hace {{time}}",
+    "staleAgo": "Última verificación hace {{time}}",
     "verificationFailed": "No se pudo verificar",
     "labVerified": "Verificado por Laboratorio",
     "verifiedByPrefix": "Verificado por ",
