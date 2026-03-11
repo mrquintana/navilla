@@ -109,7 +109,7 @@
 - [x] Week 10: Network Constellation Visualization (pluggable engine + Canvas 2D + share card)
 - [x] Week 10: Profile page consolidation (Settings → Preferences, segmented visibility control)
 - [x] Week 11: Verified test badges / Exposure recency buckets
-- [ ] Week 12: Vault + app lock + notification privacy
+- [ ] Week 12: Notification privacy + polish (vault + app lock DEFERRED post-launch)
 - [ ] Week 13: Data retention + connection staleness
 - [ ] Week 14: Network health stats + Layer 2 polish
 
@@ -299,7 +299,7 @@ A detailed breakdown of the project's directory layout and key files can be foun
 ### Next Steps
 - [ ] Shareable Connection Links (growth engine)
 - [ ] Exposure Recency Buckets
-- [ ] Vault + App Lock
+- [ ] ~~Vault + App Lock~~ DEFERRED post-launch
 - [ ] Data Retention + Connection Staleness
 - [ ] Cold Start / Estimated Network
 

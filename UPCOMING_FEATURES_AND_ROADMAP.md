@@ -982,7 +982,7 @@ Over time, connections become stale. Someone you connected with 2 years ago may 
 
 ---
 
-### Feature 2.8: Private Vault (Safety Feature)
+### Feature 2.8: Private Vault (Safety Feature) — DEFERRED (nice-to-have post-launch)
 
 **The problem this solves:**
 A controlling or jealous partner could demand to see someone's Navilla history. An abusive partner could grab the phone and look through the encounter journal. In conservative environments, having visible evidence of sexual activity (especially same-sex activity) could put someone at risk. The app must protect users from coerced disclosure.
@@ -1118,9 +1118,9 @@ The two layers strengthen each other:
 | Privacy settings granularity | Partially built | Visibility exists, reciprocity opt-in is new |
 | Archived connections | Not built | New lifecycle state |
 | Exposure network reciprocity opt-in | Not built | Permanent opt-in with typed confirmation |
-| Private vault (safety feature) | Not built | Hidden vault with secret phrase trigger |
+| Private vault (safety feature) | **DEFERRED** | Nice-to-have post-launch — hidden vault with secret phrase trigger |
 | Data retention controls | Not built | Auto-delete encounters/tests after configurable window |
-| App-level PIN/biometric lock | Not built | Separate from phone lock |
+| App-level PIN/biometric lock | **DEFERRED** | Nice-to-have post-launch — separate from phone lock |
 | Notification privacy (vague previews) | Not built | Safety feature for lock screen |
 
 ---
@@ -1699,7 +1699,7 @@ All factual content (symptoms, testing windows, treatment) must be verified agai
 |------|-------|-------------|
 | 10 | Shareable connection links + reciprocity opt-in | Backend: connection_invites table, invite link generation/redemption API. Frontend: share link UI, "Join exposure network" opt-in flow with ACEPTO confirmation. Non-user landing page for invite links |
 | 11 | Exposure recency buckets (WS-A from playbook) | Backend: recency metadata in exposure API response (0-30d, 31-90d, 91-365d, 365d+). Frontend: updated exposure dashboard with recency labels, visual de-emphasis of old data. Update How It Works page |
-| 12 | Vault + app lock + notification privacy | Backend: user_vault, vaulted_items tables. Frontend: vault activation via search phrase, vault/unveil UI, auto-lock timer. App-level PIN lock. Vague notification previews |
+| 12 | ~~Vault + app lock~~ **DEFERRED** — Notification privacy + polish | ~~Vault + app lock deferred to post-launch (nice-to-have when real users exist).~~ Notification privacy: vague notification previews. Additional polish and bug fixes |
 | 13 | Data retention + connection staleness | Backend: retention settings, daily cleanup job. Staleness detection + notification. Frontend: retention settings UI, connection reconfirmation prompts, archive flow |
 | 14 | Network health stats + Layer 2 polish | Backend: aggregated network health calculation. Frontend: network health dashboard (High/Medium/Low testing activity). End-to-end testing for all Layer 2 features. Bug fixes |
 
