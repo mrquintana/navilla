@@ -199,7 +199,7 @@ public class LabVerificationService {
       if (labResult.conditionCode() != null
           && conditionCatalogService.isValidCode(labResult.conditionCode().toUpperCase())) {
         syncHealthStatus(userHash, labResult.conditionCode().toUpperCase(),
-            result.getStatus(), visit.getTestDate());
+            result.getStatus(), visit.getTestDate(), visitId);
       }
     }
   }
@@ -209,7 +209,7 @@ public class LabVerificationService {
    */
   private void syncHealthStatus(
       String userHash, String conditionCode,
-      TestResultStatus resultStatus, java.time.LocalDate testDate) {
+      TestResultStatus resultStatus, java.time.LocalDate testDate, java.util.UUID visitId) {
 
     HealthStatusValue mappedStatus = mapToHealthStatusValue(resultStatus);
     if (mappedStatus == null) {
@@ -232,6 +232,7 @@ public class LabVerificationService {
     healthStatus.setStatus(mappedStatus);
     healthStatus.setTestDate(testDate);
     healthStatus.setVerified(true);
+    healthStatus.setVisitId(visitId);
 
     if (mappedStatus == HealthStatusValue.POSITIVE && healthStatus.getClearedAt() != null) {
       healthStatus.setClearedAt(null);

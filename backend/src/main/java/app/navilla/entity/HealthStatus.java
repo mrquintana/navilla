@@ -78,6 +78,9 @@ public class HealthStatus {
   @Builder.Default
   private Boolean verified = false;
 
+  @Column(name = "visit_id")
+  private UUID visitId;
+
   @Column(name = "cleared_at")
   private OffsetDateTime clearedAt;
 }

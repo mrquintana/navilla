@@ -34,7 +34,7 @@ class LabProviderPropertiesTest {
     var field = new LabProviderProperties.FieldConfig(
         "orderId", "Order ID", "Número de orden");
     var config = new LabProviderProperties.LabConfig(
-        "MOCK", "Mock", "Mock", true, "http://localhost", List.of(field));
+        "MOCK", "Mock", "Mock", true, "http://localhost", "https://www.mock.com", List.of(field));
     var props = new LabProviderProperties(null, List.of(config));
 
     assertThat(props.providers()).hasSize(1);

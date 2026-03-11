@@ -1026,6 +1026,10 @@ export interface PublicConditionStatus {
   status: string;
   verificationLevel: string | null;
   testDate: string | null;
+  labName: string | null;
+  labProvider: string | null;
+  verifiedAt: string | null;
+  labWebsiteUrl: string | null;
 }
 
 export interface PublicVerificationCardResponse {

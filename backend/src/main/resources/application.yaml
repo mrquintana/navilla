@@ -197,6 +197,7 @@ navilla:
         name-es: "Lab Demo MX"
         enabled: ${NAVILLA_DEV_MODE:false}
         base-url: "${navilla.labs.mock-base-url}/api/dev/mock-labs/demo-mx"
+        website-url: "https://www.labdemomx.com"
         required-fields:
           - key: orderId
             label: "Order ID"
@@ -209,6 +210,7 @@ navilla:
         name-es: "Lab Express"
         enabled: ${NAVILLA_DEV_MODE:false}
         base-url: "${navilla.labs.mock-base-url}/api/dev/mock-labs/express"
+        website-url: "https://www.labexpress.com"
         required-fields:
           - key: orderId
             label: "Order ID"

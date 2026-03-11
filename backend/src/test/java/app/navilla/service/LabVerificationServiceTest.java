@@ -269,12 +269,13 @@ class LabVerificationServiceTest {
       assertThat(savedResult.getConditionType()).isEqualTo("HIV");
       assertThat(savedResult.getStatus()).isEqualTo(TestResultStatus.NEGATIVE);
 
-      // Verify health status was synced with verified=true
+      // Verify health status was synced with verified=true and visitId
       ArgumentCaptor<HealthStatus> hsCaptor = ArgumentCaptor.forClass(HealthStatus.class);
       verify(healthStatusRepository).save(hsCaptor.capture());
       HealthStatus savedHs = hsCaptor.getValue();
       assertThat(savedHs.getConditionType()).isEqualTo("HIV");
       assertThat(savedHs.getVerified()).isTrue();
+      assertThat(savedHs.getVisitId()).isEqualTo(VISIT_ID);
     }
 
     @Test

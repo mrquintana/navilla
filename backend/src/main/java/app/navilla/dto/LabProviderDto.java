@@ -27,6 +27,7 @@ public record LabProviderDto(
     String code,
     String name,
     String nameEs,
+    String websiteUrl,
     List<FieldDto> requiredFields) {
 
   /**
@@ -46,6 +47,7 @@ public record LabProviderDto(
         config.code(),
         config.name(),
         config.nameEs(),
+        config.websiteUrl(),
         config.requiredFields().stream()
             .map(f -> new FieldDto(f.key(), f.label(), f.labelEs()))
             .toList());

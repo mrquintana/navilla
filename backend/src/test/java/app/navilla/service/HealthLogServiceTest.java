@@ -294,11 +294,13 @@ class HealthLogServiceTest {
       assertThat(hivStatus.getStatus()).isEqualTo(HealthStatusValue.POSITIVE);
       assertThat(hivStatus.getUserHash()).isEqualTo(USER_HASH);
       assertThat(hivStatus.getTestDate()).isEqualTo(LocalDate.of(2026, 2, 15));
+      assertThat(hivStatus.getVisitId()).isEqualTo(VISIT_ID);
 
       HealthStatus syphilisStatus = savedStatuses.stream()
           .filter(hs -> "SYPHILIS".equals(hs.getConditionType()))
           .findFirst().orElseThrow();
       assertThat(syphilisStatus.getStatus()).isEqualTo(HealthStatusValue.NEGATIVE);
+      assertThat(syphilisStatus.getVisitId()).isEqualTo(VISIT_ID);
     }
 
     @Test

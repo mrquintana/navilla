@@ -35,6 +35,7 @@ public record LabProviderProperties(String mockBaseUrl, List<LabConfig> provider
       String nameEs,
       boolean enabled,
       String baseUrl,
+      String websiteUrl,
       List<FieldConfig> requiredFields) {
   }
 

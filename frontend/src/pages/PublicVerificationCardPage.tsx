@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
-import { ShieldCheck, ShieldAlert, Clock, Eye } from 'lucide-react';
+import { ShieldCheck, ShieldAlert, Clock, Eye, X, Info } from 'lucide-react';
 import { api, type PublicVerificationCardResponse, type CardVerificationResponse } from '../lib/api';
 
 const VERIFY_INTERVAL_MS = 30_000; // Re-verify every 30s
@@ -25,6 +25,7 @@ export function PublicVerificationCardPage() {
   const [lastVerifiedAt, setLastVerifiedAt] = useState<number | null>(null);
   const [now, setNow] = useState(0);
   const [mousePos, setMousePos] = useState({ x: 50, y: 50 });
+  const [howWeVerifyLab, setHowWeVerifyLab] = useState<string | null>(null);
 
   // Tick every second for live relative-time display
   useEffect(() => {
@@ -51,6 +52,16 @@ export function PublicVerificationCardPage() {
       return () => { clearTimeout(timeout); clearInterval(interval); };
     }
   }, [cardQuery.data, runVerification]);
+
+  // Close modal on Escape
+  useEffect(() => {
+    if (howWeVerifyLab === null) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setHowWeVerifyLab(null);
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [howWeVerifyLab]);
 
   // Freshness computation — independent of polling (now=0 means ticker not yet initialized)
   const secondsAgo = (lastVerifiedAt && now > 0) ? Math.floor((now - lastVerifiedAt) / 1000) : null;
@@ -164,15 +175,35 @@ export function PublicVerificationCardPage() {
                         </p>
                       )}
                     </div>
-                    <div className="flex items-center gap-2 flex-shrink-0">
+                    <div className="flex flex-col items-end gap-1 flex-shrink-0">
                       <span className={`badge ${c.status === 'POSITIVE' ? 'badge-error' : c.status === 'NEGATIVE' ? 'badge-info' : 'badge-warning'}`}>
                         {c.status}
                       </span>
                       {c.verificationLevel === 'LAB_VERIFIED' && (
-                        <span className="inline-flex items-center gap-1 text-xs" style={{ color: '#16a34a' }}>
-                          <ShieldCheck className="w-3.5 h-3.5" aria-hidden="true" />
-                          <span className="hidden sm:inline">{t('publicCard.labVerified')}</span>
-                        </span>
+                        <div className="flex flex-col items-end gap-0.5">
+                          <span className="inline-flex items-center gap-1 text-xs" style={{ color: '#16a34a' }}>
+                            <ShieldCheck className="w-3.5 h-3.5" aria-hidden="true" />
+                            <span>
+                              {c.labName
+                                ? (c.verifiedAt
+                                  ? t('publicCard.verifiedByLabOn', {
+                                      lab: c.labName,
+                                      date: new Date(c.verifiedAt).toLocaleDateString(locale, { month: 'short', day: 'numeric', year: 'numeric' }),
+                                    })
+                                  : t('publicCard.verifiedByLab', { lab: c.labName }))
+                                : t('publicCard.labVerified')}
+                            </span>
+                          </span>
+                          <button
+                            type="button"
+                            className="inline-flex items-center gap-0.5 text-xs hover:underline"
+                            style={{ color: 'var(--color-primary-light)', background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
+                            onClick={() => setHowWeVerifyLab(c.labName || '')}
+                          >
+                            <Info className="w-3 h-3" aria-hidden="true" />
+                            {t('publicCard.howWeVerify')}
+                          </button>
+                        </div>
                       )}
                     </div>
                   </div>
@@ -209,6 +240,50 @@ export function PublicVerificationCardPage() {
           </div>
         ) : null}
       </div>
+
+      {/* How We Verify Modal */}
+      {howWeVerifyLab !== null && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ background: 'rgba(0,0,0,0.5)' }}
+          onClick={() => setHowWeVerifyLab(null)}
+          role="dialog"
+          aria-modal="true"
+          aria-label={t('publicCard.howWeVerifyTitle')}
+        >
+          <div
+            className="card card-elevated w-full max-w-sm p-6"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-start justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-5 h-5 text-primary" aria-hidden="true" />
+                <h3 className="font-semibold text-sm">{t('publicCard.howWeVerifyTitle')}</h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setHowWeVerifyLab(null)}
+                className="p-1 rounded-full hover:bg-stone-100"
+                aria-label="Close"
+              >
+                <X className="w-4 h-4 text-muted" />
+              </button>
+            </div>
+            <p className="text-sm text-muted leading-relaxed">
+              {howWeVerifyLab
+                ? t('publicCard.howWeVerifyBody', { lab: howWeVerifyLab })
+                : t('publicCard.howWeVerifyBodyGeneric')}
+            </p>
+            <button
+              type="button"
+              className="btn btn-primary w-full mt-5"
+              onClick={() => setHowWeVerifyLab(null)}
+            >
+              {t('publicCard.howWeVerifyDismiss')}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

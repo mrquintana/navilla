@@ -36,9 +36,14 @@ import app.navilla.dto.UpdateVerificationCardRequest;
 import app.navilla.dto.VerificationCardResponse;
 import app.navilla.entity.HealthStatus;
 import app.navilla.entity.HealthStatusValue;
+import app.navilla.entity.Lab;
+import app.navilla.entity.TestVisit;
 import app.navilla.entity.User;
 import app.navilla.entity.VerificationCard;
+import app.navilla.lab.LabProviderProperties;
 import app.navilla.repository.HealthStatusRepository;
+import app.navilla.repository.LabRepository;
+import app.navilla.repository.TestVisitRepository;
 import app.navilla.repository.UserRepository;
 import app.navilla.repository.VerificationCardRepository;
 import app.navilla.security.EncryptionService;
@@ -72,6 +77,15 @@ class VerificationCardServiceTest {
 
   @Mock
   private UserRepository userRepository;
+
+  @Mock
+  private TestVisitRepository testVisitRepository;
+
+  @Mock
+  private LabRepository labRepository;
+
+  @Mock
+  private LabProviderProperties labProviderProperties;
 
   @InjectMocks
   private VerificationCardService verificationCardService;
@@ -601,6 +615,131 @@ class VerificationCardServiceTest {
           verificationCardService.getPublicCard("anon-token");
 
       assertThat(response.displayName()).isEqualTo("Anonymous");
+    }
+
+    @Test
+    @DisplayName("condition with visit + lab populates all provenance fields")
+    void getPublicCard_conditionWithVisitAndLab_populatesProvenance() {
+      UUID visitId = UUID.randomUUID();
+      UUID labId = UUID.randomUUID();
+      OffsetDateTime verifiedAt = OffsetDateTime.now();
+
+      VerificationCard card = buildCard("provenance-token", USER_HASH);
+      card.setIncludedConditions(new String[]{"hiv"});
+
+      when(verificationCardRepository.findByShareToken("provenance-token"))
+          .thenReturn(Optional.of(card));
+      when(encryptionService.decryptFromBytes(any(byte[].class))).thenReturn("User");
+      when(userRepository.findByEmailHash(USER_HASH)).thenReturn(Optional.empty());
+
+      HealthStatus hivStatus = HealthStatus.builder()
+          .userHash(USER_HASH).conditionType("hiv")
+          .status(HealthStatusValue.NEGATIVE).verified(true)
+          .testDate(LocalDate.of(2026, 3, 1)).visitId(visitId).build();
+      when(healthStatusRepository.findByUserHashOrderByReportedAtDesc(USER_HASH))
+          .thenReturn(List.of(hivStatus));
+
+      TestVisit visit = TestVisit.builder()
+          .id(visitId).userHash(USER_HASH).testDate(LocalDate.of(2026, 3, 1))
+          .labId(labId).verified(true).verifiedAt(verifiedAt).build();
+      when(testVisitRepository.findById(visitId)).thenReturn(Optional.of(visit));
+
+      Lab lab = Lab.builder()
+          .id(labId).userHash(USER_HASH).provider("MOCK_DEMO_MX")
+          .nameEncrypted(new byte[]{50, 60}).build();
+      when(labRepository.findById(labId)).thenReturn(Optional.of(lab));
+      when(encryptionService.decryptFromBytes(new byte[]{50, 60})).thenReturn("Lab Demo MX");
+
+      when(labProviderProperties.providers()).thenReturn(List.of(
+          new LabProviderProperties.LabConfig(
+              "MOCK_DEMO_MX", "Lab Demo MX", "Lab Demo MX", true,
+              "http://localhost:8080", "https://www.labdemomx.com", List.of())
+      ));
+
+      when(verificationCardRepository.save(any(VerificationCard.class)))
+          .thenAnswer(invocation -> invocation.getArgument(0));
+
+      PublicVerificationCardResponse response =
+          verificationCardService.getPublicCard("provenance-token");
+
+      assertThat(response.conditions()).hasSize(1);
+      PublicVerificationCardResponse.PublicConditionStatus condition = response.conditions().get(0);
+      assertThat(condition.labName()).isEqualTo("Lab Demo MX");
+      assertThat(condition.labProvider()).isEqualTo("MOCK_DEMO_MX");
+      assertThat(condition.verifiedAt()).isEqualTo(verifiedAt.toString());
+      assertThat(condition.labWebsiteUrl()).isEqualTo("https://www.labdemomx.com");
+    }
+
+    @Test
+    @DisplayName("condition with visit but no lab returns only verifiedAt")
+    void getPublicCard_conditionWithVisitNoLab_returnsOnlyVerifiedAt() {
+      UUID visitId = UUID.randomUUID();
+      OffsetDateTime verifiedAt = OffsetDateTime.now();
+
+      VerificationCard card = buildCard("no-lab-token", USER_HASH);
+      card.setIncludedConditions(new String[]{"hiv"});
+
+      when(verificationCardRepository.findByShareToken("no-lab-token"))
+          .thenReturn(Optional.of(card));
+      when(encryptionService.decryptFromBytes(any(byte[].class))).thenReturn("User");
+      when(userRepository.findByEmailHash(USER_HASH)).thenReturn(Optional.empty());
+
+      HealthStatus hivStatus = HealthStatus.builder()
+          .userHash(USER_HASH).conditionType("hiv")
+          .status(HealthStatusValue.NEGATIVE).verified(true)
+          .testDate(LocalDate.of(2026, 3, 1)).visitId(visitId).build();
+      when(healthStatusRepository.findByUserHashOrderByReportedAtDesc(USER_HASH))
+          .thenReturn(List.of(hivStatus));
+
+      TestVisit visit = TestVisit.builder()
+          .id(visitId).userHash(USER_HASH).testDate(LocalDate.of(2026, 3, 1))
+          .verified(true).verifiedAt(verifiedAt).build();
+      when(testVisitRepository.findById(visitId)).thenReturn(Optional.of(visit));
+
+      when(verificationCardRepository.save(any(VerificationCard.class)))
+          .thenAnswer(invocation -> invocation.getArgument(0));
+
+      PublicVerificationCardResponse response =
+          verificationCardService.getPublicCard("no-lab-token");
+
+      assertThat(response.conditions()).hasSize(1);
+      PublicVerificationCardResponse.PublicConditionStatus condition = response.conditions().get(0);
+      assertThat(condition.labName()).isNull();
+      assertThat(condition.labProvider()).isNull();
+      assertThat(condition.verifiedAt()).isEqualTo(verifiedAt.toString());
+      assertThat(condition.labWebsiteUrl()).isNull();
+    }
+
+    @Test
+    @DisplayName("condition without visitId returns null provenance fields")
+    void getPublicCard_conditionWithoutVisitId_nullProvenance() {
+      VerificationCard card = buildCard("no-visit-token", USER_HASH);
+      card.setIncludedConditions(new String[]{"hiv"});
+
+      when(verificationCardRepository.findByShareToken("no-visit-token"))
+          .thenReturn(Optional.of(card));
+      when(encryptionService.decryptFromBytes(any(byte[].class))).thenReturn("User");
+      when(userRepository.findByEmailHash(USER_HASH)).thenReturn(Optional.empty());
+
+      HealthStatus hivStatus = HealthStatus.builder()
+          .userHash(USER_HASH).conditionType("hiv")
+          .status(HealthStatusValue.NEGATIVE).verified(true)
+          .testDate(LocalDate.of(2026, 3, 1)).build();
+      when(healthStatusRepository.findByUserHashOrderByReportedAtDesc(USER_HASH))
+          .thenReturn(List.of(hivStatus));
+
+      when(verificationCardRepository.save(any(VerificationCard.class)))
+          .thenAnswer(invocation -> invocation.getArgument(0));
+
+      PublicVerificationCardResponse response =
+          verificationCardService.getPublicCard("no-visit-token");
+
+      assertThat(response.conditions()).hasSize(1);
+      PublicVerificationCardResponse.PublicConditionStatus condition = response.conditions().get(0);
+      assertThat(condition.labName()).isNull();
+      assertThat(condition.labProvider()).isNull();
+      assertThat(condition.verifiedAt()).isNull();
+      assertThat(condition.labWebsiteUrl()).isNull();
     }
   }
 

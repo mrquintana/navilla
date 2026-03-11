@@ -113,7 +113,7 @@ public class HealthLogService {
       savedResults.add(testResultRepository.save(result));
     }
 
-    syncHealthStatus(userHash, savedResults, savedVisit.getTestDate());
+    syncHealthStatus(userHash, savedResults, savedVisit.getTestDate(), savedVisit.getId());
 
     return toResponse(savedVisit, savedResults);
   }
@@ -196,7 +196,7 @@ public class HealthLogService {
         newResults.add(testResultRepository.save(result));
       }
 
-      syncHealthStatus(userHash, newResults, visit.getTestDate());
+      syncHealthStatus(userHash, newResults, visit.getTestDate(), visit.getId());
     } else {
       newResults = testResultRepository.findByVisitIdOrderByCreatedAt(id);
     }
@@ -472,7 +472,8 @@ public class HealthLogService {
    * (POSITIVE or NEGATIVE), finds or creates the corresponding HealthStatus
    * record and updates it. PENDING and INDETERMINATE statuses are skipped.
    */
-  private void syncHealthStatus(String userHash, List<TestResult> results, LocalDate testDate) {
+  private void syncHealthStatus(String userHash, List<TestResult> results, LocalDate testDate,
+      UUID visitId) {
     for (TestResult result : results) {
       if (result.getConditionType() == null) {
         continue; // Skip custom conditions
@@ -498,6 +499,7 @@ public class HealthLogService {
 
       healthStatus.setStatus(mappedStatus);
       healthStatus.setTestDate(testDate);
+      healthStatus.setVisitId(visitId);
 
       // If POSITIVE and was previously cleared, reset clearedAt
       if (mappedStatus == HealthStatusValue.POSITIVE && healthStatus.getClearedAt() != null) {
@@ -533,12 +535,14 @@ public class HealthLogService {
       if (existingOpt.isPresent()) {
         HealthStatus hs = existingOpt.get();
         hs.setStatus(mappedStatus);
+        hs.setVisitId(latestDefinitive.getVisitId());
         healthStatusRepository.save(hs);
       } else {
         HealthStatus hs = HealthStatus.builder()
             .userHash(userHash)
             .conditionType(conditionType)
             .status(mappedStatus)
+            .visitId(latestDefinitive.getVisitId())
             .build();
         healthStatusRepository.save(hs);
       }

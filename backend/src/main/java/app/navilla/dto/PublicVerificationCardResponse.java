@@ -36,6 +36,10 @@ public record PublicVerificationCardResponse(
       String condition,
       String status,
       String verificationLevel,
-      String testDate
+      String testDate,
+      String labName,
+      String labProvider,
+      String verifiedAt,
+      String labWebsiteUrl
   ) {}
 }

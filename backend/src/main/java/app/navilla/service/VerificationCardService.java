@@ -23,6 +23,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.HexFormat;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -32,9 +33,14 @@ import app.navilla.dto.PublicVerificationCardResponse;
 import app.navilla.dto.UpdateVerificationCardRequest;
 import app.navilla.dto.VerificationCardResponse;
 import app.navilla.entity.HealthStatus;
+import app.navilla.entity.Lab;
+import app.navilla.entity.TestVisit;
 import app.navilla.entity.User;
 import app.navilla.entity.VerificationCard;
+import app.navilla.lab.LabProviderProperties;
 import app.navilla.repository.HealthStatusRepository;
+import app.navilla.repository.LabRepository;
+import app.navilla.repository.TestVisitRepository;
 import app.navilla.repository.UserRepository;
 import app.navilla.repository.VerificationCardRepository;
 import app.navilla.security.EncryptionService;
@@ -51,6 +57,9 @@ public class VerificationCardService {
   private final HealthStatusRepository healthStatusRepository;
   private final EncryptionService encryptionService;
   private final UserRepository userRepository;
+  private final TestVisitRepository testVisitRepository;
+  private final LabRepository labRepository;
+  private final LabProviderProperties labProviderProperties;
   private final SecureRandom secureRandom = new SecureRandom();
 
   @Value("${navilla.app.base-url:https://www.navilla.app}")
@@ -243,14 +252,42 @@ public class VerificationCardService {
         .filter(hs -> includedConditions.contains(hs.getConditionType().toLowerCase())
             || includedConditions.contains(hs.getConditionType()))
         .filter(hs -> Boolean.TRUE.equals(hs.getVerified()) && hs.getTestDate() != null)
-        .map(hs -> new PublicVerificationCardResponse.PublicConditionStatus(
-            hs.getConditionType(),
-            hs.getStatus().name(),
-            card.getShowVerificationLevel()
-                ? "LAB_VERIFIED"
-                : null,
-            hs.getTestDate().toString()
-        ))
+        .map(hs -> {
+          String labName = null;
+          String labProvider = null;
+          String verifiedAt = null;
+          String labWebsiteUrl = null;
+
+          if (hs.getVisitId() != null) {
+            Optional<TestVisit> visitOpt = testVisitRepository.findById(hs.getVisitId());
+            if (visitOpt.isPresent()) {
+              TestVisit visit = visitOpt.get();
+              if (visit.getVerifiedAt() != null) {
+                verifiedAt = visit.getVerifiedAt().toString();
+              }
+              if (visit.getLabId() != null) {
+                Optional<Lab> labOpt = labRepository.findById(visit.getLabId());
+                if (labOpt.isPresent()) {
+                  Lab lab = labOpt.get();
+                  labName = encryptionService.decryptFromBytes(lab.getNameEncrypted());
+                  labProvider = lab.getProvider();
+                  labWebsiteUrl = lookupWebsiteUrl(lab.getProvider());
+                }
+              }
+            }
+          }
+
+          return new PublicVerificationCardResponse.PublicConditionStatus(
+              hs.getConditionType(),
+              hs.getStatus().name(),
+              card.getShowVerificationLevel() ? "LAB_VERIFIED" : null,
+              hs.getTestDate().toString(),
+              labName,
+              labProvider,
+              verifiedAt,
+              labWebsiteUrl
+          );
+        })
         .toList();
 
     Integer viewsRemaining = card.getMaxViews() != null
@@ -317,6 +354,17 @@ public class VerificationCardService {
     return requestedConditions.stream()
         .filter(c -> verifiedConditionCodes.contains(c.toLowerCase()))
         .toArray(String[]::new);
+  }
+
+  private String lookupWebsiteUrl(String providerCode) {
+    if (providerCode == null || labProviderProperties.providers() == null) {
+      return null;
+    }
+    return labProviderProperties.providers().stream()
+        .filter(p -> providerCode.equals(p.code()))
+        .map(LabProviderProperties.LabConfig::websiteUrl)
+        .findFirst()
+        .orElse(null);
   }
 
   private VerificationCardResponse toResponse(VerificationCard card, String username) {

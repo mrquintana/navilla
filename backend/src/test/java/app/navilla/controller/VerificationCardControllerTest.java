@@ -209,7 +209,8 @@ class VerificationCardControllerTest {
         "Public User",
         "publicuser",
         List.of(new PublicVerificationCardResponse.PublicConditionStatus(
-            "hiv", "NEGATIVE", "LAB_VERIFIED", "2026-01-15")),
+            "hiv", "NEGATIVE", "LAB_VERIFIED", "2026-01-15",
+            null, null, null, null)),
         null,
         null
     );
