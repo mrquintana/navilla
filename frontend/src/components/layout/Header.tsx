@@ -2,7 +2,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuthOptional } from '../../contexts/AuthContext';
 import { useUser } from '../../hooks/useUser';
-import { BarChart3, Bell, BookOpen, ChevronDown, HeartPulse, LayoutDashboard, LogOut, Menu, ShieldCheck, Sparkles, UserCircle2 } from 'lucide-react';
+import { BarChart3, Bell, BookOpen, ChevronDown, HeartPulse, LayoutDashboard, LogOut, Menu, ShieldCheck, UserCircle2 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { api, type NotificationItem } from '../../lib/api';
@@ -165,10 +165,6 @@ export function Header() {
                       <BarChart3 className="nav-icon" aria-hidden="true" />
                       {t('nav.insights')}
                     </Link>
-                    <Link to="/network" className={`nav-dropdown-item${pathname === '/network' ? ' nav-dropdown-item-active' : ''}`} role="menuitem">
-                      <Sparkles className="nav-icon" aria-hidden="true" />
-                      {t('nav.network')}
-                    </Link>
                     <Link to="/verification-card" className={`nav-dropdown-item${pathname === '/verification-card' ? ' nav-dropdown-item-active' : ''}`} role="menuitem" onClick={() => setMobileMenuOpen(false)}>
                       <ShieldCheck className="nav-icon" aria-hidden="true" />
                       {t('nav.verificationCard')}
@@ -228,10 +224,6 @@ export function Header() {
                 <Link to="/insights" className={`nav-link${pathname === '/insights' ? ' nav-link-active' : ''}`}>
                   <BarChart3 className="nav-icon" aria-hidden="true" />
                   {t('nav.insights')}
-                </Link>
-                <Link to="/network" className={`nav-link${pathname === '/network' ? ' nav-link-active' : ''}`}>
-                  <Sparkles className="nav-icon" aria-hidden="true" />
-                  {t('nav.network')}
                 </Link>
                 <Link to="/verification-card" className={`nav-link${pathname === '/verification-card' ? ' nav-link-active' : ''}`}>
                   <ShieldCheck className="nav-icon" aria-hidden="true" />
