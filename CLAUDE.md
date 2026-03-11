@@ -117,7 +117,7 @@ gh issue create --title "Title" --body "Description"
 - The user is the **product owner** — they review, test, and provide design direction
 - The agent does implementation, testing, documentation, and code review
 - Always read `ROADMAP_SUMMARY.md` at session start to understand current priorities
-- When the user says "Build [feature]" or "Start Week X", read `docs/plans/full-roadmap.md` for the detailed spec
+- When the user says "Build [feature]" or "Start Week X", use Grep to find the relevant section in `docs/plans/full-roadmap.md` — do NOT read the entire file (it's 108KB)
 
 ### Be a Proactive Partner (Non-negotiable)
 - **Don't just fix what the user reports** — when fixing a bug on one page, check ALL similar pages for the same issue. If you fix the login page, check signup, forgot-password, and reset-password too
