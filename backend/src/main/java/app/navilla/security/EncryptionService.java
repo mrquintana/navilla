@@ -119,12 +119,34 @@ public class EncryptionService {
    * @return the hex-encoded hash (64 characters)
    */
   public String hashPhone(String rawPhone) {
+    return hashPhone(rawPhone, null);
+  }
+
+  /**
+   * Hashes a phone number, optionally stripping a country code prefix.
+   *
+   * <p>If a country code is provided and the normalized digits start with it,
+   * the prefix is stripped before hashing. This ensures matching works regardless
+   * of whether users include the country code.
+   *
+   * @param rawPhone    the raw phone number (digits only expected, but non-digits are stripped)
+   * @param countryCode optional country calling code (e.g. "52", "1") — digits only, no "+"
+   * @return the hex-encoded hash (64 characters)
+   */
+  public String hashPhone(String rawPhone, String countryCode) {
     if (rawPhone == null || rawPhone.isBlank()) {
       throw new IllegalArgumentException("Phone number cannot be null or blank");
     }
     String normalized = rawPhone.replaceAll("[^\\d]", "");
     if (normalized.isEmpty()) {
       throw new IllegalArgumentException("Phone number must contain at least one digit");
+    }
+    // Strip country code prefix if provided and present
+    if (countryCode != null && !countryCode.isBlank()) {
+      String ccDigits = countryCode.replaceAll("[^\\d]", "");
+      if (!ccDigits.isEmpty() && normalized.startsWith(ccDigits)) {
+        normalized = normalized.substring(ccDigits.length());
+      }
     }
     return hash(normalized);
   }
