@@ -199,7 +199,7 @@ public class NotificationService {
     try {
       String url = mapNotificationTypeToUrl(type);
       PushPayload pushPayload = PushPayload.withDefaults(
-          type.name(), messageKey, url, type.name());
+          "Navilla", "You have a new update", url, type.name());
       webPushService.sendPushToUser(userHash, pushPayload, pushSubscriptionService);
     } catch (Exception ex) {
       log.warn("Failed to send push notification (non-fatal): {}", ex.getMessage());
