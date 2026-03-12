@@ -153,7 +153,7 @@ export function DashboardPage() {
             }}
           >
             <Heart className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
-            <span className="truncate">{t('dashboard.goToHealth')}</span>
+            <span className="hidden sm:inline truncate">{t('dashboard.goToHealth')}</span>
           </Link>
           <Link
             to="/journal"
@@ -164,7 +164,7 @@ export function DashboardPage() {
             }}
           >
             <BookOpen className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
-            <span className="truncate">{t('dashboard.goToJournal')}</span>
+            <span className="hidden sm:inline truncate">{t('dashboard.goToJournal')}</span>
           </Link>
           <Link
             to="/connections"
@@ -175,7 +175,7 @@ export function DashboardPage() {
             }}
           >
             <Users className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
-            <span className="truncate">{t('dashboard.goToConnections')}</span>
+            <span className="hidden sm:inline truncate">{t('dashboard.goToConnections')}</span>
           </Link>
           <Link
             to="/insights"
@@ -186,7 +186,7 @@ export function DashboardPage() {
             }}
           >
             <BarChart3 className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
-            <span className="truncate">{t('dashboard.goToInsights')}</span>
+            <span className="hidden sm:inline truncate">{t('dashboard.goToInsights')}</span>
           </Link>
         </div>
       </div>

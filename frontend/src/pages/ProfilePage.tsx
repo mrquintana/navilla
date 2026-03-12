@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -70,6 +70,11 @@ export function ProfilePage() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const cancelDeleteRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (showDeleteModal) cancelDeleteRef.current?.focus();
+  }, [showDeleteModal]);
 
   const fillRandomProfile = () => {
     const names = ['Ana', 'Luis', 'Carla', 'Mateo', 'Sofia', 'Diego', 'Lucia', 'Javier'];
@@ -536,8 +541,11 @@ export function ProfilePage() {
       </div>
 
       {showDeleteModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl space-y-4">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+          onKeyDown={(e) => { if (e.key === 'Escape') setShowDeleteModal(false); }}
+        >
+          <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl space-y-4" role="dialog" aria-modal="true">
             <h3 className="text-lg font-semibold text-red-700">{t('settings.deleteAccount')}</h3>
             <p className="text-sm text-muted">{t('settings.deleteAccountWarning')}</p>
             <div>
@@ -557,6 +565,7 @@ export function ProfilePage() {
             {deleteError && <div className="alert alert-error">{deleteError}</div>}
             <div className="flex justify-end gap-3">
               <button
+                ref={cancelDeleteRef}
                 type="button"
                 className="btn btn-secondary"
                 onClick={() => setShowDeleteModal(false)}
@@ -722,9 +731,9 @@ function PreferencesSection() {
                       }}
                       disabled={visibilityMutation.isPending}
                     >
-                      {value === 'PRIVATE' && t('profile.visibilityPrivate')}
-                      {value === 'CONNECTIONS_ONLY' && t('profile.visibilityConnections')}
-                      {value === 'PUBLIC' && t('profile.visibilityPublic')}
+                      {value === 'PRIVATE' && (<><span className="sm:hidden">{t('profile.visibilityPrivateShort')}</span><span className="hidden sm:inline">{t('profile.visibilityPrivate')}</span></>)}
+                      {value === 'CONNECTIONS_ONLY' && (<><span className="sm:hidden">{t('profile.visibilityConnectionsShort')}</span><span className="hidden sm:inline">{t('profile.visibilityConnections')}</span></>)}
+                      {value === 'PUBLIC' && (<><span className="sm:hidden">{t('profile.visibilityPublicShort')}</span><span className="hidden sm:inline">{t('profile.visibilityPublic')}</span></>)}
                     </button>
                   ))}
                 </div>

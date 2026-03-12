@@ -35,6 +35,12 @@ export function VerificationCardPage() {
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [qrUrl, setQrUrl] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (deleteConfirmId) {
+      document.getElementById(`cancel-delete-${deleteConfirmId}`)?.focus();
+    }
+  }, [deleteConfirmId]);
+
   const openCreate = () => {
     setEditingCard(null);
     setIsModalOpen(true);
@@ -138,7 +144,7 @@ export function VerificationCardPage() {
               </div>
 
               {/* Actions */}
-              <div className="mt-3 flex flex-wrap items-center gap-2">
+              <div className="mt-3 flex flex-col sm:flex-row flex-wrap gap-2">
                 <button
                   type="button"
                   className="btn btn-secondary btn-sm"
@@ -184,7 +190,7 @@ export function VerificationCardPage() {
                     <button type="button" className="btn btn-sm text-red-600" onClick={() => handleDelete(card.id)}>
                       {t('common.confirm')}
                     </button>
-                    <button type="button" className="btn btn-secondary btn-sm" onClick={() => setDeleteConfirmId(null)}>
+                    <button type="button" className="btn btn-secondary btn-sm" id={`cancel-delete-${card.id}`} onClick={() => setDeleteConfirmId(null)}>
                       {t('common.cancel')}
                     </button>
                   </div>
