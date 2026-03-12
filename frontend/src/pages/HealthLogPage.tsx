@@ -8,7 +8,7 @@ import { useMedications } from '../hooks/useMedications';
 import { useVaccinations } from '../hooks/useVaccinations';
 import { api } from '../lib/api';
 import { getConditionInfo } from '../lib/conditionInfo';
-import { sortExposureItems, getExposureBorderStyle } from '../lib/exposureSort';
+import { sortExposureItems, getUrgencyConfig, getExposureCardStyle } from '../lib/exposureSort';
 import { HealthLogStats } from '../components/health-log/HealthLogStats';
 import { ConditionCard } from '../components/health-log/ConditionCard';
 import { TestVisitModal } from '../components/health-log/TestVisitModal';
@@ -246,44 +246,55 @@ function TestsTabContent() {
               </span>
             </div>
             {(showAllExposures ? exposureItems : exposureItems.slice(0, 6)).map(
-              (item) => (
-                <div key={item.condition} className="exposure-item" style={getExposureBorderStyle(item)}>
-                  <div className="text-xs font-semibold uppercase tracking-wide text-foreground">
-                    <a
-                      className="health-condition-link"
-                      href={
-                        getConditionInfo(item.condition, i18n.language).url
-                      }
-                      target="_blank"
-                      rel="noreferrer"
+              (item) => {
+                const urgency = getUrgencyConfig(item);
+                return (
+                  <div key={item.condition} className="exposure-item" style={getExposureCardStyle(item)}>
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="text-xs font-semibold uppercase tracking-wide text-foreground">
+                        <a
+                          className="health-condition-link"
+                          href={
+                            getConditionInfo(item.condition, i18n.language).url
+                          }
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          {item.condition}
+                          <ExternalLink
+                            className="nav-icon"
+                            aria-hidden="true"
+                          />
+                        </a>
+                      </div>
+                      <span
+                        className="inline-block text-[11px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full flex-shrink-0"
+                        style={{ color: urgency.badgeColor, background: urgency.badgeBg }}
+                      >
+                        {t(urgency.labelKey)}
+                      </span>
+                    </div>
+                    <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted">
+                      <span>
+                        {t('health.exposureClosest', {
+                          degree: item.closestDegree,
+                        })}
+                      </span>
+                      <span>&bull;</span>
+                      <span>
+                        {t('health.exposureCases')} {item.count}
+                      </span>
+                    </div>
+                    <p
+                      className="text-xs text-muted cursor-help"
+                      title={`${t(`dashboard.exposureStatusHint.${item.status}`)} \u00B7 ${t(`dashboard.exposureTimeframeHint.${item.timeframe}`)}`}
                     >
-                      {item.condition}
-                      <ExternalLink
-                        className="nav-icon"
-                        aria-hidden="true"
-                      />
-                    </a>
+                      {t(`dashboard.exposureStatusLabels.${item.status}`)} &middot;{' '}
+                      {t(`dashboard.exposureTimeframe.${item.timeframe}`)}
+                    </p>
                   </div>
-                  <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted">
-                    <span>
-                      {t('health.exposureClosest', {
-                        degree: item.closestDegree,
-                      })}
-                    </span>
-                    <span>&bull;</span>
-                    <span>
-                      {t('health.exposureCases')} {item.count}
-                    </span>
-                  </div>
-                  <p
-                    className="text-xs text-muted cursor-help"
-                    title={`${t(`dashboard.exposureStatusHint.${item.status}`)} \u00B7 ${t(`dashboard.exposureTimeframeHint.${item.timeframe}`)}`}
-                  >
-                    {t(`dashboard.exposureStatusLabels.${item.status}`)} &middot;{' '}
-                    {t(`dashboard.exposureTimeframe.${item.timeframe}`)}
-                  </p>
-                </div>
-              )
+                );
+              }
             )}
             {exposureItems.length > 6 && (
               <button

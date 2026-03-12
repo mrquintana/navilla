@@ -7,7 +7,7 @@ import { useUser } from '../hooks/useUser';
 import { queryClient } from '../queryClient';
 import { DEV_MODE } from '../lib/devMode';
 import { getConditionInfo } from '../lib/conditionInfo';
-import { sortExposureItems, getExposureBorderStyle } from '../lib/exposureSort';
+import { sortExposureItems, getUrgencyConfig, getExposureCardStyle } from '../lib/exposureSort';
 import { ExternalLink, HelpCircle, Plus, Trash2 } from 'lucide-react';
 import { PageSkeleton, SkeletonBlock, SkeletonRows } from '../components/ui/LoadingShell';
 
@@ -144,15 +144,15 @@ export function HealthStatusPage() {
     return (
       <PageSkeleton loadingLabel={t('common.loading')}>
         <SkeletonBlock className="h-20 rounded-2xl" />
-        <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
-          <div className="card card-elevated space-y-4">
-            <SkeletonBlock className="h-5 w-56 rounded-full" />
-            <SkeletonRows rows={4} />
-          </div>
-          <div className="card card-elevated space-y-4">
-            <SkeletonBlock className="h-5 w-48 rounded-full" />
-            <SkeletonRows rows={4} />
-          </div>
+        <div className="card card-elevated space-y-4">
+          <SkeletonBlock className="h-5 w-48 rounded-full" />
+          <SkeletonBlock className="h-20 rounded-xl" />
+          <SkeletonBlock className="h-20 rounded-xl" />
+          <SkeletonBlock className="h-20 rounded-xl" />
+        </div>
+        <div className="card card-elevated space-y-4">
+          <SkeletonBlock className="h-5 w-56 rounded-full" />
+          <SkeletonRows rows={4} />
         </div>
       </PageSkeleton>
     );
@@ -170,9 +170,97 @@ export function HealthStatusPage() {
         <p className="text-sm text-muted">{t('health.whatItMeansBody')}</p>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
-        <div className="card card-elevated space-y-4">
-          <div className="flex items-center justify-between gap-4">
+      {/* Exposure Overview — top priority section */}
+      <div className="card card-elevated space-y-3">
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <h3 className="font-semibold">{t('health.exposureOverview')}</h3>
+            <p className="text-xs text-muted">{t('health.exposureHint')}</p>
+          </div>
+          <button
+            type="button"
+            className="btn btn-secondary btn-sm"
+            onClick={() => setShowExposureInfo(true)}
+            title={t('health.moreInfoTitle')}
+          >
+            <HelpCircle className="nav-icon" aria-hidden="true" />
+          </button>
+        </div>
+        {exposureInitialLoading ? (
+          <div role="status" aria-live="polite">
+            <span className="sr-only">{t('common.loading')}</span>
+            <SkeletonBlock className="h-5 w-48 rounded-full" />
+            <div className="space-y-2 mt-3">
+              <SkeletonBlock className="h-20 rounded-xl" />
+              <SkeletonBlock className="h-20 rounded-xl" />
+              <SkeletonBlock className="h-20 rounded-xl" />
+            </div>
+          </div>
+        ) : exposureItems.length > 0 ? (
+          <div className="space-y-2 text-sm">
+            <div className="flex items-center justify-between text-xs text-muted">
+              <span>{t('health.exposureDetected')}</span>
+              <span>{t('health.exposureUpdatedAt')} {exposureQuery.data?.computedAt
+                ? new Date(exposureQuery.data.computedAt).toLocaleDateString()
+                : '—'}</span>
+            </div>
+            {(showAllExposures ? exposureItems : exposureItems.slice(0, 6)).map((item) => {
+              const urgency = getUrgencyConfig(item);
+              return (
+                <div key={item.condition} className="exposure-item" style={getExposureCardStyle(item)}>
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="text-xs font-semibold uppercase tracking-wide text-foreground">
+                      <a
+                        className="health-condition-link"
+                        href={getConditionInfo(item.condition, i18n.language).url}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        {item.condition}
+                        <ExternalLink className="nav-icon" aria-hidden="true" />
+                      </a>
+                    </div>
+                    <span
+                      className="inline-block text-[11px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full flex-shrink-0"
+                      style={{ color: urgency.badgeColor, background: urgency.badgeBg }}
+                    >
+                      {t(urgency.labelKey)}
+                    </span>
+                  </div>
+                  <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted">
+                    <span>{t('health.exposureClosest', { degree: item.closestDegree })}</span>
+                    <span>•</span>
+                    <span>{t('health.exposureCases')} {item.count}</span>
+                  </div>
+                  <p
+                    className="text-xs text-muted cursor-help"
+                    title={`${t(`dashboard.exposureStatusHint.${item.status}`)} · ${t(`dashboard.exposureTimeframeHint.${item.timeframe}`)}`}
+                  >
+                    {t(`dashboard.exposureStatusLabels.${item.status}`)} · {t(`dashboard.exposureTimeframe.${item.timeframe}`)}
+                  </p>
+                </div>
+              );
+            })}
+            {exposureItems.length > 6 && (
+              <button
+                type="button"
+                className="btn btn-secondary btn-sm"
+                onClick={() => setShowAllExposures((prev) => !prev)}
+              >
+                {showAllExposures ? t('health.showLess') : t('health.showAll')}
+              </button>
+            )}
+          </div>
+        ) : exposureQuery.data?.message ? (
+          <p className="text-sm text-muted">{t(exposureQuery.data.message)}</p>
+        ) : (
+          <p className="text-sm text-muted">{t('health.noExposure')}</p>
+        )}
+      </div>
+
+      {/* My Results */}
+      <div className="card card-elevated space-y-4">
+        <div className="flex items-center justify-between gap-4">
           <div>
             <h3 className="font-semibold">{t('health.myResults')}</h3>
             <p className="text-xs text-muted">{t('health.myResultsSubtitle')}</p>
@@ -190,199 +278,141 @@ export function HealthStatusPage() {
               <button
                 type="button"
                 className="btn btn-secondary btn-sm"
-                  onClick={fillRandomStatus}
-                >
-                  {t('common.fillRandom')}
-                </button>
-              )}
-              <button
-                type="button"
-                className="btn btn-primary btn-sm"
-                onClick={() => setIsFormOpen(true)}
+                onClick={fillRandomStatus}
               >
-                <span className="inline-flex items-center gap-1">
-                  <Plus className="nav-icon" aria-hidden="true" />
-                  {t('health.addResult')}
-                </span>
+                {t('common.fillRandom')}
               </button>
-            </div>
-          </div>
-          <div className="grid gap-2 text-xs text-muted sm:grid-cols-3">
-            <div>
-              <span className="block text-xs text-muted">{t('health.totalReports')}</span>
-              <span className="text-sm font-semibold text-foreground">{statuses.length}</span>
-            </div>
-            <div>
-              <span className="block text-xs text-muted">{t('health.activePositives')}</span>
-              <span className="text-sm font-semibold text-foreground">{activePositives.length}</span>
-            </div>
-            <div>
-              <span className="block text-xs text-muted">{t('health.lastReport')}</span>
-              <span className="text-sm font-semibold text-foreground">
-                {latestStatus ? new Date(latestStatus.reportedAt).toLocaleDateString() : '—'}
+            )}
+            <button
+              type="button"
+              className="btn btn-primary btn-sm"
+              onClick={() => setIsFormOpen(true)}
+            >
+              <span className="inline-flex items-center gap-1">
+                <Plus className="nav-icon" aria-hidden="true" />
+                {t('health.addResult')}
               </span>
-            </div>
+            </button>
           </div>
-          {statuses.length > 0 ? (
-            <div className="space-y-3 pt-2">
-              {statuses.map((status: HealthStatus) => {
-                const exposureMatch = exposureItems.some(
-                  (item) => item.condition.toLowerCase() === status.condition.toLowerCase()
-                );
-
-                return (
-                  <div key={status.id} className="health-row-card flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                    <div>
-                      <div className="health-row-header">
-                        <a
-                          className="health-condition-link"
-                          href={getConditionInfo(status.condition, i18n.language).url}
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          {status.condition.toUpperCase()}
-                          <ExternalLink className="nav-icon" aria-hidden="true" />
-                        </a>
-                      </div>
-                      {exposureMatch && (
-                        <p className="text-xs text-muted">{t('health.exposureMatchNote')}</p>
-                      )}
-                      <div className="flex flex-wrap items-center gap-2 text-xs text-muted">
-                        <span
-                          className={`badge text-xs ${
-                            status.clearedAt
-                              ? 'badge-warning'
-                              : status.status === 'positive'
-                                ? 'badge-error'
-                                : 'badge-info'
-                          }`}
-                        >
-                          {status.clearedAt
-                            ? t('health.cleared')
-                            : status.status === 'positive'
-                              ? t('health.statusPositive')
-                              : t('health.statusNegative')}
-                        </span>
-                        <span>·</span>
-                        <span>
-                          {status.clearedAt
-                            ? `${t('health.clearedOn')} ${new Date(status.clearedAt).toLocaleDateString()}`
-                            : status.testDate ?? t('health.noTestDate')}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex gap-2">
-                      <button
-                        className="btn btn-secondary btn-sm"
-                        onClick={() => runHealthAction(status.id, status.clearedAt ? 'activate' : 'clear')}
-                        disabled={pendingHealthId === status.id
-                          && (pendingHealthAction === 'clear' || pendingHealthAction === 'activate')}
-                        title={status.clearedAt ? t('health.activateTooltip') : t('health.clearTooltip')}
-                      >
-                        {pendingHealthId === status.id
-                        && (pendingHealthAction === 'clear' || pendingHealthAction === 'activate') ? (
-                          <span className="inline-flex items-center gap-1">
-                            <span className="spinner" aria-hidden="true" />
-                            {t('common.loading')}
-                          </span>
-                        ) : status.clearedAt ? t('health.markActive') : t('health.clear')}
-                      </button>
-                      <button
-                        className="btn btn-secondary btn-sm"
-                        onClick={() => runHealthAction(status.id, 'delete')}
-                        disabled={pendingHealthId === status.id && pendingHealthAction === 'delete'}
-                        title={t('health.deleteTooltip')}
-                        aria-label={t('health.deleteTooltip')}
-                      >
-                        {pendingHealthId === status.id && pendingHealthAction === 'delete' ? (
-                          <span className="inline-flex items-center gap-1">
-                            <span className="spinner" aria-hidden="true" />
-                            {t('common.loading')}
-                          </span>
-                        ) : (
-                          <Trash2 className="nav-icon" aria-hidden="true" />
-                        )}
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          ) : (
-            <p className="text-sm text-muted">{t('health.noStatus')}</p>
-          )}
         </div>
-
-        <div className="card card-elevated space-y-3">
-          <div className="flex items-center justify-between gap-4">
-          <div>
-            <h3 className="font-semibold">{t('health.exposureOverview')}</h3>
-            <p className="text-xs text-muted">{t('health.exposureHint')}</p>
+        {listInitialLoading ? (
+          <div role="status" aria-live="polite">
+            <span className="sr-only">{t('common.loading')}</span>
+            <div className="grid gap-2 sm:grid-cols-3 mb-3">
+              <SkeletonBlock className="h-10 rounded-lg" />
+              <SkeletonBlock className="h-10 rounded-lg" />
+              <SkeletonBlock className="h-10 rounded-lg" />
+            </div>
+            <SkeletonRows rows={3} />
           </div>
-          <button
-            type="button"
-            className="btn btn-secondary btn-sm"
-            onClick={() => setShowExposureInfo(true)}
-            title={t('health.moreInfoTitle')}
-          >
-            <HelpCircle className="nav-icon" aria-hidden="true" />
-          </button>
-        </div>
-          {exposureInitialLoading ? (
-            <div role="status" aria-live="polite">
-              <span className="sr-only">{t('common.loading')}</span>
-              <SkeletonRows rows={4} />
-            </div>
-          ) : exposureItems.length > 0 ? (
-            <div className="space-y-2 text-sm">
-              <div className="flex items-center justify-between text-xs text-muted">
-                <span>{t('health.exposureDetected')}</span>
-                <span>{t('health.exposureUpdatedAt')} {exposureQuery.data?.computedAt
-                  ? new Date(exposureQuery.data.computedAt).toLocaleDateString()
-                  : '—'}</span>
+        ) : (
+          <>
+            <div className="grid gap-2 text-xs text-muted sm:grid-cols-3">
+              <div>
+                <span className="block text-xs text-muted">{t('health.totalReports')}</span>
+                <span className="text-sm font-semibold text-foreground">{statuses.length}</span>
               </div>
-              {(showAllExposures ? exposureItems : exposureItems.slice(0, 6)).map((item) => (
-                <div key={item.condition} className="exposure-item" style={getExposureBorderStyle(item)}>
-                  <div className="text-xs font-semibold uppercase tracking-wide text-foreground">
-                    <a
-                      className="health-condition-link"
-                      href={getConditionInfo(item.condition, i18n.language).url}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      {item.condition}
-                      <ExternalLink className="nav-icon" aria-hidden="true" />
-                    </a>
-                  </div>
-                  <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted">
-                    <span>{t('health.exposureClosest', { degree: item.closestDegree })}</span>
-                    <span>•</span>
-                    <span>{t('health.exposureCases')} {item.count}</span>
-                  </div>
-                  <p
-                    className="text-xs text-muted cursor-help"
-                    title={`${t(`dashboard.exposureStatusHint.${item.status}`)} · ${t(`dashboard.exposureTimeframeHint.${item.timeframe}`)}`}
-                  >
-                    {t(`dashboard.exposureStatusLabels.${item.status}`)} · {t(`dashboard.exposureTimeframe.${item.timeframe}`)}
-                  </p>
-                </div>
-              ))}
-              {exposureItems.length > 6 && (
-                <button
-                  type="button"
-                  className="btn btn-secondary btn-sm"
-                  onClick={() => setShowAllExposures((prev) => !prev)}
-                >
-                  {showAllExposures ? t('health.showLess') : t('health.showAll')}
-                </button>
-              )}
+              <div>
+                <span className="block text-xs text-muted">{t('health.activePositives')}</span>
+                <span className="text-sm font-semibold text-foreground">{activePositives.length}</span>
+              </div>
+              <div>
+                <span className="block text-xs text-muted">{t('health.lastReport')}</span>
+                <span className="text-sm font-semibold text-foreground">
+                  {latestStatus ? new Date(latestStatus.reportedAt).toLocaleDateString() : '—'}
+                </span>
+              </div>
             </div>
-          ) : exposureQuery.data?.message ? (
-            <p className="text-sm text-muted">{t(exposureQuery.data.message)}</p>
-          ) : (
-            <p className="text-sm text-muted">{t('health.noExposure')}</p>
-          )}
-        </div>
+            {statuses.length > 0 ? (
+              <div className="space-y-3 pt-2">
+                {statuses.map((status: HealthStatus) => {
+                  const exposureMatch = exposureItems.some(
+                    (item) => item.condition.toLowerCase() === status.condition.toLowerCase()
+                  );
+
+                  return (
+                    <div key={status.id} className="health-row-card flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                      <div>
+                        <div className="health-row-header">
+                          <a
+                            className="health-condition-link"
+                            href={getConditionInfo(status.condition, i18n.language).url}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            {status.condition.toUpperCase()}
+                            <ExternalLink className="nav-icon" aria-hidden="true" />
+                          </a>
+                        </div>
+                        {exposureMatch && (
+                          <p className="text-xs text-muted">{t('health.exposureMatchNote')}</p>
+                        )}
+                        <div className="flex flex-wrap items-center gap-2 text-xs text-muted">
+                          <span
+                            className={`badge text-xs ${
+                              status.clearedAt
+                                ? 'badge-warning'
+                                : status.status === 'positive'
+                                  ? 'badge-error'
+                                  : 'badge-info'
+                            }`}
+                          >
+                            {status.clearedAt
+                              ? t('health.cleared')
+                              : status.status === 'positive'
+                                ? t('health.statusPositive')
+                                : t('health.statusNegative')}
+                          </span>
+                          <span>·</span>
+                          <span>
+                            {status.clearedAt
+                              ? `${t('health.clearedOn')} ${new Date(status.clearedAt).toLocaleDateString()}`
+                              : status.testDate ?? t('health.noTestDate')}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          className="btn btn-secondary btn-sm"
+                          onClick={() => runHealthAction(status.id, status.clearedAt ? 'activate' : 'clear')}
+                          disabled={pendingHealthId === status.id
+                            && (pendingHealthAction === 'clear' || pendingHealthAction === 'activate')}
+                          title={status.clearedAt ? t('health.activateTooltip') : t('health.clearTooltip')}
+                        >
+                          {pendingHealthId === status.id
+                          && (pendingHealthAction === 'clear' || pendingHealthAction === 'activate') ? (
+                            <span className="inline-flex items-center gap-1">
+                              <span className="spinner" aria-hidden="true" />
+                              {t('common.loading')}
+                            </span>
+                          ) : status.clearedAt ? t('health.markActive') : t('health.clear')}
+                        </button>
+                        <button
+                          className="btn btn-secondary btn-sm"
+                          onClick={() => runHealthAction(status.id, 'delete')}
+                          disabled={pendingHealthId === status.id && pendingHealthAction === 'delete'}
+                          title={t('health.deleteTooltip')}
+                          aria-label={t('health.deleteTooltip')}
+                        >
+                          {pendingHealthId === status.id && pendingHealthAction === 'delete' ? (
+                            <span className="inline-flex items-center gap-1">
+                              <span className="spinner" aria-hidden="true" />
+                              {t('common.loading')}
+                            </span>
+                          ) : (
+                            <Trash2 className="nav-icon" aria-hidden="true" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <p className="text-sm text-muted">{t('health.noStatus')}</p>
+            )}
+          </>
+        )}
       </div>
 
       {isFormOpen && (

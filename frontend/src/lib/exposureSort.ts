@@ -49,14 +49,50 @@ export function sortExposureItems(items: ExposureItem[]): ExposureItem[] {
   });
 }
 
-export const URGENCY_BORDER_COLORS: Record<UrgencyTier, string> = {
-  high: '#e3a008',
-  medium: '#4f46e5',
-  low: '#d6d3d1',
+export interface UrgencyConfig {
+  tier: UrgencyTier;
+  labelKey: string;
+  borderColor: string;
+  badgeColor: string;
+  badgeBg: string;
+  cardBg: string;
+}
+
+const URGENCY_CONFIGS: Record<UrgencyTier, Omit<UrgencyConfig, 'tier'>> = {
+  high: {
+    labelKey: 'dashboard.urgencyHigh',
+    borderColor: '#e3a008',
+    badgeColor: '#e3a008',
+    badgeBg: 'rgba(227, 160, 8, 0.12)',
+    cardBg: 'rgba(227, 160, 8, 0.06)',
+  },
+  medium: {
+    labelKey: 'dashboard.urgencyMedium',
+    borderColor: '#4f46e5',
+    badgeColor: '#4f46e5',
+    badgeBg: 'rgba(99, 102, 241, 0.12)',
+    cardBg: 'rgba(99, 102, 241, 0.06)',
+  },
+  low: {
+    labelKey: 'dashboard.urgencyLow',
+    borderColor: '#78716c',
+    badgeColor: '#78716c',
+    badgeBg: 'rgba(120, 113, 108, 0.12)',
+    cardBg: 'rgba(120, 113, 108, 0.06)',
+  },
 };
 
-export function getExposureBorderStyle(item: ExposureItem): React.CSSProperties {
+export function getUrgencyConfig(item: ExposureItem): UrgencyConfig {
   const score = computeExposureScore(item);
   const tier = getUrgencyTier(score);
-  return { borderLeftWidth: '3px', borderLeftColor: URGENCY_BORDER_COLORS[tier] };
+  return { tier, ...URGENCY_CONFIGS[tier] };
+}
+
+export function getExposureCardStyle(item: ExposureItem): React.CSSProperties {
+  const config = getUrgencyConfig(item);
+  return {
+    borderLeftWidth: '4px',
+    borderLeftColor: config.borderColor,
+    background: config.cardBg,
+  };
 }

@@ -8,7 +8,7 @@ import { DEV_MODE } from '../lib/devMode';
 import { HelpCircle, ExternalLink, Heart, BookOpen, Users, BarChart3, Sparkles } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { getConditionInfo } from '../lib/conditionInfo';
-import { sortExposureItems, getExposureBorderStyle } from '../lib/exposureSort';
+import { sortExposureItems, getUrgencyConfig, getExposureCardStyle } from '../lib/exposureSort';
 import { PageSkeleton, SkeletonBlock } from '../components/ui/LoadingShell';
 import { UpcomingReminders } from '../components/reminders/UpcomingReminders';
 import { OnboardingFlow } from '../components/onboarding/OnboardingFlow';
@@ -267,22 +267,31 @@ export function DashboardPage() {
                 <div className="space-y-2">
                   {sortExposureItems(exposureQuery.data?.exposures ?? []).slice(0, 3).map((item) => {
                     const info = getConditionInfo(item.condition, i18n.language);
+                    const urgency = getUrgencyConfig(item);
                     return (
                       <div
                         key={item.condition}
                         className="exposure-item"
-                        style={getExposureBorderStyle(item)}
+                        style={getExposureCardStyle(item)}
                       >
-                        <div className="text-xs font-semibold uppercase tracking-wide text-foreground">
-                          <a
-                            className="health-condition-link"
-                            href={info.url}
-                            target="_blank"
-                            rel="noreferrer"
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="text-xs font-semibold uppercase tracking-wide text-foreground">
+                            <a
+                              className="health-condition-link"
+                              href={info.url}
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              {item.condition}
+                              <ExternalLink className="nav-icon" aria-hidden="true" />
+                            </a>
+                          </div>
+                          <span
+                            className="inline-block text-[11px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full flex-shrink-0"
+                            style={{ color: urgency.badgeColor, background: urgency.badgeBg }}
                           >
-                            {item.condition}
-                            <ExternalLink className="nav-icon" aria-hidden="true" />
-                          </a>
+                            {t(urgency.labelKey)}
+                          </span>
                         </div>
                         <div className="mt-2 grid gap-2 text-xs sm:grid-cols-3">
                           <div className="space-y-1">

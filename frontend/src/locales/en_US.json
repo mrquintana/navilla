@@ -139,6 +139,9 @@
       "91_365d": "Reported 3 to 12 months ago",
       "365d_plus": "Reported over a year ago"
     },
+    "urgencyHigh": "High",
+    "urgencyMedium": "Medium",
+    "urgencyLow": "Low",
     "goToInsights": "Insights",
     "constellation": "Your Constellation",
     "viewConstellation": "View your constellation"
