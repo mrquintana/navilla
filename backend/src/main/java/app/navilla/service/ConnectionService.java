@@ -18,7 +18,10 @@ package app.navilla.service;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import app.navilla.dto.ConnectionResponse;
 import app.navilla.dto.ConnectionStatsResponse;
@@ -132,9 +135,12 @@ public class ConnectionService {
     String email = jwt.getClaimAsString("email");
     String userHash = encryptionService.hashEmail(email);
 
-    return connectionRepository.findAllByUserHash(userHash).stream()
-        .filter(c -> isVisibleToRequester(c, userHash))
-        .map(c -> toConnectionResponse(c, userHash))
+    List<Connection> connections = connectionRepository.findAllByUserHash(userHash);
+    Map<String, User> userLookup = fetchPartnerUsers(connections, userHash);
+
+    return connections.stream()
+        .filter(c -> isVisibleToRequester(c, userHash, userLookup))
+        .map(c -> toConnectionResponse(c, userHash, userLookup))
         .toList();
   }
 
@@ -149,8 +155,11 @@ public class ConnectionService {
     String email = jwt.getClaimAsString("email");
     String userHash = encryptionService.hashEmail(email);
 
-    return connectionRepository.findConfirmedByUserHash(userHash).stream()
-        .map(c -> toConnectionResponse(c, userHash))
+    List<Connection> connections = connectionRepository.findConfirmedByUserHash(userHash);
+    Map<String, User> userLookup = fetchPartnerUsers(connections, userHash);
+
+    return connections.stream()
+        .map(c -> toConnectionResponse(c, userHash, userLookup))
         .toList();
   }
 
@@ -165,9 +174,12 @@ public class ConnectionService {
     String email = jwt.getClaimAsString("email");
     String userHash = encryptionService.hashEmail(email);
 
-    return connectionRepository.findByRecipientHashAndStatus(userHash, ConnectionStatus.PENDING)
-        .stream()
-        .map(c -> toConnectionResponse(c, userHash))
+    List<Connection> connections = connectionRepository
+        .findByRecipientHashAndStatus(userHash, ConnectionStatus.PENDING);
+    Map<String, User> userLookup = fetchPartnerUsers(connections, userHash);
+
+    return connections.stream()
+        .map(c -> toConnectionResponse(c, userHash, userLookup))
         .toList();
   }
 
@@ -182,10 +194,13 @@ public class ConnectionService {
     String email = jwt.getClaimAsString("email");
     String userHash = encryptionService.hashEmail(email);
 
-    return connectionRepository.findByRequesterHashAndStatus(userHash, ConnectionStatus.PENDING)
-        .stream()
-        .filter(c -> isVisibleToRequester(c, userHash))
-        .map(c -> toConnectionResponse(c, userHash))
+    List<Connection> connections = connectionRepository
+        .findByRequesterHashAndStatus(userHash, ConnectionStatus.PENDING);
+    Map<String, User> userLookup = fetchPartnerUsers(connections, userHash);
+
+    return connections.stream()
+        .filter(c -> isVisibleToRequester(c, userHash, userLookup))
+        .map(c -> toConnectionResponse(c, userHash, userLookup))
         .toList();
   }
 
@@ -225,7 +240,8 @@ public class ConnectionService {
     connectionMetrics.recordAccepted();
     notificationService.createConnectionConfirmedNotification(connection.getRequesterHash(), connectionId);
 
-    return toConnectionResponse(saved, userHash);
+    Map<String, User> userLookup = fetchPartnerUsers(List.of(saved), userHash);
+    return toConnectionResponse(saved, userHash, userLookup);
   }
 
   /**
@@ -263,7 +279,8 @@ public class ConnectionService {
     connectionMetrics.recordDenied();
     notificationService.createConnectionDeniedNotification(connection.getRequesterHash(), connectionId);
 
-    return toConnectionResponse(saved, userHash);
+    Map<String, User> userLookup = fetchPartnerUsers(List.of(saved), userHash);
+    return toConnectionResponse(saved, userHash, userLookup);
   }
 
   /**
@@ -323,15 +340,19 @@ public class ConnectionService {
     long confirmedCount = connectionRepository.countConfirmedByUserHash(userHash);
     long pendingIncomingCount = connectionRepository.countByRecipientHashAndStatus(
         userHash, ConnectionStatus.PENDING);
-    long pendingSentCount = connectionRepository.findByRequesterHashAndStatus(
-        userHash, ConnectionStatus.PENDING).stream()
-        .filter(c -> isVisibleToRequester(c, userHash))
+
+    List<Connection> pendingSent = connectionRepository
+        .findByRequesterHashAndStatus(userHash, ConnectionStatus.PENDING);
+    Map<String, User> userLookup = fetchPartnerUsers(pendingSent, userHash);
+    long pendingSentCount = pendingSent.stream()
+        .filter(c -> isVisibleToRequester(c, userHash, userLookup))
         .count();
 
     return new ConnectionStatsResponse(confirmedCount, pendingIncomingCount, pendingSentCount);
   }
 
-  private boolean isVisibleToRequester(Connection connection, String currentUserHash) {
+  private boolean isVisibleToRequester(Connection connection, String currentUserHash,
+      Map<String, User> userLookup) {
     if (!connection.getRequesterHash().equals(currentUserHash)) {
       return true;
     }
@@ -339,7 +360,7 @@ public class ConnectionService {
       return true;
     }
 
-    User recipient = userRepository.findByEmailHash(connection.getRecipientHash()).orElse(null);
+    User recipient = userLookup.get(connection.getRecipientHash());
     if (recipient == null) {
       return false;
     }
@@ -418,13 +439,36 @@ public class ConnectionService {
   }
 
   /**
+   * Batch-fetches all partner users for a list of connections.
+   *
+   * <p>Collects all partner email hashes and fetches them in a single query,
+   * avoiding N+1 when converting multiple connections to responses.
+   *
+   * @param connections the connections to fetch partners for
+   * @param currentUserHash the current user's email hash
+   * @return map of email hash to User
+   */
+  private Map<String, User> fetchPartnerUsers(List<Connection> connections, String currentUserHash) {
+    Set<String> partnerHashes = connections.stream()
+        .map(c -> c.getRequesterHash().equals(currentUserHash)
+            ? c.getRecipientHash() : c.getRequesterHash())
+        .collect(Collectors.toSet());
+    if (partnerHashes.isEmpty()) {
+      return Map.of();
+    }
+    return userRepository.findByEmailHashIn(partnerHashes).stream()
+        .collect(Collectors.toMap(User::getEmailHash, u -> u, (a, b) -> a));
+  }
+
+  /**
    * Converts a Connection entity to a ConnectionResponse DTO.
    */
-  private ConnectionResponse toConnectionResponse(Connection connection, String currentUserHash) {
+  private ConnectionResponse toConnectionResponse(Connection connection, String currentUserHash,
+      Map<String, User> userLookup) {
     boolean isRequester = connection.getRequesterHash().equals(currentUserHash);
     String partnerHash = isRequester ? connection.getRecipientHash() : connection.getRequesterHash();
 
-    User partner = userRepository.findByEmailHash(partnerHash).orElse(null);
+    User partner = userLookup.get(partnerHash);
     String partnerDisplayName = null;
     String partnerUsername = null;
     String partnerAvatarThumbUrl = null;

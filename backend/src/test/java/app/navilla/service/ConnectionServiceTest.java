@@ -26,6 +26,7 @@ import static org.mockito.Mockito.when;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import app.navilla.dto.ConnectionResponse;
@@ -391,13 +392,16 @@ class ConnectionServiceTest {
               .build()
       ));
 
-      User publicRecipient = User.builder()
+      User recipientA = User.builder()
+          .emailHash("recipient-a")
           .profileVisibility(ProfileVisibility.PUBLIC)
           .build();
-      when(userRepository.findByEmailHash("recipient-a"))
-          .thenReturn(java.util.Optional.of(publicRecipient));
-      when(userRepository.findByEmailHash("recipient-b"))
-          .thenReturn(java.util.Optional.of(publicRecipient));
+      User recipientB = User.builder()
+          .emailHash("recipient-b")
+          .profileVisibility(ProfileVisibility.PUBLIC)
+          .build();
+      when(userRepository.findByEmailHashIn(Set.of("recipient-a", "recipient-b")))
+          .thenReturn(List.of(recipientA, recipientB));
 
       ConnectionStatsResponse stats = connectionService.getStats(jwt);
 
