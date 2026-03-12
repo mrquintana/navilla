@@ -14,6 +14,7 @@ import {
 } from '../../hooks/useJournal';
 import { api } from '../../lib/api';
 import type { JournalEntry, CustomField, Connection } from '../../lib/api';
+import { CountryCodePicker } from '../ui/CountryCodePicker';
 
 interface JournalEntryModalProps {
   isOpen: boolean;
@@ -130,6 +131,8 @@ function JournalEntryForm({
   const [formConnectionId, setFormConnectionId] = useState<string>(entry?.connectionId ?? '');
   const [formPartnerId, setFormPartnerId] = useState<string | null>(entry?.partnerId ?? null);
   const [formPhone, setFormPhone] = useState('');
+  const [formCountryCode, setFormCountryCode] = useState<string | null>(null);
+  const [phoneHint, setPhoneHint] = useState<string | null>(null);
   const [formNotes, setFormNotes] = useState(entry?.notes ?? '');
   const [customFields, setCustomFields] = useState<CustomFieldState[]>(
     () => buildInitialCustomFields(entry, savedLabels)
@@ -143,6 +146,25 @@ function JournalEntryForm({
 
   const aliasInputRef = useRef<HTMLInputElement>(null);
   const suggestionsRef = useRef<HTMLUListElement>(null);
+
+  const handlePhoneChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value;
+    if (raw === '') {
+      setFormPhone('');
+      setPhoneHint(null);
+      return;
+    }
+    if (raw.includes('+')) {
+      setPhoneHint(t('journal.phoneCountryCodeHint'));
+      return;
+    }
+    if (/[^0-9]/.test(raw)) {
+      setPhoneHint(t('journal.phoneDigitsOnly'));
+      return;
+    }
+    setPhoneHint(null);
+    setFormPhone(raw);
+  }, [t]);
 
   // Build the combined suggestion list (saved partners + recent aliases, deduplicated)
   const allSuggestions = useMemo((): PartnerSuggestion[] => {
@@ -315,6 +337,7 @@ function JournalEntryForm({
       connectionId: formConnectionId || undefined,
       partnerId: formPartnerId || undefined,
       phone: formPhone.trim() || undefined,
+      countryCode: formCountryCode || undefined,
       notes: formNotes.trim() || undefined,
       customFields: filteredCustomFields.length > 0 ? filteredCustomFields : undefined,
       encounterTypes: formEncounterTypes.length > 0 ? formEncounterTypes : undefined,
@@ -585,19 +608,33 @@ function JournalEntryForm({
             <label className="label" htmlFor="journal-phone">
               {t('journal.phone')}
             </label>
-            <input
-              id="journal-phone"
-              type="tel"
-              className="input"
-              value={formPhone}
-              placeholder="+52 55 1234 5678"
-              maxLength={20}
-              onChange={(e) => setFormPhone(e.target.value)}
-              autoComplete="off"
-            />
-            <p className="text-xs text-muted mt-1">
-              {t('journal.phoneHint')}
-            </p>
+            <div className="flex gap-2">
+              <CountryCodePicker
+                value={formCountryCode}
+                onChange={setFormCountryCode}
+              />
+              <input
+                id="journal-phone"
+                type="tel"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                className="input flex-1"
+                value={formPhone}
+                placeholder="5512345678"
+                maxLength={15}
+                onChange={handlePhoneChange}
+                autoComplete="off"
+              />
+            </div>
+            {phoneHint ? (
+              <p className="text-xs mt-1" style={{ color: 'var(--color-warning)' }}>
+                {phoneHint}
+              </p>
+            ) : (
+              <p className="text-xs text-muted mt-1">
+                {t('journal.phoneHint')}
+              </p>
+            )}
           </div>
 
           {/* Encounter types */}
