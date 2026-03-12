@@ -1136,5 +1136,29 @@
     "testDate": "Test Date",
     "expiresOn": "Expires on {{date}}",
     "viewsLeft": "{{count}} views remaining"
+  },
+  "networkHealth": {
+    "title": "Network Health",
+    "testingActivity": "Testing Activity",
+    "activity": {
+      "high": "Most of your network has tested recently",
+      "medium": "Some of your network has tested recently",
+      "low": "Few in your network have tested recently",
+      "unknown": "Not enough connections to determine"
+    },
+    "levelHigh": "High",
+    "levelMedium": "Medium",
+    "levelLow": "Low",
+    "levelUnknown": "Unknown",
+    "networkCoverage": "Network Coverage",
+    "directConnections": "direct connections",
+    "extendedConnections": "extended connections",
+    "uniquePeople": "~{{count}} unique people across {{degrees}} degrees",
+    "exposureSummary": "Exposure Summary",
+    "activeConditions": "{{count}} active condition in your network",
+    "activeConditions_plural": "{{count}} active conditions in your network",
+    "resolvedRecently": "{{count}} resolved in last 30 days",
+    "noActiveExposures": "No active exposures in your network",
+    "compactSummary": "{{connections}} connections · {{network}} in network"
   }
 }

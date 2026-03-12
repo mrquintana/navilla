@@ -545,6 +545,10 @@ export const api = {
     get: (token: string) =>
       apiRequest<InsightsResponse>('/api/insights', token),
   },
+  networkHealth: {
+    get: (token: string) =>
+      apiRequest<NetworkHealth>('/api/network-health', token),
+  },
   push: {
     vapidPublicKey: async () => {
       const baseUrl = getApiBaseUrl();
@@ -1004,6 +1008,20 @@ export interface InsightsResponse {
   activity: InsightsActivity;
   testing: InsightsTesting;
   prevention: InsightsPrevention;
+}
+
+// ── Network Health ──
+export interface NetworkHealth {
+  testingActivityLevel: 'HIGH' | 'MEDIUM' | 'LOW' | 'UNKNOWN';
+  testingActivityKey: string;
+  connectionCount: number;
+  secondDegreeCount: number | null;
+  thirdDegreeCount: number | null;
+  totalNetworkSize: number | null;
+  maxDepth: number;
+  activeExposureCount: number;
+  recentlyResolvedCount: number;
+  computedAt: string;
 }
 
 // ── Verification Cards ──

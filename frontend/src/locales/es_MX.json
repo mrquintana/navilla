@@ -1135,5 +1135,29 @@
     "testDate": "Fecha de Prueba",
     "expiresOn": "Expira el {{date}}",
     "viewsLeft": "{{count}} vistas restantes"
+  },
+  "networkHealth": {
+    "title": "Salud de la Red",
+    "testingActivity": "Actividad de Pruebas",
+    "activity": {
+      "high": "La mayoría de tu red se ha hecho pruebas recientemente",
+      "medium": "Algunos en tu red se han hecho pruebas recientemente",
+      "low": "Pocos en tu red se han hecho pruebas recientemente",
+      "unknown": "No hay suficientes conexiones para determinar"
+    },
+    "levelHigh": "Alta",
+    "levelMedium": "Media",
+    "levelLow": "Baja",
+    "levelUnknown": "Desconocida",
+    "networkCoverage": "Cobertura de Red",
+    "directConnections": "conexiones directas",
+    "extendedConnections": "conexiones extendidas",
+    "uniquePeople": "~{{count}} personas únicas en {{degrees}} grados",
+    "exposureSummary": "Resumen de Exposición",
+    "activeConditions": "{{count}} condición activa en tu red",
+    "activeConditions_plural": "{{count}} condiciones activas en tu red",
+    "resolvedRecently": "{{count}} resueltas en los últimos 30 días",
+    "noActiveExposures": "Sin exposiciones activas en tu red",
+    "compactSummary": "{{connections}} conexiones · {{network}} en la red"
   }
 }
