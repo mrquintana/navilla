@@ -20,6 +20,12 @@ self.addEventListener('message', (event) => {
   }
 })
 
+// Claim clients immediately after activation so the new SW takes control
+// This triggers the 'controllerchange' event which vite-plugin-pwa uses to reload
+self.addEventListener('activate', (event) => {
+  event.waitUntil(self.clients.claim())
+})
+
 // API calls: NetworkFirst with 10s timeout, 5min cache fallback
 registerRoute(
   ({ url }) => url.pathname.startsWith('/api/') && !url.pathname.includes('/catalog'),
