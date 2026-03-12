@@ -132,7 +132,7 @@ function OverviewTabContent() {
               <span>
                 {t('health.exposureUpdatedAt')}{' '}
                 {exposureQuery.data?.computedAt
-                  ? new Date(exposureQuery.data.computedAt).toLocaleDateString()
+                  ? new Date(exposureQuery.data.computedAt).toLocaleDateString(i18n.language.replace('_', '-'), { year: 'numeric', month: 'short', day: 'numeric' })
                   : '\u2014'}
               </span>
             </div>
@@ -318,7 +318,7 @@ function TestsTabContent() {
               >
                 <div
                   className="flex items-center justify-center w-9 h-9 rounded-lg shrink-0"
-                  style={{ backgroundColor: 'rgba(79, 70, 229, 0.08)' }}
+                  style={{ backgroundColor: 'var(--color-primary-light-bg)' }}
                 >
                   <Calendar className="w-4 h-4" style={{ color: 'var(--color-primary)' }} aria-hidden="true" />
                 </div>
@@ -455,7 +455,7 @@ function MedicationsTabContent() {
         <div className="flex flex-col items-center justify-center text-center py-16 px-6">
           <div
             className="w-16 h-16 rounded-full flex items-center justify-center mb-6"
-            style={{ backgroundColor: 'rgba(79, 70, 229, 0.08)' }}
+            style={{ backgroundColor: 'var(--color-primary-light-bg)' }}
           >
             <Pill className="w-8 h-8" style={{ color: 'var(--color-primary)' }} aria-hidden="true" />
           </div>
@@ -556,7 +556,7 @@ function VaccinesTabContent() {
         <div className="flex flex-col items-center justify-center text-center py-16 px-6">
           <div
             className="w-16 h-16 rounded-full flex items-center justify-center mb-6"
-            style={{ backgroundColor: 'rgba(79, 70, 229, 0.08)' }}
+            style={{ backgroundColor: 'var(--color-primary-light-bg)' }}
           >
             <Syringe className="w-8 h-8" style={{ color: 'var(--color-primary)' }} aria-hidden="true" />
           </div>

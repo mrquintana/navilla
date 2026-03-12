@@ -148,7 +148,7 @@ export function DashboardPage() {
             to="/health-log"
             className="flex items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium transition-colors"
             style={{
-              background: 'rgba(99, 102, 241, 0.08)',
+              background: 'var(--color-primary-light-bg)',
               color: 'var(--color-primary)',
             }}
           >
@@ -159,7 +159,7 @@ export function DashboardPage() {
             to="/journal"
             className="flex items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium transition-colors"
             style={{
-              background: 'rgba(99, 102, 241, 0.08)',
+              background: 'var(--color-primary-light-bg)',
               color: 'var(--color-primary)',
             }}
           >
@@ -170,7 +170,7 @@ export function DashboardPage() {
             to="/connections"
             className="flex items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium transition-colors"
             style={{
-              background: 'rgba(99, 102, 241, 0.08)',
+              background: 'var(--color-primary-light-bg)',
               color: 'var(--color-primary)',
             }}
           >
@@ -181,7 +181,7 @@ export function DashboardPage() {
             to="/insights"
             className="flex items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium transition-colors"
             style={{
-              background: 'rgba(99, 102, 241, 0.08)',
+              background: 'var(--color-primary-light-bg)',
               color: 'var(--color-primary)',
             }}
           >
@@ -203,19 +203,27 @@ export function DashboardPage() {
                 className={`w-10 h-10 rounded-full flex items-center justify-center ${
                   hasPositiveStatus ? 'bg-red-100' : 'bg-green-100'
                 }`}
+                role="img"
+                aria-label={hasPositiveStatus ? t('dashboard.statusActive') : t('dashboard.statusClear')}
               >
                 <svg
                   className={`w-5 h-5 ${hasPositiveStatus ? 'text-red-600' : 'text-green-600'}`}
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
+                  aria-hidden="true"
                 >
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <h3 className="text-sm font-semibold uppercase tracking-wider" style={{ color: 'var(--color-muted)' }}>
-                {t('dashboard.exposureStatus')}
-              </h3>
+              <div>
+                <h3 className="text-sm font-semibold uppercase tracking-wider" style={{ color: 'var(--color-muted)' }}>
+                  {t('dashboard.exposureStatus')}
+                </h3>
+                <p className={`text-xs font-medium ${hasPositiveStatus ? 'text-red-600' : 'text-green-600'}`}>
+                  {hasPositiveStatus ? t('dashboard.statusActive') : t('dashboard.statusClear')}
+                </p>
+              </div>
             </div>
 
             {/* Status badge */}
@@ -355,7 +363,7 @@ export function DashboardPage() {
         {/* Connections Card */}
         <div className="card card-elevated">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: 'rgba(99, 102, 241, 0.08)' }}>
+            <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: 'var(--color-primary-light-bg)' }}>
               <svg className="w-5 h-5" style={{ color: 'var(--color-primary)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
               </svg>
@@ -414,7 +422,7 @@ export function DashboardPage() {
         <div className="card card-elevated">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: 'rgba(99, 102, 241, 0.08)' }}>
+              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: 'var(--color-primary-light-bg)' }}>
                 <Sparkles className="w-5 h-5" style={{ color: 'var(--color-primary)' }} aria-hidden="true" />
               </div>
               <h3 className="text-sm font-semibold uppercase tracking-wider">{t('dashboard.constellation')}</h3>

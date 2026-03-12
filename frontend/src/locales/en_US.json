@@ -144,7 +144,9 @@
     "urgencyLow": "Low",
     "goToInsights": "Insights",
     "constellation": "Your Constellation",
-    "viewConstellation": "View your constellation"
+    "viewConstellation": "View your constellation",
+    "statusActive": "Active exposure detected",
+    "statusClear": "No active exposure"
   },
   "insights": {
     "title": "Personal Insights",

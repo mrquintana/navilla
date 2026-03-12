@@ -144,7 +144,9 @@
     "urgencyLow": "Baja",
     "goToInsights": "Perspectivas",
     "constellation": "Tu Constelación",
-    "viewConstellation": "Ver tu constelación"
+    "viewConstellation": "Ver tu constelación",
+    "statusActive": "Exposición activa detectada",
+    "statusClear": "Sin exposición activa"
   },
   "insights": {
     "title": "Perspectivas personales",

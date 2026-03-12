@@ -34,7 +34,7 @@ function ConnectionList({
   compact?: boolean;
   focusedConnectionId?: string | null;
 }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   return (
     <div className="card card-elevated">
@@ -88,7 +88,7 @@ function ConnectionList({
                         <p className="text-xs text-muted">@{connection.partnerUsername}</p>
                       )}
                       <p className="text-xs text-muted" title={dateLabel}>
-                        {new Date(connection.requestedAt).toLocaleDateString()}
+                        {new Date(connection.requestedAt).toLocaleDateString(i18n.language.replace('_', '-'), { year: 'numeric', month: 'short', day: 'numeric' })}
                       </p>
                     </div>
                   </div>

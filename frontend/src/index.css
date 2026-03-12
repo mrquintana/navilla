@@ -24,6 +24,7 @@
   --color-primary-light: #6366f1;
   --color-primary-lighter: #818cf8;
   --color-primary-lightest: #a5b4fc;
+  --color-primary-light-bg: rgba(99, 102, 241, 0.08);
 
   /* Neutral palette — warm stone */
   --color-background: #fafaf9;
