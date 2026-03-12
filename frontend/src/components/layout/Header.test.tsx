@@ -85,10 +85,10 @@ describe('Header', () => {
     renderHeader();
 
     expect(screen.getByText('nav.dashboard')).toBeInTheDocument();
-    expect(screen.getByText('nav.connections')).toBeInTheDocument();
     expect(screen.getByText('nav.health')).toBeInTheDocument();
+    expect(screen.getByText('nav.network')).toBeInTheDocument();
+    expect(screen.getByText('nav.more')).toBeInTheDocument();
     expect(screen.getByText('nav.notifications')).toBeInTheDocument();
-    expect(screen.getByText('(@migue)')).toBeInTheDocument();
     expect(screen.getByText('2')).toBeInTheDocument();
   });
 

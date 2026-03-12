@@ -2,7 +2,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuthOptional } from '../../contexts/AuthContext';
 import { useUser } from '../../hooks/useUser';
-import { BarChart3, Bell, BookOpen, ChevronDown, HeartPulse, LayoutDashboard, LogOut, Menu, ShieldCheck, UserCircle2 } from 'lucide-react';
+import { BarChart3, Bell, BookOpen, ChevronDown, HeartPulse, LayoutDashboard, LogOut, Menu, MoreHorizontal, ShieldCheck, Sparkles, UserCircle2 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { api, type NotificationItem } from '../../lib/api';
@@ -95,23 +95,25 @@ export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
   const notificationsRef = useRef<HTMLDivElement | null>(null);
   const mobileMenuRef = useRef<HTMLDivElement | null>(null);
+  const moreRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const handleClick = (event: MouseEvent) => {
-      if (!menuRef.current) return;
-      if (!menuRef.current.contains(event.target as Node)) {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setMenuOpen(false);
       }
-      if (!mobileMenuRef.current) return;
-      if (!mobileMenuRef.current.contains(event.target as Node)) {
+      if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target as Node)) {
         setMobileMenuOpen(false);
       }
-      if (!notificationsRef.current) return;
-      if (!notificationsRef.current.contains(event.target as Node)) {
+      if (notificationsRef.current && !notificationsRef.current.contains(event.target as Node)) {
         setNotificationsOpen(false);
+      }
+      if (moreRef.current && !moreRef.current.contains(event.target as Node)) {
+        setMoreOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClick);
@@ -160,6 +162,10 @@ export function Header() {
                     <Link to="/health-log" className={`nav-dropdown-item${pathname === '/health-log' || pathname.startsWith('/health-log/') ? ' nav-dropdown-item-active' : ''}`} role="menuitem">
                       <HeartPulse className="nav-icon" aria-hidden="true" />
                       {t('nav.health')}
+                    </Link>
+                    <Link to="/network" className={`nav-dropdown-item${pathname === '/network' ? ' nav-dropdown-item-active' : ''}`} role="menuitem" onClick={() => setMobileMenuOpen(false)}>
+                      <Sparkles className="nav-icon" aria-hidden="true" />
+                      {t('nav.network')}
                     </Link>
                     <Link to="/insights" className={`nav-dropdown-item${pathname === '/insights' ? ' nav-dropdown-item-active' : ''}`} role="menuitem">
                       <BarChart3 className="nav-icon" aria-hidden="true" />
@@ -221,14 +227,35 @@ export function Header() {
                   <HeartPulse className="nav-icon" aria-hidden="true" />
                   {t('nav.health')}
                 </Link>
-                <Link to="/insights" className={`nav-link${pathname === '/insights' ? ' nav-link-active' : ''}`}>
-                  <BarChart3 className="nav-icon" aria-hidden="true" />
-                  {t('nav.insights')}
+                <Link to="/network" className={`nav-link${pathname === '/network' ? ' nav-link-active' : ''}`}>
+                  <Sparkles className="nav-icon" aria-hidden="true" />
+                  {t('nav.network')}
                 </Link>
-                <Link to="/verification-card" className={`nav-link${pathname === '/verification-card' ? ' nav-link-active' : ''}`}>
-                  <ShieldCheck className="nav-icon" aria-hidden="true" />
-                  {t('nav.verificationCard')}
-                </Link>
+                <div className="nav-menu" ref={moreRef}>
+                  <button
+                    className={`nav-link${pathname === '/insights' || pathname === '/verification-card' ? ' nav-link-active' : ''}`}
+                    type="button"
+                    onClick={() => setMoreOpen((open) => !open)}
+                    aria-expanded={moreOpen}
+                    aria-haspopup="menu"
+                  >
+                    <MoreHorizontal className="nav-icon" aria-hidden="true" />
+                    {t('nav.more')}
+                    <ChevronDown className="nav-icon" aria-hidden="true" />
+                  </button>
+                  {moreOpen && (
+                    <div className="nav-dropdown" role="menu">
+                      <Link to="/insights" className={`nav-dropdown-item${pathname === '/insights' ? ' nav-dropdown-item-active' : ''}`} role="menuitem" onClick={() => setMoreOpen(false)}>
+                        <BarChart3 className="nav-icon" aria-hidden="true" />
+                        {t('nav.insights')}
+                      </Link>
+                      <Link to="/verification-card" className={`nav-dropdown-item${pathname === '/verification-card' ? ' nav-dropdown-item-active' : ''}`} role="menuitem" onClick={() => setMoreOpen(false)}>
+                        <ShieldCheck className="nav-icon" aria-hidden="true" />
+                        {t('nav.verificationCard')}
+                      </Link>
+                    </div>
+                  )}
+                </div>
                 <div className="nav-menu" ref={notificationsRef}>
                   <button
                     className={`nav-link${pathname === '/notifications' ? ' nav-link-active' : ''}`}

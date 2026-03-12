@@ -74,6 +74,7 @@
     "profile": "Profile",
     "journal": "Journal",
     "insights": "Insights",
+    "more": "More",
     "network": "Network",
     "verificationCard": "Verification"
   },
@@ -1048,7 +1049,9 @@
     "stats": "{{direct}} direct · {{extended}} extended · {{total}} total",
     "shareError": "Something went wrong while exporting your constellation. Please try again.",
     "coldStartMessage": "Your sky is waiting. Add your first connection to light it up.",
-    "coldStartLink": "Add a connection"
+    "coldStartLink": "Add a connection",
+    "constellationHelpTitle": "What is a constellation?",
+    "constellationHelpBody": "Your connections visualized as stars. More connections create a bigger constellation. Stages: Empty Sky, Spark, Cluster, Constellation, Galaxy, Supercluster."
   },
   "labVerification": {
     "title": "Verify with Lab",
@@ -1164,6 +1167,10 @@
     "activeConditions_plural": "{{count}} active conditions in your network",
     "resolvedRecently": "{{count}} resolved in last 30 days",
     "noActiveExposures": "No active exposures in your network",
-    "compactSummary": "{{connections}} connections · {{network}} in network"
+    "compactSummary": "{{connections}} connections · {{network}} in network",
+    "activityHelpTitle": "What is testing activity?",
+    "activityHelpBody": "Based on the percentage of your direct connections who logged a test in the last 90 days. High means 60% or more tested recently. Medium means 30-59%. Low means fewer than 30%.",
+    "coverageHelpTitle": "What is network coverage?",
+    "coverageHelpBody": "Direct connections are people you're linked to. Extended connections are their connections. Total shows how many unique people are in your network across all degrees of separation."
   }
 }

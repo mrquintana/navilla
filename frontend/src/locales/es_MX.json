@@ -74,6 +74,7 @@
     "profile": "Perfil",
     "journal": "Diario",
     "insights": "Estadísticas",
+    "more": "Más",
     "network": "Red",
     "verificationCard": "Verificación"
   },
@@ -1047,7 +1048,9 @@
     "stats": "{{direct}} directos · {{extended}} extendidos · {{total}} total",
     "shareError": "Ocurrió un error al exportar tu constelación. Inténtalo de nuevo.",
     "coldStartMessage": "Tu cielo te espera. Agrega tu primera conexión para iluminarlo.",
-    "coldStartLink": "Agregar una conexión"
+    "coldStartLink": "Agregar una conexión",
+    "constellationHelpTitle": "¿Qué es una constelación?",
+    "constellationHelpBody": "Tus conexiones visualizadas como estrellas. Más conexiones crean una constelación más grande. Etapas: Cielo Vacío, Chispa, Cúmulo, Constelación, Galaxia, Supercúmulo."
   },
   "labVerification": {
     "title": "Verificar con laboratorio",
@@ -1163,6 +1166,10 @@
     "activeConditions_plural": "{{count}} condiciones activas en tu red",
     "resolvedRecently": "{{count}} resueltas en los últimos 30 días",
     "noActiveExposures": "Sin exposiciones activas en tu red",
-    "compactSummary": "{{connections}} conexiones · {{network}} en la red"
+    "compactSummary": "{{connections}} conexiones · {{network}} en la red",
+    "activityHelpTitle": "¿Qué es la actividad de pruebas?",
+    "activityHelpBody": "Basado en el porcentaje de tus conexiones directas que registraron una prueba en los últimos 90 días. Alta significa que 60% o más se hicieron pruebas recientemente. Media significa 30-59%. Baja significa menos del 30%.",
+    "coverageHelpTitle": "¿Qué es la cobertura de red?",
+    "coverageHelpBody": "Las conexiones directas son personas vinculadas contigo. Las conexiones extendidas son sus conexiones. El total muestra cuántas personas únicas hay en tu red en todos los grados de separación."
   }
 }

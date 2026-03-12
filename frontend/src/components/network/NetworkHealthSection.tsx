@@ -1,5 +1,6 @@
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Activity, Users, Shield } from 'lucide-react';
+import { Activity, HelpCircle, Users, Shield } from 'lucide-react';
 import type { NetworkHealth } from '../../hooks/useNetworkHealth';
 
 interface Props {
@@ -36,11 +37,13 @@ const levelConfig = {
 export function NetworkHealthSection({ data }: Props) {
   const { t } = useTranslation();
   const config = levelConfig[data.testingActivityLevel];
+  const [showActivityHelp, setShowActivityHelp] = useState(false);
+  const [showCoverageHelp, setShowCoverageHelp] = useState(false);
 
   const extendedCount = (data.secondDegreeCount ?? 0) + (data.thirdDegreeCount ?? 0);
 
   return (
-    <div className="container py-6 space-y-4">
+    <div className="space-y-4">
       {/* Testing Activity */}
       <div className="card p-4" style={{ background: 'white' }}>
         <div className="flex items-center gap-3 mb-3">
@@ -48,7 +51,21 @@ export function NetworkHealthSection({ data }: Props) {
           <h3 className="text-sm font-semibold uppercase tracking-wider" style={{ color: 'var(--color-muted)' }}>
             {t('networkHealth.testingActivity')}
           </h3>
+          <button
+            type="button"
+            className="btn btn-secondary btn-sm p-1"
+            onClick={() => setShowActivityHelp((prev) => !prev)}
+            aria-label={t('networkHealth.activityHelpTitle')}
+          >
+            <HelpCircle className="w-3.5 h-3.5" />
+          </button>
         </div>
+        {showActivityHelp && (
+          <div className="mb-3 rounded-md border border-border-light p-3 text-xs text-muted" style={{ background: 'var(--color-background-secondary)' }}>
+            <p className="font-semibold text-foreground mb-1">{t('networkHealth.activityHelpTitle')}</p>
+            <p>{t('networkHealth.activityHelpBody')}</p>
+          </div>
+        )}
         <div className="flex items-center gap-2 mb-1">
           <span
             role="status"
@@ -75,7 +92,21 @@ export function NetworkHealthSection({ data }: Props) {
           <h3 className="text-sm font-semibold uppercase tracking-wider" style={{ color: 'var(--color-muted)' }}>
             {t('networkHealth.networkCoverage')}
           </h3>
+          <button
+            type="button"
+            className="btn btn-secondary btn-sm p-1"
+            onClick={() => setShowCoverageHelp((prev) => !prev)}
+            aria-label={t('networkHealth.coverageHelpTitle')}
+          >
+            <HelpCircle className="w-3.5 h-3.5" />
+          </button>
         </div>
+        {showCoverageHelp && (
+          <div className="mb-3 rounded-md border border-border-light p-3 text-xs text-muted" style={{ background: 'var(--color-background-secondary)' }}>
+            <p className="font-semibold text-foreground mb-1">{t('networkHealth.coverageHelpTitle')}</p>
+            <p>{t('networkHealth.coverageHelpBody')}</p>
+          </div>
+        )}
         <div className="space-y-2 text-sm">
           <div className="flex items-center justify-between">
             <span className="text-muted">{t('networkHealth.directConnections')}</span>
