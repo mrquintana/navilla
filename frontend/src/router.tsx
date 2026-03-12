@@ -6,131 +6,147 @@ import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { FullPageLoader } from './components/ui/LoadingShell';
 import { ErrorPage } from './pages/ErrorPage';
 
+// Auto-reload on stale chunks after deploy
+function lazyWithReload<T extends { default: React.ComponentType }>(
+  factory: () => Promise<T>,
+) {
+  return lazy(() =>
+    factory().catch((err: unknown) => {
+      const msg = err instanceof Error ? err.message : '';
+      if (msg.includes('dynamically imported module') || msg.includes('Failed to fetch')) {
+        window.location.reload();
+        return new Promise<T>(() => {}); // never resolves — reload takes over
+      }
+      throw err;
+    }),
+  );
+}
+
 // --- Lazy-loaded page components (route-level code splitting) ---
 
-const HomePage = lazy(() =>
+const HomePage = lazyWithReload(() =>
   import('./pages/HomePage').then(m => ({ default: m.HomePage })),
 );
-const LoginPage = lazy(() =>
+const LoginPage = lazyWithReload(() =>
   import('./pages/LoginPage').then(m => ({ default: m.LoginPage })),
 );
-const SignUpPage = lazy(() =>
+const SignUpPage = lazyWithReload(() =>
   import('./pages/SignUpPage').then(m => ({ default: m.SignUpPage })),
 );
-const ForgotPasswordPage = lazy(() =>
+const ForgotPasswordPage = lazyWithReload(() =>
   import('./pages/ForgotPasswordPage').then(m => ({
     default: m.ForgotPasswordPage,
   })),
 );
-const ResetPasswordPage = lazy(() =>
+const ResetPasswordPage = lazyWithReload(() =>
   import('./pages/ResetPasswordPage').then(m => ({
     default: m.ResetPasswordPage,
   })),
 );
-const DashboardPage = lazy(() =>
+const DashboardPage = lazyWithReload(() =>
   import('./pages/DashboardPage').then(m => ({ default: m.DashboardPage })),
 );
-const ConnectionsPage = lazy(() =>
+const ConnectionsPage = lazyWithReload(() =>
   import('./pages/ConnectionsPage').then(m => ({ default: m.ConnectionsPage })),
 );
-const ProfilePage = lazy(() =>
+const ProfilePage = lazyWithReload(() =>
   import('./pages/ProfilePage').then(m => ({ default: m.ProfilePage })),
 );
-const HealthLogPage = lazy(() =>
+const HealthLogPage = lazyWithReload(() =>
   import('./pages/HealthLogPage').then(m => ({ default: m.HealthLogPage })),
 );
-const ConditionDetailPage = lazy(() =>
+const ConditionDetailPage = lazyWithReload(() =>
   import('./pages/ConditionDetailPage').then(m => ({
     default: m.ConditionDetailPage,
   })),
 );
-const NotificationsPage = lazy(() =>
+const NotificationsPage = lazyWithReload(() =>
   import('./pages/NotificationsPage').then(m => ({
     default: m.NotificationsPage,
   })),
 );
-const HowItWorksPage = lazy(() =>
+const HowItWorksPage = lazyWithReload(() =>
   import('./pages/HowItWorksPage').then(m => ({ default: m.HowItWorksPage })),
 );
-const ContactPage = lazy(() =>
+const ContactPage = lazyWithReload(() =>
   import('./pages/ContactPage').then(m => ({ default: m.ContactPage })),
 );
-const AboutPage = lazy(() =>
+const AboutPage = lazyWithReload(() =>
   import('./pages/AboutPage').then(m => ({ default: m.AboutPage })),
 );
-const CareersPage = lazy(() =>
+const CareersPage = lazyWithReload(() =>
   import('./pages/CareersPage').then(m => ({ default: m.CareersPage })),
 );
-const PrivacyPage = lazy(() =>
+const PrivacyPage = lazyWithReload(() =>
   import('./pages/PrivacyPage').then(m => ({ default: m.PrivacyPage })),
 );
-const SecurityPage = lazy(() =>
+const SecurityPage = lazyWithReload(() =>
   import('./pages/SecurityPage').then(m => ({ default: m.SecurityPage })),
 );
-const TermsPage = lazy(() =>
+const TermsPage = lazyWithReload(() =>
   import('./pages/TermsPage').then(m => ({ default: m.TermsPage })),
 );
-const PrivacyPolicyPage = lazy(() =>
+const PrivacyPolicyPage = lazyWithReload(() =>
   import('./pages/PrivacyPolicyPage').then(m => ({
     default: m.PrivacyPolicyPage,
   })),
 );
-const CookiePolicyPage = lazy(() =>
+const CookiePolicyPage = lazyWithReload(() =>
   import('./pages/CookiePolicyPage').then(m => ({
     default: m.CookiePolicyPage,
   })),
 );
-const HelpPage = lazy(() =>
+const HelpPage = lazyWithReload(() =>
   import('./pages/HelpPage').then(m => ({ default: m.HelpPage })),
 );
-const StatusPage = lazy(() =>
+const StatusPage = lazyWithReload(() =>
   import('./pages/StatusPage').then(m => ({ default: m.StatusPage })),
 );
-const AccessibilityPage = lazy(() =>
+const AccessibilityPage = lazyWithReload(() =>
   import('./pages/AccessibilityPage').then(m => ({
     default: m.AccessibilityPage,
   })),
 );
-const JournalPage = lazy(() =>
+const JournalPage = lazyWithReload(() =>
   import('./pages/JournalPage').then(m => ({ default: m.JournalPage })),
 );
-const PartnerDetailPage = lazy(() =>
+const PartnerDetailPage = lazyWithReload(() =>
   import('./pages/PartnerDetailPage').then(m => ({
     default: m.PartnerDetailPage,
   })),
 );
-const NotFoundPage = lazy(() =>
+const NotFoundPage = lazyWithReload(() =>
   import('./pages/NotFoundPage').then(m => ({ default: m.NotFoundPage })),
 );
-const WindowPeriodCalculatorPage = lazy(() =>
+const WindowPeriodCalculatorPage = lazyWithReload(() =>
   import('./pages/WindowPeriodCalculatorPage').then(m => ({
     default: m.WindowPeriodCalculatorPage,
   })),
 );
-const GuidesIndexPage = lazy(() =>
+const GuidesIndexPage = lazyWithReload(() =>
   import('./pages/GuidesIndexPage').then(m => ({ default: m.GuidesIndexPage })),
 );
-const GuideDetailPage = lazy(() =>
+const GuideDetailPage = lazyWithReload(() =>
   import('./pages/GuideDetailPage').then(m => ({ default: m.GuideDetailPage })),
 );
-const TestingCostPage = lazy(() =>
+const TestingCostPage = lazyWithReload(() =>
   import('./pages/TestingCostPage').then(m => ({ default: m.TestingCostPage })),
 );
-const MedicationDetailPage = lazy(() =>
+const MedicationDetailPage = lazyWithReload(() =>
   import('./pages/MedicationDetailPage').then(m => ({
     default: m.MedicationDetailPage,
   })),
 );
-const InsightsPage = lazy(() =>
+const InsightsPage = lazyWithReload(() =>
   import('./pages/InsightsPage').then(m => ({ default: m.InsightsPage })),
 );
-const NetworkPage = lazy(() =>
+const NetworkPage = lazyWithReload(() =>
   import('./pages/NetworkPage').then(m => ({ default: m.NetworkPage })),
 );
-const VerificationCardPage = lazy(() =>
+const VerificationCardPage = lazyWithReload(() =>
   import('./pages/VerificationCardPage').then(m => ({ default: m.VerificationCardPage })),
 );
-const PublicVerificationCardPage = lazy(() =>
+const PublicVerificationCardPage = lazyWithReload(() =>
   import('./pages/PublicVerificationCardPage').then(m => ({ default: m.PublicVerificationCardPage })),
 );
 
