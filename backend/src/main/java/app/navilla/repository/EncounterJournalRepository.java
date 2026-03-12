@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.UUID;
 
 import app.navilla.entity.EncounterJournal;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -30,6 +32,13 @@ import org.springframework.stereotype.Repository;
 public interface EncounterJournalRepository extends JpaRepository<EncounterJournal, UUID> {
 
   List<EncounterJournal> findByUserHashOrderByEncounterDateDesc(String userHash);
+
+  Page<EncounterJournal> findByUserHashOrderByEncounterDateDesc(String userHash, Pageable pageable);
+
+  @Query("SELECT DISTINCT FUNCTION('TO_CHAR', e.encounterDate, 'YYYY-MM') "
+      + "FROM EncounterJournal e WHERE e.userHash = :userHash "
+      + "ORDER BY 1")
+  List<String> findDistinctMonthsByUserHash(@Param("userHash") String userHash);
 
   @Query("SELECT e FROM EncounterJournal e WHERE e.userHash = :userHash "
       + "AND e.encounterDate >= :startDate AND e.encounterDate <= :endDate "

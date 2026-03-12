@@ -68,10 +68,18 @@ public class EncounterJournalController {
    * @return list of journal entry responses
    */
   @GetMapping
-  public ResponseEntity<List<JournalEntryResponse>> listEntries(
+  public ResponseEntity<?> listEntries(
       @AuthenticationPrincipal Jwt jwt,
-      @RequestParam(required = false) String month) {
-    return ResponseEntity.ok(journalService.listEntries(jwt, month));
+      @RequestParam(required = false) String month,
+      @RequestParam(required = false) Integer page,
+      @RequestParam(required = false) Integer size) {
+    return ResponseEntity.ok(journalService.listEntries(jwt, month, page, size));
+  }
+
+  @GetMapping("/months")
+  public ResponseEntity<List<String>> getMonthsWithEntries(
+      @AuthenticationPrincipal Jwt jwt) {
+    return ResponseEntity.ok(journalService.getMonthsWithEntries(jwt));
   }
 
   /**

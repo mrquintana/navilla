@@ -142,7 +142,10 @@ class EncounterJournalServiceTest {
       when(objectMapper.readValue(eq(customJson), any(TypeReference.class)))
           .thenReturn(List.of(new CustomFieldDto("Location", "Home")));
 
-      List<JournalEntryResponse> result = encounterJournalService.listEntries(jwt, null);
+      @SuppressWarnings("unchecked")
+      List<JournalEntryResponse> result =
+          (List<JournalEntryResponse>) encounterJournalService
+              .listEntries(jwt, null, null, null);
 
       assertThat(result).hasSize(1);
       assertThat(result.getFirst().partnerAlias()).isEqualTo("Partner A");
@@ -160,7 +163,10 @@ class EncounterJournalServiceTest {
       when(journalRepository.findByUserHashOrderByEncounterDateDesc(USER_HASH))
           .thenReturn(Collections.emptyList());
 
-      List<JournalEntryResponse> result = encounterJournalService.listEntries(jwt, null);
+      @SuppressWarnings("unchecked")
+      List<JournalEntryResponse> result =
+          (List<JournalEntryResponse>) encounterJournalService
+              .listEntries(jwt, null, null, null);
 
       assertThat(result).isEmpty();
     }
@@ -183,7 +189,10 @@ class EncounterJournalServiceTest {
       when(objectMapper.readValue(eq(customJson), any(TypeReference.class)))
           .thenReturn(List.of(new CustomFieldDto("Location", "Home")));
 
-      List<JournalEntryResponse> result = encounterJournalService.listEntries(jwt, "2026-03");
+      @SuppressWarnings("unchecked")
+      List<JournalEntryResponse> result =
+          (List<JournalEntryResponse>) encounterJournalService
+              .listEntries(jwt, "2026-03", null, null);
 
       assertThat(result).hasSize(1);
       verify(journalRepository).findByUserHashAndMonth(USER_HASH, startDate, endDate);

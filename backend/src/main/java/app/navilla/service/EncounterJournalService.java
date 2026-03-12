@@ -79,23 +79,38 @@ public class EncounterJournalService {
    * @return list of decrypted journal entry responses
    */
   @Transactional(readOnly = true)
-  public List<JournalEntryResponse> listEntries(Jwt jwt, String month) {
+  public Object listEntries(Jwt jwt, String month, Integer page, Integer size) {
     String userHash = hashEmail(jwt);
 
-    List<EncounterJournal> entries;
+    // Month filter — return all entries for that month (no pagination)
     if (month != null && !month.isBlank()) {
       YearMonth ym = YearMonth.parse(month);
       LocalDate startDate = ym.atDay(1);
       LocalDate endDate = ym.atEndOfMonth();
-      entries = journalRepository.findByUserHashAndMonth(
+      List<EncounterJournal> entries = journalRepository.findByUserHashAndMonth(
           userHash, startDate, endDate);
-    } else {
-      entries = journalRepository
-          .findByUserHashOrderByEncounterDateDesc(userHash);
+      return entries.stream().map(e -> toResponse(e, userHash)).toList();
     }
 
+    // Paginated — for timeline view
+    if (page != null && size != null) {
+      org.springframework.data.domain.Page<EncounterJournal> pageResult = journalRepository
+          .findByUserHashOrderByEncounterDateDesc(userHash,
+              org.springframework.data.domain.PageRequest.of(page, size));
+      return pageResult.map(e -> toResponse(e, userHash));
+    }
+
+    // Default — all entries (backward compat)
+    List<EncounterJournal> entries = journalRepository
+        .findByUserHashOrderByEncounterDateDesc(userHash);
     return entries.stream()
         .map(e -> toResponse(e, userHash)).toList();
+  }
+
+  @Transactional(readOnly = true)
+  public List<String> getMonthsWithEntries(Jwt jwt) {
+    String userHash = hashEmail(jwt);
+    return journalRepository.findDistinctMonthsByUserHash(userHash);
   }
 
   /**
