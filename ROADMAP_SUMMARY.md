@@ -28,7 +28,7 @@
 ### Phase 3: Layer 2 — Network Enhancements — Weeks 10-14
 - Week 10: Network foundation (reciprocity, catalog, phone matching, constellation viz, profile) ✅
 - Week 11: Exposure recency buckets + verification cards + profile refactor ✅
-- Week 12: Notification privacy + polish (vault + app lock DEFERRED post-launch)
+- Week 12: Notification privacy + polish (vault + app lock DEFERRED post-launch) ✅
 - Week 13: Data retention + connection staleness
 - Week 14: Network health stats + Layer 2 polish
 
@@ -42,7 +42,7 @@
 
 ## Current Position
 
-**We are at Week 12** (Phase 3). Weeks 1-11 complete.
+**We are at Week 13** (Phase 3). Weeks 1-12 complete.
 
 Next up: Check `docs/plans/full-roadmap.md` Phase 3 table (Weeks 12-14) for detailed deliverables.
 
