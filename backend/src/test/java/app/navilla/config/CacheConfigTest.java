@@ -43,6 +43,7 @@ class CacheConfigTest {
     assertThat(manager.getCache("healthLogSummary")).isNotNull();
     assertThat(manager.getCache("insights")).isNotNull();
     assertThat(manager.getCache("prepStreak")).isNotNull();
+    assertThat(manager.getCache("networkHealth")).isNotNull();
   }
 
   @Test
@@ -64,6 +65,7 @@ class CacheConfigTest {
 
     assertThat(manager.getCacheNames())
         .containsExactlyInAnyOrder(
-            "catalog", "appConfig", "healthLogSummary", "insights", "prepStreak");
+            "catalog", "appConfig", "healthLogSummary", "insights",
+            "prepStreak", "networkHealth");
   }
 }

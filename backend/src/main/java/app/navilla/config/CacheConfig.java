@@ -37,6 +37,7 @@ import org.springframework.context.annotation.Configuration;
  *   <li>{@code healthLogSummary} — per-user, 5 minute TTL</li>
  *   <li>{@code insights} — per-user, 5 minute TTL</li>
  *   <li>{@code prepStreak} — per-user, 10 minute TTL</li>
+ *   <li>{@code networkHealth} — per-user, 5 minute TTL</li>
  * </ul>
  */
 @Configuration
@@ -56,7 +57,8 @@ public class CacheConfig {
         buildCache("appConfig", 1, TimeUnit.HOURS, 200),
         buildCache("healthLogSummary", 5, TimeUnit.MINUTES, 500),
         buildCache("insights", 5, TimeUnit.MINUTES, 500),
-        buildCache("prepStreak", 10, TimeUnit.MINUTES, 500)
+        buildCache("prepStreak", 10, TimeUnit.MINUTES, 500),
+        buildCache("networkHealth", 5, TimeUnit.MINUTES, 500)
     ));
     return manager;
   }
