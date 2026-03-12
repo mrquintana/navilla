@@ -17,15 +17,15 @@ import { MedicationModal } from '../components/reminders/MedicationModal';
 import { VaccinationSeriesCard } from '../components/reminders/VaccinationSeriesCard';
 import { VaccinationModal } from '../components/reminders/VaccinationModal';
 import { UpcomingReminders } from '../components/reminders/UpcomingReminders';
-import { SkeletonBlock, SkeletonRows } from '../components/ui/LoadingShell';
+import { SkeletonBlock } from '../components/ui/LoadingShell';
 import { LabVerificationModal } from '../components/health/LabVerificationModal';
 import type { VaccineSeries } from '../lib/api';
 
-type HealthTab = 'tests' | 'medications' | 'vaccines';
+type HealthTab = 'overview' | 'tests' | 'medications' | 'vaccines';
 
 export function HealthLogPage() {
   const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState<HealthTab>('tests');
+  const [activeTab, setActiveTab] = useState<HealthTab>('overview');
 
   return (
     <div className="container py-8 space-y-6">
@@ -48,7 +48,7 @@ export function HealthLogPage() {
         role="tablist"
         aria-label={t('myHealth.title')}
       >
-        {(['tests', 'medications', 'vaccines'] as const).map((tab) => (
+        {(['overview', 'tests', 'medications', 'vaccines'] as const).map((tab) => (
           <button
             key={tab}
             type="button"
@@ -69,6 +69,7 @@ export function HealthLogPage() {
 
       {/* Tab Content */}
       <div id={`tabpanel-${activeTab}`} role="tabpanel">
+        {activeTab === 'overview' && <OverviewTabContent />}
         {activeTab === 'tests' && <TestsTabContent />}
         {activeTab === 'medications' && <MedicationsTabContent />}
         {activeTab === 'vaccines' && <VaccinesTabContent />}
@@ -77,22 +78,17 @@ export function HealthLogPage() {
   );
 }
 
-// ── Tests Tab ──────────────────────────────────────────────────────────
+// ── Overview Tab ──────────────────────────────────────────────────────
 
-function TestsTabContent() {
+function OverviewTabContent() {
   const { t, i18n } = useTranslation();
   const { session } = useAuth();
   const token = session?.access_token ?? '';
 
-  const [modalOpen, setModalOpen] = useState(false);
-  const [editingVisit, setEditingVisit] = useState<import('../lib/api').TestVisit | null>(null);
   const [showAllExposures, setShowAllExposures] = useState(false);
-  const [showAllVisits, setShowAllVisits] = useState(false);
   const [showExposureInfo, setShowExposureInfo] = useState(false);
-  const [verifyVisitId, setVerifyVisitId] = useState<string | null>(null);
 
   const summaryQuery = useHealthLogSummary();
-  const visitsQuery = useHealthLogVisits();
   const exposureQuery = useQuery({
     queryKey: ['exposures'],
     queryFn: () => api.exposures.get(token),
@@ -103,42 +99,11 @@ function TestsTabContent() {
   const exposureItems = sortExposureItems(exposureQuery.data?.exposures ?? []);
   const exposureInitialLoading = exposureQuery.isLoading && !exposureQuery.data;
   const summaryLoading = summaryQuery.isLoading && !summaryQuery.data;
-  const isInitialLoading = summaryLoading && exposureInitialLoading;
-
-  if (isInitialLoading) {
-    return (
-      <div className="space-y-4">
-        <SkeletonBlock className="h-24 rounded-2xl" />
-        <SkeletonBlock className="h-40 rounded-2xl" />
-        <div className="grid gap-3 sm:grid-cols-2">
-          <SkeletonBlock className="h-20 rounded-xl" />
-          <SkeletonBlock className="h-20 rounded-xl" />
-          <SkeletonBlock className="h-20 rounded-xl" />
-          <SkeletonBlock className="h-20 rounded-xl" />
-        </div>
-      </div>
-    );
-  }
-
   const hasConditions = (summary?.conditions?.length ?? 0) > 0;
 
   return (
     <div className="space-y-6">
-      {/* Add Visit button */}
-      <div className="flex justify-end">
-        <button
-          type="button"
-          className="btn btn-primary btn-sm"
-          onClick={() => setModalOpen(true)}
-        >
-          <span className="inline-flex items-center gap-1">
-            <Plus className="w-4 h-4" aria-hidden="true" />
-            {t('healthLog.addVisit')}
-          </span>
-        </button>
-      </div>
-
-      {/* Exposure Overview section — top priority */}
+      {/* Exposure Overview */}
       <div className="card card-elevated space-y-3">
         <div className="flex items-center justify-between gap-4">
           <div>
@@ -157,7 +122,12 @@ function TestsTabContent() {
         {exposureInitialLoading ? (
           <div role="status" aria-live="polite">
             <span className="sr-only">{t('common.loading')}</span>
-            <SkeletonRows rows={4} />
+            <SkeletonBlock className="h-5 w-48 rounded-full" />
+            <div className="space-y-2 mt-3">
+              <SkeletonBlock className="h-20 rounded-xl" />
+              <SkeletonBlock className="h-20 rounded-xl" />
+              <SkeletonBlock className="h-20 rounded-xl" />
+            </div>
           </div>
         ) : exposureItems.length > 0 ? (
           <div className="space-y-2 text-sm">
@@ -179,17 +149,12 @@ function TestsTabContent() {
                       <div className="text-xs font-semibold uppercase tracking-wide text-foreground">
                         <a
                           className="health-condition-link"
-                          href={
-                            getConditionInfo(item.condition, i18n.language).url
-                          }
+                          href={getConditionInfo(item.condition, i18n.language).url}
                           target="_blank"
                           rel="noreferrer"
                         >
                           {item.condition}
-                          <ExternalLink
-                            className="nav-icon"
-                            aria-hidden="true"
-                          />
+                          <ExternalLink className="nav-icon" aria-hidden="true" />
                         </a>
                       </div>
                       <span
@@ -200,15 +165,9 @@ function TestsTabContent() {
                       </span>
                     </div>
                     <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted">
-                      <span>
-                        {t('health.exposureClosest', {
-                          degree: item.closestDegree,
-                        })}
-                      </span>
+                      <span>{t('health.exposureClosest', { degree: item.closestDegree })}</span>
                       <span>&bull;</span>
-                      <span>
-                        {t('health.exposureCases')} {item.count}
-                      </span>
+                      <span>{t('health.exposureCases')} {item.count}</span>
                     </div>
                     <p
                       className="text-xs text-muted cursor-help"
@@ -227,19 +186,111 @@ function TestsTabContent() {
                 className="btn btn-secondary btn-sm"
                 onClick={() => setShowAllExposures((prev) => !prev)}
               >
-                {showAllExposures
-                  ? t('health.showLess')
-                  : t('health.showAll')}
+                {showAllExposures ? t('health.showLess') : t('health.showAll')}
               </button>
             )}
           </div>
         ) : exposureQuery.data?.message ? (
-          <p className="text-sm text-muted">
-            {t(exposureQuery.data.message)}
-          </p>
+          <p className="text-sm text-muted">{t(exposureQuery.data.message)}</p>
         ) : (
           <p className="text-sm text-muted">{t('health.noExposure')}</p>
         )}
+      </div>
+
+      {/* My Results */}
+      <div className="space-y-3">
+        <h3 className="font-semibold">{t('healthLog.myResults')}</h3>
+        {summaryLoading ? (
+          <div className="grid gap-3 sm:grid-cols-2">
+            <SkeletonBlock className="h-20 rounded-xl" />
+            <SkeletonBlock className="h-20 rounded-xl" />
+            <SkeletonBlock className="h-20 rounded-xl" />
+            <SkeletonBlock className="h-20 rounded-xl" />
+          </div>
+        ) : hasConditions ? (
+          <div className="grid gap-3 sm:grid-cols-2">
+            {summary!.conditions.map((condition) => {
+              const key = condition.conditionType ?? condition.customCondition ?? 'unknown';
+              return <ConditionCard key={key} condition={condition} />;
+            })}
+          </div>
+        ) : (
+          <p className="text-sm text-muted">{t('healthLog.noTests')}</p>
+        )}
+      </div>
+
+      {/* Coverage text */}
+      {summary && summary.conditionsCovered > 0 && (
+        <p className="text-sm text-muted text-center">
+          {t('healthLog.coverageDescription', {
+            count: summary.conditionsCovered,
+            total: summary.totalStandardConditions,
+          })}
+        </p>
+      )}
+
+      {/* Exposure Info Modal */}
+      {showExposureInfo && (
+        <div className="modal-backdrop" role="dialog" aria-modal="true">
+          <div className="modal">
+            <div className="flex items-center justify-between gap-4 mb-4">
+              <h3 className="font-semibold">{t('healthLog.exposureOverview')}</h3>
+              <button
+                type="button"
+                className="btn btn-secondary btn-sm"
+                onClick={() => setShowExposureInfo(false)}
+              >
+                {t('common.close')}
+              </button>
+            </div>
+            <p className="text-sm text-muted">
+              {t('health.exposureInfo')
+                .split(/(\*\*[^*]+\*\*)/g)
+                .map((part, index) => {
+                  if (part.startsWith('**') && part.endsWith('**')) {
+                    return <strong key={index}>{part.slice(2, -2)}</strong>;
+                  }
+                  return <span key={index}>{part}</span>;
+                })}
+            </p>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Tests Tab ──────────────────────────────────────────────────────────
+
+function TestsTabContent() {
+  const { t, i18n } = useTranslation();
+
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editingVisit, setEditingVisit] = useState<import('../lib/api').TestVisit | null>(null);
+  const [showAllVisits, setShowAllVisits] = useState(false);
+  const [verifyVisitId, setVerifyVisitId] = useState<string | null>(null);
+
+  const summaryQuery = useHealthLogSummary();
+  const visitsQuery = useHealthLogVisits();
+
+  const summary = summaryQuery.data;
+  const summaryLoading = summaryQuery.isLoading && !summaryQuery.data;
+  const visitsLoading = visitsQuery.isLoading && !visitsQuery.data;
+
+  return (
+    <div className="space-y-6">
+      {/* Add Visit button */}
+      <div className="flex justify-end">
+        <button
+          type="button"
+          className="btn btn-primary btn-sm"
+          onClick={() => setModalOpen(true)}
+        >
+          <span className="inline-flex items-center gap-1">
+            <Plus className="w-4 h-4" aria-hidden="true" />
+            {t('healthLog.addVisit')}
+          </span>
+        </button>
       </div>
 
       {/* Stats bar */}
@@ -249,8 +300,8 @@ function TestsTabContent() {
         <HealthLogStats summary={summary} />
       ) : null}
 
-      {/* Visit History section */}
-      {visitsQuery.isLoading && !visitsQuery.data ? (
+      {/* Visit History */}
+      {visitsLoading ? (
         <div className="space-y-3">
           <SkeletonBlock className="h-5 w-40 rounded-full" />
           <SkeletonBlock className="h-14 rounded-xl" />
@@ -326,41 +377,22 @@ function TestsTabContent() {
             </button>
           )}
         </div>
-      ) : null}
-
-      {/* My Results section */}
-      <div className="space-y-3">
-        <h3 className="font-semibold">{t('healthLog.myResults')}</h3>
-
-        {hasConditions ? (
-          <div className="grid gap-3 sm:grid-cols-2">
-            {summary!.conditions.map((condition) => {
-              const key =
-                condition.conditionType ?? condition.customCondition ?? 'unknown';
-              return <ConditionCard key={key} condition={condition} />;
-            })}
-          </div>
-        ) : (
-          <div className="card card-elevated text-center py-10 space-y-3">
-            <p className="text-lg font-semibold text-foreground">
-              {t('healthLog.noTests')}
-            </p>
-            <p className="text-sm text-muted">
-              {t('healthLog.noTestsDescription')}
-            </p>
-            <button
-              type="button"
-              className="btn btn-primary"
-              onClick={() => setModalOpen(true)}
-            >
-              <span className="inline-flex items-center gap-1">
-                <Plus className="w-4 h-4" aria-hidden="true" />
-                {t('healthLog.addVisit')}
-              </span>
-            </button>
-          </div>
-        )}
-      </div>
+      ) : (
+        <div className="card card-elevated text-center py-10 space-y-3">
+          <p className="text-lg font-semibold text-foreground">{t('healthLog.noTests')}</p>
+          <p className="text-sm text-muted">{t('healthLog.noTestsDescription')}</p>
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={() => setModalOpen(true)}
+          >
+            <span className="inline-flex items-center gap-1">
+              <Plus className="w-4 h-4" aria-hidden="true" />
+              {t('healthLog.addVisit')}
+            </span>
+          </button>
+        </div>
+      )}
 
       {/* Lab Verification Modal */}
       {verifyVisitId && (
@@ -374,16 +406,6 @@ function TestsTabContent() {
         />
       )}
 
-      {/* Coverage text */}
-      {summary && summary.conditionsCovered > 0 && (
-        <p className="text-sm text-muted text-center">
-          {t('healthLog.coverageDescription', {
-            count: summary.conditionsCovered,
-            total: summary.totalStandardConditions,
-          })}
-        </p>
-      )}
-
       {/* Test Visit Modal */}
       <TestVisitModal
         isOpen={modalOpen}
@@ -393,36 +415,6 @@ function TestsTabContent() {
         }}
         editVisit={editingVisit}
       />
-
-      {/* Exposure Info Modal */}
-      {showExposureInfo && (
-        <div className="modal-backdrop" role="dialog" aria-modal="true">
-          <div className="modal">
-            <div className="flex items-center justify-between gap-4 mb-4">
-              <h3 className="font-semibold">
-                {t('healthLog.exposureOverview')}
-              </h3>
-              <button
-                type="button"
-                className="btn btn-secondary btn-sm"
-                onClick={() => setShowExposureInfo(false)}
-              >
-                {t('common.close')}
-              </button>
-            </div>
-            <p className="text-sm text-muted">
-              {t('health.exposureInfo')
-                .split(/(\*\*[^*]+\*\*)/g)
-                .map((part, index) => {
-                  if (part.startsWith('**') && part.endsWith('**')) {
-                    return <strong key={index}>{part.slice(2, -2)}</strong>;
-                  }
-                  return <span key={index}>{part}</span>;
-                })}
-            </p>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

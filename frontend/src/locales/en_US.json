@@ -815,6 +815,7 @@
   "myHealth": {
     "title": "My Health",
     "tabs": {
+      "overview": "Overview",
       "tests": "Tests",
       "medications": "Meds",
       "vaccines": "Vaccines"

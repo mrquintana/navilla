@@ -814,6 +814,7 @@
   "myHealth": {
     "title": "Mi Salud",
     "tabs": {
+      "overview": "Resumen",
       "tests": "Pruebas",
       "medications": "Medicamentos",
       "vaccines": "Vacunas"
