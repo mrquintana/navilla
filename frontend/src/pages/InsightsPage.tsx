@@ -9,7 +9,10 @@ import {
   Check,
   Clock,
   Bell,
+  Settings,
 } from 'lucide-react';
+import { useState } from 'react';
+import { ReminderSettingsModal } from '../components/reminders/ReminderSettingsModal';
 
 export function InsightsPage() {
   const { t } = useTranslation();
@@ -309,6 +312,7 @@ function PreventionCard({
     | undefined;
 }) {
   const { t } = useTranslation();
+  const [showReminderSettings, setShowReminderSettings] = useState(false);
 
   const hasPrepData = prevention?.prepAdherenceRate != null;
   const adherencePct = hasPrepData ? Math.round(prevention!.prepAdherenceRate! * 100) : 0;
@@ -442,9 +446,21 @@ function PreventionCard({
             <Bell className="w-4 h-4" style={{ color: 'var(--color-primary)' }} aria-hidden="true" />
             <span className="text-muted">{t('insights.activeReminders')}:</span>
             <span className="font-semibold">{prevention.activeReminders}</span>
+            <button
+              onClick={() => setShowReminderSettings(true)}
+              className="ml-auto p-1 rounded-md text-muted hover:text-foreground hover:bg-secondary transition-colors"
+              aria-label={t('reminders.settings')}
+            >
+              <Settings className="w-4 h-4" />
+            </button>
           </div>
         )}
       </div>
+
+      <ReminderSettingsModal
+        isOpen={showReminderSettings}
+        onClose={() => setShowReminderSettings(false)}
+      />
     </div>
   );
 }
