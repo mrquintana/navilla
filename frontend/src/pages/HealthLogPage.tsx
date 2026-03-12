@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
-import { Lock, Plus, HelpCircle, ExternalLink, Pill, Syringe, ChevronDown, Calendar, Edit3, CheckCircle2 } from 'lucide-react';
+import { Lock, Plus, HelpCircle, ExternalLink, Pill, Shield, Syringe, ChevronDown, Calendar, Edit3, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { useHealthLogSummary, useHealthLogVisits } from '../hooks/useHealthLog';
 import { useMedications } from '../hooks/useMedications';
@@ -189,7 +189,10 @@ function OverviewTabContent() {
         ) : exposureQuery.data?.message ? (
           <p className="text-sm text-muted">{t(exposureQuery.data.message)}</p>
         ) : (
-          <p className="text-sm text-muted">{t('health.noExposure')}</p>
+          <div className="text-center py-6">
+            <Shield className="w-10 h-10 mx-auto mb-2 opacity-40" style={{ color: 'var(--color-muted)' }} aria-hidden="true" />
+            <p className="text-sm text-muted">{t('health.noExposure')}</p>
+          </div>
         )}
       </div>
 

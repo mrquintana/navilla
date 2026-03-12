@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { api, ApiError, type Connection } from '../lib/api';
 import { useAuth } from '../hooks/useAuth';
 import { queryClient } from '../queryClient';
-import { Check, HeartPulse, Search, Send, UserRound, X } from 'lucide-react';
+import { Check, Clock, HeartPulse, Inbox, Search, Send, UserRound, Users, X } from 'lucide-react';
 import { DEV_MODE } from '../lib/devMode';
 import { PageSkeleton, SkeletonBlock, SkeletonRows } from '../components/ui/LoadingShell';
 import { useSearchParams } from 'react-router-dom';
@@ -14,6 +14,7 @@ function ConnectionList({
   headerExtra,
   connections,
   emptyText,
+  emptyIcon,
   renderActions,
   renderDetails,
   isExpanded,
@@ -26,6 +27,7 @@ function ConnectionList({
   headerExtra?: ReactNode;
   connections: Connection[];
   emptyText: string;
+  emptyIcon?: ReactNode;
   renderActions?: (connection: Connection) => ReactNode;
   renderDetails?: (connection: Connection) => ReactNode;
   isExpanded?: (connection: Connection) => boolean;
@@ -48,7 +50,10 @@ function ConnectionList({
           <SkeletonRows rows={compact ? 4 : 3} rowClassName={compact ? 'h-12 rounded-xl' : 'h-14 rounded-xl'} />
         </div>
       ) : connections.length === 0 ? (
-        <p className="text-sm text-muted">{emptyText}</p>
+        <div className="text-center py-8">
+          {emptyIcon && <div className="mx-auto mb-2 opacity-40" style={{ color: 'var(--color-muted)' }}>{emptyIcon}</div>}
+          <p className="text-sm text-muted">{emptyText}</p>
+        </div>
       ) : (
         <div className={compact ? 'space-y-2' : 'space-y-3'}>
           {connections.map((connection) => {
@@ -407,6 +412,7 @@ export function ConnectionsPage() {
           title={t('connections.pendingIncoming')}
           connections={pendingIncomingSlice}
           emptyText={t('connections.noPending')}
+          emptyIcon={<Inbox className="w-10 h-10" />}
           isLoading={incomingLoading}
           focusedConnectionId={focusConnectionId}
           renderActions={(connection) => (
@@ -472,6 +478,7 @@ export function ConnectionsPage() {
           title={t('connections.pendingSent')}
           connections={pendingSentQuery.data ?? []}
           emptyText={t('connections.noPendingSent')}
+          emptyIcon={<Clock className="w-10 h-10" />}
           isLoading={sentLoading}
           renderActions={(connection) => (
             <button
@@ -497,6 +504,7 @@ export function ConnectionsPage() {
       <ConnectionList
         title={t('connections.confirmed')}
         compact
+        emptyIcon={<Users className="w-10 h-10" />}
         headerExtra={(
           <div className="relative w-full max-w-xs">
             <Search className="nav-icon input-icon" aria-hidden="true" />
