@@ -15,7 +15,9 @@ import { OnboardingFlow } from '../components/onboarding/OnboardingFlow';
 import { useReciprocityStatus } from '../hooks/useReciprocity';
 import { ReciprocityOptInCard } from '../components/reciprocity/ReciprocityOptInCard';
 import { useNetworkVisualization } from '../hooks/useNetworkVisualization';
+import { useNetworkHealth } from '../hooks/useNetworkHealth';
 import { NetworkVisualizationHost } from '../components/network/NetworkVisualizationHost';
+import { NetworkHealthCard } from '../components/network/NetworkHealthCard';
 import { ActiveEngine } from '../lib/visualization';
 
 export function DashboardPage() {
@@ -53,6 +55,7 @@ export function DashboardPage() {
   const isOptedIn = reciprocityQuery.data?.optedIn ?? false;
 
   const { data: networkData } = useNetworkVisualization();
+  const { data: networkHealthData } = useNetworkHealth();
   const constellationEngine = useMemo(() => new ActiveEngine(), []);
 
   const hasPositiveStatus = (healthQuery.data ?? []).some(
@@ -425,6 +428,11 @@ export function DashboardPage() {
             {t('dashboard.viewConstellation')} &rarr;
           </Link>
         </div>
+      )}
+
+      {/* Network Health — compact card for opted-in users */}
+      {isOptedIn && networkHealthData && (
+        <NetworkHealthCard data={networkHealthData} />
       )}
 
       {/* Snapshot notice — bottom, dismissible */}

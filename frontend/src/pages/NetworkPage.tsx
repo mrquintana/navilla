@@ -4,7 +4,9 @@ import { useTranslation } from 'react-i18next';
 import { Share2 } from 'lucide-react';
 import { useReciprocityStatus } from '../hooks/useReciprocity';
 import { useNetworkVisualization } from '../hooks/useNetworkVisualization';
+import { useNetworkHealth } from '../hooks/useNetworkHealth';
 import { NetworkVisualizationHost } from '../components/network/NetworkVisualizationHost';
+import { NetworkHealthSection } from '../components/network/NetworkHealthSection';
 import { ShareConstellationModal } from '../components/network/ShareConstellationModal';
 import { ReciprocityOptInCard } from '../components/reciprocity/ReciprocityOptInCard';
 import { ActiveEngine } from '../lib/visualization';
@@ -13,6 +15,7 @@ export function NetworkPage() {
   const { t } = useTranslation();
   const { data: reciprocityStatus, isLoading: reciprocityLoading } = useReciprocityStatus();
   const { data: networkData, isLoading: dataLoading } = useNetworkVisualization();
+  const { data: networkHealthData } = useNetworkHealth();
   const [shareOpen, setShareOpen] = useState(false);
   const engine = useMemo(() => new ActiveEngine(), []);
 
@@ -81,6 +84,10 @@ export function NetworkPage() {
           </div>
         </div>
       </div>
+
+      {networkHealthData && (
+        <NetworkHealthSection data={networkHealthData} />
+      )}
 
       <ShareConstellationModal
         isOpen={shareOpen}
