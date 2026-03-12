@@ -83,7 +83,7 @@ export function MonthYearPicker({ currentMonth, monthsWithEntries, onNavigate, l
     <div className="relative inline-block" ref={popoverRef}>
       <button
         type="button"
-        className="journal-month-nav-label cursor-pointer inline-flex items-center gap-1 hover:text-indigo-600 transition-colors"
+        className="journal-month-nav-label cursor-pointer inline-flex items-center gap-1 pl-[18px] hover:text-indigo-600 transition-colors"
         onClick={handleOpen}
         aria-label={t('journal.selectMonth')}
         aria-expanded={open}
