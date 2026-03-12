@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Lock, Plus, List, Calendar, Users, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, AlertTriangle, X } from 'lucide-react';
-import { useJournalEntries, useJournalSummary, useDeleteJournalEntry, usePromoteAlias } from '../hooks/useJournal';
+import { useJournalEntries, useJournalEntriesPaginated, useJournalMonths, useJournalSummary, useDeleteJournalEntry, usePromoteAlias } from '../hooks/useJournal';
 import type { JournalEntry } from '../lib/api';
 import { JournalTimeline } from '../components/journal/JournalTimeline';
 import { JournalCalendar } from '../components/journal/JournalCalendar';
@@ -9,6 +9,8 @@ import { JournalEntryCard } from '../components/journal/JournalEntryCard';
 import { JournalEmptyState } from '../components/journal/JournalEmptyState';
 import { JournalEntryModal } from '../components/journal/JournalEntryModal';
 import { JournalPartnersTab } from '../components/journal/JournalPartnersTab';
+import { Pagination } from '../components/ui/Pagination';
+import { MonthYearPicker } from '../components/journal/MonthYearPicker';
 import { PageSkeleton, SkeletonBlock, SkeletonRows } from '../components/ui/LoadingShell';
 
 type ViewMode = 'timeline' | 'calendar' | 'partners';
@@ -38,18 +40,31 @@ export function JournalPage() {
     new Date(now.getFullYear(), now.getMonth(), 1)
   );
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [timelinePage, setTimelinePage] = useState(0);
 
   // Promotion toast state
   const [promoteState, setPromoteState] = useState<PromoteState | null>(null);
   const dismissedAliasesRef = useRef<Set<string>>(new Set());
 
-  const { data: entries, isLoading: entriesLoading, isFetching: entriesFetching } = useJournalEntries();
+  // Data hooks — timeline uses paginated, calendar uses per-month
+  const calendarMonthKey = toMonthKey(calendarMonth);
+  const { data: paginatedData, isLoading: timelineLoading, isFetching: timelineFetching } = useJournalEntriesPaginated(timelinePage);
+  const { data: calendarEntries, isLoading: calendarLoading, isFetching: calendarFetching } = useJournalEntries(calendarMonthKey);
+  const { data: monthsWithEntries } = useJournalMonths();
   const { data: summary } = useJournalSummary(currentYear);
   const deleteMutation = useDeleteJournalEntry();
   const promoteMutation = usePromoteAlias();
 
-  const isInitialLoading = entriesLoading && !entries;
-  const isRefetching = entriesFetching && !entriesLoading;
+  const monthsList = useMemo(() => monthsWithEntries ?? [], [monthsWithEntries]);
+  const timelineEntries = useMemo(() => paginatedData?.content ?? [], [paginatedData]);
+  const calendarEntryList = useMemo(() => calendarEntries ?? [], [calendarEntries]);
+
+  const isInitialLoading = viewMode === 'timeline'
+    ? (timelineLoading && !paginatedData)
+    : (calendarLoading && !calendarEntries);
+  const isRefetching = viewMode === 'timeline'
+    ? (timelineFetching && !timelineLoading)
+    : (calendarFetching && !calendarLoading);
 
   const handleAdd = () => {
     setEditingEntry(null);
@@ -97,41 +112,34 @@ export function JournalPage() {
     setSelectedDate(null);
   }, []);
 
-  // Sorted set of "YYYY-MM" keys that have entries
-  const monthsWithEntries = useMemo(() => {
-    if (!entries || entries.length === 0) return [];
-    const keys = new Set<string>();
-    for (const e of entries) {
-      keys.add(e.encounterDate.slice(0, 7));
-    }
-    return [...keys].sort();
-  }, [entries]);
+  const handleMonthNavigate = useCallback((year: number, monthIndex: number) => {
+    setCalendarMonth(new Date(year, monthIndex, 1));
+    setSelectedDate(null);
+  }, []);
 
   const handleSkipPrev = useCallback(() => {
     const key = toMonthKey(calendarMonth);
-    // Find the latest month with entries before the current month
-    for (let i = monthsWithEntries.length - 1; i >= 0; i--) {
-      if (monthsWithEntries[i] < key) {
-        const [y, m] = monthsWithEntries[i].split('-').map(Number);
+    for (let i = monthsList.length - 1; i >= 0; i--) {
+      if (monthsList[i] < key) {
+        const [y, m] = monthsList[i].split('-').map(Number);
         setCalendarMonth(new Date(y, m - 1, 1));
         setSelectedDate(null);
         return;
       }
     }
-  }, [calendarMonth, monthsWithEntries]);
+  }, [calendarMonth, monthsList]);
 
   const handleSkipNext = useCallback(() => {
     const key = toMonthKey(calendarMonth);
-    // Find the earliest month with entries after the current month
-    for (let i = 0; i < monthsWithEntries.length; i++) {
-      if (monthsWithEntries[i] > key) {
-        const [y, m] = monthsWithEntries[i].split('-').map(Number);
+    for (let i = 0; i < monthsList.length; i++) {
+      if (monthsList[i] > key) {
+        const [y, m] = monthsList[i].split('-').map(Number);
         setCalendarMonth(new Date(y, m - 1, 1));
         setSelectedDate(null);
         return;
       }
     }
-  }, [calendarMonth, monthsWithEntries]);
+  }, [calendarMonth, monthsList]);
 
   const handleToday = useCallback(() => {
     const today = new Date();
@@ -139,27 +147,19 @@ export function JournalPage() {
     setSelectedDate(null);
   }, []);
 
-  // Promotion callback — called by JournalEntryModal after successful save
+  // Promotion callback — uses timeline entries for approximation
   const handlePromote = useCallback(
     (alias: string) => {
-      // Skip if already dismissed this session
       if (dismissedAliasesRef.current.has(alias.toLowerCase())) return;
-
-      // Count entries with same alias (case-insensitive), including the one just saved.
-      // +1 for the entry just created — React Query cache may not yet reflect it
-      // since invalidateQueries fires asynchronously. This is a known approximation
-      // that only affects the toast message text, not the correctness of promotion.
-      const currentEntries = entries ?? [];
       const matchCount =
-        currentEntries.filter(
+        timelineEntries.filter(
           (e) => e.partnerAlias?.toLowerCase() === alias.toLowerCase() && !e.partnerId
         ).length + 1;
-
       if (matchCount >= 3) {
         setPromoteState({ alias, count: matchCount });
       }
     },
-    [entries]
+    [timelineEntries]
   );
 
   const handlePromoteConfirm = async () => {
@@ -179,18 +179,11 @@ export function JournalPage() {
     setPromoteState(null);
   };
 
-  // Entries filtered to the current calendar month
-  const calendarMonthKey = toMonthKey(calendarMonth);
-  const calendarEntries = useMemo(() => {
-    if (!entries) return [];
-    return entries.filter((e) => e.encounterDate.startsWith(calendarMonthKey));
-  }, [entries, calendarMonthKey]);
-
   // Entries for the selected date in calendar view
   const selectedDateEntries = useMemo(() => {
-    if (!selectedDate || !entries) return [];
-    return entries.filter((e) => e.encounterDate === selectedDate);
-  }, [entries, selectedDate]);
+    if (!selectedDate) return [];
+    return calendarEntryList.filter((e) => e.encounterDate === selectedDate);
+  }, [calendarEntryList, selectedDate]);
 
   // Month label for the nav header
   const calendarMonthLabel = useMemo(() => {
@@ -201,14 +194,19 @@ export function JournalPage() {
   }, [calendarMonth, locale]);
 
   // Skip button disabled state
-  const canSkipPrev = monthsWithEntries.some((k) => k < calendarMonthKey);
-  const canSkipNext = monthsWithEntries.some((k) => k > calendarMonthKey);
+  const canSkipPrev = monthsList.some((k) => k < calendarMonthKey);
+  const canSkipNext = monthsList.some((k) => k > calendarMonthKey);
   const isCurrentMonth = calendarMonthKey === toMonthKey(now);
 
   // Compute this-month count from summary
   const thisMonthKey = toMonthKey(now);
   const thisMonthCount = summary?.monthlyCounts?.[thisMonthKey] ?? 0;
   const yearTotal = summary?.yearTotal ?? 0;
+
+  // Determine if there are any entries at all (for empty state)
+  const hasAnyEntries = viewMode === 'timeline'
+    ? (paginatedData ? paginatedData.totalElements > 0 : false)
+    : calendarEntryList.length > 0 || monthsList.length > 0;
 
   if (isInitialLoading) {
     return (
@@ -218,8 +216,6 @@ export function JournalPage() {
       </PageSkeleton>
     );
   }
-
-  const entryList = entries ?? [];
 
   return (
     <div className="container py-8 space-y-6">
@@ -294,6 +290,15 @@ export function JournalPage() {
         </button>
       </div>
 
+      {/* Summary bar — moved to top */}
+      {hasAnyEntries && (
+        <div className="journal-summary-bar">
+          <span>{t('journal.monthSummary', { count: thisMonthCount })}</span>
+          <span className="text-muted mx-2">|</span>
+          <span>{t('journal.yearTotal', { count: yearTotal })}</span>
+        </div>
+      )}
+
       {/* View toggle */}
       <div className="flex items-center gap-3 flex-wrap">
         <div className="flex items-center gap-2">
@@ -343,15 +348,28 @@ export function JournalPage() {
       {/* Content */}
       {viewMode === 'partners' ? (
         <JournalPartnersTab />
-      ) : entryList.length === 0 ? (
-        <JournalEmptyState onAdd={handleAdd} />
       ) : viewMode === 'timeline' ? (
-        <JournalTimeline
-          entries={entryList}
-          onEdit={handleEdit}
-          onDelete={handleDeleteRequest}
-          deletingId={deleteMutation.isPending ? deletingId : null}
-        />
+        !hasAnyEntries ? (
+          <JournalEmptyState onAdd={handleAdd} />
+        ) : (
+          <>
+            <JournalTimeline
+              entries={timelineEntries}
+              onEdit={handleEdit}
+              onDelete={handleDeleteRequest}
+              deletingId={deleteMutation.isPending ? deletingId : null}
+            />
+            {paginatedData && (
+              <Pagination
+                currentPage={paginatedData.number}
+                totalPages={paginatedData.totalPages}
+                totalElements={paginatedData.totalElements}
+                pageSize={paginatedData.size}
+                onPageChange={setTimelinePage}
+              />
+            )}
+          </>
+        )
       ) : (
         <div className="space-y-6">
           {/* Month navigation */}
@@ -374,7 +392,12 @@ export function JournalPage() {
               >
                 <ChevronLeft className="w-4 h-4" aria-hidden="true" />
               </button>
-              <span className="journal-month-nav-label">{calendarMonthLabel}</span>
+              <MonthYearPicker
+                currentMonth={calendarMonth}
+                monthsWithEntries={monthsList}
+                onNavigate={handleMonthNavigate}
+                label={calendarMonthLabel}
+              />
               <button
                 type="button"
                 className="journal-month-nav-btn"
@@ -402,17 +425,17 @@ export function JournalPage() {
                 </button>
               )}
             </nav>
-            {!canSkipPrev && monthsWithEntries.length > 0 && (
+            {!canSkipPrev && monthsList.length > 0 && (
               <p className="text-xs text-muted text-center">{t('journal.noEncountersBefore')}</p>
             )}
-            {!canSkipNext && monthsWithEntries.length > 0 && (
+            {!canSkipNext && monthsList.length > 0 && (
               <p className="text-xs text-muted text-center">{t('journal.noEncountersAfter')}</p>
             )}
           </div>
 
           {/* Calendar grid */}
           <JournalCalendar
-            entries={calendarEntries}
+            entries={calendarEntryList}
             currentMonth={calendarMonth}
             onDayClick={handleDayClick}
             selectedDate={selectedDate}
@@ -443,15 +466,6 @@ export function JournalPage() {
               )}
             </div>
           )}
-        </div>
-      )}
-
-      {/* Summary bar */}
-      {entryList.length > 0 && (
-        <div className="journal-summary-bar">
-          <span>{t('journal.monthSummary', { count: thisMonthCount })}</span>
-          <span className="text-muted mx-2">|</span>
-          <span>{t('journal.yearTotal', { count: yearTotal })}</span>
         </div>
       )}
 
