@@ -117,11 +117,11 @@ class PhoneMatchServiceTest {
       stubDefaultConfig();
       when(phoneEntryRepository.countEntriesThisWeek(eq(USER_A_HASH), any(OffsetDateTime.class)))
           .thenReturn(0L);
-      when(encryptionService.hashPhone(RAW_PHONE)).thenReturn(PHONE_HASH);
+      when(encryptionService.hashPhone(RAW_PHONE, null)).thenReturn(PHONE_HASH);
       when(phoneEntryRepository.findByPhoneHashAndMatchedFalseAndUserHashNot(PHONE_HASH, USER_A_HASH))
           .thenReturn(List.of());
 
-      phoneMatchService.registerPhoneEntry(USER_A_HASH, RAW_PHONE, ENCOUNTER_DATE, null);
+      phoneMatchService.registerPhoneEntry(USER_A_HASH, RAW_PHONE, null, ENCOUNTER_DATE, null);
 
       ArgumentCaptor<ConnectionPhoneEntry> captor =
           ArgumentCaptor.forClass(ConnectionPhoneEntry.class);
@@ -141,7 +141,7 @@ class PhoneMatchServiceTest {
           .thenReturn(5L);
 
       assertThatThrownBy(() ->
-          phoneMatchService.registerPhoneEntry(USER_A_HASH, RAW_PHONE, ENCOUNTER_DATE, null))
+          phoneMatchService.registerPhoneEntry(USER_A_HASH, RAW_PHONE, null, ENCOUNTER_DATE, null))
           .isInstanceOf(RateLimitException.class)
           .hasMessage("phoneMatch.rateLimitExceeded");
 
@@ -155,11 +155,11 @@ class PhoneMatchServiceTest {
       UUID journalId = UUID.randomUUID();
       when(phoneEntryRepository.countEntriesThisWeek(eq(USER_A_HASH), any(OffsetDateTime.class)))
           .thenReturn(0L);
-      when(encryptionService.hashPhone(RAW_PHONE)).thenReturn(PHONE_HASH);
+      when(encryptionService.hashPhone(RAW_PHONE, null)).thenReturn(PHONE_HASH);
       when(phoneEntryRepository.findByPhoneHashAndMatchedFalseAndUserHashNot(PHONE_HASH, USER_A_HASH))
           .thenReturn(List.of());
 
-      phoneMatchService.registerPhoneEntry(USER_A_HASH, RAW_PHONE, ENCOUNTER_DATE, journalId);
+      phoneMatchService.registerPhoneEntry(USER_A_HASH, RAW_PHONE, null, ENCOUNTER_DATE, journalId);
 
       ArgumentCaptor<ConnectionPhoneEntry> captor =
           ArgumentCaptor.forClass(ConnectionPhoneEntry.class);

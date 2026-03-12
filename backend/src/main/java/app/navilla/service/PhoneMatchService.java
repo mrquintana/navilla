@@ -83,12 +83,13 @@ public class PhoneMatchService {
    *
    * @param userHash       the submitting user's hash
    * @param rawPhone       the raw phone number
+   * @param countryCode    optional country calling code (e.g. "52", "1")
    * @param encounterDate  the date of the encounter
    * @param journalEntryId optional journal entry ID
    * @throws RateLimitException if the user has exceeded their weekly limit
    */
   @Transactional
-  public void registerPhoneEntry(String userHash, String rawPhone,
+  public void registerPhoneEntry(String userHash, String rawPhone, String countryCode,
                                   LocalDate encounterDate, UUID journalEntryId) {
     // 1. Check rate limit
     int maxPerWeek = appConfigService.getInt("phone_match.max_attempts_per_week", 5);
@@ -99,12 +100,13 @@ public class PhoneMatchService {
     }
 
     // 2. Hash phone
-    String phoneHash = hashPhone(rawPhone);
+    String phoneHash = encryptionService.hashPhone(rawPhone, countryCode);
 
     // 3. Save entry
     ConnectionPhoneEntry entry = ConnectionPhoneEntry.builder()
         .userHash(userHash)
         .phoneHash(phoneHash)
+        .countryCode(countryCode)
         .encounterDate(encounterDate)
         .journalEntryId(journalEntryId)
         .build();

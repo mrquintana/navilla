@@ -353,7 +353,7 @@ class EncounterJournalServiceTest {
       CreateJournalEntryRequest request = new CreateJournalEntryRequest(
           LocalDate.of(2026, 3, 15), null, null, null, null, null, rawPhone, null, null, null);
 
-      when(encryptionService.hashPhone(rawPhone)).thenReturn(phoneHash);
+      when(encryptionService.hashPhone(rawPhone, null)).thenReturn(phoneHash);
       when(journalRepository.save(any(EncounterJournal.class))).thenAnswer(invocation -> {
         EncounterJournal saved = invocation.getArgument(0);
         if (saved.getId() == null) {
@@ -374,7 +374,7 @@ class EncounterJournalServiceTest {
 
       // Verify phone match registration was called
       verify(phoneMatchService).registerPhoneEntry(
-          eq(USER_HASH), eq(rawPhone),
+          eq(USER_HASH), eq(rawPhone), eq(null),
           eq(LocalDate.of(2026, 3, 15)), eq(ENTRY_ID));
     }
 
@@ -395,8 +395,8 @@ class EncounterJournalServiceTest {
 
       encounterJournalService.createEntry(jwt, request);
 
-      verify(phoneMatchService, never()).registerPhoneEntry(any(), any(), any(), any());
-      verify(encryptionService, never()).hashPhone(any());
+      verify(phoneMatchService, never()).registerPhoneEntry(any(), any(), any(), any(), any());
+      verify(encryptionService, never()).hashPhone(any(), any());
     }
   }
 

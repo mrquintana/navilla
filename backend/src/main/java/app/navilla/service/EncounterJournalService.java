@@ -136,11 +136,11 @@ public class EncounterJournalService {
 
     // If phone provided, hash it and register for phone matching
     if (request.phone() != null && !request.phone().isBlank()) {
-      String phoneHash = encryptionService.hashPhone(request.phone());
+      String phoneHash = encryptionService.hashPhone(request.phone(), request.countryCode());
       saved.setPhoneHash(phoneHash);
       saved = journalRepository.save(saved);
       phoneMatchService.registerPhoneEntry(
-          userHash, request.phone(),
+          userHash, request.phone(), request.countryCode(),
           request.encounterDate(), saved.getId());
     }
 
