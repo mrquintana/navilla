@@ -297,7 +297,7 @@ export function DashboardPage() {
                               className="font-medium cursor-help"
                               title={`${t(`dashboard.exposureStatusHint.${item.status}`)} \u00B7 ${t(`dashboard.exposureTimeframeHint.${item.timeframe}`)}`}
                             >
-                              {t(`dashboard.exposureStatusLabels.${item.status}`)} \u00B7 {t(`dashboard.exposureTimeframe.${item.timeframe}`)}
+                              {t(`dashboard.exposureStatusLabels.${item.status}`)} {'\u00B7'} {t(`dashboard.exposureTimeframe.${item.timeframe}`)}
                             </div>
                           </div>
                         </div>
