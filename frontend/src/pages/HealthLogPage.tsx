@@ -16,7 +16,6 @@ import { MedicationCard } from '../components/reminders/MedicationCard';
 import { MedicationModal } from '../components/reminders/MedicationModal';
 import { VaccinationSeriesCard } from '../components/reminders/VaccinationSeriesCard';
 import { VaccinationModal } from '../components/reminders/VaccinationModal';
-import { UpcomingReminders } from '../components/reminders/UpcomingReminders';
 import { SkeletonBlock } from '../components/ui/LoadingShell';
 import { LabVerificationModal } from '../components/health/LabVerificationModal';
 import type { VaccineSeries } from '../lib/api';
@@ -37,9 +36,6 @@ export function HealthLogPage() {
           <span>{t('healthLog.encrypted')}</span>
         </div>
       </div>
-
-      {/* Upcoming Reminders — persistent above tabs */}
-      <UpcomingReminders />
 
       {/* Tab Bar */}
       <div
