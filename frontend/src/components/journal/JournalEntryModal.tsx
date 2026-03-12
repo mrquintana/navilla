@@ -111,7 +111,7 @@ function JournalEntryForm({
   onPromote,
   dateOfBirth,
 }: JournalEntryFormProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   // Mutations
   const createMutation = useCreateJournalEntry();
@@ -131,7 +131,9 @@ function JournalEntryForm({
   const [formConnectionId, setFormConnectionId] = useState<string>(entry?.connectionId ?? '');
   const [formPartnerId, setFormPartnerId] = useState<string | null>(entry?.partnerId ?? null);
   const [formPhone, setFormPhone] = useState('');
-  const [formCountryCode, setFormCountryCode] = useState<string | null>(null);
+  const [formCountryCode, setFormCountryCode] = useState<string | null>(
+    () => i18n.language.startsWith('es') ? '52' : '1'
+  );
   const [phoneHint, setPhoneHint] = useState<string | null>(null);
   const [formNotes, setFormNotes] = useState(entry?.notes ?? '');
   const [customFields, setCustomFields] = useState<CustomFieldState[]>(
