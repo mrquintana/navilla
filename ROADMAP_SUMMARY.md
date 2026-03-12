@@ -29,8 +29,8 @@
 - Week 10: Network foundation (reciprocity, catalog, phone matching, constellation viz, profile) ✅
 - Week 11: Exposure recency buckets + verification cards + profile refactor ✅
 - Week 12: Notification privacy + polish (vault + app lock DEFERRED post-launch) ✅
-- Week 13: Data retention + connection staleness
-- Week 14: Network health stats + Layer 2 polish
+- Week 13: ~~Data retention + connection staleness~~ DEFERRED post-launch
+- Week 14: Network health stats + Layer 2 polish ✅
 
 ### Phase 4: Layer 3 + Launch Prep — Weeks 15-16
 - Week 15: Anonymous notifications + content verification
@@ -42,9 +42,9 @@
 
 ## Current Position
 
-**We are at Week 13** (Phase 3). Weeks 1-12 complete.
+**We are at Week 15** (Phase 4). Weeks 1-12 + 14 complete. Week 13 deferred post-launch.
 
-Next up: Check `docs/plans/full-roadmap.md` Phase 3 table (Weeks 12-14) for detailed deliverables.
+Next up: Check `docs/plans/full-roadmap.md` Phase 4 table (Weeks 15-16) for detailed deliverables.
 
 ## Key References
 

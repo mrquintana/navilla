@@ -97,11 +97,33 @@
 
 ---
 
+## Session Notes (2026-03-12 — Week 14: Network Health Stats + Layer 2 Polish)
+
+### What was done
+- **Network Health Stats**: New `GET /api/network-health` endpoint with `NetworkHealthService` — aggregated testing activity levels (High/Medium/Low/Unknown) based on % of connections tested in last 90 days. Privacy threshold: <3 connections = Unknown
+- **Network Health UI**: Compact `NetworkHealthCard` on Dashboard + full `NetworkHealthSection` on Network page (testing activity, network coverage, exposure summary)
+- **N+1 query fix**: Batch-fetch users in `ConnectionService` via `findByEmailHashIn()` — eliminates 100+ queries for users with many connections
+- **Verification card fixes**: `@Size(max=50)` on conditions list, atomic view counting via `incrementViewsIfAllowed()`, i18n error message keys, shareToken length validation
+- **CSS variables**: Replaced 9 hardcoded `rgba()` colors with `var(--color-primary-light-bg)`
+- **Date locale**: Fixed `.toLocaleDateString()` calls in ConnectionsPage and HealthLogPage to use i18n locale
+- **Accessibility**: Status indicator text label + sr-only on Dashboard, focus traps in delete modals
+- **Mobile**: Icon-only quick actions on small screens, stacked verification card buttons, abbreviated profile segmented control
+- **Empty states**: Icon + text pattern on ConnectionsPage and HealthLogPage
+- **Cache**: Added `networkHealth` Caffeine cache (5min TTL, 500 max)
+- **i18n**: ~25 new keys in en_US + es_MX for network health
+- **Tests**: 471 backend (was 471, +14 new network health tests offset by test consolidation), frontend lint clean
+
+### Key decisions
+- Network health gated by reciprocity opt-in (same as exposure data)
+- Testing activity uses qualitative labels only (High/Medium/Low) to prevent inference
+- Privacy threshold: fewer than 3 connections = "Unknown" level
+
+---
+
 ## Next Steps
 
 | Priority | Item | Notes |
 |----------|------|-------|
-| **Next** | Week 12 | Notification privacy + polish (vault + app lock DEFERRED) |
-| **Then** | Week 13 | Data retention + connection staleness |
-| **Then** | Week 14 | Network health stats + Layer 2 polish |
-| **Action** | Run migrations 014-017 on Supabase | If not already done |
+| **Next** | Week 15 | Anonymous notifications + content verification |
+| **Then** | Week 16 | Launch prep + API security hardening |
+| **Then** | Weeks 17-20 | Soft launch + growth |
