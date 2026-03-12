@@ -201,7 +201,7 @@ class EncounterJournalServiceTest {
       stubAuth();
       List<CustomFieldDto> customFields = List.of(new CustomFieldDto("Location", "Home"));
       CreateJournalEntryRequest request = new CreateJournalEntryRequest(
-          LocalDate.of(2026, 3, 15), "Partner A", null, "Some notes", customFields, null, null, null, null);
+          LocalDate.of(2026, 3, 15), "Partner A", null, "Some notes", customFields, null, null, null, null, null);
 
       when(encryptionService.encryptToBytes("Partner A")).thenReturn(ENCRYPTED_ALIAS);
       when(encryptionService.encryptToBytes("Some notes")).thenReturn(ENCRYPTED_NOTES);
@@ -240,7 +240,7 @@ class EncounterJournalServiceTest {
     void shouldHandleNullOptionalFields() throws Exception {
       stubAuth();
       CreateJournalEntryRequest request = new CreateJournalEntryRequest(
-          LocalDate.of(2026, 3, 15), null, null, null, null, null, null, null, null);
+          LocalDate.of(2026, 3, 15), null, null, null, null, null, null, null, null, null);
 
       when(journalRepository.save(any(EncounterJournal.class))).thenAnswer(invocation -> {
         EncounterJournal saved = invocation.getArgument(0);
@@ -276,7 +276,7 @@ class EncounterJournalServiceTest {
           new CustomFieldDto("Location", "Home"),
           new CustomFieldDto("Mood", "Happy"));
       CreateJournalEntryRequest request = new CreateJournalEntryRequest(
-          LocalDate.of(2026, 3, 15), null, null, null, customFields, null, null, null, null);
+          LocalDate.of(2026, 3, 15), null, null, null, customFields, null, null, null, null, null);
 
       String customJson = "[{\"label\":\"Location\",\"value\":\"Home\"},{\"label\":\"Mood\",\"value\":\"Happy\"}]";
       when(objectMapper.writeValueAsString(customFields)).thenReturn(customJson);
@@ -307,7 +307,7 @@ class EncounterJournalServiceTest {
       List<String> encounterTypes = List.of("ORAL", "ANAL");
       List<String> protectionMethods = List.of("CONDOM", "PREP");
       CreateJournalEntryRequest request = new CreateJournalEntryRequest(
-          LocalDate.of(2026, 3, 15), null, null, null, null, null, null,
+          LocalDate.of(2026, 3, 15), null, null, null, null, null, null, null,
           encounterTypes, protectionMethods);
 
       byte[] encTypes = new byte[]{50, 51, 52};
@@ -351,7 +351,7 @@ class EncounterJournalServiceTest {
       String rawPhone = "+52 55 1234 5678";
       String phoneHash = "phone_hash_abc123";
       CreateJournalEntryRequest request = new CreateJournalEntryRequest(
-          LocalDate.of(2026, 3, 15), null, null, null, null, null, rawPhone, null, null);
+          LocalDate.of(2026, 3, 15), null, null, null, null, null, rawPhone, null, null, null);
 
       when(encryptionService.hashPhone(rawPhone)).thenReturn(phoneHash);
       when(journalRepository.save(any(EncounterJournal.class))).thenAnswer(invocation -> {
@@ -383,7 +383,7 @@ class EncounterJournalServiceTest {
     void shouldNotRegisterPhoneMatchWhenPhoneNull() throws Exception {
       stubAuth();
       CreateJournalEntryRequest request = new CreateJournalEntryRequest(
-          LocalDate.of(2026, 3, 15), null, null, null, null, null, null, null, null);
+          LocalDate.of(2026, 3, 15), null, null, null, null, null, null, null, null, null);
 
       when(journalRepository.save(any(EncounterJournal.class))).thenAnswer(invocation -> {
         EncounterJournal saved = invocation.getArgument(0);

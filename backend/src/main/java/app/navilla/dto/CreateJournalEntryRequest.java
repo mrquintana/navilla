@@ -54,6 +54,9 @@ public record CreateJournalEntryRequest(
     @Size(max = 20, message = "{journal.error.phoneTooLong}")
     String phone,
 
+    @Size(max = 5, message = "{journal.error.countryCodeTooLong}")
+    String countryCode,
+
     @Size(max = 10, message = "{journal.error.tooManyEncounterTypes}")
     List<String> encounterTypes,
 

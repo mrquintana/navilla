@@ -72,6 +72,13 @@ public class ConnectionPhoneEntry {
   private String phoneHash;
 
   /**
+   * Optional country calling code (e.g. "52" for Mexico, "1" for US).
+   * Stored for future use, not part of the matching hash.
+   */
+  @Column(name = "country_code", length = 5)
+  private String countryCode;
+
+  /**
    * Date of the encounter associated with this phone entry.
    */
   @Column(name = "encounter_date", nullable = false)
