@@ -12,6 +12,7 @@ import {
   type CreatePartnerRequest,
   type UpdatePartnerRequest,
   type PromoteAliasRequest,
+  type PageResponse,
 } from '../lib/api';
 
 export type {
@@ -25,6 +26,7 @@ export type {
   CreatePartnerRequest,
   UpdatePartnerRequest,
   PromoteAliasRequest,
+  PageResponse,
 };
 
 export function useJournalEntries(month?: string) {
@@ -34,6 +36,26 @@ export function useJournalEntries(month?: string) {
     queryFn: () => api.journal.list(session!.access_token, month),
     enabled: !!session?.access_token,
     staleTime: 2 * 60 * 1000,
+  });
+}
+
+export function useJournalMonths() {
+  const { session } = useAuth();
+  return useQuery({
+    queryKey: ['journal', 'months'],
+    queryFn: () => api.journal.months(session!.access_token),
+    enabled: !!session?.access_token,
+    staleTime: 60_000,
+  });
+}
+
+export function useJournalEntriesPaginated(page: number, size: number = 20) {
+  const { session } = useAuth();
+  return useQuery({
+    queryKey: ['journal', 'list', 'page', page, size],
+    queryFn: () => api.journal.listPaginated(session!.access_token, page, size),
+    enabled: !!session?.access_token,
+    placeholderData: (prev) => prev,
   });
 }
 

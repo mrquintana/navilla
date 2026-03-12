@@ -132,7 +132,9 @@ function mockApiRequest<T>(
 
   if (endpoint.startsWith('/api/journal/templates')) return Promise.resolve({ labels: [] } as T);
   if (endpoint.startsWith('/api/journal/summary')) return Promise.resolve({ year: 2026, monthlyCounts: {}, yearTotal: 0 } as T);
+  if (endpoint === '/api/journal/months') return Promise.resolve([] as T);
   if (endpoint === '/api/journal' && (!options || options.method === undefined || options.method === 'GET')) return Promise.resolve([] as T);
+  if (endpoint.startsWith('/api/journal?page=')) return Promise.resolve({ content: [], totalElements: 0, totalPages: 0, number: 0, size: 20 } as T);
 
   return Promise.reject(new ApiError(`Unhandled E2E endpoint: ${endpoint}`, 500));
 }
@@ -161,6 +163,15 @@ export class ApiError extends Error {
     this.status = status;
     this.data = data;
   }
+}
+
+// Pagination types
+export interface PageResponse<T> {
+  content: T[];
+  totalElements: number;
+  totalPages: number;
+  number: number;
+  size: number;
 }
 
 // Journal types
@@ -378,6 +389,11 @@ export const api = {
   journal: {
     list: (token: string, month?: string) =>
       apiRequest<JournalEntry[]>(month ? `/api/journal?month=${month}` : '/api/journal', token),
+    listPaginated: (token: string, page: number, size: number) =>
+      apiRequest<PageResponse<JournalEntry>>(
+        `/api/journal?page=${page}&size=${size}`, token),
+    months: (token: string) =>
+      apiRequest<string[]>('/api/journal/months', token),
     create: (token: string, data: CreateJournalEntryRequest) =>
       apiRequest<JournalEntry>('/api/journal', token, { method: 'POST', body: data }),
     update: (token: string, id: string, data: UpdateJournalEntryRequest) =>
