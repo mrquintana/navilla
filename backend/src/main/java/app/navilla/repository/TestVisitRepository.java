@@ -16,15 +16,25 @@
 
 package app.navilla.repository;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import app.navilla.entity.TestVisit;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TestVisitRepository extends JpaRepository<TestVisit, UUID> {
 
   List<TestVisit> findByUserHashOrderByTestDateDesc(String userHash);
+
+  @Query("SELECT DISTINCT tv.userHash FROM TestVisit tv "
+      + "WHERE tv.userHash IN :userHashes AND tv.testDate >= :after")
+  Set<String> findUserHashesWithTestsAfter(
+      @Param("userHashes") Set<String> userHashes,
+      @Param("after") LocalDate after);
 }
