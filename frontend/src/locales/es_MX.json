@@ -297,6 +297,13 @@
     "connectionRequest": "Tienes una nueva solicitud de conexión",
     "connectionConfirmed": "Tu solicitud fue aceptada",
     "connectionDenied": "Tu solicitud fue rechazada",
+    "exposureAlert": "Podrías tener una nueva exposición — revisa tu registro de salud",
+    "exposureCleared": "Buenas noticias — una exposición ha sido descartada",
+    "medicationReminder": "Es hora de tu medicamento",
+    "vaccinationReminder": "Tienes una vacunación próxima",
+    "testingReminder": "Es hora de agendar una prueba",
+    "followUpReminder": "Tienes un seguimiento pendiente",
+    "accountSecurity": "Actualización importante de seguridad de tu cuenta",
     "generic": "Tienes una nueva notificación"
   },
   "status": {

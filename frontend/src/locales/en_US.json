@@ -298,6 +298,13 @@
     "connectionRequest": "You have a new connection request",
     "connectionConfirmed": "Your connection request was accepted",
     "connectionDenied": "Your connection request was denied",
+    "exposureAlert": "You may have a new exposure — check your health log",
+    "exposureCleared": "Good news — an exposure has been cleared",
+    "medicationReminder": "Time for your medication",
+    "vaccinationReminder": "You have an upcoming vaccination",
+    "testingReminder": "It's time to schedule a test",
+    "followUpReminder": "You have a follow-up to complete",
+    "accountSecurity": "Important account security update",
     "generic": "You have a new notification"
   },
   "status": {
