@@ -353,4 +353,77 @@ class EncounterJournalControllerTest {
         .andExpect(jsonPath("$.year").value(2026))
         .andExpect(jsonPath("$.yearTotal").value(1));
   }
+
+  @Test
+  @DisplayName("should return months with entries")
+  void shouldReturnMonthsWithEntries() throws Exception {
+    // Create entries in different months
+    mockMvc.perform(post("/api/journal")
+            .with(jwt().jwt(builder -> builder
+                .subject("test-subject")
+                .claim("email", USER_EMAIL)))
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("""
+                {
+                  "encounterDate": "2026-01-10",
+                  "partnerAlias": "Jan"
+                }
+                """))
+        .andExpect(status().isOk());
+
+    mockMvc.perform(post("/api/journal")
+            .with(jwt().jwt(builder -> builder
+                .subject("test-subject")
+                .claim("email", USER_EMAIL)))
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("""
+                {
+                  "encounterDate": "2026-03-05",
+                  "partnerAlias": "Mar"
+                }
+                """))
+        .andExpect(status().isOk());
+
+    // Get months
+    mockMvc.perform(get("/api/journal/months")
+            .with(jwt().jwt(builder -> builder
+                .subject("test-subject")
+                .claim("email", USER_EMAIL))))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$[0]").value("2026-01"))
+        .andExpect(jsonPath("$[1]").value("2026-03"));
+  }
+
+  @Test
+  @DisplayName("should paginate journal entries")
+  void shouldPaginateEntries() throws Exception {
+    // Create 3 entries
+    for (int i = 1; i <= 3; i++) {
+      mockMvc.perform(post("/api/journal")
+              .with(jwt().jwt(builder -> builder
+                  .subject("test-subject")
+                  .claim("email", USER_EMAIL)))
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(String.format("""
+                  {
+                    "encounterDate": "2026-03-%02d",
+                    "partnerAlias": "P%d"
+                  }
+                  """, i, i)))
+          .andExpect(status().isOk());
+    }
+
+    // Get page 0 with size 2
+    mockMvc.perform(get("/api/journal")
+            .param("page", "0")
+            .param("size", "2")
+            .with(jwt().jwt(builder -> builder
+                .subject("test-subject")
+                .claim("email", USER_EMAIL))))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.content").isArray())
+        .andExpect(jsonPath("$.content.length()").value(2))
+        .andExpect(jsonPath("$.totalElements").value(3))
+        .andExpect(jsonPath("$.totalPages").value(2));
+  }
 }

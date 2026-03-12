@@ -611,6 +611,26 @@ class EncounterJournalServiceTest {
   }
 
   @Nested
+  @DisplayName("getMonthsWithEntries")
+  class GetMonthsWithEntries {
+
+    @Test
+    @DisplayName("returns distinct months")
+    void returnsDistinctMonths() {
+      stubAuth();
+      List<String> months = List.of("2025-11", "2026-01", "2026-03");
+      when(journalRepository.findDistinctMonthsByUserHash(USER_HASH))
+          .thenReturn(months);
+
+      List<String> result =
+          encounterJournalService.getMonthsWithEntries(jwt);
+
+      assertThat(result)
+          .containsExactly("2025-11", "2026-01", "2026-03");
+    }
+  }
+
+  @Nested
   @DisplayName("summary")
   class SummaryTests {
 
