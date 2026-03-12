@@ -8,6 +8,7 @@ import { DEV_MODE } from '../lib/devMode';
 import { HelpCircle, ExternalLink, Heart, BookOpen, Users, BarChart3, Sparkles } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { getConditionInfo } from '../lib/conditionInfo';
+import { sortExposureItems, getExposureBorderStyle } from '../lib/exposureSort';
 import { PageSkeleton, SkeletonBlock } from '../components/ui/LoadingShell';
 import { UpcomingReminders } from '../components/reminders/UpcomingReminders';
 import { OnboardingFlow } from '../components/onboarding/OnboardingFlow';
@@ -264,12 +265,13 @@ export function DashboardPage() {
                   })}
                 </p>
                 <div className="space-y-2">
-                  {exposureQuery.data?.exposures?.slice(0, 3).map((item) => {
+                  {sortExposureItems(exposureQuery.data?.exposures ?? []).slice(0, 3).map((item) => {
                     const info = getConditionInfo(item.condition, i18n.language);
                     return (
                       <div
                         key={item.condition}
-                        className={"exposure-item" + (item.timeframe === "31_90d" ? " opacity-85" : item.timeframe === "91_365d" ? " opacity-70" : item.timeframe === "365d_plus" ? " opacity-55" : "")}
+                        className="exposure-item"
+                        style={getExposureBorderStyle(item)}
                       >
                         <div className="text-xs font-semibold uppercase tracking-wide text-foreground">
                           <a

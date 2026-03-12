@@ -85,3 +85,22 @@ This is a future enhancement (temporal edges) currently being designed. See [ADR
 
 These values may change as the product evolves.
 
+## 10) How exposures are prioritized
+
+When you view your exposure overview, items are sorted so the most relevant ones appear first. The ranking considers four factors:
+
+1. **Status** — Active conditions rank higher than resolved ones. An active case in your network is more actionable than one that has been cleared.
+
+2. **Closeness** — 1st-degree exposures (your direct connections) rank higher than 2nd or 3rd degree. The closer the exposure, the more relevant it is to you.
+
+3. **Recency** — Exposures reported in the last 30 days rank higher than older ones. Recent reports are more likely to require your attention.
+
+4. **Case count** — More cases of the same condition rank slightly higher than fewer cases.
+
+Each exposure card also shows a subtle colored accent on the left edge:
+- **Amber** — High priority: recent, close, and active. Consider testing soon.
+- **Indigo** — Medium priority: still relevant but less immediate.
+- **Gray** — Low priority: older, more distant, or resolved exposures.
+
+This system helps you quickly scan your exposure overview and identify what matters most, without needing to read every detail.
+

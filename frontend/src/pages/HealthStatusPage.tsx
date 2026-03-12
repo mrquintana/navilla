@@ -7,6 +7,7 @@ import { useUser } from '../hooks/useUser';
 import { queryClient } from '../queryClient';
 import { DEV_MODE } from '../lib/devMode';
 import { getConditionInfo } from '../lib/conditionInfo';
+import { sortExposureItems, getExposureBorderStyle } from '../lib/exposureSort';
 import { ExternalLink, HelpCircle, Plus, Trash2 } from 'lucide-react';
 import { PageSkeleton, SkeletonBlock, SkeletonRows } from '../components/ui/LoadingShell';
 
@@ -125,7 +126,7 @@ export function HealthStatusPage() {
   const statuses = listQuery.data ?? [];
   const latestStatus = statuses[0];
   const activePositives = statuses.filter((status) => status.status === 'positive' && !status.clearedAt);
-  const exposureItems = exposureQuery.data?.exposures ?? [];
+  const exposureItems = sortExposureItems(exposureQuery.data?.exposures ?? []);
   const listInitialLoading = listQuery.isLoading && !listQuery.data;
   const exposureInitialLoading = exposureQuery.isLoading && !exposureQuery.data;
   const isInitialLoading = listInitialLoading && exposureInitialLoading;
@@ -341,7 +342,7 @@ export function HealthStatusPage() {
                   : '—'}</span>
               </div>
               {(showAllExposures ? exposureItems : exposureItems.slice(0, 6)).map((item) => (
-                <div key={item.condition} className={"exposure-item" + (item.timeframe === "31_90d" ? " opacity-85" : item.timeframe === "91_365d" ? " opacity-70" : item.timeframe === "365d_plus" ? " opacity-55" : "")}>
+                <div key={item.condition} className="exposure-item" style={getExposureBorderStyle(item)}>
                   <div className="text-xs font-semibold uppercase tracking-wide text-foreground">
                     <a
                       className="health-condition-link"

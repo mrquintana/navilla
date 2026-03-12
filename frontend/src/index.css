@@ -342,6 +342,7 @@ select.input {
 
 .exposure-item {
   border: 1px solid var(--color-border-light);
+  border-left: 3px solid var(--color-border);
   border-radius: 0.75rem;
   background: linear-gradient(135deg, rgba(99, 102, 241, 0.06), rgba(79, 70, 229, 0.015));
   padding: 0.75rem 0.85rem;

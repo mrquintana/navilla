@@ -8,6 +8,7 @@ import { useMedications } from '../hooks/useMedications';
 import { useVaccinations } from '../hooks/useVaccinations';
 import { api } from '../lib/api';
 import { getConditionInfo } from '../lib/conditionInfo';
+import { sortExposureItems, getExposureBorderStyle } from '../lib/exposureSort';
 import { HealthLogStats } from '../components/health-log/HealthLogStats';
 import { ConditionCard } from '../components/health-log/ConditionCard';
 import { TestVisitModal } from '../components/health-log/TestVisitModal';
@@ -99,7 +100,7 @@ function TestsTabContent() {
   });
 
   const summary = summaryQuery.data;
-  const exposureItems = exposureQuery.data?.exposures ?? [];
+  const exposureItems = sortExposureItems(exposureQuery.data?.exposures ?? []);
   const exposureInitialLoading = exposureQuery.isLoading && !exposureQuery.data;
   const summaryLoading = summaryQuery.isLoading && !summaryQuery.data;
   const isInitialLoading = summaryLoading && exposureInitialLoading;
@@ -246,7 +247,7 @@ function TestsTabContent() {
             </div>
             {(showAllExposures ? exposureItems : exposureItems.slice(0, 6)).map(
               (item) => (
-                <div key={item.condition} className={"exposure-item" + (item.timeframe === "31_90d" ? " opacity-85" : item.timeframe === "91_365d" ? " opacity-70" : item.timeframe === "365d_plus" ? " opacity-55" : "")}>
+                <div key={item.condition} className="exposure-item" style={getExposureBorderStyle(item)}>
                   <div className="text-xs font-semibold uppercase tracking-wide text-foreground">
                     <a
                       className="health-condition-link"
