@@ -231,7 +231,7 @@ class VerificationCardControllerTest {
   @DisplayName("GET /api/public/cards/invalid should return 400 for non-existent token")
   void getPublicCard_invalidToken_shouldReturn400() throws Exception {
     when(verificationCardService.getPublicCard("nonexistent-token-abc123"))
-        .thenThrow(new IllegalArgumentException("Card not found"));
+        .thenThrow(new IllegalArgumentException("card.error.notFound"));
 
     mockMvc.perform(get("/api/public/cards/nonexistent-token-abc123"))
         .andExpect(status().isBadRequest())

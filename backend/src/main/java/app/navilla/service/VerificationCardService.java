@@ -78,7 +78,7 @@ public class VerificationCardService {
   @Transactional
   public VerificationCardResponse createCard(String userHash, CreateVerificationCardRequest req) {
     User user = userRepository.findByEmailHash(userHash)
-        .orElseThrow(() -> new IllegalStateException("User not found"));
+        .orElseThrow(() -> new IllegalStateException("user.error.notFound"));
 
     String firstName = user.getFirstNameEncrypted() != null
         ? encryptionService.decryptFromBytes(user.getFirstNameEncrypted()) : null;
@@ -89,7 +89,7 @@ public class VerificationCardService {
     if (firstName == null || firstName.isBlank()
         || lastName == null || lastName.isBlank()
         || username == null || username.isBlank()) {
-      throw new IllegalStateException("First name, last name, and username must be set");
+      throw new IllegalStateException("card.error.incompleteProfile");
     }
 
     String displayName = firstName + " " + lastName;
@@ -151,11 +151,11 @@ public class VerificationCardService {
       UpdateVerificationCardRequest req) {
     VerificationCard card = verificationCardRepository.findByIdAndUserHash(
         java.util.UUID.fromString(cardId), userHash)
-        .orElseThrow(() -> new IllegalArgumentException("Card not found"));
+        .orElseThrow(() -> new IllegalArgumentException("card.error.notFound"));
 
     // Re-resolve name from profile
     User user = userRepository.findByEmailHash(userHash)
-        .orElseThrow(() -> new IllegalStateException("User not found"));
+        .orElseThrow(() -> new IllegalStateException("user.error.notFound"));
 
     String firstName = user.getFirstNameEncrypted() != null
         ? encryptionService.decryptFromBytes(user.getFirstNameEncrypted()) : null;
@@ -198,7 +198,7 @@ public class VerificationCardService {
   public void deleteCard(String userHash, String cardId) {
     VerificationCard card = verificationCardRepository.findByIdAndUserHash(
         java.util.UUID.fromString(cardId), userHash)
-        .orElseThrow(() -> new IllegalArgumentException("Card not found"));
+        .orElseThrow(() -> new IllegalArgumentException("card.error.notFound"));
     verificationCardRepository.delete(card);
   }
 
@@ -216,21 +216,18 @@ public class VerificationCardService {
   @Transactional
   public PublicVerificationCardResponse getPublicCard(String shareToken) {
     VerificationCard card = verificationCardRepository.findByShareToken(shareToken)
-        .orElseThrow(() -> new IllegalArgumentException("Card not found"));
+        .orElseThrow(() -> new IllegalArgumentException("card.error.notFound"));
 
     // Check expiry
     if (card.getExpiresAt() != null && card.getExpiresAt().isBefore(OffsetDateTime.now())) {
-      throw new IllegalStateException("Card has expired");
+      throw new IllegalStateException("card.error.expired");
     }
 
-    // Check view limit
-    if (card.getMaxViews() != null && card.getCurrentViews() >= card.getMaxViews()) {
-      throw new IllegalStateException("Card view limit reached");
+    // Atomic view increment — avoids race conditions with concurrent access
+    int updated = verificationCardRepository.incrementViewsIfAllowed(card.getId());
+    if (updated == 0 && card.getMaxViews() != null) {
+      throw new IllegalStateException("card.error.viewLimitReached");
     }
-
-    // Increment views
-    card.setCurrentViews(card.getCurrentViews() + 1);
-    verificationCardRepository.save(card);
 
     // Build response
     String displayName = card.getDisplayNameEncrypted() != null
@@ -315,7 +312,7 @@ public class VerificationCardService {
   @Transactional(readOnly = true)
   public CardVerificationResponse verifyCard(String shareToken) {
     VerificationCard card = verificationCardRepository.findByShareToken(shareToken)
-        .orElseThrow(() -> new IllegalArgumentException("Card not found"));
+        .orElseThrow(() -> new IllegalArgumentException("card.error.notFound"));
 
     // Check expiry
     if (card.getExpiresAt() != null && card.getExpiresAt().isBefore(OffsetDateTime.now())) {

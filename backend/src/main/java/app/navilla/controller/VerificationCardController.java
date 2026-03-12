@@ -26,11 +26,13 @@ import app.navilla.dto.VerificationCardResponse;
 import app.navilla.security.EncryptionService;
 import app.navilla.service.VerificationCardService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -41,6 +43,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
+@Validated
 public class VerificationCardController {
 
   private final VerificationCardService verificationCardService;
@@ -82,13 +85,13 @@ public class VerificationCardController {
 
   @GetMapping("/api/public/cards/{shareToken}")
   public ResponseEntity<PublicVerificationCardResponse> getPublicCard(
-      @PathVariable String shareToken) {
+      @PathVariable @Size(min = 1, max = 64) String shareToken) {
     return ResponseEntity.ok(verificationCardService.getPublicCard(shareToken));
   }
 
   @GetMapping("/api/public/cards/{shareToken}/verify")
   public ResponseEntity<CardVerificationResponse> verifyCard(
-      @PathVariable String shareToken) {
+      @PathVariable @Size(min = 1, max = 64) String shareToken) {
     return ResponseEntity.ok(verificationCardService.verifyCard(shareToken));
   }
 }

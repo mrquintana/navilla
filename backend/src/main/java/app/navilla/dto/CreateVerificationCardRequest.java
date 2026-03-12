@@ -19,6 +19,7 @@ package app.navilla.dto;
 import java.time.OffsetDateTime;
 import java.util.List;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Size;
 
 /**
@@ -28,6 +29,8 @@ import jakarta.validation.constraints.Size;
  * Test dates are always shown on verification cards.
  */
 public record CreateVerificationCardRequest(
+    @Valid
+    @Size(max = 50, message = "verification.error.tooManyConditions")
     List<@Size(max = 50) String> includedConditions,
     Boolean showVerificationLevel,
     Integer maxViews,

@@ -51,7 +51,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -199,7 +198,7 @@ class VerificationCardServiceTest {
 
       assertThatThrownBy(() -> verificationCardService.createCard(USER_HASH, req))
           .isInstanceOf(IllegalStateException.class)
-          .hasMessage("User not found");
+          .hasMessage("user.error.notFound");
     }
 
     @Test
@@ -214,7 +213,7 @@ class VerificationCardServiceTest {
 
       assertThatThrownBy(() -> verificationCardService.createCard(USER_HASH, req))
           .isInstanceOf(IllegalStateException.class)
-          .hasMessage("First name, last name, and username must be set");
+          .hasMessage("card.error.incompleteProfile");
     }
 
     @Test
@@ -388,7 +387,7 @@ class VerificationCardServiceTest {
       assertThatThrownBy(() ->
           verificationCardService.updateCard(USER_HASH, cardId.toString(), req))
           .isInstanceOf(IllegalArgumentException.class)
-          .hasMessage("Card not found");
+          .hasMessage("card.error.notFound");
     }
   }
 
@@ -426,7 +425,7 @@ class VerificationCardServiceTest {
       assertThatThrownBy(() ->
           verificationCardService.deleteCard(USER_HASH, cardId.toString()))
           .isInstanceOf(IllegalArgumentException.class)
-          .hasMessage("Card not found");
+          .hasMessage("card.error.notFound");
     }
   }
 
@@ -477,8 +476,8 @@ class VerificationCardServiceTest {
           .build();
       when(healthStatusRepository.findByUserHashOrderByReportedAtDesc(USER_HASH))
           .thenReturn(List.of(hivVerified, chlamydiaNotVerified));
-      when(verificationCardRepository.save(any(VerificationCard.class)))
-          .thenAnswer(invocation -> invocation.getArgument(0));
+      when(verificationCardRepository.incrementViewsIfAllowed(card.getId()))
+          .thenReturn(1);
 
       PublicVerificationCardResponse response =
           verificationCardService.getPublicCard("valid-token");
@@ -494,7 +493,7 @@ class VerificationCardServiceTest {
     }
 
     @Test
-    @DisplayName("view count increments on each access")
+    @DisplayName("view count increments atomically on each access")
     void getPublicCard_incrementsViewCount() {
       VerificationCard card = buildCard("view-token", USER_HASH);
       card.setCurrentViews(5);
@@ -502,18 +501,16 @@ class VerificationCardServiceTest {
 
       when(verificationCardRepository.findByShareToken("view-token"))
           .thenReturn(Optional.of(card));
+      when(verificationCardRepository.incrementViewsIfAllowed(card.getId()))
+          .thenReturn(1);
       when(encryptionService.decryptFromBytes(any(byte[].class))).thenReturn("User");
       when(userRepository.findByEmailHash(USER_HASH)).thenReturn(Optional.empty());
       when(healthStatusRepository.findByUserHashOrderByReportedAtDesc(USER_HASH))
           .thenReturn(List.of());
 
-      ArgumentCaptor<VerificationCard> captor = ArgumentCaptor.forClass(VerificationCard.class);
-      when(verificationCardRepository.save(captor.capture()))
-          .thenAnswer(invocation -> invocation.getArgument(0));
-
       verificationCardService.getPublicCard("view-token");
 
-      assertThat(captor.getValue().getCurrentViews()).isEqualTo(6);
+      verify(verificationCardRepository).incrementViewsIfAllowed(card.getId());
     }
 
     @Test
@@ -528,7 +525,7 @@ class VerificationCardServiceTest {
       assertThatThrownBy(() ->
           verificationCardService.getPublicCard("expired-token"))
           .isInstanceOf(IllegalStateException.class)
-          .hasMessage("Card has expired");
+          .hasMessage("card.error.expired");
     }
 
     @Test
@@ -540,11 +537,13 @@ class VerificationCardServiceTest {
 
       when(verificationCardRepository.findByShareToken("limited-token"))
           .thenReturn(Optional.of(card));
+      when(verificationCardRepository.incrementViewsIfAllowed(card.getId()))
+          .thenReturn(0);
 
       assertThatThrownBy(() ->
           verificationCardService.getPublicCard("limited-token"))
           .isInstanceOf(IllegalStateException.class)
-          .hasMessage("Card view limit reached");
+          .hasMessage("card.error.viewLimitReached");
     }
 
     @Test
@@ -573,8 +572,8 @@ class VerificationCardServiceTest {
 
       when(healthStatusRepository.findByUserHashOrderByReportedAtDesc(USER_HASH))
           .thenReturn(List.of(hivVerified, chlamydiaNoTestDate, gonorrheaNotVerified));
-      when(verificationCardRepository.save(any(VerificationCard.class)))
-          .thenAnswer(invocation -> invocation.getArgument(0));
+      when(verificationCardRepository.incrementViewsIfAllowed(card.getId()))
+          .thenReturn(1);
 
       PublicVerificationCardResponse response =
           verificationCardService.getPublicCard("filter-token");
@@ -594,7 +593,7 @@ class VerificationCardServiceTest {
       assertThatThrownBy(() ->
           verificationCardService.getPublicCard("nonexistent"))
           .isInstanceOf(IllegalArgumentException.class)
-          .hasMessage("Card not found");
+          .hasMessage("card.error.notFound");
     }
 
     @Test
@@ -608,8 +607,8 @@ class VerificationCardServiceTest {
       when(userRepository.findByEmailHash(USER_HASH)).thenReturn(Optional.empty());
       when(healthStatusRepository.findByUserHashOrderByReportedAtDesc(USER_HASH))
           .thenReturn(List.of());
-      when(verificationCardRepository.save(any(VerificationCard.class)))
-          .thenAnswer(invocation -> invocation.getArgument(0));
+      when(verificationCardRepository.incrementViewsIfAllowed(card.getId()))
+          .thenReturn(1);
 
       PublicVerificationCardResponse response =
           verificationCardService.getPublicCard("anon-token");
@@ -656,8 +655,8 @@ class VerificationCardServiceTest {
               "http://localhost:8080", "https://www.labdemomx.com", List.of())
       ));
 
-      when(verificationCardRepository.save(any(VerificationCard.class)))
-          .thenAnswer(invocation -> invocation.getArgument(0));
+      when(verificationCardRepository.incrementViewsIfAllowed(card.getId()))
+          .thenReturn(1);
 
       PublicVerificationCardResponse response =
           verificationCardService.getPublicCard("provenance-token");
@@ -696,8 +695,8 @@ class VerificationCardServiceTest {
           .verified(true).verifiedAt(verifiedAt).build();
       when(testVisitRepository.findById(visitId)).thenReturn(Optional.of(visit));
 
-      when(verificationCardRepository.save(any(VerificationCard.class)))
-          .thenAnswer(invocation -> invocation.getArgument(0));
+      when(verificationCardRepository.incrementViewsIfAllowed(card.getId()))
+          .thenReturn(1);
 
       PublicVerificationCardResponse response =
           verificationCardService.getPublicCard("no-lab-token");
@@ -728,8 +727,8 @@ class VerificationCardServiceTest {
       when(healthStatusRepository.findByUserHashOrderByReportedAtDesc(USER_HASH))
           .thenReturn(List.of(hivStatus));
 
-      when(verificationCardRepository.save(any(VerificationCard.class)))
-          .thenAnswer(invocation -> invocation.getArgument(0));
+      when(verificationCardRepository.incrementViewsIfAllowed(card.getId()))
+          .thenReturn(1);
 
       PublicVerificationCardResponse response =
           verificationCardService.getPublicCard("no-visit-token");
@@ -819,7 +818,7 @@ class VerificationCardServiceTest {
 
       assertThatThrownBy(() -> verificationCardService.verifyCard("nonexistent"))
           .isInstanceOf(IllegalArgumentException.class)
-          .hasMessage("Card not found");
+          .hasMessage("card.error.notFound");
     }
   }
 }
