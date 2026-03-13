@@ -50,6 +50,9 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.oauth2.jwt.Jwt;
 
 /**
@@ -362,6 +365,37 @@ class ConnectionServiceTest {
       assertThat(connections.get(0).connectionType()).isEqualTo(ConnectionType.EXPLICIT.name());
       assertThat(connections.get(1).isRequester()).isFalse();
       assertThat(connections.get(1).connectionType()).isEqualTo(ConnectionType.EXPLICIT.name());
+    }
+  }
+
+  @Nested
+  @DisplayName("getConfirmedConnectionsPaged")
+  class GetConfirmedConnectionsPagedTests {
+
+    @Test
+    @DisplayName("should return paginated results")
+    void shouldReturnPaginatedResults() {
+      stubRequesterAuth();
+
+      Connection conn = Connection.builder()
+          .id(UUID.randomUUID())
+          .requesterHash(REQUESTER_HASH)
+          .recipientHash("other_hash")
+          .status(ConnectionStatus.CONFIRMED)
+          .requestedAt(OffsetDateTime.now())
+          .confirmedAt(OffsetDateTime.now())
+          .build();
+
+      Page<Connection> page = new PageImpl<>(List.of(conn), PageRequest.of(0, 10), 1);
+      when(connectionRepository.findConfirmedByUserHashPaged(REQUESTER_HASH, PageRequest.of(0, 10)))
+          .thenReturn(page);
+      when(userRepository.findByEmailHashIn(any())).thenReturn(List.of());
+
+      Page<ConnectionResponse> result = connectionService.getConfirmedConnectionsPaged(jwt, 0, 10, null);
+
+      assertThat(result.getContent()).hasSize(1);
+      assertThat(result.getTotalElements()).isEqualTo(1);
+      assertThat(result.getNumber()).isEqualTo(0);
     }
   }
 

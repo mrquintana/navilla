@@ -39,6 +39,9 @@ import app.navilla.security.EncryptionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -161,6 +164,46 @@ public class ConnectionService {
     return connections.stream()
         .map(c -> toConnectionResponse(c, userHash, userLookup))
         .toList();
+  }
+
+  /**
+   * Gets confirmed connections with server-side pagination and optional search.
+   *
+   * @param jwt the JWT token of the user
+   * @param page zero-based page number
+   * @param size page size
+   * @param search optional search term to filter by partner name or username
+   * @return paginated confirmed connections
+   */
+  @Transactional(readOnly = true)
+  public Page<ConnectionResponse> getConfirmedConnectionsPaged(Jwt jwt, int page, int size, String search) {
+    String email = jwt.getClaimAsString("email");
+    String userHash = encryptionService.hashEmail(email);
+
+    Page<Connection> connectionPage = connectionRepository.findConfirmedByUserHashPaged(
+        userHash, PageRequest.of(page, size));
+
+    Map<String, User> userLookup = fetchPartnerUsers(connectionPage.getContent(), userHash);
+
+    List<ConnectionResponse> responses = connectionPage.getContent().stream()
+        .map(c -> toConnectionResponse(c, userHash, userLookup))
+        .toList();
+
+    if (search != null && !search.isBlank()) {
+      String query = search.trim().toLowerCase();
+      List<ConnectionResponse> filtered = responses.stream()
+          .filter(r -> {
+            String displayName = r.partnerDisplayName() != null
+                ? r.partnerDisplayName().toLowerCase() : "";
+            String username = r.partnerUsername() != null
+                ? r.partnerUsername().toLowerCase() : "";
+            return displayName.contains(query) || username.contains(query);
+          })
+          .toList();
+      return new PageImpl<>(filtered, connectionPage.getPageable(), connectionPage.getTotalElements());
+    }
+
+    return new PageImpl<>(responses, connectionPage.getPageable(), connectionPage.getTotalElements());
   }
 
   /**
