@@ -172,6 +172,8 @@ export interface PageResponse<T> {
   totalPages: number;
   number: number;
   size: number;
+  first: boolean;
+  last: boolean;
 }
 
 // Journal types
@@ -318,8 +320,11 @@ export const api = {
   connections: {
     list: (token: string) =>
       apiRequest<Connection[]>('/api/connections', token),
-    confirmed: (token: string) =>
-      apiRequest<Connection[]>('/api/connections/confirmed', token),
+    confirmed: (token: string, page = 0, size = 10, search?: string) => {
+      const params = new URLSearchParams({ page: String(page), size: String(size) });
+      if (search) params.set('search', search);
+      return apiRequest<PageResponse<Connection>>(`/api/connections/confirmed?${params}`, token);
+    },
     pendingIncoming: (token: string) =>
       apiRequest<Connection[]>('/api/connections/pending/incoming', token),
     pendingSent: (token: string) =>
