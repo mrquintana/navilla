@@ -45,12 +45,6 @@ export function DashboardPage() {
     enabled: !!token,
   });
 
-  const healthQuery = useQuery({
-    queryKey: ['health', 'list'],
-    queryFn: () => api.health.list(token),
-    enabled: !!token,
-  });
-
   const reciprocityQuery = useReciprocityStatus();
   const isOptedIn = reciprocityQuery.data?.optedIn ?? false;
 
@@ -58,10 +52,6 @@ export function DashboardPage() {
   const { data: networkHealthData } = useNetworkHealth();
   const constellationEngine = useMemo(() => new ActiveEngine(), []);
 
-  const hasPositiveStatus = (healthQuery.data ?? []).some(
-    (status) => status.status === 'positive' && !status.clearedAt
-  );
-  const healthInitialLoading = healthQuery.isLoading && !healthQuery.data;
   const exposureInitialLoading = exposureQuery.isLoading && !exposureQuery.data;
 
   const recomputeMutation = useMutation({
@@ -83,8 +73,7 @@ export function DashboardPage() {
   const isInitialLoading = authLoading
     || isLoading
     || statsQuery.isLoading
-    || exposureInitialLoading
-    || healthInitialLoading;
+    || exposureInitialLoading;
 
   const displayName = (profile?.firstName && profile?.lastName
     ? `${profile.firstName} ${profile.lastName}`
@@ -200,14 +189,14 @@ export function DashboardPage() {
           <div className="card card-elevated">
             <div className="flex items-center gap-3 mb-4">
               <div
-                className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                  hasPositiveStatus ? 'bg-red-100' : 'bg-green-100'
-                }`}
+                className="w-10 h-10 rounded-full flex items-center justify-center"
+                style={{ background: 'var(--color-primary-light-bg)' }}
                 role="img"
-                aria-label={hasPositiveStatus ? t('dashboard.statusActive') : t('dashboard.statusClear')}
+                aria-label={t('dashboard.exposureStatus')}
               >
                 <svg
-                  className={`w-5 h-5 ${hasPositiveStatus ? 'text-red-600' : 'text-green-600'}`}
+                  className="w-5 h-5"
+                  style={{ color: 'var(--color-primary)' }}
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -220,20 +209,15 @@ export function DashboardPage() {
                 <h3 className="text-sm font-semibold uppercase tracking-wider" style={{ color: 'var(--color-muted)' }}>
                   {t('dashboard.exposureStatus')}
                 </h3>
-                <p className={`text-xs font-medium ${hasPositiveStatus ? 'text-red-600' : 'text-green-600'}`}>
-                  {hasPositiveStatus ? t('dashboard.statusActive') : t('dashboard.statusClear')}
-                </p>
               </div>
             </div>
 
-            {/* Status badge */}
-            {healthInitialLoading || exposureInitialLoading ? (
+            {/* Exposure status */}
+            {exposureInitialLoading ? (
               <div role="status" aria-live="polite" className="mt-1">
                 <span className="sr-only">{t('common.loading')}</span>
                 <SkeletonBlock className="h-7 w-44 rounded-full" />
               </div>
-            ) : hasPositiveStatus ? (
-              <span className="badge badge-error text-sm">{t('dashboard.selfPositive')}</span>
             ) : (exposureQuery.data?.exposures?.length ?? 0) > 0 ? (
               <div className="flex items-center gap-2">
                 <span className="badge badge-warning text-sm">{t('dashboard.potentialExposure')}</span>
