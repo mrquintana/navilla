@@ -127,6 +127,7 @@ export function ConnectionsPage() {
   const [pendingActionIds, setPendingActionIds] = useState<Set<string>>(new Set());
   const [pendingIncomingPage, setPendingIncomingPage] = useState(1);
   const [confirmedSearch, setConfirmedSearch] = useState('');
+  const [confirmedPage, setConfirmedPage] = useState(0);
   const [expandedConnectionId, setExpandedConnectionId] = useState<string | null>(null);
   const [expandedView, setExpandedView] = useState<'profile' | 'status'>('profile');
   const [removeTarget, setRemoveTarget] = useState<Connection | null>(null);
@@ -156,9 +157,10 @@ export function ConnectionsPage() {
   });
 
   const confirmedQuery = useQuery({
-    queryKey: ['connections', 'confirmed'],
-    queryFn: () => api.connections.confirmed(token),
+    queryKey: ['connections', 'confirmed', confirmedPage, confirmedSearch],
+    queryFn: () => api.connections.confirmed(token, confirmedPage, 10, confirmedSearch || undefined),
     enabled: !!token,
+    placeholderData: (prev: unknown) => prev,
   });
 
   const acceptMutation = useMutation({
@@ -226,18 +228,8 @@ export function ConnectionsPage() {
     }
   };
 
-  const confirmedConnections = useMemo(() => confirmedQuery.data ?? [], [confirmedQuery.data]);
-  const filteredConfirmed = useMemo(() => {
-    const query = confirmedSearch.trim().toLowerCase();
-    if (!query) {
-      return confirmedConnections;
-    }
-    return confirmedConnections.filter((connection) => {
-      const displayName = connection.partnerDisplayName?.toLowerCase() ?? '';
-      const username = connection.partnerUsername?.toLowerCase() ?? '';
-      return displayName.includes(query) || username.includes(query);
-    });
-  }, [confirmedConnections, confirmedSearch]);
+  const confirmedData = confirmedQuery.data;
+  const confirmedConnections = confirmedData?.content ?? [];
 
   const toggleExpanded = (id: string, view: 'profile' | 'status') => {
     if (expandedConnectionId === id && expandedView === view) {
@@ -512,11 +504,14 @@ export function ConnectionsPage() {
               className="input input-with-icon"
               placeholder={t('connections.searchPlaceholder')}
               value={confirmedSearch}
-              onChange={(e) => setConfirmedSearch(e.target.value)}
+              onChange={(e) => {
+                setConfirmedSearch(e.target.value);
+                setConfirmedPage(0);
+              }}
             />
           </div>
         )}
-        connections={filteredConfirmed}
+        connections={confirmedConnections}
         emptyText={t('connections.noConfirmed')}
         isLoading={confirmedLoading}
         isExpanded={(connection) => expandedConnectionId === connection.id}
@@ -560,6 +555,27 @@ export function ConnectionsPage() {
             </button>
           </>
         )}
+        footer={confirmedData && confirmedData.totalPages > 1 ? (
+          <div className="flex items-center justify-between text-xs text-muted mt-4">
+            <span>{t('common.page')} {confirmedData.number + 1} {t('common.of')} {confirmedData.totalPages}</span>
+            <div className="flex gap-2">
+              <button
+                className="btn btn-secondary btn-sm"
+                onClick={() => setConfirmedPage((p) => Math.max(0, p - 1))}
+                disabled={confirmedData.first}
+              >
+                {t('common.back')}
+              </button>
+              <button
+                className="btn btn-secondary btn-sm"
+                onClick={() => setConfirmedPage((p) => p + 1)}
+                disabled={confirmedData.last}
+              >
+                {t('common.next')}
+              </button>
+            </div>
+          </div>
+        ) : null}
         renderDetails={(connection) => {
           if (expandedView === 'status') {
             return (
