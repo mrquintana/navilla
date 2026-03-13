@@ -26,6 +26,7 @@ import app.navilla.dto.CreateConnectionRequest;
 import app.navilla.service.ConnectionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -36,6 +37,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -86,16 +88,22 @@ public class ConnectionController {
   }
 
   /**
-   * Gets confirmed connections for the current user.
+   * Gets confirmed connections for the current user with pagination.
    *
    * @param jwt the JWT token containing user information
-   * @return list of confirmed connections
+   * @param page the page number (zero-based, default 0)
+   * @param size the page size (default 10)
+   * @param search optional search filter for alias
+   * @return paginated confirmed connections
    */
   @GetMapping("/confirmed")
-  public ResponseEntity<List<ConnectionResponse>> getConfirmedConnections(
-      @AuthenticationPrincipal Jwt jwt) {
+  public ResponseEntity<Page<ConnectionResponse>> getConfirmedConnections(
+      @AuthenticationPrincipal Jwt jwt,
+      @RequestParam(defaultValue = "0") int page,
+      @RequestParam(defaultValue = "10") int size,
+      @RequestParam(required = false) String search) {
 
-    List<ConnectionResponse> connections = connectionService.getConfirmedConnections(jwt);
+    Page<ConnectionResponse> connections = connectionService.getConfirmedConnectionsPaged(jwt, page, size, search);
     return ResponseEntity.ok(connections);
   }
 

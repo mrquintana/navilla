@@ -204,6 +204,86 @@ class ConnectionControllerTest {
   }
 
   @Nested
+  @DisplayName("GET /api/connections/confirmed")
+  class GetConfirmedConnectionsTests {
+
+    @Test
+    @DisplayName("should return paginated confirmed connections")
+    void shouldReturnPaginatedConfirmedConnections() throws Exception {
+      // Create a confirmed connection
+      Connection connection = Connection.builder()
+          .requesterHash(encryptionService.hashEmail(USER_A_EMAIL))
+          .recipientHash(encryptionService.hashEmail(USER_B_EMAIL))
+          .status(ConnectionStatus.CONFIRMED)
+          .build();
+      connectionRepository.save(connection);
+
+      mockMvc.perform(get("/api/connections/confirmed")
+              .param("page", "0")
+              .param("size", "10")
+              .with(jwt().jwt(builder -> builder
+                  .subject(USER_A_SUPABASE_ID.toString())
+                  .claim("email", USER_A_EMAIL))))
+          .andExpect(status().isOk())
+          .andExpect(jsonPath("$.content", hasSize(1)))
+          .andExpect(jsonPath("$.content[0].status").value("CONFIRMED"))
+          .andExpect(jsonPath("$.totalElements").value(1))
+          .andExpect(jsonPath("$.totalPages").value(1))
+          .andExpect(jsonPath("$.number").value(0))
+          .andExpect(jsonPath("$.size").value(10));
+    }
+
+    @Test
+    @DisplayName("should return empty page when no confirmed connections")
+    void shouldReturnEmptyPageWhenNoConfirmedConnections() throws Exception {
+      mockMvc.perform(get("/api/connections/confirmed")
+              .param("page", "0")
+              .param("size", "10")
+              .with(jwt().jwt(builder -> builder
+                  .subject(USER_A_SUPABASE_ID.toString())
+                  .claim("email", USER_A_EMAIL))))
+          .andExpect(status().isOk())
+          .andExpect(jsonPath("$.content", hasSize(0)))
+          .andExpect(jsonPath("$.totalElements").value(0));
+    }
+
+    @Test
+    @DisplayName("should use default pagination when no params provided")
+    void shouldUseDefaultPaginationWhenNoParams() throws Exception {
+      mockMvc.perform(get("/api/connections/confirmed")
+              .with(jwt().jwt(builder -> builder
+                  .subject(USER_A_SUPABASE_ID.toString())
+                  .claim("email", USER_A_EMAIL))))
+          .andExpect(status().isOk())
+          .andExpect(jsonPath("$.content").isArray())
+          .andExpect(jsonPath("$.number").value(0))
+          .andExpect(jsonPath("$.size").value(10));
+    }
+
+    @Test
+    @DisplayName("should not include pending connections in confirmed results")
+    void shouldNotIncludePendingInConfirmedResults() throws Exception {
+      // Create a pending connection (should NOT appear)
+      Connection pending = Connection.builder()
+          .requesterHash(encryptionService.hashEmail(USER_A_EMAIL))
+          .recipientHash(encryptionService.hashEmail(USER_B_EMAIL))
+          .status(ConnectionStatus.PENDING)
+          .build();
+      connectionRepository.save(pending);
+
+      mockMvc.perform(get("/api/connections/confirmed")
+              .param("page", "0")
+              .param("size", "10")
+              .with(jwt().jwt(builder -> builder
+                  .subject(USER_A_SUPABASE_ID.toString())
+                  .claim("email", USER_A_EMAIL))))
+          .andExpect(status().isOk())
+          .andExpect(jsonPath("$.content", hasSize(0)))
+          .andExpect(jsonPath("$.totalElements").value(0));
+    }
+  }
+
+  @Nested
   @DisplayName("GET /api/connections/stats")
   class GetStatsTests {
 
