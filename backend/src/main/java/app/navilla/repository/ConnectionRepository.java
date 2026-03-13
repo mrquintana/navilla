@@ -22,6 +22,8 @@ import java.util.UUID;
 
 import app.navilla.entity.Connection;
 import app.navilla.entity.ConnectionStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -57,6 +59,17 @@ public interface ConnectionRepository extends JpaRepository<Connection, UUID> {
   @Query("SELECT c FROM Connection c WHERE (c.requesterHash = :userHash OR c.recipientHash = :userHash) "
       + "AND c.status = 'CONFIRMED'")
   List<Connection> findConfirmedByUserHash(@Param("userHash") String userHash);
+
+  /**
+   * Finds confirmed connections for a user with pagination.
+   *
+   * @param userHash the user's hashed identifier
+   * @param pageable pagination parameters
+   * @return page of confirmed connections
+   */
+  @Query("SELECT c FROM Connection c WHERE (c.requesterHash = :userHash OR c.recipientHash = :userHash) "
+      + "AND c.status = 'CONFIRMED' ORDER BY c.confirmedAt DESC")
+  Page<Connection> findConfirmedByUserHashPaged(@Param("userHash") String userHash, Pageable pageable);
 
   /**
    * Finds pending connection requests received by a user.
