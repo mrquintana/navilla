@@ -45,7 +45,7 @@ export function NetworkHealthSection({ data }: Props) {
   return (
     <div className="space-y-4">
       {/* Testing Activity */}
-      <div className="card p-4" style={{ background: 'white' }}>
+      <div className="card card-elevated p-4">
         <div className="flex items-center gap-3 mb-3">
           <Activity className="w-5 h-5" style={{ color: 'var(--color-primary)' }} aria-hidden="true" />
           <h3 className="text-sm font-semibold uppercase tracking-wider" style={{ color: 'var(--color-muted)' }}>
@@ -86,7 +86,7 @@ export function NetworkHealthSection({ data }: Props) {
       </div>
 
       {/* Network Coverage */}
-      <div className="card p-4" style={{ background: 'white' }}>
+      <div className="card card-elevated p-4">
         <div className="flex items-center gap-3 mb-3">
           <Users className="w-5 h-5" style={{ color: 'var(--color-primary)' }} aria-hidden="true" />
           <h3 className="text-sm font-semibold uppercase tracking-wider" style={{ color: 'var(--color-muted)' }}>
@@ -107,47 +107,63 @@ export function NetworkHealthSection({ data }: Props) {
             <p>{t('networkHealth.coverageHelpBody')}</p>
           </div>
         )}
-        <div className="space-y-2 text-sm">
-          <div className="flex items-center justify-between">
-            <span className="text-muted">{t('networkHealth.directConnections')}</span>
-            <span className="font-semibold" style={{ color: 'var(--color-foreground)' }}>
+        <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
+          <div>
+            <span className="font-semibold text-lg" style={{ color: 'var(--color-foreground)' }}>
               {data.connectionCount}
             </span>
+            <span className="text-muted ml-1.5">{t('networkHealth.directConnections')}</span>
           </div>
-          <div className="flex items-center justify-between">
-            <span className="text-muted">{t('networkHealth.extendedConnections')}</span>
-            <span className="font-semibold" style={{ color: 'var(--color-foreground)' }}>
+          <div>
+            <span className="font-semibold text-lg" style={{ color: 'var(--color-foreground)' }}>
               {extendedCount}
             </span>
+            <span className="text-muted ml-1.5">{t('networkHealth.extendedConnections')}</span>
           </div>
-          {data.totalNetworkSize != null && (
-            <p className="text-xs text-muted pt-1">
-              {t('networkHealth.uniquePeople', {
-                count: data.totalNetworkSize,
-                degrees: data.maxDepth,
-              })}
-            </p>
-          )}
         </div>
+        {data.totalNetworkSize != null && (
+          <p className="text-xs text-muted mt-2">
+            {t('networkHealth.uniquePeople', {
+              count: data.totalNetworkSize,
+              degrees: data.maxDepth,
+            })}
+          </p>
+        )}
       </div>
 
       {/* Exposure Summary */}
-      <div className="card p-4" style={{ background: 'white' }}>
+      <div className="card card-elevated p-4">
         <div className="flex items-center gap-3 mb-3">
           <Shield className="w-5 h-5" style={{ color: 'var(--color-primary)' }} aria-hidden="true" />
           <h3 className="text-sm font-semibold uppercase tracking-wider" style={{ color: 'var(--color-muted)' }}>
             {t('networkHealth.exposureSummary')}
           </h3>
         </div>
-        <div className="space-y-1 text-sm">
+        <div className="space-y-2 text-sm">
           {data.activeExposureCount > 0 ? (
-            <p style={{ color: 'var(--color-warning)' }}>
+            <div
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium"
+              style={{ color: '#92400e', background: 'rgba(227, 160, 8, 0.12)' }}
+            >
+              <span
+                className="w-2 h-2 rounded-full flex-shrink-0"
+                style={{ background: 'var(--color-warning)' }}
+                aria-hidden="true"
+              />
               {t('networkHealth.activeConditions', { count: data.activeExposureCount })}
-            </p>
+            </div>
           ) : (
-            <p style={{ color: 'var(--color-success)' }}>
+            <div
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium"
+              style={{ color: '#166534', background: 'rgba(22, 163, 74, 0.1)' }}
+            >
+              <span
+                className="w-2 h-2 rounded-full flex-shrink-0"
+                style={{ background: 'var(--color-success)' }}
+                aria-hidden="true"
+              />
               {t('networkHealth.noActiveExposures')}
-            </p>
+            </div>
           )}
           {data.recentlyResolvedCount > 0 && (
             <p className="text-muted text-xs">

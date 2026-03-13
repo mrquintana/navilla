@@ -1050,6 +1050,7 @@
     "coldStartMessage": "Tu cielo te espera. Agrega tu primera conexión para iluminarlo.",
     "coldStartLink": "Agregar una conexión",
     "constellationHelpTitle": "¿Qué es una constelación?",
+    "constellation": "Constelación",
     "constellationHelpBody": "Tus conexiones visualizadas como estrellas. Más conexiones crean una constelación más grande. Etapas: Cielo Vacío, Chispa, Cúmulo, Constelación, Galaxia, Supercúmulo."
   },
   "labVerification": {
@@ -1162,8 +1163,8 @@
     "extendedConnections": "conexiones extendidas",
     "uniquePeople": "~{{count}} personas únicas en {{degrees}} grados",
     "exposureSummary": "Resumen de Exposición",
-    "activeConditions": "{{count}} condición activa en tu red",
-    "activeConditions_plural": "{{count}} condiciones activas en tu red",
+    "activeConditions_one": "{{count}} condición activa en tu red",
+    "activeConditions_other": "{{count}} condiciones activas en tu red",
     "resolvedRecently": "{{count}} resueltas en los últimos 30 días",
     "noActiveExposures": "Sin exposiciones activas en tu red",
     "compactSummary": "{{connections}} conexiones · {{network}} en la red",
