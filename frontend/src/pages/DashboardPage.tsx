@@ -247,12 +247,7 @@ export function DashboardPage() {
             {/* Exposure items */}
             {(exposureQuery.data?.exposures?.length ?? 0) > 0 && (
               <div className="mt-3 space-y-2 text-sm">
-                <div className="flex items-center justify-between gap-3">
-                  <p className="text-xs text-muted">{t('dashboard.exposureSummary')}</p>
-                  <Link to="/health-log" className="text-[11px] font-semibold tracking-wide uppercase text-primary">
-                    {t('dashboard.exposureSummaryMore')}
-                  </Link>
-                </div>
+                <p className="text-xs text-muted">{t('dashboard.exposureSummary')}</p>
                 <p className="text-[11px] text-muted">
                   {t('dashboard.exposureSummaryPreview', {
                     shown: Math.min(3, exposureQuery.data?.exposures?.length ?? 0),
