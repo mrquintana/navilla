@@ -120,6 +120,23 @@
 
 ---
 
+## Session Notes (2026-03-12 continued — Polish Fixes + Connections Pagination)
+
+### What was done
+- **Network page health cards**: Upgraded from plain white to `card-elevated` (indigo gradient overlay), matching constellation card
+- **Missing locale**: Added `network.constellation` key in both en_US and es_MX
+- **Pluralization fix**: Renamed `activeConditions_plural` → `activeConditions_one`/`activeConditions_other` (i18next v25 format)
+- **Exposure summary readability**: Replaced yellow text on white with amber badge (dark text + tinted background)
+- **Network coverage layout**: Changed from spread-out `justify-between` to compact number-first format
+- **Dashboard cleanup**: Removed useless "You reported a positive status" self-status badge — card now purely shows network exposure data
+- **Dashboard duplicate link**: Removed redundant "More" link (same destination as "View Health Status")
+- **Connections pagination**: Server-side pagination for confirmed connections (page size 10)
+  - Backend: `findConfirmedByUserHashPaged` repo query, `getConfirmedConnectionsPaged` service method, controller accepts `?page=0&size=10&search=`
+  - Frontend: `PageResponse<T>` type, paginated React Query, page controls footer, search resets to page 1
+- **Tests**: 476 backend (+5 new pagination tests), frontend lint clean
+
+---
+
 ## Next Steps
 
 | Priority | Item | Notes |
