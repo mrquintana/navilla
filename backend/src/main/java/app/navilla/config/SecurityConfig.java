@@ -171,6 +171,22 @@ public class SecurityConfig {
   }
 
   /**
+   * Registers the rate limiting filter for API endpoints.
+   *
+   * @param rateLimitProperties the rate limit configuration
+   * @return filter registration bean for the rate limit filter
+   */
+  @Bean
+  public FilterRegistrationBean<RateLimitFilter> rateLimitFilterRegistration(
+      RateLimitProperties rateLimitProperties) {
+    FilterRegistrationBean<RateLimitFilter> registration =
+        new FilterRegistrationBean<>(new RateLimitFilter(rateLimitProperties));
+    registration.setOrder(10);
+    registration.addUrlPatterns("/api/*");
+    return registration;
+  }
+
+  /**
    * Registers a CORS filter early in the chain to ensure preflight requests
    * receive CORS headers before security filters run.
    *

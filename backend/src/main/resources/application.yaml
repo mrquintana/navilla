@@ -98,6 +98,7 @@ logging:
 # Application-specific Configuration
 navilla:
   rate-limit:
+    enabled: true
     write-per-minute: 30
     read-per-minute: 120
     sensitive-per-minute: 10

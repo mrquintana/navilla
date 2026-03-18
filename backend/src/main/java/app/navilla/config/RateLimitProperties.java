@@ -5,6 +5,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 /**
  * Configuration properties for API rate limiting.
  *
+ * @param enabled whether rate limiting is active
  * @param writePerMinute max write requests per user per minute
  * @param readPerMinute max read requests per user per minute
  * @param sensitivePerMinute max sensitive endpoint requests per user per minute
@@ -12,6 +13,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  */
 @ConfigurationProperties(prefix = "navilla.rate-limit")
 public record RateLimitProperties(
+    boolean enabled,
     int writePerMinute,
     int readPerMinute,
     int sensitivePerMinute,

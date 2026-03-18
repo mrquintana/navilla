@@ -53,6 +53,9 @@ navilla:
     batch-hour: 18
     random-delay-hours: 6
 
+  rate-limit:
+    enabled: false
+
   push:
     vapid-public-key: test-vapid-public-key
     vapid-private-key: test-vapid-private-key
