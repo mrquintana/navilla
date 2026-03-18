@@ -16,6 +16,7 @@
 
 package app.navilla.dto;
 
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 /**
@@ -30,7 +31,9 @@ import jakarta.validation.constraints.Size;
  * @param vaccinationRemindersEnabled whether vaccination reminders are enabled
  */
 public record UpdateReminderSettingsRequest(
+    @Size(max = 5) @Pattern(regexp = "^\\d{2}:\\d{2}$", message = "Must be in HH:mm format")
     String quietHoursStart,
+    @Size(max = 5) @Pattern(regexp = "^\\d{2}:\\d{2}$", message = "Must be in HH:mm format")
     String quietHoursEnd,
     Boolean emailDigestEnabled,
     @Size(max = 12) String emailDigestDay,
