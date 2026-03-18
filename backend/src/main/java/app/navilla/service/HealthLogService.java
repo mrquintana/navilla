@@ -23,7 +23,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import app.navilla.dto.ConditionHistoryResponse;
 import app.navilla.dto.ConditionSummary;
@@ -279,6 +282,8 @@ public class HealthLogService {
     String userHash = hashEmail(jwt);
 
     List<TestVisit> visits = testVisitRepository.findByUserHashOrderByTestDateDesc(userHash);
+    Map<UUID, TestVisit> visitById = visits.stream()
+        .collect(Collectors.toMap(TestVisit::getId, Function.identity()));
     List<TestResult> allResults = testResultRepository.findAllByUserHash(userHash);
 
     // daysSinceLastTest: -1 if never tested
@@ -334,11 +339,8 @@ public class HealthLogService {
           : null;
 
       // Lookup test date from the visit for the latest result
-      LocalDate lastTestDate = null;
-      Optional<TestVisit> visitOpt = testVisitRepository.findById(latest.getVisitId());
-      if (visitOpt.isPresent()) {
-        lastTestDate = visitOpt.get().getTestDate();
-      }
+      TestVisit latestVisit = visitById.get(latest.getVisitId());
+      LocalDate lastTestDate = latestVisit != null ? latestVisit.getTestDate() : null;
 
       int totalTests = groupResults.size();
       boolean hasPositive = groupResults.stream()
@@ -353,9 +355,9 @@ public class HealthLogService {
     int conditionsCovered = (int) allResults.stream()
         .filter(r -> r.getConditionType() != null)
         .filter(r -> {
-          Optional<TestVisit> resultVisit = testVisitRepository.findById(r.getVisitId());
-          return resultVisit.isPresent()
-              && resultVisit.get().getTestDate().getYear() == currentYear;
+          TestVisit resultVisit = visitById.get(r.getVisitId());
+          return resultVisit != null
+              && resultVisit.getTestDate().getYear() == currentYear;
         })
         .map(TestResult::getConditionType)
         .distinct()
@@ -392,10 +394,21 @@ public class HealthLogService {
           normalizedType, null, 0, null, List.of());
     }
 
+    // Batch-fetch all visits and labs to avoid N+1 queries
+    Set<UUID> visitIds = results.stream()
+        .map(TestResult::getVisitId).collect(Collectors.toSet());
+    Map<UUID, TestVisit> historyVisitMap = testVisitRepository.findAllById(visitIds).stream()
+        .collect(Collectors.toMap(TestVisit::getId, Function.identity()));
+
+    Set<UUID> labIds = historyVisitMap.values().stream()
+        .map(TestVisit::getLabId).filter(id -> id != null).collect(Collectors.toSet());
+    Map<UUID, Lab> labMap = labIds.isEmpty() ? Map.of()
+        : labRepository.findAllById(labIds).stream()
+            .collect(Collectors.toMap(Lab::getId, Function.identity()));
+
     List<ConditionHistoryResponse.HistoryEntry> entries = new ArrayList<>();
     for (TestResult result : results) {
-      Optional<TestVisit> visitOpt = testVisitRepository.findById(result.getVisitId());
-      TestVisit visit = visitOpt.orElse(null);
+      TestVisit visit = historyVisitMap.get(result.getVisitId());
 
       LocalDate testDate = visit != null ? visit.getTestDate() : null;
       boolean verified = visit != null && Boolean.TRUE.equals(visit.getVerified());
@@ -403,9 +416,8 @@ public class HealthLogService {
       String labName = null;
       String labProvider = null;
       if (visit != null && visit.getLabId() != null) {
-        Optional<Lab> labOpt = labRepository.findById(visit.getLabId());
-        if (labOpt.isPresent()) {
-          Lab lab = labOpt.get();
+        Lab lab = labMap.get(visit.getLabId());
+        if (lab != null) {
           labName = encryptionService.decryptFromBytes(lab.getNameEncrypted());
           labProvider = lab.getProvider();
         }

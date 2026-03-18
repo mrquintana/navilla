@@ -26,8 +26,10 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import app.navilla.dto.InsightsResponse;
 import app.navilla.dto.InsightsResponse.ActivitySummary;
@@ -196,6 +198,8 @@ public class InsightsService {
   private TestingSummary buildTestingSummary(String userHash) {
     List<TestVisit> visits =
         testVisitRepository.findByUserHashOrderByTestDateDesc(userHash);
+    Map<UUID, TestVisit> visitById = visits.stream()
+        .collect(Collectors.toMap(TestVisit::getId, Function.identity()));
     List<TestResult> allResults =
         testResultRepository.findAllByUserHash(userHash);
 
@@ -231,8 +235,8 @@ public class InsightsService {
       }
 
       // Track coverage this year
-      Optional<TestVisit> visit = testVisitRepository.findById(result.getVisitId());
-      if (visit.isPresent() && visit.get().getTestDate().getYear() == currentYear) {
+      TestVisit visit = visitById.get(result.getVisitId());
+      if (visit != null && visit.getTestDate().getYear() == currentYear) {
         coveredThisYear.add(result.getConditionType());
       }
     }

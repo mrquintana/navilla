@@ -768,7 +768,6 @@ class HealthLogServiceTest {
           .thenReturn(List.of(visit));
       when(testResultRepository.findAllByUserHash(USER_HASH))
           .thenReturn(List.of(hivResult, syphilisResult, chlamydiaResult));
-      when(testVisitRepository.findById(visitId)).thenReturn(Optional.of(visit));
 
       HealthLogSummaryResponse response = healthLogService.getSummary(jwt);
 
@@ -802,8 +801,6 @@ class HealthLogServiceTest {
           .thenReturn(List.of(newerVisit, olderVisit));
       when(testResultRepository.findAllByUserHash(USER_HASH))
           .thenReturn(List.of(newerHiv, olderHiv));
-      when(testVisitRepository.findById(newerVisitId)).thenReturn(Optional.of(newerVisit));
-      when(testVisitRepository.findById(olderVisitId)).thenReturn(Optional.of(olderVisit));
 
       HealthLogSummaryResponse response = healthLogService.getSummary(jwt);
 
@@ -844,7 +841,6 @@ class HealthLogServiceTest {
           .thenReturn(List.of(visit));
       when(testResultRepository.findAllByUserHash(USER_HASH))
           .thenReturn(List.of(customResult));
-      when(testVisitRepository.findById(visitId)).thenReturn(Optional.of(visit));
       when(encryptionService.decryptFromBytes(ENCRYPTED_CUSTOM_CONDITION)).thenReturn("Mycoplasma");
 
       HealthLogSummaryResponse response = healthLogService.getSummary(jwt);
@@ -903,9 +899,7 @@ class HealthLogServiceTest {
 
       when(testResultRepository.findByUserAndCondition(USER_HASH, "HIV"))
           .thenReturn(List.of(r1, r2, r3));
-      when(testVisitRepository.findById(visitId1)).thenReturn(Optional.of(visit1));
-      when(testVisitRepository.findById(visitId2)).thenReturn(Optional.of(visit2));
-      when(testVisitRepository.findById(visitId3)).thenReturn(Optional.of(visit3));
+      when(testVisitRepository.findAllById(any())).thenReturn(List.of(visit1, visit2, visit3));
 
       ConditionHistoryResponse response = healthLogService.getConditionHistory(jwt, "HIV");
 
@@ -942,8 +936,8 @@ class HealthLogServiceTest {
 
       when(testResultRepository.findByUserAndCondition(USER_HASH, "HIV"))
           .thenReturn(List.of(result));
-      when(testVisitRepository.findById(visitId)).thenReturn(Optional.of(visit));
-      when(labRepository.findById(LAB_ID)).thenReturn(Optional.of(lab));
+      when(testVisitRepository.findAllById(any())).thenReturn(List.of(visit));
+      when(labRepository.findAllById(any())).thenReturn(List.of(lab));
       when(encryptionService.decryptFromBytes(ENCRYPTED_LAB_NAME)).thenReturn("Mi Chopo");
       when(encryptionService.decryptFromBytes(ENCRYPTED_RESULT_VALUE)).thenReturn("non-reactive");
 

@@ -28,7 +28,6 @@ import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import app.navilla.dto.InsightsResponse;
@@ -371,8 +370,6 @@ class InsightsServiceTest {
           .thenReturn(List.of(visit));
       when(testResultRepository.findAllByUserHash(USER_HASH))
           .thenReturn(List.of(hivResult, syphilisResult));
-      when(testVisitRepository.findById(visitId))
-          .thenReturn(Optional.of(visit));
 
       stubPreventionDefaults(jwt);
 
