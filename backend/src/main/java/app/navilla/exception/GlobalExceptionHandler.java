@@ -144,6 +144,24 @@ public class GlobalExceptionHandler {
   }
 
   /**
+   * Handles resource cap exceeded exceptions (409).
+   */
+  @ExceptionHandler(ResourceCapExceededException.class)
+  public ResponseEntity<ApiError> handleResourceCapExceeded(
+      ResourceCapExceededException ex,
+      HttpServletRequest request,
+      Locale locale) {
+
+    String message = messageSource.getMessage(
+        ex.getMessageKey(),
+        new Object[]{ex.getResourceType(), ex.getCap()},
+        ex.getMessageKey(),
+        locale);
+    ApiError error = ApiError.of(409, "Resource Limit Reached", message, request.getRequestURI());
+    return ResponseEntity.status(409).body(error);
+  }
+
+  /**
    * Handles connection conflict exceptions.
    */
   @ExceptionHandler(ConnectionConflictException.class)
