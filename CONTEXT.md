@@ -149,6 +149,7 @@
 - **Mobile Polish**: Touch target fixes in 5 components (UpcomingReminders, NetworkHealthSection, Pagination, LabPicker, TestVisitModal)
 - **E2E Tests**: 4 new spec files (verification cards, journal lifecycle, health log CRUD, reminders/notifications)
 - **Performance**: Bundle 696KB/214KB gzip (no chunk >500KB gzip). All pages lazy-loaded. No large assets. TypeScript pagination type fixes
+- **N+1 Query Fixes**: HealthLogService.getSummary() (2 N+1s → Map lookup), HealthLogService.getConditionHistory() (batch findAllById for visits + labs), InsightsService.buildTestingSummary() (Map lookup)
 - **Tests**: 488 backend (was 476), frontend lint clean
 - **i18n**: Rate limit + resource cap error keys in both en_US and es_MX
 
