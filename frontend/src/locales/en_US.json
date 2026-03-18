@@ -6,6 +6,7 @@
     "rateLimitExceeded": "Too many requests. Please wait a moment and try again.",
     "rateLimitWrite": "You're making changes too quickly. Please slow down.",
     "rateLimitSensitive": "This action is limited for security. Please try again shortly.",
+    "resourceCapExceeded": "You've reached the maximum limit for this resource. Please remove some existing items if you need to add more.",
     "retry": "Retry",
     "cancel": "Cancel",
     "save": "Save",
