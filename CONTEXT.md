@@ -137,10 +137,32 @@
 
 ---
 
+## Session Notes (2026-03-18 — Weeks 15-16: Launch Readiness Sprint)
+
+### What was done
+- **Rate Limiting**: Bucket4j token bucket filter with 3 tiers (write 30/min, read 120/min, sensitive 10/min) + IP fallback (300/min). Retry-After header support in backend + frontend
+- **Resource Caps**: ResourceCapService with 9 configurable per-user limits (journal 10K, partners 500, visits 5K, labs 50, connections 500, templates 10, cards 20, reminders 50, medications 50). Wired into all service create methods
+- **Validation Sweep**: SnoozeReminderRequest upgraded to OffsetDateTime with @Future. Quiet hours @Pattern(HH:mm). Request body 1MB max. Full DTO sweep — all string fields capped across 10 request DTOs
+- **OWASP Review**: Enhanced CSP (font-src, style-src, connect-src, img-src). Referrer-Policy + Permissions-Policy headers. CORS cleanup (removed stale AWS IP). Dead spring.mail config removed. PII log audit — fixed 7 email/username leaks. IDOR audit — all clear
+- **Abuse Detection**: Structured logging for rate limits + resource caps. Grafana/Loki alert documentation
+- **Content Verification**: 4 treatment updates per CDC 2021 guidelines (chlamydia doxycycline first-line, syphilis removed tetracycline, trichomoniasis anatomy-specific dosing, mycoplasma doxycycline-first approach). All 10 STIs verified accurate
+- **Mobile Polish**: Touch target fixes in 5 components (UpcomingReminders, NetworkHealthSection, Pagination, LabPicker, TestVisitModal)
+- **E2E Tests**: 4 new spec files (verification cards, journal lifecycle, health log CRUD, reminders/notifications)
+- **Performance**: Bundle 696KB/214KB gzip (no chunk >500KB gzip). All pages lazy-loaded. No large assets. TypeScript pagination type fixes
+- **Tests**: 488 backend (was 476), frontend lint clean
+- **i18n**: Rate limit + resource cap error keys in both en_US and es_MX
+
+### Key decisions
+- Rate limiting disabled in test context via `enabled` property to avoid interference with controller tests
+- Resource caps share "medications" cap between medications and vaccinations
+- CDC 2021 STI Treatment Guidelines used as authoritative source for content updates
+- Remaining npm audit vulnerabilities (4 high) are all in build-time dependencies (vite/rollup/workbox), not runtime
+
+---
+
 ## Next Steps
 
 | Priority | Item | Notes |
 |----------|------|-------|
-| **Next** | Week 15 | Anonymous notifications + content verification |
-| **Then** | Week 16 | Launch prep + API security hardening |
-| **Then** | Weeks 17-20 | Soft launch + growth |
+| **Next** | Week 17 | Soft launch — LGBTQ+ CDMX |
+| **Then** | Weeks 18-20 | Iterate, content marketing, growth assessment |
