@@ -104,6 +104,17 @@ navilla:
     sensitive-per-minute: 10
     global-per-minute-per-ip: 300
 
+  resource-caps:
+    journal-entries: 10000
+    partners: 500
+    test-visits: 5000
+    labs: 50
+    connections: 500
+    custom-field-templates: 10
+    verification-cards: 20
+    reminders: 50
+    medications: 50
+
   # Supabase Configuration
   supabase:
     url: ${SUPABASE_URL:https://your-project.supabase.co}

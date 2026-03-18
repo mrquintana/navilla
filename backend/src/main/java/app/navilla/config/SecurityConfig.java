@@ -56,7 +56,7 @@ import org.springframework.web.filter.CorsFilter;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
-@EnableConfigurationProperties({CorsProperties.class, RateLimitProperties.class})
+@EnableConfigurationProperties({CorsProperties.class, RateLimitProperties.class, ResourceCapProperties.class})
 public class SecurityConfig {
 
   @Value("${navilla.supabase.url}")
