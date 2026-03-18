@@ -138,7 +138,9 @@ public class GlobalExceptionHandler {
         message,
         request.getRequestURI()
     );
-    return ResponseEntity.status(429).body(error);
+    return ResponseEntity.status(429)
+        .header("Retry-After", String.valueOf(ex.getRetryAfterSeconds()))
+        .body(error);
   }
 
   /**

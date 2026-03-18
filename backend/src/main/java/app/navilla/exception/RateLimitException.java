@@ -27,15 +27,27 @@ package app.navilla.exception;
 public class RateLimitException extends RuntimeException {
 
   private final String messageKey;
+  private final long retryAfterSeconds;
 
   /**
-   * Creates a rate limit exception with an i18n message key.
+   * Creates a rate limit exception with an i18n message key and default retry of 60s.
    *
    * @param messageKey localized message key
    */
   public RateLimitException(String messageKey) {
+    this(messageKey, 60);
+  }
+
+  /**
+   * Creates a rate limit exception with an i18n message key and retry delay.
+   *
+   * @param messageKey localized message key
+   * @param retryAfterSeconds seconds until the client should retry
+   */
+  public RateLimitException(String messageKey, long retryAfterSeconds) {
     super(messageKey);
     this.messageKey = messageKey;
+    this.retryAfterSeconds = retryAfterSeconds;
   }
 
   /**
@@ -45,5 +57,14 @@ public class RateLimitException extends RuntimeException {
    */
   public String getMessageKey() {
     return messageKey;
+  }
+
+  /**
+   * Returns the number of seconds until the client should retry.
+   *
+   * @return retry delay in seconds
+   */
+  public long getRetryAfterSeconds() {
+    return retryAfterSeconds;
   }
 }

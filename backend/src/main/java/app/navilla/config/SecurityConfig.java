@@ -161,7 +161,7 @@ public class SecurityConfig {
         "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
     configuration.setAllowedHeaders(List.of("*"));
     configuration.setExposedHeaders(List.of(
-        "Authorization", "Content-Type", "X-Request-Id"));
+        "Authorization", "Content-Type", "X-Request-Id", "Retry-After"));
     configuration.setAllowCredentials(true);
     configuration.setMaxAge(3600L);
 
