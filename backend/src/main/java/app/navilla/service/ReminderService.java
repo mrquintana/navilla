@@ -113,11 +113,10 @@ public class ReminderService {
 
     verifyOwnership(reminder, userHash);
 
-    OffsetDateTime until = OffsetDateTime.parse(request.until());
-    reminder.setSnoozedUntil(until);
+    reminder.setSnoozedUntil(request.until());
 
     reminderRepository.save(reminder);
-    log.info("Reminder snoozed: {} until {}", id, until);
+    log.info("Reminder snoozed: {} until {}", id, request.until());
 
     return toResponse(reminder);
   }

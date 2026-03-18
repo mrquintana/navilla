@@ -176,7 +176,7 @@ class ReminderControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content("""
                 {
-                  "until": "2026-03-04T09:00:00Z"
+                  "until": "2099-12-31T09:00:00Z"
                 }
                 """))
         .andExpect(status().isOk())

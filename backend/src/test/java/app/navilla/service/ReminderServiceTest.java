@@ -195,8 +195,8 @@ class ReminderServiceTest {
 
       stubDecryption();
 
-      String snoozeUntil = "2026-03-11T09:00:00Z";
-      SnoozeReminderRequest request = new SnoozeReminderRequest(snoozeUntil);
+      SnoozeReminderRequest request = new SnoozeReminderRequest(
+          OffsetDateTime.parse("2026-03-11T09:00:00Z"));
 
       ReminderResponse response = reminderService.snooze(jwt, REMINDER_ID, request);
 
@@ -214,7 +214,8 @@ class ReminderServiceTest {
       Reminder otherReminder = buildReminder(REMINDER_ID, "other_hash", true);
       when(reminderRepository.findById(REMINDER_ID)).thenReturn(Optional.of(otherReminder));
 
-      SnoozeReminderRequest request = new SnoozeReminderRequest("2026-03-11T09:00:00Z");
+      SnoozeReminderRequest request = new SnoozeReminderRequest(
+          OffsetDateTime.parse("2026-03-11T09:00:00Z"));
 
       assertThatThrownBy(() -> reminderService.snooze(jwt, REMINDER_ID, request))
           .isInstanceOf(IllegalStateException.class)

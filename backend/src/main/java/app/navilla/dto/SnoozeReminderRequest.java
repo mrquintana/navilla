@@ -16,13 +16,16 @@
 
 package app.navilla.dto;
 
-import jakarta.validation.constraints.NotBlank;
+import java.time.OffsetDateTime;
+
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * Request DTO for snoozing a reminder.
  *
- * @param until the ISO-8601 datetime to snooze until
+ * @param until the datetime to snooze until (must be in the future)
  */
 public record SnoozeReminderRequest(
-    @NotBlank String until
+    @NotNull @Future OffsetDateTime until
 ) {}
