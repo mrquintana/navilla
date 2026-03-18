@@ -43,6 +43,7 @@ spring:
 # Server Configuration
 server:
   port: ${PORT:8080}
+  forward-headers-strategy: framework
   error:
     include-message: always
     include-binding-errors: always
@@ -96,6 +97,12 @@ logging:
 
 # Application-specific Configuration
 navilla:
+  rate-limit:
+    write-per-minute: 30
+    read-per-minute: 120
+    sensitive-per-minute: 10
+    global-per-minute-per-ip: 300
+
   # Supabase Configuration
   supabase:
     url: ${SUPABASE_URL:https://your-project.supabase.co}
