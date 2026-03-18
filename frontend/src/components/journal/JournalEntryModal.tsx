@@ -87,7 +87,7 @@ export function JournalEntryModal({ isOpen, onClose, entry, onPromote }: Journal
       entry={entry}
       onClose={onClose}
       savedLabels={savedLabels}
-      connections={connectionsQuery.data ?? []}
+      connections={connectionsQuery.data?.content ?? []}
       onPromote={onPromote}
       dateOfBirth={userProfile?.dateOfBirth}
     />

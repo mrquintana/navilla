@@ -160,7 +160,7 @@ export function ConnectionsPage() {
     queryKey: ['connections', 'confirmed', confirmedPage, confirmedSearch],
     queryFn: () => api.connections.confirmed(token, confirmedPage, 10, confirmedSearch || undefined),
     enabled: !!token,
-    placeholderData: (prev: unknown) => prev,
+    placeholderData: (prev) => prev,
   });
 
   const acceptMutation = useMutation({
