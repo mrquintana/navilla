@@ -60,6 +60,7 @@ public class VerificationCardService {
   private final TestVisitRepository testVisitRepository;
   private final LabRepository labRepository;
   private final LabProviderProperties labProviderProperties;
+  private final ResourceCapService resourceCapService;
   private final SecureRandom secureRandom = new SecureRandom();
 
   @Value("${navilla.app.base-url:https://www.navilla.app}")
@@ -77,6 +78,8 @@ public class VerificationCardService {
    */
   @Transactional
   public VerificationCardResponse createCard(String userHash, CreateVerificationCardRequest req) {
+    resourceCapService.checkCap("verificationCards", verificationCardRepository.countByUserHash(userHash));
+
     User user = userRepository.findByEmailHash(userHash)
         .orElseThrow(() -> new IllegalStateException("user.error.notFound"));
 

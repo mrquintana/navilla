@@ -70,6 +70,7 @@ public class EncounterJournalService {
   private final PhoneMatchService phoneMatchService;
   private final ObjectMapper objectMapper;
   private final JournalMetrics journalMetrics;
+  private final ResourceCapService resourceCapService;
 
   /**
    * Lists journal entries for the authenticated user.
@@ -124,6 +125,7 @@ public class EncounterJournalService {
   public JournalEntryResponse createEntry(
       Jwt jwt, CreateJournalEntryRequest request) {
     String userHash = hashEmail(jwt);
+    resourceCapService.checkCap("journalEntries", journalRepository.countByUserHash(userHash));
 
     // When linked to a partner, use the partner's current alias
     byte[] aliasEncrypted = request.partnerId() != null
@@ -303,6 +305,7 @@ public class EncounterJournalService {
   public JournalTemplateResponse saveTemplates(
       Jwt jwt, JournalTemplatesRequest request) {
     String userHash = hashEmail(jwt);
+    resourceCapService.checkCap("customFieldTemplates", request.labels().size());
 
     templateRepository.deleteByUserHash(userHash);
 

@@ -26,6 +26,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface MedicationRepository extends JpaRepository<Medication, UUID> {
 
+  long countByUserHash(String userHash);
+
   List<Medication> findByUserHashOrderByActiveDescCreatedAtDesc(String userHash);
 
   List<Medication> findByUserHashAndActiveTrue(String userHash);

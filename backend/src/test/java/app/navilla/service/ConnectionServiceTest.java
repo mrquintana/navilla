@@ -80,6 +80,9 @@ class ConnectionServiceTest {
   private ConnectionMetrics connectionMetrics;
 
   @Mock
+  private ResourceCapService resourceCapService;
+
+  @Mock
   private Jwt jwt;
 
   @InjectMocks

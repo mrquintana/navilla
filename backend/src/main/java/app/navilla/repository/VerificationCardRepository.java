@@ -31,6 +31,8 @@ import org.springframework.data.repository.query.Param;
  */
 public interface VerificationCardRepository extends JpaRepository<VerificationCard, UUID> {
 
+  long countByUserHash(String userHash);
+
   List<VerificationCard> findByUserHashOrderByCreatedAtDesc(String userHash);
 
   Optional<VerificationCard> findByShareToken(String shareToken);

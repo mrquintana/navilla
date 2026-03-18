@@ -86,6 +86,9 @@ class VerificationCardServiceTest {
   @Mock
   private LabProviderProperties labProviderProperties;
 
+  @Mock
+  private ResourceCapService resourceCapService;
+
   @InjectMocks
   private VerificationCardService verificationCardService;
 

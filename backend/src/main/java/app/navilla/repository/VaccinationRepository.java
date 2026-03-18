@@ -26,6 +26,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface VaccinationRepository extends JpaRepository<Vaccination, UUID> {
 
+  long countByUserHash(String userHash);
+
   List<Vaccination> findByUserHashOrderByVaccineTypeAscDoseNumberAsc(String userHash);
 
   List<Vaccination> findByUserHashAndVaccineType(String userHash, String vaccineType);

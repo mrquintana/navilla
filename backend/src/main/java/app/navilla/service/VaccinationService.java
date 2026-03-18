@@ -64,6 +64,7 @@ public class VaccinationService {
   private final ReminderRepository reminderRepository;
   private final EncryptionService encryptionService;
   private final HealthCatalogProperties catalogProperties;
+  private final ResourceCapService resourceCapService;
 
   /**
    * Records a vaccination dose with encrypted fields and auto-creates a next-dose reminder
@@ -77,6 +78,7 @@ public class VaccinationService {
   @Transactional
   public VaccinationResponse create(Jwt jwt, CreateVaccinationRequest request) {
     String userHash = hashEmail(jwt);
+    resourceCapService.checkCap("medications", vaccinationRepository.countByUserHash(userHash));
 
     // Validate vaccine type against catalog
     Map<String, VaccineSeriesConfig> series = catalogProperties.vaccineSeries();

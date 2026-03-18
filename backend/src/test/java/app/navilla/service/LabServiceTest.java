@@ -69,6 +69,9 @@ class LabServiceTest {
   @Mock
   private EncryptionService encryptionService;
 
+  @Mock
+  private ResourceCapService resourceCapService;
+
   @InjectMocks
   private LabService labService;
 

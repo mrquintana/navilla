@@ -64,6 +64,7 @@ public class JournalPartnerService {
   private final EncryptionService encryptionService;
   private final ObjectMapper objectMapper;
   private final JournalMetrics journalMetrics;
+  private final ResourceCapService resourceCapService;
 
   /**
    * Lists all partners for the authenticated user.
@@ -94,6 +95,7 @@ public class JournalPartnerService {
   public PartnerResponse createPartner(
       Jwt jwt, CreatePartnerRequest request) {
     String userHash = hashEmail(jwt);
+    resourceCapService.checkCap("partners", partnerRepository.countByUserHash(userHash));
 
     JournalPartner partner = JournalPartner.builder()
         .userHash(userHash)

@@ -78,6 +78,9 @@ class JournalPartnerServiceTest {
   private JournalMetrics journalMetrics;
 
   @Mock
+  private ResourceCapService resourceCapService;
+
+  @Mock
   private Jwt jwt;
 
   @InjectMocks

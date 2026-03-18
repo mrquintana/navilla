@@ -88,6 +88,9 @@ class HealthLogServiceTest {
   @Mock
   private ConditionCatalogService conditionCatalogService;
 
+  @Mock
+  private ResourceCapService resourceCapService;
+
   @InjectMocks
   private HealthLogService healthLogService;
 

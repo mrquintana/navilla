@@ -83,6 +83,9 @@ class MedicationServiceTest {
   @Mock
   private HealthCatalogProperties catalogProperties;
 
+  @Mock
+  private ResourceCapService resourceCapService;
+
   @InjectMocks
   private MedicationService medicationService;
 

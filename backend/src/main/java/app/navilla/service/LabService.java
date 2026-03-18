@@ -53,6 +53,7 @@ public class LabService {
   private final LabRepository labRepository;
   private final LabCredentialRepository labCredentialRepository;
   private final EncryptionService encryptionService;
+  private final ResourceCapService resourceCapService;
 
   /**
    * Creates a new lab connection for the authenticated user.
@@ -64,6 +65,7 @@ public class LabService {
   @Transactional
   public LabResponse createLab(Jwt jwt, CreateLabRequest request) {
     String userHash = hashEmail(jwt);
+    resourceCapService.checkCap("labs", labRepository.countByUserHash(userHash));
 
     String provider = request.provider().toUpperCase();
 

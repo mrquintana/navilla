@@ -65,6 +65,7 @@ public class ConnectionService {
   private final EncryptionService encryptionService;
   private final NotificationService notificationService;
   private final ConnectionMetrics connectionMetrics;
+  private final ResourceCapService resourceCapService;
 
   @Value("${navilla.storage.public-base-url}")
   private String storagePublicBaseUrl;
@@ -84,6 +85,7 @@ public class ConnectionService {
   public void createConnection(Jwt jwt, CreateConnectionRequest request) {
     String requesterEmail = jwt.getClaimAsString("email");
     String requesterHash = encryptionService.hashEmail(requesterEmail);
+    resourceCapService.checkCap("connections", connectionRepository.countConfirmedByUserHash(requesterHash));
     String identifier = request.identifier() == null ? "" : request.identifier().trim();
 
     if (identifier.isBlank()) {

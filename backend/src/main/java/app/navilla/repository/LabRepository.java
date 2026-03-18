@@ -26,5 +26,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface LabRepository extends JpaRepository<Lab, UUID> {
 
+  long countByUserHash(String userHash);
+
   List<Lab> findByUserHashOrderByCreatedAtDesc(String userHash);
 }

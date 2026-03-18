@@ -28,5 +28,7 @@ public interface JournalPartnerRepository extends JpaRepository<JournalPartner, 
 
   List<JournalPartner> findByUserHashOrderByUpdatedAtDesc(String userHash);
 
+  long countByUserHash(String userHash);
+
   void deleteByUserHash(String userHash);
 }

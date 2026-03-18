@@ -77,6 +77,7 @@ public class HealthLogService {
   private final HealthStatusRepository healthStatusRepository;
   private final EncryptionService encryptionService;
   private final ConditionCatalogService conditionCatalogService;
+  private final ResourceCapService resourceCapService;
 
   /**
    * Creates a new test visit with results.
@@ -95,6 +96,7 @@ public class HealthLogService {
   })
   public TestVisitResponse createVisit(Jwt jwt, CreateTestVisitRequest request) {
     String userHash = hashEmail(jwt);
+    resourceCapService.checkCap("testVisits", testVisitRepository.countByUserHash(userHash));
 
     TestVisit visit = TestVisit.builder()
         .userHash(userHash)

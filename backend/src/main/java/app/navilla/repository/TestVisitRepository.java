@@ -30,6 +30,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TestVisitRepository extends JpaRepository<TestVisit, UUID> {
 
+  long countByUserHash(String userHash);
+
   List<TestVisit> findByUserHashOrderByTestDateDesc(String userHash);
 
   @Query("SELECT DISTINCT tv.userHash FROM TestVisit tv "

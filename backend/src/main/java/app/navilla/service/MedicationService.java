@@ -70,6 +70,7 @@ public class MedicationService {
   private final ReminderRepository reminderRepository;
   private final EncryptionService encryptionService;
   private final HealthCatalogProperties catalogProperties;
+  private final ResourceCapService resourceCapService;
 
   /**
    * Creates a new medication with encrypted fields and an optional linked reminder.
@@ -82,6 +83,7 @@ public class MedicationService {
   @Transactional
   public MedicationResponse create(Jwt jwt, CreateMedicationRequest request) {
     String userHash = hashEmail(jwt);
+    resourceCapService.checkCap("medications", medicationRepository.countByUserHash(userHash));
 
     // Validate medication type against catalog
     if (!catalogProperties.medicationTypes().containsKey(request.medicationType())) {
