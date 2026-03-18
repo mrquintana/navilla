@@ -57,7 +57,13 @@ export async function apiRequest<T>(
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));
     const message = error.message || `Request failed with status ${response.status}`;
-    throw new ApiError(message, response.status, error);
+    const retryAfter = response.headers.get('Retry-After');
+    throw new ApiError(
+      message,
+      response.status,
+      error,
+      retryAfter ? parseInt(retryAfter, 10) : undefined
+    );
   }
 
   // Handle empty responses (204 No Content)
@@ -156,12 +162,18 @@ function mockUserProfile(user: E2eUser): UserProfile {
 export class ApiError extends Error {
   status: number;
   data?: unknown;
+  retryAfterSeconds?: number;
 
-  constructor(message: string, status: number, data?: unknown) {
+  constructor(message: string, status: number, data?: unknown, retryAfterSeconds?: number) {
     super(message);
     this.name = 'ApiError';
     this.status = status;
     this.data = data;
+    this.retryAfterSeconds = retryAfterSeconds;
+  }
+
+  get isRateLimited(): boolean {
+    return this.status === 429;
   }
 }
 
