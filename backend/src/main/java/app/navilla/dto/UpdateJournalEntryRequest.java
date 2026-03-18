@@ -55,8 +55,8 @@ public record UpdateJournalEntryRequest(
     String phone,
 
     @Size(max = 10, message = "{journal.error.tooManyEncounterTypes}")
-    List<String> encounterTypes,
+    List<@Size(max = 50) String> encounterTypes,
 
     @Size(max = 10, message = "{journal.error.tooManyProtectionMethods}")
-    List<String> protectionMethods
+    List<@Size(max = 50) String> protectionMethods
 ) {}

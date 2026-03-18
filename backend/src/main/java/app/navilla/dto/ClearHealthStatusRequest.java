@@ -17,6 +17,7 @@
 package app.navilla.dto;
 
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 /**
  * Request DTO for clearing a health status.
@@ -24,6 +25,7 @@ import jakarta.validation.constraints.Pattern;
  * @param clearedDate optional cleared date (YYYY-MM-DD)
  */
 public record ClearHealthStatusRequest(
+    @Size(max = 10, message = "{validation.date.invalid}")
     @Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2}$", message = "{validation.date.invalid}")
     String clearedDate
 ) {}

@@ -30,7 +30,7 @@ import jakarta.validation.constraints.Size;
 public record UpdateVaccinationRequest(
     @Size(max = 32) String vaccineType,
     Integer doseNumber,
-    String administeredDate,
+    @Size(max = 10) String administeredDate,
     @Size(max = 200) String location,
     @Size(max = 5000) String notes
 ) {}

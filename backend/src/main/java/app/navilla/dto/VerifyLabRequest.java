@@ -33,8 +33,8 @@ import jakarta.validation.constraints.Size;
 public record VerifyLabRequest(
     UUID visitId,
     @NotBlank @Size(max = 50) String labCode,
-    @NotNull Map<String, String> visitCredentials,
-    Map<String, String> labCredentials,
+    @NotNull @Size(max = 10) Map<String, String> visitCredentials,
+    @Size(max = 10) Map<String, String> labCredentials,
     @Size(max = 10) @Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2}$", message = "must be yyyy-MM-dd")
     String testDate) {
 

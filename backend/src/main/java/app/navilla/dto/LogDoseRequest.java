@@ -27,7 +27,7 @@ import jakarta.validation.constraints.Size;
  * @param notes optional notes (will be encrypted)
  */
 public record LogDoseRequest(
-    @NotBlank String scheduledFor,
+    @NotBlank @Size(max = 10) String scheduledFor,
     boolean taken,
     @Size(max = 5000) String notes
 ) {}

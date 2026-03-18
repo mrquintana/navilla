@@ -35,9 +35,9 @@ public record CreateMedicationRequest(
     @NotBlank @Size(max = 32) String medicationType,
     @NotBlank @Size(max = 200) String name,
     @Size(max = 200) String dosage,
-    @NotBlank String startDate,
-    String endDate,
+    @NotBlank @Size(max = 10) String startDate,
+    @Size(max = 10) String endDate,
     @NotBlank @Size(max = 32) String frequency,
-    String reminderTime,
+    @Size(max = 5) String reminderTime,
     @Size(max = 5000) String notes
 ) {}

@@ -33,7 +33,7 @@ public record UpdateVerificationCardRequest(
     @Size(max = 50, message = "verification.error.tooManyConditions")
     List<@Size(max = 50) String> includedConditions,
     Boolean showVerificationLevel,
-    String privacyMode,
+    @Size(max = 50, message = "verification.error.privacyModeTooLong") String privacyMode,
     Integer maxViews,
     OffsetDateTime expiresAt
 ) {}

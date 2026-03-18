@@ -35,10 +35,10 @@ public record UpdateMedicationRequest(
     @Size(max = 32) String medicationType,
     @Size(max = 200) String name,
     @Size(max = 200) String dosage,
-    String startDate,
-    String endDate,
+    @Size(max = 10) String startDate,
+    @Size(max = 10) String endDate,
     @Size(max = 32) String frequency,
-    String reminderTime,
+    @Size(max = 5) String reminderTime,
     @Size(max = 5000) String notes,
     Boolean active
 ) {}
