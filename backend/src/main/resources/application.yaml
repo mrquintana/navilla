@@ -35,6 +35,11 @@ spring:
           issuer-uri: ${SUPABASE_URL:https://your-project.supabase.co}/auth/v1
           jwk-set-uri: ${SUPABASE_URL:https://your-project.supabase.co}/auth/v1/.well-known/jwks.json
 
+  servlet:
+    multipart:
+      max-file-size: 1MB
+      max-request-size: 1MB
+
   # Email Configuration (SendGrid HTTP API — SMTP ports blocked on Railway)
   mail:
     host: ${SMTP_HOST:localhost}
@@ -44,6 +49,8 @@ spring:
 server:
   port: ${PORT:8080}
   forward-headers-strategy: framework
+  tomcat:
+    max-http-form-post-size: 1048576
   error:
     include-message: always
     include-binding-errors: always
