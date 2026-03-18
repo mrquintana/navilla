@@ -86,17 +86,17 @@ public class EmailService {
   public void sendTemplatedEmail(String to, String subject, String templateName,
                                   Map<String, Object> variables, Locale locale) {
     if (!emailProperties.enabled()) {
-      log.debug("Email disabled, skipping send to {} (template: {})", to, templateName);
+      log.debug("Email disabled, skipping send (template: {})", templateName);
       return;
     }
 
     try {
       String htmlContent = emailTemplateService.render(templateName, variables, locale);
       sendViaHttpApi(to, subject, htmlContent);
-      log.info("Email sent to {} (template: {})", to, templateName);
+      log.info("Email sent (template: {})", templateName);
     } catch (Exception ex) {
-      log.error("Failed to send email to {} (template: {}): {}",
-          to, templateName, ex.getMessage(), ex);
+      log.error("Failed to send email (template: {}): {}",
+          templateName, ex.getMessage(), ex);
     }
   }
 
@@ -106,7 +106,7 @@ public class EmailService {
   void sendViaHttpApi(String to, String subject, String htmlContent) throws Exception {
     String apiKey = emailProperties.sendgridApiKey();
     if (apiKey == null || apiKey.isBlank()) {
-      log.warn("SendGrid API key not configured, skipping email to {}", to);
+      log.warn("SendGrid API key not configured, skipping email");
       return;
     }
 
@@ -140,10 +140,10 @@ public class EmailService {
         HttpResponse.BodyHandlers.ofString());
 
     if (response.statusCode() >= 200 && response.statusCode() < 300) {
-      log.debug("SendGrid accepted email to {} (HTTP {})", to, response.statusCode());
+      log.debug("SendGrid accepted email (HTTP {})", response.statusCode());
     } else {
-      log.error("SendGrid rejected email to {} (HTTP {}): {}",
-          to, response.statusCode(), response.body());
+      log.error("SendGrid rejected email (HTTP {}): {}",
+          response.statusCode(), response.body());
       throw new RuntimeException("SendGrid HTTP " + response.statusCode()
           + ": " + response.body());
     }

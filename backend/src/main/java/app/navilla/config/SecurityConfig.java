@@ -37,6 +37,7 @@ import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -114,11 +115,21 @@ public class SecurityConfig {
             .jwt(jwt -> jwt.decoder(jwtDecoder())))
         .headers(headers -> headers
             .contentSecurityPolicy(csp ->
-                csp.policyDirectives("default-src 'self'"))
+                csp.policyDirectives(
+                    "default-src 'self'; "
+                    + "font-src 'self' fonts.gstatic.com; "
+                    + "style-src 'self' 'unsafe-inline' fonts.googleapis.com; "
+                    + "connect-src 'self' *.supabase.co; "
+                    + "img-src 'self' data: blob:"))
             .frameOptions(HeadersConfigurer.FrameOptionsConfig::deny)
             .contentTypeOptions(content -> {})
             .httpStrictTransportSecurity(hsts ->
-                hsts.includeSubDomains(true).maxAgeInSeconds(31536000)))
+                hsts.includeSubDomains(true).maxAgeInSeconds(31536000))
+            .referrerPolicy(referrer ->
+                referrer.policy(ReferrerPolicyHeaderWriter.ReferrerPolicy
+                    .STRICT_ORIGIN_WHEN_CROSS_ORIGIN))
+            .permissionsPolicy(permissions ->
+                permissions.policy("camera=(), microphone=(), geolocation=()")))
         .build();
   }
 

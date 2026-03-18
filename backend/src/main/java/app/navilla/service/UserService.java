@@ -364,7 +364,7 @@ public class UserService {
         user.setUsername(normalized);
         user.setUsernameHash(encryptionService.hashUsername(normalized));
       } else {
-        log.warn("Username from metadata already taken: {}", normalized);
+        log.warn("Username from metadata already taken");
       }
     }
 

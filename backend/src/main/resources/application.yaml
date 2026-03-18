@@ -40,11 +40,6 @@ spring:
       max-file-size: 1MB
       max-request-size: 1MB
 
-  # Email Configuration (SendGrid HTTP API — SMTP ports blocked on Railway)
-  mail:
-    host: ${SMTP_HOST:localhost}
-    port: ${SMTP_PORT:25}
-
 # Server Configuration
 server:
   port: ${PORT:8080}
@@ -257,7 +252,6 @@ navilla:
     allowed-origins:
       - http://localhost:5173
       - http://localhost:3000
-      - http://54.159.90.88
       - https://navilla.app
       - https://www.navilla.app
       - https://navilla-production.up.railway.app
