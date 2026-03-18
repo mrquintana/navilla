@@ -774,7 +774,7 @@ function ManualEntryForm({ editVisit, onClose, conditionCodes, onBack }: ManualE
                       />
                       <button
                         type="button"
-                        className="btn btn-secondary btn-sm flex-shrink-0 p-1.5"
+                        className="btn btn-secondary btn-sm flex-shrink-0 p-2"
                         onClick={() => removeCustomRow(index)}
                         aria-label={t('common.delete')}
                       >

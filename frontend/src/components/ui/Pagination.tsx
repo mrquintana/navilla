@@ -39,7 +39,7 @@ export function Pagination({ currentPage, totalPages, totalElements, pageSize, o
       <div className="flex items-center gap-1">
         <button
           type="button"
-          className="btn btn-secondary btn-sm p-1.5"
+          className="btn btn-secondary btn-sm p-2"
           disabled={currentPage === 0}
           onClick={() => onPageChange(currentPage - 1)}
           aria-label={t('journal.prevPage')}
@@ -76,7 +76,7 @@ export function Pagination({ currentPage, totalPages, totalElements, pageSize, o
 
         <button
           type="button"
-          className="btn btn-secondary btn-sm p-1.5"
+          className="btn btn-secondary btn-sm p-2"
           disabled={currentPage >= totalPages - 1}
           onClick={() => onPageChange(currentPage + 1)}
           aria-label={t('journal.nextPage')}

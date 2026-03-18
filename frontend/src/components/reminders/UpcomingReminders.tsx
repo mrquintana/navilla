@@ -96,7 +96,7 @@ function ReminderCard({ reminder }: ReminderCardProps) {
           type="button"
           className="btn btn-sm flex-1"
           style={{
-            padding: '0.25rem',
+            padding: '0.5rem',
             color: 'var(--color-success)',
             border: '1px solid var(--color-border)',
             borderRadius: '0.375rem',
@@ -107,13 +107,13 @@ function ReminderCard({ reminder }: ReminderCardProps) {
           title={t('reminders.markDone')}
           aria-label={t('reminders.markDone')}
         >
-          <Check className="w-3.5 h-3.5" aria-hidden="true" />
+          <Check className="w-4 h-4" aria-hidden="true" />
         </button>
         <button
           type="button"
           className="btn btn-sm flex-1"
           style={{
-            padding: '0.25rem',
+            padding: '0.5rem',
             color: 'var(--color-muted)',
             border: '1px solid var(--color-border)',
             borderRadius: '0.375rem',
@@ -124,7 +124,7 @@ function ReminderCard({ reminder }: ReminderCardProps) {
           title={t('reminders.snooze')}
           aria-label={t('reminders.snooze')}
         >
-          <Clock className="w-3.5 h-3.5" aria-hidden="true" />
+          <Clock className="w-4 h-4" aria-hidden="true" />
         </button>
       </div>
     </div>

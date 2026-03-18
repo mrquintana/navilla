@@ -195,7 +195,7 @@ export function LabPicker({ selectedLabId, onSelect, onCreateNew }: LabPickerPro
                     />
                     <button
                       type="button"
-                      className="btn btn-secondary btn-sm flex-shrink-0 p-1.5"
+                      className="btn btn-secondary btn-sm flex-shrink-0 p-2"
                       onClick={() => removeCredential(index)}
                       aria-label={t('common.delete')}
                     >

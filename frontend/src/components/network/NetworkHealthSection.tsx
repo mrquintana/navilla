@@ -53,7 +53,7 @@ export function NetworkHealthSection({ data }: Props) {
           </h3>
           <button
             type="button"
-            className="btn btn-secondary btn-sm p-1"
+            className="btn btn-secondary btn-sm p-2"
             onClick={() => setShowActivityHelp((prev) => !prev)}
             aria-label={t('networkHealth.activityHelpTitle')}
           >
@@ -94,7 +94,7 @@ export function NetworkHealthSection({ data }: Props) {
           </h3>
           <button
             type="button"
-            className="btn btn-secondary btn-sm p-1"
+            className="btn btn-secondary btn-sm p-2"
             onClick={() => setShowCoverageHelp((prev) => !prev)}
             aria-label={t('networkHealth.coverageHelpTitle')}
           >
