@@ -519,6 +519,14 @@ const TEST_VISITS = [
 // ─── Spec ───────────────────────────────────────────────────────────
 
 test.describe.serial('Seed demo data', () => {
+  // Only run against an external URL with real Supabase. The hard-coded
+  // credentials below have no equivalent in the E2E mock set, so this
+  // spec fails on CI's localhost preview.
+  test.skip(
+    !process.env.E2E_BASE_URL?.startsWith('https://'),
+    'seed-data spec requires E2E_BASE_URL pointing at a real environment',
+  );
+
   test.setTimeout(180000); // 3 minutes per test
 
   test('1 — login to dashboard', async ({ page }) => {
