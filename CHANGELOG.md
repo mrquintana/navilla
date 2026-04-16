@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-04-16
+
+First tagged pre-launch release. Closes the launch-readiness audit
+(CRITICAL #1–#5, HIGH #6–#10) and wraps weeks 1–16 of the roadmap.
+
 ### Security
 - Removed `DevTestController`, a temporary endpoint that allowed any
   authenticated user to send arbitrary emails through SendGrid.
