@@ -22,9 +22,11 @@ test.describe('Verification Cards', () => {
 
   test('opens card creation modal', async ({ page }) => {
     await page.goto('/verification-card');
-    await page.getByRole('button', { name: /create|crear|new|nueva/i }).click();
-    // Modal should show condition checkboxes
-    await expect(page.getByText(/conditions|condiciones/i)).toBeVisible();
+    await page.getByRole('button', { name: /create|crear|new|nueva/i }).first().click();
+    // Modal opens — Included Conditions legend is the unique anchor we target
+    await expect(
+      page.getByText(/included conditions|condiciones incluidas/i),
+    ).toBeVisible();
   });
 
   test('public card route renders for invalid token', async ({ page }) => {

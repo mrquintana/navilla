@@ -20,7 +20,9 @@ test.describe('Connections', () => {
   });
 
   test('shows confirmed connections section', async ({ page }) => {
-    await expect(page.getByText(/confirmed/i)).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: /confirmed connections|conexiones confirmadas/i }),
+    ).toBeVisible();
   });
 
   test('shows pending sections', async ({ page }) => {

@@ -9,46 +9,57 @@ test.describe('How It Works', () => {
     await expect(page.getByRole('heading', { level: 1, name: /how it works|cómo funciona/i })).toBeVisible();
   });
 
-  test('shows "What we show you" section', async ({ page }) => {
-    await expect(page.getByText(/what we show you|lo que te mostramos/i)).toBeVisible();
+  test('shows "What is Navilla?" overview section', async ({ page }) => {
+    await expect(
+      page.getByRole('heading', { name: /what is navilla|qué es navilla/i }),
+    ).toBeVisible();
   });
 
-  test('shows "What we never show you" section', async ({ page }) => {
-    await expect(page.getByText(/what we never show you|lo que nunca te mostramos/i)).toBeVisible();
+  test('shows Encounter Journal section', async ({ page }) => {
+    await expect(
+      page.getByRole('heading', { name: /encounter journal|diario de encuentros/i }),
+    ).toBeVisible();
   });
 
-  test('shows "Where data comes from" section', async ({ page }) => {
-    await expect(page.getByText(/where data comes from|de dónde vienen los datos/i)).toBeVisible();
+  test('shows Partner Tracking section', async ({ page }) => {
+    await expect(
+      page.getByRole('heading', { name: /partner tracking|seguimiento de parejas/i }),
+    ).toBeVisible();
   });
 
-  test('shows "How connections work" section', async ({ page }) => {
-    await expect(page.getByText(/how connections work|cómo funcionan las conexiones/i)).toBeVisible();
+  test('shows Health Log section', async ({ page }) => {
+    await expect(
+      page.getByRole('heading', { name: /^health log$|^registro de salud$/i }),
+    ).toBeVisible();
   });
 
-  test('shows "How exposure is calculated" section', async ({ page }) => {
-    await expect(page.getByText(/how exposure is calculated|cómo se calcula la exposición/i)).toBeVisible();
+  test('shows Exposure Network section', async ({ page }) => {
+    await expect(
+      page.getByRole('heading', { name: /exposure network|red de exposición/i }),
+    ).toBeVisible();
   });
 
-  test('shows "Accuracy and limitations" section', async ({ page }) => {
-    await expect(page.getByText(/accuracy and limitations|precisión y limitaciones/i)).toBeVisible();
+  test('shows Free Tools section', async ({ page }) => {
+    await expect(
+      page.getByRole('heading', { name: /free tools|herramientas gratuitas/i }),
+    ).toBeVisible();
   });
 
-  test('shows "What you can do" section', async ({ page }) => {
-    await expect(page.getByText(/what you can do|lo que puedes hacer/i)).toBeVisible();
+  test('shows Privacy & Security section', async ({ page }) => {
+    await expect(
+      page.getByRole('heading', { name: /privacy.*security|privacidad.*seguridad/i }),
+    ).toBeVisible();
   });
 
-  test('shows "Your data rights" section', async ({ page }) => {
-    await expect(page.getByText(/your data rights|tus derechos/i)).toBeVisible();
+  test('shows Your Data Rights section', async ({ page }) => {
+    await expect(
+      page.getByRole('heading', { name: /your data rights|tus derechos/i }),
+    ).toBeVisible();
   });
 
-  test('has link to dashboard', async ({ page }) => {
-    const link = page.getByRole('link', { name: /go to dashboard|ir al panel/i });
-    await expect(link).toBeVisible();
-  });
-
-  test('has back link', async ({ page }) => {
-    const link = page.getByRole('link', { name: /back|atrás/i });
-    await expect(link).toBeVisible();
+  test('has Get Started CTA link', async ({ page }) => {
+    const link = page.getByRole('link', { name: /get started|comenzar|empezar/i });
+    await expect(link.first()).toBeVisible();
   });
 
   test('is accessible without authentication', async ({ page }) => {

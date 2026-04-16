@@ -8,23 +8,36 @@ test.describe('Health Status', () => {
   });
 
   test('renders health status page', async ({ page }) => {
-    await expect(page.getByRole('heading', { name: /health status|estado de salud/i })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { level: 1, name: /my health|mi salud/i }),
+    ).toBeVisible();
   });
 
   test('shows exposure overview section', async ({ page }) => {
-    await expect(page.getByText(/exposure overview|resumen de exposición/i)).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: /exposure overview|resumen de exposición/i }),
+    ).toBeVisible();
   });
 
   test('shows my results section', async ({ page }) => {
-    await expect(page.getByText(/my confirmed results|mis resultados/i)).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: /^my results$|^mis resultados$/i }),
+    ).toBeVisible();
   });
 
-  test('shows add result button', async ({ page }) => {
-    await expect(page.getByRole('button', { name: /add result|agregar resultado/i })).toBeVisible();
+  test('shows log test visit button on tests tab', async ({ page }) => {
+    await page.getByRole('tab', { name: /tests|pruebas/i }).click();
+    await expect(
+      page.getByRole('button', { name: /log test visit|registrar visita/i }).first(),
+    ).toBeVisible();
   });
 
-  test('add result button opens report form', async ({ page }) => {
-    await page.getByRole('button', { name: /add result|agregar resultado/i }).click();
-    await expect(page.getByText(/condition|condición/i)).toBeVisible();
+  test('log test visit button opens visit modal', async ({ page }) => {
+    await page.getByRole('tab', { name: /tests|pruebas/i }).click();
+    await page
+      .getByRole('button', { name: /log test visit|registrar visita/i })
+      .first()
+      .click();
+    await expect(page.locator('input[type="date"], #visit-date').first()).toBeVisible({ timeout: 5000 });
   });
 });

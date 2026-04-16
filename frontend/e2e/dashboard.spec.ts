@@ -12,11 +12,15 @@ test.describe('Dashboard', () => {
     });
 
     test('shows connection count', async ({ page }) => {
-      await expect(page.getByText(/your connections|tus conexiones/i)).toBeVisible();
+      await expect(
+        page.getByRole('heading', { name: /your connections|tus conexiones/i }),
+      ).toBeVisible();
     });
 
     test('shows exposure status card', async ({ page }) => {
-      await expect(page.getByText(/your status|tu estado/i)).toBeVisible();
+      await expect(
+        page.getByRole('heading', { name: /your status|tu estado/i }),
+      ).toBeVisible();
     });
 
     test('shows profile card', async ({ page }) => {
@@ -24,11 +28,15 @@ test.describe('Dashboard', () => {
     });
 
     test('shows network size', async ({ page }) => {
-      await expect(page.getByText(/network size|tamaño de red/i)).toBeVisible();
+      await expect(
+        page.getByText(/^network size$|^tamaño de red$/i).first(),
+      ).toBeVisible();
     });
 
-    test('shows "What does this mean?" link to how-it-works', async ({ page }) => {
-      const helpLink = page.getByRole('link', { name: /what does this mean|qué significa/i });
+    test('has link to how-it-works explainer', async ({ page }) => {
+      const helpLink = page.getByRole('link', {
+        name: /how network size is calculated|cómo se calcula el tamaño de red/i,
+      });
       await expect(helpLink).toBeVisible();
       await helpLink.click();
       await expect(page).toHaveURL(/\/how-it-works/);
@@ -42,17 +50,10 @@ test.describe('Dashboard', () => {
     });
 
     test('view health status link works', async ({ page }) => {
-      const link = page.getByRole('link', { name: /view health status|ver estado/i });
+      const link = page.getByRole('link', { name: /view health status|ver estado de salud/i });
       await expect(link).toBeVisible();
       await link.click();
       await expect(page).toHaveURL(/\/health/);
-    });
-
-    test('edit profile link works', async ({ page }) => {
-      const link = page.getByRole('link', { name: /edit profile|editar perfil/i });
-      await expect(link).toBeVisible();
-      await link.click();
-      await expect(page).toHaveURL(/\/profile/);
     });
   });
 

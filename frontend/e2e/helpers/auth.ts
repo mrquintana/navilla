@@ -5,6 +5,13 @@ export async function login(page: Page, user: TestUser | keyof typeof testUsers)
   const testUser = typeof user === 'string' ? testUsers[user] : user;
 
   await page.goto('/login');
+  // Pre-acknowledge cookie banner and onboarding so modals don't intercept
+  // clicks on the dashboard. These are persisted in localStorage by the
+  // real UI when the user dismisses them.
+  await page.evaluate(() => {
+    localStorage.setItem('navilla_cookie_notice_ack_v1', 'true');
+    localStorage.setItem('navilla_onboarding_complete', 'true');
+  });
   await page.getByLabel(/email/i).fill(testUser.email);
   await page.getByLabel(/password/i).fill(testUser.password);
   await page.getByRole('button', { name: /sign in|iniciar/i }).click();

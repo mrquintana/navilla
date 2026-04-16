@@ -26,17 +26,20 @@ test.describe('Notifications Page', () => {
     );
   });
 
-  test('shows reminder settings section', async ({ page }) => {
+  test('shows filter buttons', async ({ page }) => {
     await page.goto('/notifications');
     await expect(
-      page.getByText(/quiet hours|horas silenciosas|reminder settings|configuración/i).first()
+      page.getByRole('button', { name: /^all$|^todas$/i }).first(),
+    ).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: /^unread$|^no leídas$/i }).first(),
     ).toBeVisible();
   });
 
-  test('shows email digest toggle', async ({ page }) => {
+  test('shows mark all read button', async ({ page }) => {
     await page.goto('/notifications');
     await expect(
-      page.getByText(/email digest|resumen por correo/i).first()
+      page.getByRole('button', { name: /mark all read|marcar todo leído/i }).first(),
     ).toBeVisible();
   });
 });

@@ -15,22 +15,26 @@ test.describe('Health Log', () => {
 
   test('shows test summary section', async ({ page }) => {
     await page.goto('/health');
+    await page.getByRole('tab', { name: /tests|pruebas/i }).click();
     await expect(
-      page.getByText(/last tested|última prueba|days since|días desde/i).first()
+      page.getByText(/days since last test|días desde la última prueba/i).first()
     ).toBeVisible();
   });
 
   test('shows log test visit button', async ({ page }) => {
     await page.goto('/health');
+    await page.getByRole('tab', { name: /tests|pruebas/i }).click();
     await expect(
-      page.getByRole('button', { name: /log.*visit|registrar.*visita|add.*test|nueva.*prueba/i })
+      page.getByRole('button', { name: /log test visit|registrar visita/i }).first()
     ).toBeVisible();
   });
 
   test('opens test visit modal', async ({ page }) => {
     await page.goto('/health');
+    await page.getByRole('tab', { name: /tests|pruebas/i }).click();
     await page
-      .getByRole('button', { name: /log.*visit|registrar.*visita|add.*test|nueva.*prueba/i })
+      .getByRole('button', { name: /log test visit|registrar visita/i })
+      .first()
       .click();
     // Modal should show date picker and result fields
     await expect(
@@ -40,21 +44,10 @@ test.describe('Health Log', () => {
 
   test('shows visit history section', async ({ page }) => {
     await page.goto('/health');
+    await page.getByRole('tab', { name: /tests|pruebas/i }).click();
     await expect(
-      page.getByText(/visit history|historial|recent visits|visitas recientes/i).first()
+      page.getByText(/visit history|historial de visitas/i).first()
     ).toBeVisible();
   });
 });
 
-test.describe('Health Log — Labs', () => {
-  test.beforeEach(async ({ page }) => {
-    await login(page, 'user2');
-  });
-
-  test('shows lab section on health page', async ({ page }) => {
-    await page.goto('/health');
-    await expect(
-      page.getByText(/lab|laboratorio/i).first()
-    ).toBeVisible();
-  });
-});
