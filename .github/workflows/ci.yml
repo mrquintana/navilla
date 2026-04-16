@@ -95,15 +95,12 @@ jobs:
 
       - name: Run linter
         run: npm run lint
-        continue-on-error: true
 
       - name: Run type check
         run: npm run type-check
-        continue-on-error: true
 
       - name: Run tests
         run: npm test -- --run
-        continue-on-error: true
 
       - name: Build
         run: npm run build
