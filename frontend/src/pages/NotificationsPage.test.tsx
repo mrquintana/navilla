@@ -4,6 +4,7 @@ import { NotificationsPage } from './NotificationsPage';
 const useAuthMock = vi.fn();
 const useQueryMock = vi.fn();
 const useMutationMock = vi.fn();
+const markAllReadMutate = vi.fn();
 
 vi.mock('../hooks/useAuth', () => ({
   useAuth: () => useAuthMock(),
@@ -30,15 +31,22 @@ describe('NotificationsPage loading behavior', () => {
     useAuthMock.mockReset();
     useQueryMock.mockReset();
     useMutationMock.mockReset();
+    markAllReadMutate.mockReset();
 
     useAuthMock.mockReturnValue({
       session: { access_token: 'token' },
     });
 
-    useMutationMock.mockReturnValue({
-      mutate: vi.fn(),
-      mutateAsync: vi.fn(),
-      isPending: false,
+    let mutationCallCount = 0;
+    useMutationMock.mockImplementation(() => {
+      mutationCallCount += 1;
+      // The second useMutation call inside NotificationsPage is markAllRead
+      const isMarkAllRead = mutationCallCount === 2;
+      return {
+        mutate: isMarkAllRead ? markAllReadMutate : vi.fn(),
+        mutateAsync: vi.fn(),
+        isPending: false,
+      };
     });
   });
 
@@ -73,5 +81,43 @@ describe('NotificationsPage loading behavior', () => {
     expect(screen.getByText('notifications.title (1)')).toBeInTheDocument();
     expect(screen.getByText('notifications.connectionRequest')).toBeInTheDocument();
     expect(container.querySelectorAll('.skeleton')).toHaveLength(0);
+  });
+
+  it('auto-marks all as read on mount when there are unread items', () => {
+    useQueryMock.mockReturnValue({
+      data: [
+        {
+          id: 'n1',
+          type: 'CONNECTION_REQUEST',
+          messageKey: 'notifications.connectionRequest',
+          createdAt: '2026-02-01T00:00:00.000Z',
+          readAt: null,
+        },
+      ],
+      isLoading: false,
+    });
+
+    render(<NotificationsPage />);
+
+    expect(markAllReadMutate).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not auto-mark when all items are already read', () => {
+    useQueryMock.mockReturnValue({
+      data: [
+        {
+          id: 'n1',
+          type: 'CONNECTION_REQUEST',
+          messageKey: 'notifications.connectionRequest',
+          createdAt: '2026-02-01T00:00:00.000Z',
+          readAt: '2026-02-02T00:00:00.000Z',
+        },
+      ],
+      isLoading: false,
+    });
+
+    render(<NotificationsPage />);
+
+    expect(markAllReadMutate).not.toHaveBeenCalled();
   });
 });
