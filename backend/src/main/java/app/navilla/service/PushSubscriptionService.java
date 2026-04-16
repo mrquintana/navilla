@@ -70,7 +70,7 @@ public class PushSubscriptionService {
         .build();
 
     PushSubscription saved = pushSubscriptionRepository.save(subscription);
-    log.info("Push subscription registered for user hash: {}", userHash);
+    log.debug("Push subscription registered for user hash: {}", userHash);
 
     return new PushSubscriptionResponse(saved.getId(), saved.getCreatedAt());
   }
@@ -91,7 +91,7 @@ public class PushSubscriptionService {
         .orElseThrow(() -> new ResourceNotFoundException("push.error.subscriptionNotFound"));
 
     pushSubscriptionRepository.delete(subscription);
-    log.info("Push subscription {} removed for user hash: {}", id, userHash);
+    log.debug("Push subscription {} removed for user hash: {}", id, userHash);
   }
 
   /**

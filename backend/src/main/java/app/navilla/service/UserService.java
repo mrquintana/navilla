@@ -273,7 +273,7 @@ public class UserService {
     }
 
     User savedUser = userRepository.save(user);
-    log.info("Updated profile for supabase_id: {}", supabaseId);
+    log.debug("Updated profile for supabase_id: {}", supabaseId);
 
     return toUserResponse(savedUser);
   }
@@ -291,7 +291,7 @@ public class UserService {
         .orElseThrow(() -> new ResourceNotFoundException("user.error.notFound"));
 
     userRepository.delete(user);
-    log.info("Deleted user with supabase_id: {}", supabaseId);
+    log.debug("Deleted user with supabase_id: {}", supabaseId);
   }
 
   /**
@@ -326,7 +326,8 @@ public class UserService {
     applyUserMetadata(user, userMetadata);
 
     User savedUser = userRepository.save(user);
-    log.info("Created new user via lazy sync. supabase_id: {}, email_hash: {}...",
+    log.info("Created new user via lazy sync");
+    log.debug("Lazy-sync user details: supabase_id: {}, email_hash: {}...",
         supabaseId, emailHash.substring(0, 8));
 
     return savedUser;

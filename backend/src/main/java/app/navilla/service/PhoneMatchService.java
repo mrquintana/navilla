@@ -111,7 +111,7 @@ public class PhoneMatchService {
         .journalEntryId(journalEntryId)
         .build();
     phoneEntryRepository.save(entry);
-    log.info("Registered phone entry for user {} on {}", userHash, encounterDate);
+    log.debug("Registered phone entry for user {} on {}", userHash, encounterDate);
 
     // 4. Check for immediate mutual match
     checkAndCreateMutualMatch(userHash, phoneHash, encounterDate);
@@ -185,7 +185,8 @@ public class PhoneMatchService {
         phoneEntryRepository.save(myEntry);
       }
 
-      log.info("Mutual phone match created between {} and {}", userHash, otherUserHash);
+      log.debug("Mutual phone match created between {} and {}", userHash, otherUserHash);
+      log.info("Mutual phone match created");
       break; // Only create one connection per phone hash match
     }
   }

@@ -124,7 +124,8 @@ public class PhoneNotificationMatchService {
     entry.setMatched(true);
     phoneEntryRepository.save(entry);
 
-    log.info("Phone match confirmed between {} and {}", userHash, otherUserHash);
+    log.debug("Phone match confirmed between {} and {}", userHash, otherUserHash);
+    log.info("Phone match confirmed");
     return connection;
   }
 
@@ -146,7 +147,7 @@ public class PhoneNotificationMatchService {
     entry.setMatched(true);
     phoneEntryRepository.save(entry);
 
-    log.info("Phone match denied by {} for entry {}", userHash, phoneEntryId);
+    log.debug("Phone match denied by {} for entry {}", userHash, phoneEntryId);
   }
 
   /**
@@ -170,7 +171,7 @@ public class PhoneNotificationMatchService {
         .build();
     phoneBlockRepository.save(block);
 
-    log.info("User {} blocked phone hash {}", userHash, phoneHash);
+    log.debug("User {} blocked phone hash {}", userHash, phoneHash);
   }
 
   /**
@@ -201,6 +202,7 @@ public class PhoneNotificationMatchService {
       phoneBlockRepository.save(block);
     }
 
-    log.info("User {} reported phone hash {} for: {}", userHash, phoneHash, reason);
+    log.info("Phone hash reported for: {}", reason);
+    log.debug("User {} reported phone hash {}", userHash, phoneHash);
   }
 }

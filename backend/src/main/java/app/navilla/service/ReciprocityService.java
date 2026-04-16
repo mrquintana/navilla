@@ -92,7 +92,7 @@ public class ReciprocityService {
     user.setExposureOptedInAt(OffsetDateTime.now());
     userRepository.save(user);
 
-    log.info("User opted into exposure network: {}", user.getEmailHash());
+    log.info("User opted into exposure network");
     return buildResponse(user);
   }
 
@@ -116,7 +116,7 @@ public class ReciprocityService {
     user.setExposureOptedOutAt(OffsetDateTime.now());
     userRepository.save(user);
 
-    log.info("User opted out of exposure network: {}", user.getEmailHash());
+    log.info("User opted out of exposure network");
     return buildResponse(user);
   }
 

@@ -190,6 +190,7 @@
     "identifierPlaceholder": "Correo o usuario",
     "sendRequest": "Enviar solicitud",
     "requestAlreadyExists": "Ya existe una solicitud de conexión para ese usuario o correo. Si está pendiente, puedes aceptarla ahora.",
+    "requestQueued": "Si el usuario tiene cuenta, será notificado.",
     "pendingIncoming": "Solicitudes recibidas",
     "pendingSent": "Solicitudes enviadas",
     "confirmed": "Conexiones confirmadas",
