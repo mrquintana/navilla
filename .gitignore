@@ -63,6 +63,8 @@ coverage/
 
 # Test results
 test-results/
+playwright-report/
+frontend/e2e/screenshots/
 
 # Temporary files
 tmp/
