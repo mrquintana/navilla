@@ -86,6 +86,26 @@ export function Header() {
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
     },
   });
+  const readAllMutation = useMutation({
+    mutationFn: () => api.notifications.markAllRead(token),
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: ['notifications'] });
+      const previous = queryClient.getQueryData<NotificationItem[]>(['notifications']);
+      const now = new Date().toISOString();
+      queryClient.setQueryData<NotificationItem[]>(['notifications'], (old) =>
+        old?.map((item) => item.readAt ? item : { ...item, readAt: now }),
+      );
+      return { previous };
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(['notifications'], context.previous);
+      }
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+    },
+  });
   const avatarThumb = profile?.avatarThumbUrl || profile?.avatarUrl;
   const initials = getInitials(profile?.firstName ? `${profile.firstName} ${profile.lastName ?? ''}`.trim() : (profile?.username || profile?.email || ''));
   const avatarBg = getAvatarColor(profile?.username || profile?.email || '');
@@ -100,6 +120,13 @@ export function Header() {
   const notificationsRef = useRef<HTMLDivElement | null>(null);
   const mobileMenuRef = useRef<HTMLDivElement | null>(null);
   const moreRef = useRef<HTMLDivElement | null>(null);
+
+  const { mutate: markAllRead } = readAllMutation;
+  useEffect(() => {
+    if (notificationsOpen && unreadCount > 0) {
+      markAllRead();
+    }
+  }, [notificationsOpen, unreadCount, markAllRead]);
 
   useEffect(() => {
     const handleClick = (event: MouseEvent) => {

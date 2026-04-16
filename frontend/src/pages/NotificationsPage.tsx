@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { api, type NotificationItem } from '../lib/api';
@@ -108,6 +108,19 @@ export function NotificationsPage() {
   const unreadItems = allItems.filter((item) => !item.readAt);
   const unreadCount = unreadItems.length;
   const listInitialLoading = listQuery.isLoading && !listQuery.data;
+
+  const { mutate: markAllRead } = readAllMutation;
+  const autoMarkedRef = useRef(false);
+  useEffect(() => {
+    if (
+      !autoMarkedRef.current
+      && listQuery.data
+      && listQuery.data.some((item) => !item.readAt)
+    ) {
+      autoMarkedRef.current = true;
+      markAllRead();
+    }
+  }, [listQuery.data, markAllRead]);
 
   if (listInitialLoading) {
     return (

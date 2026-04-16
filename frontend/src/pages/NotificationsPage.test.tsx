@@ -36,6 +36,7 @@ describe('NotificationsPage loading behavior', () => {
     });
 
     useMutationMock.mockReturnValue({
+      mutate: vi.fn(),
       mutateAsync: vi.fn(),
       isPending: false,
     });
