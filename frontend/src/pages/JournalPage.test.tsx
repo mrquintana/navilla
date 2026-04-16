@@ -3,6 +3,8 @@ import { JournalPage } from './JournalPage';
 
 // ---- Mock fns (hoisted before vi.mock) ----
 const useJournalEntriesMock = vi.fn();
+const useJournalEntriesPaginatedMock = vi.fn();
+const useJournalMonthsMock = vi.fn();
 const useJournalSummaryMock = vi.fn();
 const useDeleteJournalEntryMock = vi.fn();
 
@@ -14,6 +16,8 @@ const defaultMutation = {
 
 vi.mock('../hooks/useJournal', () => ({
   useJournalEntries: () => useJournalEntriesMock(),
+  useJournalEntriesPaginated: () => useJournalEntriesPaginatedMock(),
+  useJournalMonths: () => useJournalMonthsMock(),
   useJournalSummary: () => useJournalSummaryMock(),
   useDeleteJournalEntry: () => useDeleteJournalEntryMock(),
   usePromoteAlias: () => defaultMutation,
@@ -62,19 +66,30 @@ describe('JournalPage', () => {
 
   beforeEach(() => {
     useJournalEntriesMock.mockReset();
+    useJournalEntriesPaginatedMock.mockReset();
+    useJournalMonthsMock.mockReset();
     useJournalSummaryMock.mockReset();
     useDeleteJournalEntryMock.mockReset();
 
     useDeleteJournalEntryMock.mockReturnValue(defaultDeleteMutation);
+    useJournalEntriesMock.mockReturnValue({ data: [], isLoading: false });
+    useJournalMonthsMock.mockReturnValue({ data: [] });
   });
 
   function renderLoaded(
     entries: unknown[] = [],
     summary: { year: number; monthlyCounts: Record<string, number>; yearTotal: number } | undefined = undefined
   ) {
-    useJournalEntriesMock.mockReturnValue({
-      data: entries,
+    useJournalEntriesPaginatedMock.mockReturnValue({
+      data: {
+        content: entries,
+        number: 0,
+        size: 20,
+        totalElements: entries.length,
+        totalPages: entries.length > 0 ? 1 : 0,
+      },
       isLoading: false,
+      isFetching: false,
     });
     useJournalSummaryMock.mockReturnValue({
       data: summary ?? { year: 2026, monthlyCounts: {}, yearTotal: 0 },
@@ -83,9 +98,10 @@ describe('JournalPage', () => {
   }
 
   it('shows loading skeleton during initial load', () => {
-    useJournalEntriesMock.mockReturnValue({
+    useJournalEntriesPaginatedMock.mockReturnValue({
       data: undefined,
       isLoading: true,
+      isFetching: true,
     });
     useJournalSummaryMock.mockReturnValue({ data: undefined });
 

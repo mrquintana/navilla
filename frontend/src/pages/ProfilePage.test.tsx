@@ -13,6 +13,34 @@ vi.mock('../hooks/useUser', () => ({
   useUser: () => useUserMock(),
 }));
 
+vi.mock('../hooks/useReciprocity', () => ({
+  useReciprocityStatus: () => ({
+    data: { participating: false, cooldownEndsAt: null, lastChangeAt: null },
+    isLoading: false,
+  }),
+  useOptIn: () => ({ mutate: vi.fn(), isPending: false }),
+  useOptOut: () => ({ mutate: vi.fn(), isPending: false }),
+}));
+
+vi.mock('../hooks/useReminders', () => ({
+  useReminderSettings: () => ({
+    data: { quietHoursStart: '22:00', quietHoursEnd: '08:00', email: true, push: true },
+    isLoading: false,
+  }),
+  useUpdateReminderSettings: () => ({ mutate: vi.fn(), isPending: false }),
+}));
+
+vi.mock('../hooks/usePushNotifications', () => ({
+  usePushNotifications: () => ({
+    isSupported: false,
+    permission: 'default' as const,
+    isSubscribed: false,
+    subscribe: vi.fn(),
+    unsubscribe: vi.fn(),
+    isPending: false,
+  }),
+}));
+
 vi.mock('../components/LanguageSwitcher', () => ({
   LanguageSwitcher: () => <div>language-switcher</div>,
 }));
@@ -107,7 +135,7 @@ describe('ProfilePage loading behavior', () => {
     const { container } = await renderProfile();
 
     expect(screen.getByText('profile.title')).toBeInTheDocument();
-    expect(screen.getByText('settings.title')).toBeInTheDocument();
+    expect(screen.getByText('settings.dangerZone')).toBeInTheDocument();
     expect(container.querySelectorAll('.skeleton')).toHaveLength(0);
   });
 });

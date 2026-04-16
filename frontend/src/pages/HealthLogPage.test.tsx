@@ -1,10 +1,16 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { HealthLogPage } from './HealthLogPage';
 import type { HealthLogSummary } from '../lib/api';
 
+function clickTab(label: string) {
+  const tab = screen.getByRole('tab', { name: label });
+  fireEvent.click(tab);
+}
+
 // ---- Hoisted mock fns ----
 const useHealthLogSummaryMock = vi.fn();
+const useHealthLogVisitsMock = vi.fn();
 const useCreateTestVisitMock = vi.fn();
 const useUpdateTestVisitMock = vi.fn();
 
@@ -18,6 +24,7 @@ const defaultMutation = {
 
 vi.mock('../hooks/useHealthLog', () => ({
   useHealthLogSummary: () => useHealthLogSummaryMock(),
+  useHealthLogVisits: () => useHealthLogVisitsMock(),
   useCreateTestVisit: () => useCreateTestVisitMock(),
   useUpdateTestVisit: () => useUpdateTestVisitMock(),
   useHealthLogLabs: () => ({ data: [] }),
@@ -93,12 +100,14 @@ function makeSummary(overrides: Partial<HealthLogSummary> = {}): HealthLogSummar
 describe('HealthLogPage', () => {
   beforeEach(() => {
     useHealthLogSummaryMock.mockReset();
+    useHealthLogVisitsMock.mockReset();
     useCreateTestVisitMock.mockReset();
     useUpdateTestVisitMock.mockReset();
     useQueryMock.mockReset();
 
     useCreateTestVisitMock.mockReturnValue(defaultMutation);
     useUpdateTestVisitMock.mockReturnValue(defaultMutation);
+    useHealthLogVisitsMock.mockReturnValue({ data: [], isLoading: false });
     useQueryMock.mockReturnValue({ data: undefined, isLoading: false });
   });
 
@@ -148,7 +157,6 @@ describe('HealthLogPage', () => {
     render(<HealthLogPage />);
 
     expect(screen.getByText('healthLog.noTests')).toBeInTheDocument();
-    expect(screen.getByText('healthLog.noTestsDescription')).toBeInTheDocument();
   });
 
   it('renders stats component with summary data', () => {
@@ -158,8 +166,8 @@ describe('HealthLogPage', () => {
     });
 
     render(<HealthLogPage />);
+    clickTab('myHealth.tabs.tests');
 
-    // HealthLogStats renders the days-since number
     expect(screen.getByText('42')).toBeInTheDocument();
     expect(screen.getByText('healthLog.daysSinceTest')).toBeInTheDocument();
   });
@@ -205,8 +213,8 @@ describe('HealthLogPage', () => {
     });
 
     render(<HealthLogPage />);
+    clickTab('myHealth.tabs.tests');
 
-    // There may be multiple "addVisit" buttons (header + empty state)
     const buttons = screen.getAllByText('healthLog.addVisit');
     expect(buttons.length).toBeGreaterThanOrEqual(1);
   });

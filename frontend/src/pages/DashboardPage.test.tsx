@@ -36,6 +36,15 @@ vi.mock('../components/reminders/UpcomingReminders', () => ({
   UpcomingReminders: () => <div data-testid="upcoming-reminders">Reminders</div>,
 }));
 
+vi.mock('../hooks/useReciprocity', () => ({
+  useReciprocityStatus: () => ({
+    data: { participating: true, cooldownEndsAt: null, lastChangeAt: null },
+    isLoading: false,
+  }),
+  useOptIn: () => ({ mutate: vi.fn(), isPending: false }),
+  useOptOut: () => ({ mutate: vi.fn(), isPending: false }),
+}));
+
 function renderDashboard() {
   return render(
     <MemoryRouter>
