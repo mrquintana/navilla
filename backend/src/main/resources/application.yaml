@@ -129,8 +129,10 @@ navilla:
     avatar-bucket: ${AVATAR_BUCKET:avatars}
 
   # Encryption Configuration
+  # ENCRYPTION_PEPPER must be set via environment variable.
+  # Startup validation in EncryptionService rejects blank, placeholder, or short values.
   encryption:
-    pepper: ${ENCRYPTION_PEPPER:change-this-in-production}
+    pepper: ${ENCRYPTION_PEPPER:}
 
   # Privacy Configuration
   privacy:

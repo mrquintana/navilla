@@ -54,6 +54,8 @@ public class EncryptionService {
   private static final String ENCRYPTION_ALGORITHM = "AES/GCM/NoPadding";
   private static final int GCM_IV_LENGTH = 12;
   private static final int GCM_TAG_LENGTH = 128;
+  private static final int MIN_PEPPER_LENGTH = 16;
+  private static final String INSECURE_DEFAULT_PEPPER = "change-this-in-production";
 
   @Value("${navilla.encryption.pepper}")
   private String pepper;
@@ -64,10 +66,26 @@ public class EncryptionService {
   /**
    * Initializes the encryption key from the pepper.
    *
-   * <p>Derives a 256-bit key from the pepper using SHA-256.
+   * <p>Validates the pepper for length and rejects insecure placeholders, then
+   * derives a 256-bit key from the pepper using SHA-256.
    */
   @PostConstruct
   public void init() {
+    if (pepper == null || pepper.isBlank()) {
+      throw new IllegalStateException(
+          "ENCRYPTION_PEPPER environment variable must be set. "
+              + "Generate a strong random value (e.g. `openssl rand -base64 48`).");
+    }
+    if (pepper.length() < MIN_PEPPER_LENGTH) {
+      throw new IllegalStateException(
+          "ENCRYPTION_PEPPER must be at least " + MIN_PEPPER_LENGTH + " characters; "
+              + "shorter values weaken hashing.");
+    }
+    if (INSECURE_DEFAULT_PEPPER.equals(pepper)) {
+      throw new IllegalStateException(
+          "ENCRYPTION_PEPPER is using the insecure default placeholder. "
+              + "Set a strong random value via environment variable.");
+    }
     try {
       MessageDigest digest = MessageDigest.getInstance(HASH_ALGORITHM);
       byte[] keyBytes = digest.digest(pepper.getBytes(StandardCharsets.UTF_8));

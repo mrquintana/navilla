@@ -7,8 +7,8 @@ spring:
   datasource:
     url: ${DATABASE_URL}
     hikari:
-      maximum-pool-size: 20
-      minimum-idle: 5
+      maximum-pool-size: ${HIKARI_MAX_POOL:5}
+      minimum-idle: ${HIKARI_MIN_IDLE:1}
       connection-timeout: 30000
       idle-timeout: 600000
       max-lifetime: 1800000

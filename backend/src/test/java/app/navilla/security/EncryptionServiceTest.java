@@ -73,6 +73,67 @@ class EncryptionServiceTest {
   }
 
   /**
+   * Tests for {@link EncryptionService#init()} pepper validation.
+   */
+  @Nested
+  @DisplayName("init pepper validation")
+  class InitValidationTests {
+
+    @Test
+    @DisplayName("should throw when pepper is null")
+    void shouldThrowWhenPepperIsNull() throws Exception {
+      EncryptionService service = new EncryptionService();
+      setPepper(service, null);
+
+      assertThatThrownBy(service::init)
+          .isInstanceOf(IllegalStateException.class)
+          .hasMessageContaining("ENCRYPTION_PEPPER");
+    }
+
+    @Test
+    @DisplayName("should throw when pepper is blank")
+    void shouldThrowWhenPepperIsBlank() throws Exception {
+      EncryptionService service = new EncryptionService();
+      setPepper(service, "   ");
+
+      assertThatThrownBy(service::init)
+          .isInstanceOf(IllegalStateException.class)
+          .hasMessageContaining("ENCRYPTION_PEPPER");
+    }
+
+    @Test
+    @DisplayName("should throw when pepper is too short")
+    void shouldThrowWhenPepperIsTooShort() throws Exception {
+      EncryptionService service = new EncryptionService();
+      setPepper(service, "short");
+
+      assertThatThrownBy(service::init)
+          .isInstanceOf(IllegalStateException.class)
+          .hasMessageContaining("at least 16 characters");
+    }
+
+    @Test
+    @DisplayName("should throw when pepper matches insecure default")
+    void shouldThrowWhenPepperIsInsecureDefault() throws Exception {
+      EncryptionService service = new EncryptionService();
+      setPepper(service, "change-this-in-production");
+
+      assertThatThrownBy(service::init)
+          .isInstanceOf(IllegalStateException.class)
+          .hasMessageContaining("insecure default");
+    }
+
+    @Test
+    @DisplayName("should accept a sufficiently long random pepper")
+    void shouldAcceptStrongPepper() throws Exception {
+      EncryptionService service = new EncryptionService();
+      setPepper(service, "this-is-a-long-enough-random-pepper-value");
+
+      service.init();
+    }
+  }
+
+  /**
    * Tests for {@link EncryptionService#hashEmail(String)}.
    */
   @Nested
