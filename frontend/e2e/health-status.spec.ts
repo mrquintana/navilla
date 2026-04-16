@@ -38,6 +38,9 @@ test.describe('Health Status', () => {
       .getByRole('button', { name: /log test visit|registrar visita/i })
       .first()
       .click();
+    await page
+      .getByRole('button', { name: /enter manually|ingresar manualmente/i })
+      .click();
     await expect(page.locator('input[type="date"], #visit-date').first()).toBeVisible({ timeout: 5000 });
   });
 });

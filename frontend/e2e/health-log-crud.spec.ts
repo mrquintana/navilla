@@ -36,7 +36,10 @@ test.describe('Health Log', () => {
       .getByRole('button', { name: /log test visit|registrar visita/i })
       .first()
       .click();
-    // Modal should show date picker and result fields
+    // Modal opens on a path chooser; pick manual entry to reveal the form
+    await page
+      .getByRole('button', { name: /enter manually|ingresar manualmente/i })
+      .click();
     await expect(
       page.locator('input[type="date"], #visit-date').first()
     ).toBeVisible({ timeout: 5000 });
