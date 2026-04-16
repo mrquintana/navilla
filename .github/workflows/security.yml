@@ -12,6 +12,10 @@ on:
     # Run weekly on Monday at 9 AM UTC
     - cron: '0 9 * * 1'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
   security-events: write
@@ -92,8 +96,8 @@ jobs:
         run: npm audit --audit-level=high || true
 
       - name: Run Snyk vulnerability scan
-        uses: snyk/actions/node@master
-        continue-on-error: true
+        uses: snyk/actions/node@v1.0.0
+        continue-on-error: true  # advisory; SNYK_TOKEN may be unset for solo dev
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
@@ -141,11 +145,12 @@ jobs:
         with:
           category: "/language:${{ matrix.language }}"
 
-  # Trivy Container Scanning (runs on main only)
+  # Trivy Container Scanning. Runs on push to develop/main where Railway
+  # auto-deploys; skipped on PRs to keep PR feedback fast.
   container-scan:
     name: Container Scan
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
 
     steps:
       - name: Checkout code
@@ -169,7 +174,7 @@ jobs:
           docker build -t navilla-backend:scan .
 
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@0.35.0
         with:
           image-ref: 'navilla-backend:scan'
           format: 'sarif'
