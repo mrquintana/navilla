@@ -41,15 +41,57 @@ Setup:
 2. Set **Root Directory** to `backend`.
 3. Leave Build/Start commands empty — Railway detects `backend/start.sh` automatically.
 
-Required environment variables:
-- `SPRING_PROFILES_ACTIVE=prod`
+### Required env vars (production)
+
+Profile + JVM:
+- `SPRING_PROFILES_ACTIVE=production`
+- `JAVA_VERSION=25`
+- `NAVILLA_DEV_MODE=false` — must be false in production; gates dev endpoints
+
+Database (Supabase Postgres via PgBouncer transaction mode):
 - `DATABASE_URL=jdbc:postgresql://<supabase-host>:5432/postgres`
 - `DATABASE_USERNAME=<supabase-username>`
 - `DATABASE_PASSWORD=<supabase-password>`
-- `NAVILLA_ENCRYPTION_PEPPER=<secret>`
-- `NAVILLA_SUPABASE_URL=https://<project>.supabase.co`
-- `NAVILLA_SUPABASE_JWT=https://<project>.supabase.co/auth/v1/.well-known/jwks.json`
-- `JAVA_VERSION=25`
+
+Auth (Supabase):
+- `SUPABASE_URL=https://<project>.supabase.co`
+- `SUPABASE_ANON_KEY=<anon-key>`
+- `SUPABASE_SERVICE_KEY=<service-role-key>`
+
+Crypto (REQUIRED — backend will refuse to start without it):
+- `ENCRYPTION_PEPPER=<≥16 random chars, e.g. openssl rand -base64 48>`
+
+Email (SendGrid HTTP API):
+- `EMAIL_ENABLED=true`
+- `SENDGRID_API_KEY=<sendgrid-key>`
+- `EMAIL_FROM=no-reply@navilla.app`
+- `EMAIL_FROM_NAME=Navilla`
+- `EMAIL_REPLY_TO=contact@navilla.app`
+
+Push (VAPID / RFC 8292):
+- `VAPID_PUBLIC_KEY=<base64url public>`
+- `VAPID_PRIVATE_KEY=<base64url private>`
+- `VAPID_SUBJECT=mailto:contact@navilla.app`
+
+Observability (Grafana Cloud Loki + OTLP):
+- `LOKI_URL=<loki-push-url>`
+- `LOKI_USERNAME=<loki-tenant-id>`
+- `LOKI_PASSWORD=<loki-api-token>`
+- `OTLP_METRICS_ENABLED=true`
+- `OTLP_METRICS_URL=<otlp-endpoint>`
+- `OTLP_METRICS_AUTH=<base64-basic-auth>`
+
+Storage:
+- `AVATAR_BUCKET=avatars`
+
+Optional tuning (only set if needed):
+- `HIKARI_MAX_POOL=5` — connection pool size; default 5 for soft launch
+- `HIKARI_MIN_IDLE=1` — idle connections; default 1
+- `LOG_LEVEL_APP=INFO` — app log verbosity
+- `LOG_LEVEL_HIBERNATE=WARN`
+
+> ⚠ Anything labeled REQUIRED must be set or the service will not start.
+> Use Railway env-var groups to keep `production` and `staging` separate.
 
 ## Database (Supabase)
 

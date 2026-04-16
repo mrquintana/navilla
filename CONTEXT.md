@@ -161,9 +161,52 @@
 
 ---
 
+## Session Notes (2026-04-16 — Pre-launch hardening)
+
+### What was done
+Comprehensive pre-launch audit across frontend, backend, DB, tests,
+deployment. 5 CRITICAL items fixed, plus 4 HIGH items. Test count went
+488→493 backend, 286→304 frontend (15 broken page tests fixed).
+
+- **Security**: Removed `DevTestController` (allowed any logged-in user
+  to abuse SendGrid). `EncryptionService` now fails-fast at startup if
+  `ENCRYPTION_PEPPER` is missing, too short, or the placeholder default.
+- **Resilience**: Added top-level `ErrorBoundary` so the app no longer
+  white-screens on unhandled render errors.
+- **CI**: Dropped `continue-on-error: true` from frontend lint /
+  type-check / tests. CI is now actually a gate.
+- **Tests**: Fixed 15 broken page tests (missing hook mocks from
+  refactors — `useJournalEntriesPaginated`, `useReminderSettings`,
+  `useReciprocity`, etc.). Suite is now fully green again.
+- **Privacy logging**: Dropped per-user identifiers from INFO logs in
+  `UserService`, `ReciprocityService`, `PhoneMatchService`,
+  `PhoneNotificationMatchService`, `PushSubscriptionService`.
+- **Auth**: Supabase `createClient` now sets `persistSession`,
+  `autoRefreshToken`, `detectSessionInUrl` explicitly.
+- **Locales**: Added missing `connections.requestQueued` Spanish key.
+- **Docs**: New `docs/operations/disaster-recovery.md` runbook;
+  rewrote env-vars section of `docs/development/deployment.md` to
+  match what the backend actually reads.
+- **CHANGELOG.md**: Created with `[Unreleased]` section for this work.
+
+### Key decisions
+- Hikari pool stays at 5/1 in production for soft launch. Raise after
+  observing real traffic.
+- `DevController` (the other dev endpoint, gated by `NAVILLA_DEV_MODE`)
+  stays — used for ops troubleshooting; protected by env flag + auth.
+- ErrorBoundary fallback uses hardcoded English because i18next may
+  not be initialized when the boundary catches.
+
+### Next session
+- User does sanity check, then we tag + create GitHub release.
+
+---
+
 ## Next Steps
 
 | Priority | Item | Notes |
 |----------|------|-------|
-| **Next** | Week 17 | Soft launch — LGBTQ+ CDMX |
+| **Next** | User sanity check | Verify the pre-launch hardening locally |
+| **Then** | GitHub release | Tag v0.1.0 and publish release notes from CHANGELOG |
+| **Then** | Week 17 | Soft launch — LGBTQ+ CDMX |
 | **Then** | Weeks 18-20 | Iterate, content marketing, growth assessment |
