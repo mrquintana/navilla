@@ -7,6 +7,7 @@ import { queryClient } from './queryClient';
 import { router } from './router';
 import { FullPageLoader } from './components/ui/LoadingShell';
 import { ToastContainer } from './components/ui/Toast';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 function LoadingFallback() {
   return <FullPageLoader />;
@@ -14,16 +15,18 @@ function LoadingFallback() {
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <ToastProvider>
-          <Suspense fallback={<LoadingFallback />}>
-            <RouterProvider router={router} />
-          </Suspense>
-          <ToastContainer />
-        </ToastProvider>
-      </AuthProvider>
-    </QueryClientProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <ToastProvider>
+            <Suspense fallback={<LoadingFallback />}>
+              <RouterProvider router={router} />
+            </Suspense>
+            <ToastContainer />
+          </ToastProvider>
+        </AuthProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
 
