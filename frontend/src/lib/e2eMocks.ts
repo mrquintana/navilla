@@ -8,6 +8,7 @@ export interface E2eUser {
   lastName: string;
   username: string;
   confirmedCount: number;
+  reciprocityOptedIn: boolean;
 }
 
 const E2E_PASSWORD = 'TestPassword123!';
@@ -19,6 +20,7 @@ const E2E_USERS: E2eUser[] = [
     lastName: 'User 1',
     username: 'testuser1',
     confirmedCount: 1,
+    reciprocityOptedIn: false,
   },
   {
     id: 'e2e-user-2',
@@ -27,6 +29,7 @@ const E2E_USERS: E2eUser[] = [
     lastName: 'User 2',
     username: 'testuser2',
     confirmedCount: 3,
+    reciprocityOptedIn: true,
   },
   {
     id: 'e2e-user-7',
@@ -35,6 +38,7 @@ const E2E_USERS: E2eUser[] = [
     lastName: 'User 7',
     username: 'testuser7',
     confirmedCount: 0,
+    reciprocityOptedIn: false,
   },
 ];
 

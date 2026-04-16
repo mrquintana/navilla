@@ -125,11 +125,58 @@ function mockApiRequest<T>(
   }
 
   if (endpoint === '/api/reciprocity/status') {
-    return Promise.resolve({ optedIn: false, optedInAt: null, optedOutAt: null, cooldownDaysRemaining: null } as T);
+    return Promise.resolve({
+      optedIn: user.reciprocityOptedIn,
+      optedInAt: user.reciprocityOptedIn ? '2026-01-01T00:00:00Z' : null,
+      optedOutAt: null,
+      cooldownDaysRemaining: null,
+    } as T);
   }
 
   if (endpoint === '/api/reciprocity/opt-in' || endpoint === '/api/reciprocity/opt-out') {
-    return Promise.resolve({ optedIn: false, optedInAt: null, optedOutAt: null, cooldownDaysRemaining: null } as T);
+    return Promise.resolve({
+      optedIn: endpoint.endsWith('opt-in'),
+      optedInAt: endpoint.endsWith('opt-in') ? '2026-01-01T00:00:00Z' : null,
+      optedOutAt: null,
+      cooldownDaysRemaining: null,
+    } as T);
+  }
+
+  if (endpoint === '/api/health-log/summary') {
+    return Promise.resolve({
+      daysSinceLastTest: 14,
+      testsThisYear: 3,
+      conditionsCovered: 0,
+      totalStandardConditions: 10,
+      conditions: [],
+    } as T);
+  }
+  if (endpoint === '/api/health-log/visits') {
+    if (user.confirmedCount > 0) {
+      return Promise.resolve([
+        {
+          id: 'e2e-visit-1',
+          visitDate: '2026-03-15',
+          labName: 'Mock Lab',
+          locationCity: null,
+          notes: null,
+          results: [],
+          createdAt: '2026-03-15T10:00:00Z',
+          updatedAt: '2026-03-15T10:00:00Z',
+        },
+      ] as T);
+    }
+    return Promise.resolve([] as T);
+  }
+  if (endpoint === '/api/health-log/labs') {
+    return Promise.resolve([] as T);
+  }
+  if (endpoint.startsWith('/api/health-log/condition/')) {
+    return Promise.resolve({ conditionType: 'HIV', visits: [], labs: [] } as T);
+  }
+
+  if (endpoint === '/api/labs/providers') {
+    return Promise.resolve([] as T);
   }
 
   if (endpoint === '/api/phone-match/pending') {
