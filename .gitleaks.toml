@@ -17,6 +17,10 @@ paths = [
     '''.*\.example''',
     '''.*\.sample''',
     '''docs/.*''',
+    # Terraform provider hashes are SHA-256 fingerprints of the
+    # downloaded artifact, not secrets. The terraform/ tree is also no
+    # longer used (we deploy to Railway), but git history still scans.
+    '''terraform/.*''',
 ]
 
 # Allow specific known safe strings
@@ -41,6 +45,15 @@ id = "database-password"
 description = "Database Password"
 regex = '''DATABASE_PASSWORD\s*=\s*[^\s]+'''
 tags = ["password", "database"]
+# Allowlist scoped to this rule — gitleaks RE2 has no lookahead, so we
+# can't write a negative-pattern regex to skip placeholders. Instead,
+# whitelist anything where the value is a shell or template variable
+# substitution (${VAR}, $${VAR}, $VAR, ${VAR:-default}, %ENV%).
+[rules.allowlist]
+regexes = [
+    '''DATABASE_PASSWORD\s*=\s*\$''',
+    '''DATABASE_PASSWORD\s*=\s*%''',
+]
 
 # Entropy-based detection for high-entropy strings
 [[rules]]
