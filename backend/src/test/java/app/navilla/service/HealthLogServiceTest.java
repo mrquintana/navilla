@@ -212,6 +212,7 @@ class HealthLogServiceTest {
           .nameEncrypted(ENCRYPTED_LAB_NAME)
           .build();
       when(labRepository.findById(LAB_ID)).thenReturn(Optional.of(lab));
+      when(labRepository.findByIdAndUserHash(LAB_ID, USER_HASH)).thenReturn(Optional.of(lab));
       when(encryptionService.decryptFromBytes(ENCRYPTED_LAB_NAME)).thenReturn("Mi Chopo");
 
       TestVisitResponse response = healthLogService.createVisit(jwt, request);
@@ -247,6 +248,26 @@ class HealthLogServiceTest {
       assertThat(response.results().getFirst().conditionType()).isEqualTo("HIV");
       assertThat(response.results().getFirst().status()).isEqualTo("NEGATIVE");
       assertThat(response.results().getFirst().resultValue()).isEqualTo("non-reactive");
+    }
+
+    @Test
+    @DisplayName("should reject create when labId belongs to another user")
+    void createVisit_shouldRejectForeignLab() {
+      Jwt jwt = mockJwt();
+      when(labRepository.findByIdAndUserHash(LAB_ID, USER_HASH)).thenReturn(Optional.empty());
+
+      List<TestResultInput> results = List.of(
+          new TestResultInput("HIV", null, "NEGATIVE", null, null));
+      CreateTestVisitRequest request = new CreateTestVisitRequest(
+          "2026-02-15", LAB_ID, null, results, null);
+
+      // A labId the user does not own must read as "not found" — storing it
+      // would decrypt another user's lab name in every visit response.
+      assertThatThrownBy(() -> healthLogService.createVisit(jwt, request))
+          .isInstanceOf(ResourceNotFoundException.class)
+          .hasMessage("healthLog.error.notFound");
+
+      verify(testVisitRepository, never()).save(any());
     }
 
     @Test
@@ -548,6 +569,24 @@ class HealthLogServiceTest {
       assertThatThrownBy(() -> healthLogService.updateVisit(jwt, VISIT_ID, request))
           .isInstanceOf(IllegalStateException.class)
           .hasMessage("healthLog.error.notOwner");
+    }
+
+    @Test
+    @DisplayName("should reject update when labId belongs to another user")
+    void updateVisit_shouldRejectForeignLab() {
+      Jwt jwt = mockJwt();
+      TestVisit visit = buildVisit(VISIT_ID, USER_HASH);
+      when(testVisitRepository.findById(VISIT_ID)).thenReturn(Optional.of(visit));
+      when(labRepository.findByIdAndUserHash(LAB_ID, USER_HASH)).thenReturn(Optional.empty());
+
+      UpdateTestVisitRequest request = new UpdateTestVisitRequest(
+          null, LAB_ID, null, null, null);
+
+      assertThatThrownBy(() -> healthLogService.updateVisit(jwt, VISIT_ID, request))
+          .isInstanceOf(ResourceNotFoundException.class)
+          .hasMessage("healthLog.error.notFound");
+
+      verify(testVisitRepository, never()).save(any());
     }
   }
 

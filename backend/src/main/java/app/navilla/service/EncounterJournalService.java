@@ -127,11 +127,14 @@ public class EncounterJournalService {
     String userHash = hashEmail(jwt);
     resourceCapService.checkCap("journalEntries", journalRepository.countByUserHash(userHash));
 
-    // When linked to a partner, use the partner's current alias
+    // When linked to a partner, use the partner's current alias. The lookup is
+    // scoped to the caller so a forged partnerId can never pull (and decrypt)
+    // another user's partner record.
     byte[] aliasEncrypted = request.partnerId() != null
-        ? partnerRepository.findById(request.partnerId())
-            .map(p -> p.getAliasEncrypted())
-            .orElse(encryptOptional(request.partnerAlias()))
+        ? partnerRepository.findByIdAndUserHash(request.partnerId(), userHash)
+            .orElseThrow(() -> new ResourceNotFoundException(
+                "journal.partner.error.notFound"))
+            .getAliasEncrypted()
         : encryptOptional(request.partnerAlias());
 
     EncounterJournal entry = EncounterJournal.builder()
@@ -187,11 +190,14 @@ public class EncounterJournalService {
       throw new IllegalStateException("journal.error.notOwner");
     }
 
-    // When linked to a partner, use the partner's current alias
+    // When linked to a partner, use the partner's current alias. The lookup is
+    // scoped to the caller so a forged partnerId can never pull (and decrypt)
+    // another user's partner record.
     byte[] aliasEncrypted = request.partnerId() != null
-        ? partnerRepository.findById(request.partnerId())
-            .map(p -> p.getAliasEncrypted())
-            .orElse(encryptOptional(request.partnerAlias()))
+        ? partnerRepository.findByIdAndUserHash(request.partnerId(), userHash)
+            .orElseThrow(() -> new ResourceNotFoundException(
+                "journal.partner.error.notFound"))
+            .getAliasEncrypted()
         : encryptOptional(request.partnerAlias());
 
     entry.setEncounterDate(request.encounterDate());

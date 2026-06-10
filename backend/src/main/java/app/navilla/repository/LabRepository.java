@@ -17,6 +17,7 @@
 package app.navilla.repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import app.navilla.entity.Lab;
@@ -29,4 +30,7 @@ public interface LabRepository extends JpaRepository<Lab, UUID> {
   long countByUserHash(String userHash);
 
   List<Lab> findByUserHashOrderByCreatedAtDesc(String userHash);
+
+  /** Ownership-scoped lookup: only returns the lab if it belongs to the user. */
+  Optional<Lab> findByIdAndUserHash(UUID id, String userHash);
 }

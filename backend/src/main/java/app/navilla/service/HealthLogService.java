@@ -101,6 +101,8 @@ public class HealthLogService {
     String userHash = hashEmail(jwt);
     resourceCapService.checkCap("testVisits", testVisitRepository.countByUserHash(userHash));
 
+    requireOwnedLab(request.labId(), userHash);
+
     TestVisit visit = TestVisit.builder()
         .userHash(userHash)
         .testDate(LocalDate.parse(request.testDate()))
@@ -177,6 +179,7 @@ public class HealthLogService {
       visit.setTestDate(LocalDate.parse(request.testDate()));
     }
     if (request.labId() != null) {
+      requireOwnedLab(request.labId(), userHash);
       visit.setLabId(request.labId());
     }
     if (request.labReference() != null) {
@@ -465,6 +468,19 @@ public class HealthLogService {
     if (!visit.getUserHash().equals(userHash)) {
       throw new IllegalStateException("healthLog.error.notOwner");
     }
+  }
+
+  /**
+   * Rejects a labId that does not belong to the caller. Visit responses decrypt
+   * the linked lab's name, so accepting a foreign id would leak another user's
+   * data; foreign ids read as "not found" to avoid confirming they exist.
+   */
+  private void requireOwnedLab(UUID labId, String userHash) {
+    if (labId == null) {
+      return;
+    }
+    labRepository.findByIdAndUserHash(labId, userHash)
+        .orElseThrow(() -> new ResourceNotFoundException("healthLog.error.notFound"));
   }
 
   private TestResult buildTestResult(UUID visitId, CreateTestVisitRequest.TestResultInput input) {

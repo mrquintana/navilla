@@ -41,6 +41,7 @@ import app.navilla.dto.JournalTemplatesRequest;
 import app.navilla.dto.UpdateJournalEntryRequest;
 import app.navilla.entity.EncounterJournal;
 import app.navilla.entity.JournalFieldTemplate;
+import app.navilla.entity.JournalPartner;
 import app.navilla.exception.ResourceNotFoundException;
 import app.navilla.metrics.JournalMetrics;
 import app.navilla.repository.EncounterJournalRepository;
@@ -410,6 +411,59 @@ class EncounterJournalServiceTest {
       verify(phoneMatchService, never()).registerPhoneEntry(any(), any(), any(), any(), any());
       verify(encryptionService, never()).hashPhone(any(), any());
     }
+
+    @Test
+    @DisplayName("should copy alias from owned partner when partnerId provided")
+    void shouldCopyAliasFromOwnedPartner() {
+      stubAuth();
+      UUID partnerId = UUID.randomUUID();
+      JournalPartner partner = JournalPartner.builder()
+          .id(partnerId)
+          .userHash(USER_HASH)
+          .aliasEncrypted(ENCRYPTED_ALIAS)
+          .build();
+      when(partnerRepository.findByIdAndUserHash(partnerId, USER_HASH))
+          .thenReturn(Optional.of(partner));
+      when(journalRepository.save(any(EncounterJournal.class))).thenAnswer(invocation -> {
+        EncounterJournal saved = invocation.getArgument(0);
+        saved.setId(ENTRY_ID);
+        return saved;
+      });
+      when(encryptionService.decryptFromBytes(ENCRYPTED_ALIAS)).thenReturn("Alex");
+
+      CreateJournalEntryRequest request = new CreateJournalEntryRequest(
+          LocalDate.of(2026, 3, 15), null, null, null, null,
+          partnerId, null, null, null, null);
+
+      JournalEntryResponse response = encounterJournalService.createEntry(jwt, request);
+
+      ArgumentCaptor<EncounterJournal> captor = ArgumentCaptor.forClass(EncounterJournal.class);
+      verify(journalRepository).save(captor.capture());
+      assertThat(captor.getValue().getPartnerAliasEncrypted()).isEqualTo(ENCRYPTED_ALIAS);
+      assertThat(captor.getValue().getPartnerId()).isEqualTo(partnerId);
+      assertThat(response.partnerAlias()).isEqualTo("Alex");
+    }
+
+    @Test
+    @DisplayName("should reject create when partnerId belongs to another user")
+    void shouldRejectCreateForForeignPartner() {
+      stubAuth();
+      UUID foreignPartnerId = UUID.randomUUID();
+      when(partnerRepository.findByIdAndUserHash(foreignPartnerId, USER_HASH))
+          .thenReturn(Optional.empty());
+
+      CreateJournalEntryRequest request = new CreateJournalEntryRequest(
+          LocalDate.of(2026, 3, 15), null, null, null, null,
+          foreignPartnerId, null, null, null, null);
+
+      // A partnerId the user does not own must read as "not found" — resolving
+      // it would copy (and later decrypt) another user's partner alias.
+      assertThatThrownBy(() -> encounterJournalService.createEntry(jwt, request))
+          .isInstanceOf(ResourceNotFoundException.class)
+          .hasMessage("journal.partner.error.notFound");
+
+      verify(journalRepository, never()).save(any());
+    }
   }
 
   @Nested
@@ -569,6 +623,27 @@ class EncounterJournalServiceTest {
       // so the edit form cannot re-submit it. A blank phone on update must mean
       // "unchanged" — clearing would destroy the match hash on every edit.
       assertThat(captor.getValue().getPhoneHash()).isEqualTo("existing_hash");
+    }
+
+    @Test
+    @DisplayName("should reject update when partnerId belongs to another user")
+    void shouldRejectUpdateForForeignPartner() {
+      stubAuth();
+      EncounterJournal existing = buildEntry(ENTRY_ID, USER_HASH);
+      when(journalRepository.findById(ENTRY_ID)).thenReturn(Optional.of(existing));
+      UUID foreignPartnerId = UUID.randomUUID();
+      when(partnerRepository.findByIdAndUserHash(foreignPartnerId, USER_HASH))
+          .thenReturn(Optional.empty());
+
+      UpdateJournalEntryRequest request = new UpdateJournalEntryRequest(
+          LocalDate.of(2026, 4, 1), null, null, null, null,
+          foreignPartnerId, null, null, null, null);
+
+      assertThatThrownBy(() -> encounterJournalService.updateEntry(jwt, ENTRY_ID, request))
+          .isInstanceOf(ResourceNotFoundException.class)
+          .hasMessage("journal.partner.error.notFound");
+
+      verify(journalRepository, never()).save(any());
     }
   }
 

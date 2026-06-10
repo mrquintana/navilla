@@ -17,6 +17,7 @@
 package app.navilla.repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import app.navilla.entity.JournalPartner;
@@ -27,6 +28,9 @@ import org.springframework.stereotype.Repository;
 public interface JournalPartnerRepository extends JpaRepository<JournalPartner, UUID> {
 
   List<JournalPartner> findByUserHashOrderByUpdatedAtDesc(String userHash);
+
+  /** Ownership-scoped lookup: only returns the partner if it belongs to the user. */
+  Optional<JournalPartner> findByIdAndUserHash(UUID id, String userHash);
 
   long countByUserHash(String userHash);
 
