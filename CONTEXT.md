@@ -202,11 +202,63 @@ deployment. 5 CRITICAL items fixed, plus 4 HIGH items. Test count went
 
 ---
 
+## Session Notes (2026-06-09 — Pre-MVP review + hardening punch list)
+
+### What was done
+Full codebase review (security, correctness, product scope), then fixed
+everything found, TDD throughout. 7 commits pushed to develop. Test
+count 493→507 backend, 304→314 frontend.
+
+- **Phone-hash bug (the big one)**: `updateEntry` hashed phones without
+  the country code while `createEntry` stripped it — editing an entry
+  silently broke phone auto-matching. Also: any edit wiped the stored
+  phone hash because the form can't re-submit a value the API never
+  returns; blank phone on update now means "unchanged". Removed dead
+  `PhoneMatchService.hashPhone(String)` wrapper.
+- **Ownership scoping**: journal `partnerId` and visit `labId` are now
+  looked up with `findByIdAndUserHash`; foreign UUIDs → 404 (previously
+  copied/decrypted the foreign record's alias / lab name).
+- **Rate limiting**: `/api/users/search` (email lookup → enumeration
+  vector) moved to sensitive tier via new `SENSITIVE_READ_PATHS`.
+- **CORS**: wildcard `*.railway.app` patterns removed from default +
+  production profiles (staging-only now). `CorsConfigurationPolicyTest`
+  parses the yamls and pins the policy.
+- **nginx**: live prod served SPA routes (/dashboard etc.) with ZERO
+  security headers (add_header inheritance gotcha). Shared
+  `nginx-security-headers.conf` snippet now included per-location; CSP
+  tightened to `script-src 'self'`; HSTS added; sw.js no longer cached
+  1 year (regex location ordering bug, verified in local nginx
+  container before push).
+- **Deps**: `npm audit fix` → react-router 7.17.0 etc., 0 advisories.
+- **Observability**: new public `POST /api/public/client-errors` +
+  `lib/errorReporter.ts` (dedupe, 10/session cap, log-forging
+  sanitization). Frontend crashes are now visible in Loki.
+- **Lab verify**: CTA hidden when provider list is empty (production
+  reality at launch); removed HealthLogPage's unreachable modal copy.
+
+### Key decisions
+- Blank phone on journal update = "keep existing hash". Removing a
+  phone from an entry is not supported by the UI (it can't display what
+  is stored); revisit only if users ask.
+- Client error reporting is deliberately not Sentry: no breadcrumbs, no
+  user context — privacy-first. Report = message, stack, URL, UA only.
+- HSTS ships without `preload` — submitting to the preload list is a
+  product-owner decision (hard to reverse).
+- Railway CORS wildcards live in the staging profile only.
+
+### Verify after next deploy
+- `curl -sI https://www.navilla.app/dashboard` → must show CSP + HSTS.
+- `curl -sI https://www.navilla.app/sw.js` → must show no-cache.
+- Click through the app once; CSP violations would appear in console.
+
+---
+
 ## Next Steps
 
 | Priority | Item | Notes |
 |----------|------|-------|
-| **Next** | User sanity check | Verify the pre-launch hardening locally |
-| **Then** | GitHub release | Tag v0.1.0 and publish release notes from CHANGELOG |
+| **Next** | Deploy + verify | Headers on /dashboard + sw.js, app click-through (CSP) |
+| **Then** | User sanity check | Verify the hardening on production |
+| **Then** | GitHub release | Tag v0.1.x and publish release notes from CHANGELOG |
 | **Then** | Week 17 | Soft launch — LGBTQ+ CDMX |
 | **Then** | Weeks 18-20 | Iterate, content marketing, growth assessment |

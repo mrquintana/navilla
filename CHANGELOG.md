@@ -7,6 +7,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Journal `updateEntry` now hashes phones with the country-code-aware
+  overload (matching `createEntry`); editing an entry no longer breaks
+  phone auto-matching. `UpdateJournalEntryRequest` gained `countryCode`.
+- Editing a journal entry no longer silently wipes its stored phone
+  hash: a blank phone on update now means "unchanged" (the raw phone is
+  never returned to clients, so the edit form cannot re-submit it).
+- Service worker (`sw.js`) was cached for 1 year by the generic asset
+  rule; the no-cache location now precedes it.
+- SPA routes (e.g. `/dashboard`) were served without any security
+  headers due to nginx `add_header` inheritance; headers now ship on
+  every response class via a shared snippet.
+
+### Security
+- `partnerId` (journal entries) and `labId` (test visits) lookups are
+  now ownership-scoped; foreign UUIDs read as 404 instead of copying or
+  decrypting another user's partner alias / lab name.
+- `/api/users/search` moved to the sensitive rate-limit tier (10/min)
+  to slow account enumeration; introduced `SENSITIVE_READ_PATHS`.
+- Removed wildcard `*.railway.app` CORS origin patterns from default
+  and production profiles (staging-only now); pinned by
+  `CorsConfigurationPolicyTest`.
+- Frontend CSP tightened: `script-src 'self'` (dropped `unsafe-inline`
+  and `unsafe-eval`), added `object-src 'none'`, `base-uri 'self'`,
+  and HSTS (1 year, includeSubDomains) on the frontend domain.
+- `npm audit fix`: react-router 7.17.0, i18next-http-backend, postcss,
+  ws — clears all production-dependency advisories.
+
+### Added
+- Client error reporting: uncaught frontend errors and unhandled
+  rejections POST to public `POST /api/public/client-errors`, which
+  logs a sanitized WARN line (Loki-visible). Deduped, capped at 10 per
+  session, disabled in dev/E2E.
+- Lab-verify CTA on condition detail pages now hides itself when no
+  lab providers are configured (production has none at launch) instead
+  of opening a dead-end modal.
+
 ## [0.1.0] - 2026-04-16
 
 First tagged pre-launch release. Closes the launch-readiness audit
