@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, BadgeCheck, ShieldCheck } from 'lucide-react';
 import { useConditionHistory } from '../hooks/useHealthLog';
+import { useLabProviders } from '../hooks/useLabProviders';
 import { LabVerificationModal } from '../components/health/LabVerificationModal';
 import { PageSkeleton, SkeletonBlock, SkeletonRows } from '../components/ui/LoadingShell';
 
@@ -29,6 +30,11 @@ export function ConditionDetailPage() {
 
   const historyQuery = useConditionHistory(condition ?? '');
   const history = historyQuery.data;
+
+  // No lab providers are enabled in production yet (mocks are dev-only), so
+  // the verify CTA must disappear rather than open a dead-end modal.
+  const labProvidersQuery = useLabProviders();
+  const canVerify = (labProvidersQuery.data?.length ?? 0) > 0;
 
   if (historyQuery.isLoading && !history) {
     return (
@@ -179,7 +185,7 @@ export function ConditionDetailPage() {
                         <BadgeCheck className="w-3.5 h-3.5" aria-hidden="true" />
                         {t('healthLog.verified')}
                       </span>
-                    ) : (
+                    ) : canVerify ? (
                       <button
                         type="button"
                         className="inline-flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-lg transition-colors hover:bg-[var(--color-secondary)]"
@@ -189,7 +195,7 @@ export function ConditionDetailPage() {
                         <ShieldCheck className="w-3.5 h-3.5" aria-hidden="true" />
                         {t('labVerification.verifyButton')}
                       </button>
-                    )}
+                    ) : null}
                   </div>
                 </div>
               </div>

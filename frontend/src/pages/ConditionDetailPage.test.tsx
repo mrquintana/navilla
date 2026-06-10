@@ -6,9 +6,14 @@ import type { ConditionHistory } from '../lib/api';
 
 // ---- Hoisted mock fns ----
 const useConditionHistoryMock = vi.fn();
+const useLabProvidersMock = vi.fn();
 
 vi.mock('../hooks/useHealthLog', () => ({
   useConditionHistory: (type: string) => useConditionHistoryMock(type),
+}));
+
+vi.mock('../hooks/useLabProviders', () => ({
+  useLabProviders: () => useLabProvidersMock(),
 }));
 
 vi.mock('../hooks/useAuth', () => ({
@@ -83,7 +88,41 @@ function renderPage() {
 describe('ConditionDetailPage', () => {
   beforeEach(() => {
     useConditionHistoryMock.mockReset();
+    // Production reality at launch: no lab providers are configured, so the
+    // default for every test is the empty list.
+    useLabProvidersMock.mockReset();
+    useLabProvidersMock.mockReturnValue({ data: [], isLoading: false });
     mockParams.condition = 'HIV';
+  });
+
+  it('hides the verify button when no lab providers are configured', () => {
+    useConditionHistoryMock.mockReturnValue({
+      data: makeHistory(),
+      isLoading: false,
+      isError: false,
+    });
+
+    renderPage();
+
+    // Entry v1 is unverified, but with zero providers the button would only
+    // lead to a dead-end "no providers" modal — it must not render at all.
+    expect(screen.queryByText('labVerification.verifyButton')).not.toBeInTheDocument();
+  });
+
+  it('shows the verify button when lab providers exist', () => {
+    useLabProvidersMock.mockReturnValue({
+      data: [{ code: 'LAB_X', name: 'Lab X', nameEs: 'Lab X', requiredFields: [] }],
+      isLoading: false,
+    });
+    useConditionHistoryMock.mockReturnValue({
+      data: makeHistory(),
+      isLoading: false,
+      isError: false,
+    });
+
+    renderPage();
+
+    expect(screen.getByText('labVerification.verifyButton')).toBeInTheDocument();
   });
 
   it('renders loading skeleton while data loads', () => {

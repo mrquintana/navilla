@@ -17,7 +17,6 @@ import { MedicationModal } from '../components/reminders/MedicationModal';
 import { VaccinationSeriesCard } from '../components/reminders/VaccinationSeriesCard';
 import { VaccinationModal } from '../components/reminders/VaccinationModal';
 import { SkeletonBlock } from '../components/ui/LoadingShell';
-import { LabVerificationModal } from '../components/health/LabVerificationModal';
 import type { VaccineSeries } from '../lib/api';
 
 type HealthTab = 'overview' | 'tests' | 'medications' | 'vaccines';
@@ -267,7 +266,6 @@ function TestsTabContent() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingVisit, setEditingVisit] = useState<import('../lib/api').TestVisit | null>(null);
   const [showAllVisits, setShowAllVisits] = useState(false);
-  const [verifyVisitId, setVerifyVisitId] = useState<string | null>(null);
 
   const summaryQuery = useHealthLogSummary();
   const visitsQuery = useHealthLogVisits();
@@ -391,18 +389,6 @@ function TestsTabContent() {
             </span>
           </button>
         </div>
-      )}
-
-      {/* Lab Verification Modal */}
-      {verifyVisitId && (
-        <LabVerificationModal
-          visitId={verifyVisitId}
-          onClose={() => setVerifyVisitId(null)}
-          onVerified={() => {
-            summaryQuery.refetch();
-            setVerifyVisitId(null);
-          }}
-        />
       )}
 
       {/* Test Visit Modal */}
