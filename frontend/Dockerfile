@@ -47,8 +47,9 @@ LABEL org.opencontainers.image.created="${BUILD_DATE}" \
       org.opencontainers.image.title="Navilla Frontend" \
       org.opencontainers.image.description="Privacy-preserving sexual health platform frontend"
 
-# Copy nginx configuration
+# Copy nginx configuration + shared security headers snippet
 COPY nginx.conf /etc/nginx/nginx.conf
+COPY nginx-security-headers.conf /etc/nginx/security-headers.conf
 
 # Copy built assets from builder stage
 COPY --from=builder /app/dist /usr/share/nginx/html
