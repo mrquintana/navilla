@@ -92,22 +92,6 @@ class PhoneMatchServiceTest {
   }
 
   @Nested
-  @DisplayName("hashPhone")
-  class HashPhone {
-
-    @Test
-    @DisplayName("normalizes and hashes phone correctly")
-    void hashPhoneNormalizesAndHashes() {
-      when(encryptionService.hashPhone(RAW_PHONE)).thenReturn(PHONE_HASH);
-
-      String result = phoneMatchService.hashPhone(RAW_PHONE);
-
-      assertThat(result).isEqualTo(PHONE_HASH);
-      verify(encryptionService).hashPhone(RAW_PHONE);
-    }
-  }
-
-  @Nested
   @DisplayName("registerPhoneEntry")
   class RegisterPhoneEntry {
 

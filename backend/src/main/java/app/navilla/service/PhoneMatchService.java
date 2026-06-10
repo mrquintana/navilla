@@ -61,16 +61,6 @@ public class PhoneMatchService {
   private final EncryptionService encryptionService;
 
   /**
-   * Hashes a phone number using the same pepper-based approach as email hashing.
-   *
-   * @param rawPhone the raw phone number (may contain dashes, spaces, etc.)
-   * @return the hex-encoded hash (64 characters)
-   */
-  public String hashPhone(String rawPhone) {
-    return encryptionService.hashPhone(rawPhone);
-  }
-
-  /**
    * Registers a phone entry from a journal encounter.
    *
    * <p>This method:

@@ -206,12 +206,15 @@ public class EncounterJournalService {
         encryptStringList(request.protectionMethods()));
     entry.setPartnerId(request.partnerId());
 
-    // Handle phone hash update
+    // Phone hash update. Must use the country-code-aware overload so an edited
+    // entry produces the same hash as createEntry — otherwise editing silently
+    // breaks phone auto-matching for this encounter.
+    // A blank phone means "unchanged", not "remove": the raw phone is never
+    // returned to clients (only its hash is stored), so the edit form cannot
+    // re-submit it and clearing here would wipe the hash on every edit.
     if (request.phone() != null && !request.phone().isBlank()) {
-      String phoneHash = encryptionService.hashPhone(request.phone());
+      String phoneHash = encryptionService.hashPhone(request.phone(), request.countryCode());
       entry.setPhoneHash(phoneHash);
-    } else {
-      entry.setPhoneHash(null);
     }
 
     EncounterJournal saved = journalRepository.save(entry);

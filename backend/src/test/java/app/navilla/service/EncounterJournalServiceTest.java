@@ -433,7 +433,7 @@ class EncounterJournalServiceTest {
       when(encryptionService.decryptFromBytes(newNotes)).thenReturn("Updated notes");
 
       UpdateJournalEntryRequest request = new UpdateJournalEntryRequest(
-          LocalDate.of(2026, 4, 1), "Partner B", null, "Updated notes", null, null, null, null, null);
+          LocalDate.of(2026, 4, 1), "Partner B", null, "Updated notes", null, null, null, null, null, null);
 
       JournalEntryResponse result = encounterJournalService.updateEntry(jwt, ENTRY_ID, request);
 
@@ -478,7 +478,7 @@ class EncounterJournalServiceTest {
           .thenReturn(protectionMethods);
 
       UpdateJournalEntryRequest request = new UpdateJournalEntryRequest(
-          LocalDate.of(2026, 4, 1), "Partner B", null, null, null, null, null,
+          LocalDate.of(2026, 4, 1), "Partner B", null, null, null, null, null, null,
           encounterTypes, protectionMethods);
 
       JournalEntryResponse result = encounterJournalService.updateEntry(jwt, ENTRY_ID, request);
@@ -500,7 +500,7 @@ class EncounterJournalServiceTest {
       when(journalRepository.findById(ENTRY_ID)).thenReturn(Optional.of(existing));
 
       UpdateJournalEntryRequest request = new UpdateJournalEntryRequest(
-          LocalDate.of(2026, 4, 1), "Partner B", null, "Updated notes", null, null, null, null, null);
+          LocalDate.of(2026, 4, 1), "Partner B", null, "Updated notes", null, null, null, null, null, null);
 
       assertThatThrownBy(() -> encounterJournalService.updateEntry(jwt, ENTRY_ID, request))
           .isInstanceOf(IllegalStateException.class)
@@ -516,13 +516,59 @@ class EncounterJournalServiceTest {
       when(journalRepository.findById(ENTRY_ID)).thenReturn(Optional.empty());
 
       UpdateJournalEntryRequest request = new UpdateJournalEntryRequest(
-          LocalDate.of(2026, 4, 1), "Partner B", null, "Updated notes", null, null, null, null, null);
+          LocalDate.of(2026, 4, 1), "Partner B", null, "Updated notes", null, null, null, null, null, null);
 
       assertThatThrownBy(() -> encounterJournalService.updateEntry(jwt, ENTRY_ID, request))
           .isInstanceOf(ResourceNotFoundException.class)
           .hasMessage("journal.error.notFound");
 
       verify(journalRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("should hash phone with country code, consistent with createEntry")
+    void shouldHashPhoneWithCountryCodeOnUpdate() {
+      stubAuth();
+      EncounterJournal existing = buildEntry(ENTRY_ID, USER_HASH);
+      when(journalRepository.findById(ENTRY_ID)).thenReturn(Optional.of(existing));
+      when(journalRepository.save(any(EncounterJournal.class))).thenAnswer(i -> i.getArgument(0));
+      // A phone logged at create time as "+52 55..." must produce the same hash
+      // when the entry is edited, or phone auto-matching silently breaks.
+      when(encryptionService.hashPhone("5512345678", "52")).thenReturn("cc_aware_hash");
+
+      UpdateJournalEntryRequest request = new UpdateJournalEntryRequest(
+          LocalDate.of(2026, 4, 1), null, null, null, null, null,
+          "5512345678", "52", null, null);
+
+      encounterJournalService.updateEntry(jwt, ENTRY_ID, request);
+
+      ArgumentCaptor<EncounterJournal> captor = ArgumentCaptor.forClass(EncounterJournal.class);
+      verify(journalRepository).save(captor.capture());
+      assertThat(captor.getValue().getPhoneHash()).isEqualTo("cc_aware_hash");
+      // The country-code-blind overload must never be used for journal phones.
+      verify(encryptionService, never()).hashPhone(any());
+    }
+
+    @Test
+    @DisplayName("should preserve existing phone hash when update omits phone")
+    void shouldPreservePhoneHashWhenUpdateOmitsPhone() {
+      stubAuth();
+      EncounterJournal existing = buildEntry(ENTRY_ID, USER_HASH);
+      existing.setPhoneHash("existing_hash");
+      when(journalRepository.findById(ENTRY_ID)).thenReturn(Optional.of(existing));
+      when(journalRepository.save(any(EncounterJournal.class))).thenAnswer(i -> i.getArgument(0));
+
+      UpdateJournalEntryRequest request = new UpdateJournalEntryRequest(
+          LocalDate.of(2026, 4, 1), null, null, null, null, null, null, null, null, null);
+
+      encounterJournalService.updateEntry(jwt, ENTRY_ID, request);
+
+      ArgumentCaptor<EncounterJournal> captor = ArgumentCaptor.forClass(EncounterJournal.class);
+      verify(journalRepository).save(captor.capture());
+      // The raw phone is never returned to clients (only its hash is stored),
+      // so the edit form cannot re-submit it. A blank phone on update must mean
+      // "unchanged" — clearing would destroy the match hash on every edit.
+      assertThat(captor.getValue().getPhoneHash()).isEqualTo("existing_hash");
     }
   }
 

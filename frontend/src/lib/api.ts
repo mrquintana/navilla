@@ -276,6 +276,7 @@ export interface UpdateJournalEntryRequest {
   connectionId?: string;
   partnerId?: string;
   phone?: string;
+  countryCode?: string;
   notes?: string;
   customFields?: CustomField[];
   encounterTypes?: string[];
