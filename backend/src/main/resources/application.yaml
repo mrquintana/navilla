@@ -250,6 +250,9 @@ navilla:
     reply-to: ${EMAIL_REPLY_TO:contact@navilla.app}
     sendgrid-api-key: ${SENDGRID_API_KEY:}
 
+  # No allowed-origin-patterns here: anyone can deploy to *.up.railway.app, so
+  # wildcard Railway origins are only acceptable in the staging profile (see
+  # application-staging.yaml). CorsConfigurationPolicyTest enforces this.
   cors:
     allowed-origins:
       - http://localhost:5173
@@ -257,6 +260,3 @@ navilla:
       - https://navilla.app
       - https://www.navilla.app
       - https://navilla-production.up.railway.app
-    allowed-origin-patterns:
-      - https://*.up.railway.app
-      - https://*.railway.app

@@ -77,11 +77,11 @@ navilla:
     batch-day: SUNDAY
     batch-hour: 18
     random-delay-hours: 6
+  # Explicit origins only — wildcard Railway patterns would let any app
+  # deployed on *.up.railway.app make credentialed requests to this API.
+  # CorsConfigurationPolicyTest enforces this stays pattern-free.
   cors:
     allowed-origins:
       - https://navilla.app
       - https://www.navilla.app
       - https://navilla-production.up.railway.app
-    allowed-origin-patterns:
-      - https://*.up.railway.app
-      - https://*.railway.app

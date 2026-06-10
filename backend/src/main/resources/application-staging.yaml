@@ -42,3 +42,11 @@ navilla:
     batch-day: SUNDAY
     batch-hour: 18
     random-delay-hours: 6
+
+  # Staging frontends live on ephemeral Railway preview domains, so wildcard
+  # patterns are tolerated HERE ONLY — never in the default or production
+  # profiles (enforced by CorsConfigurationPolicyTest).
+  cors:
+    allowed-origin-patterns:
+      - https://*.up.railway.app
+      - https://*.railway.app
