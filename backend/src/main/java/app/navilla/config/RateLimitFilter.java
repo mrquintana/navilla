@@ -42,6 +42,14 @@ public class RateLimitFilter extends OncePerRequestFilter {
       "/api/push/subscribe"
   );
 
+  // Read endpoints whose abuse vector is probing/enumeration via GET (e.g.
+  // looking up accounts by email). These hit the sensitive bucket for ALL
+  // methods, unlike SENSITIVE_PATHS which only throttles writes so that
+  // ordinary list/detail reads of those resources stay on the read tier.
+  private static final Set<String> SENSITIVE_READ_PATHS = Set.of(
+      "/api/users/search"
+  );
+
   private static final Set<String> WRITE_METHODS = Set.of(
       "POST", "PUT", "PATCH", "DELETE"
   );
@@ -87,7 +95,7 @@ public class RateLimitFilter extends OncePerRequestFilter {
 
     // Determine which bucket to check
     Bucket bucket;
-    if (authenticated && isSensitivePath(path) && WRITE_METHODS.contains(method)) {
+    if (authenticated && isSensitive(path, method)) {
       bucket = sensitiveBuckets.get(
           userKey + ":sensitive", k -> createBucket(properties.sensitivePerMinute()));
     } else if (authenticated && WRITE_METHODS.contains(method)) {
@@ -138,9 +146,16 @@ public class RateLimitFilter extends OncePerRequestFilter {
     return request.getRemoteAddr();
   }
 
-  private boolean isSensitivePath(String path) {
-    for (String sensitive : SENSITIVE_PATHS) {
-      if (path.equals(sensitive) || path.startsWith(sensitive + "/")) {
+  private boolean isSensitive(String path, String method) {
+    if (WRITE_METHODS.contains(method) && matchesAnyPath(path, SENSITIVE_PATHS)) {
+      return true;
+    }
+    return matchesAnyPath(path, SENSITIVE_READ_PATHS);
+  }
+
+  private boolean matchesAnyPath(String path, Set<String> prefixes) {
+    for (String prefix : prefixes) {
+      if (path.equals(prefix) || path.startsWith(prefix + "/")) {
         return true;
       }
     }

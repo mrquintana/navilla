@@ -113,6 +113,30 @@ class RateLimitFilterTest {
   }
 
   @Test
+  @DisplayName("applies sensitive tier to user search reads")
+  void appliesSensitiveTierToUserSearch() throws Exception {
+    setAuthenticatedUser("user-5");
+    RateLimitProperties strictProps = new RateLimitProperties(true, 30, 120, 2, 300);
+    RateLimitFilter strictFilter = new RateLimitFilter(strictProps);
+
+    // /api/users/search is an email/username lookup — the abuse vector is
+    // account enumeration via GET, so it must hit the sensitive bucket even
+    // though it is a read endpoint.
+    for (int i = 0; i < 2; i++) {
+      MockHttpServletResponse resp = new MockHttpServletResponse();
+      strictFilter.doFilterInternal(
+          getRequest("/api/users/search"), resp, new MockFilterChain());
+      assertThat(resp.getStatus()).isEqualTo(200);
+    }
+
+    MockHttpServletResponse blocked = new MockHttpServletResponse();
+    strictFilter.doFilterInternal(
+        getRequest("/api/users/search"), blocked, new MockFilterChain());
+
+    assertThat(blocked.getStatus()).isEqualTo(429);
+  }
+
+  @Test
   @DisplayName("allows read requests within read rate limit")
   void allowsReadRequestsWithinLimit() throws Exception {
     setAuthenticatedUser("user-4");
