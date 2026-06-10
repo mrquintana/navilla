@@ -138,8 +138,13 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/health",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "health"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "health"
+              ]
             },
             "description": "Public health check endpoint - no authentication required. Returns API status."
           }
@@ -177,11 +182,59 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/auth/health",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "auth", "health"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "health"
+              ]
             },
             "description": "Authenticated health check - requires valid JWT token. Verifies authentication is working."
           }
+        },
+        {
+          "name": "Report Client Error",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 204', function() {",
+                  "    pm.response.to.have.status(204);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"TypeError: x is undefined\",\n  \"stack\": \"TypeError: x is undefined\\n  at App.tsx:10\",\n  \"url\": \"https://www.navilla.app/dashboard\",\n  \"userAgent\": \"Mozilla/5.0\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/public/client-errors",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "public",
+                "client-errors"
+              ]
+            },
+            "description": "Public, unauthenticated. Logs a browser-side error as a WARN line (no persistence). Caps: message 500, stack 5000, url 500, userAgent 300."
+          },
+          "response": []
         }
       ]
     },
@@ -226,8 +279,14 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/users/me",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "users", "me"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "me"
+              ]
             },
             "description": "Get the current authenticated user's profile. Creates the user if they don't exist (lazy sync from Supabase Auth)."
           }
@@ -267,8 +326,14 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/users/me",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "users", "me"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "me"
+              ]
             },
             "description": "Update the current user's profile. Only displayName can be updated."
           }
@@ -293,8 +358,14 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/users/me",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "users", "me"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "me"
+              ]
             },
             "description": "Delete the current user's account. WARNING: This is irreversible."
           }
@@ -339,8 +410,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/connections",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "connections"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "connections"
+              ]
             },
             "description": "Create a new connection request to another user by their email or username."
           }
@@ -379,8 +455,13 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/connections",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "connections"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "connections"
+              ]
             },
             "description": "Get all connections for the current user (all statuses: PENDING, CONFIRMED, DENIED, EXPIRED)"
           }
@@ -417,8 +498,14 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/connections/confirmed",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "connections", "confirmed"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "connections",
+                "confirmed"
+              ]
             },
             "description": "Get only confirmed connections for the current user"
           }
@@ -455,8 +542,15 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/connections/pending/incoming",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "connections", "pending", "incoming"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "connections",
+                "pending",
+                "incoming"
+              ]
             },
             "description": "Get pending connection requests received by the current user (requests they can accept or deny)"
           }
@@ -493,8 +587,15 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/connections/pending/sent",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "connections", "pending", "sent"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "connections",
+                "pending",
+                "sent"
+              ]
             },
             "description": "Get pending connection requests sent by the current user (requests they can cancel)"
           }
@@ -533,8 +634,14 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/connections/stats",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "connections", "stats"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "connections",
+                "stats"
+              ]
             },
             "description": "Get connection statistics including confirmed count, pending incoming, and pending sent counts"
           }
@@ -564,8 +671,15 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/connections/{{connectionId}}/accept",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "connections", "{{connectionId}}", "accept"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "connections",
+                "{{connectionId}}",
+                "accept"
+              ]
             },
             "description": "Accept a pending connection request. Only the recipient can accept. Changes status to CONFIRMED."
           }
@@ -595,8 +709,15 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/connections/{{connectionId}}/deny",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "connections", "{{connectionId}}", "deny"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "connections",
+                "{{connectionId}}",
+                "deny"
+              ]
             },
             "description": "Deny a pending connection request. Only the recipient can deny. Changes status to DENIED."
           }
@@ -621,8 +742,14 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/connections/{{connectionId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "connections", "{{connectionId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "connections",
+                "{{connectionId}}"
+              ]
             },
             "description": "Cancel a pending connection request. Only the requester can cancel. Removes the connection."
           }
@@ -640,8 +767,13 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/health-status",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "health-status"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "health-status"
+              ]
             },
             "description": "Get all health status records for the authenticated user"
           }
@@ -662,8 +794,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/health-status",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "health-status"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "health-status"
+              ]
             },
             "description": "Report or update a health status"
           }
@@ -684,8 +821,15 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/health-status/{{healthStatusId}}/clear",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "health-status", "{{healthStatusId}}", "clear"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "health-status",
+                "{{healthStatusId}}",
+                "clear"
+              ]
             },
             "description": "Mark a health status as cleared (e.g., condition treated and resolved). Optionally provide a cleared date."
           }
@@ -697,8 +841,15 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/health-status/{{healthStatusId}}/activate",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "health-status", "{{healthStatusId}}", "activate"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "health-status",
+                "{{healthStatusId}}",
+                "activate"
+              ]
             },
             "description": "Reactivate a previously cleared health status record."
           }
@@ -710,8 +861,14 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/health-status/{{healthStatusId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "health-status", "{{healthStatusId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "health-status",
+                "{{healthStatusId}}"
+              ]
             },
             "description": "Permanently delete a health status record."
           }
@@ -729,8 +886,13 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/exposures",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "exposures"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "exposures"
+              ]
             },
             "description": "Get exposure snapshot for the authenticated user"
           }
@@ -748,8 +910,13 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/notifications",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "notifications"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "notifications"
+              ]
             },
             "description": "Get all notifications for the authenticated user"
           }
@@ -761,8 +928,15 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/notifications/{{notificationId}}/read",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "notifications", "{{notificationId}}", "read"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "notifications",
+                "{{notificationId}}",
+                "read"
+              ]
             },
             "description": "Mark a single notification as read by its ID. Returns 204 No Content."
           }
@@ -774,8 +948,14 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/notifications/read-all",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "notifications", "read-all"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "notifications",
+                "read-all"
+              ]
             },
             "description": "Mark all notifications as read for the authenticated user. Returns 204 No Content."
           }
@@ -820,8 +1000,13 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/journal",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "journal"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "journal"
+              ]
             },
             "description": "Get all journal entries for the authenticated user. Returns entries sorted by encounter date descending."
           }
@@ -858,8 +1043,13 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/journal?month=2026-03",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "journal"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "journal"
+              ],
               "query": [
                 {
                   "key": "month",
@@ -920,8 +1110,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/journal",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "journal"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "journal"
+              ]
             },
             "description": "Create a new journal entry. All sensitive fields (partnerAlias, notes, customFields) are encrypted server-side with AES-256-GCM. Maximum 3 custom fields per entry."
           }
@@ -962,8 +1157,14 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/journal/{{journalEntryId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "journal", "{{journalEntryId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "journal",
+                "{{journalEntryId}}"
+              ]
             },
             "description": "Update an existing journal entry. Only the entry owner can update. All sensitive fields re-encrypted on save."
           }
@@ -988,8 +1189,14 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/journal/{{journalEntryId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "journal", "{{journalEntryId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "journal",
+                "{{journalEntryId}}"
+              ]
             },
             "description": "Delete a journal entry. Only the entry owner can delete. This is a hard delete."
           }
@@ -1020,8 +1227,14 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/journal/templates",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "journal", "templates"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "journal",
+                "templates"
+              ]
             },
             "description": "Get the user's saved custom field label templates."
           }
@@ -1061,8 +1274,14 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/journal/templates",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "journal", "templates"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "journal",
+                "templates"
+              ]
             },
             "description": "Save or update the user's custom field label templates. Maximum 3 labels, each max 100 chars."
           }
@@ -1094,8 +1313,14 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/journal/summary?year=2026",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "journal", "summary"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "journal",
+                "summary"
+              ],
               "query": [
                 {
                   "key": "year",
@@ -1132,8 +1357,14 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/journal/recent-aliases",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "journal", "recent-aliases"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "journal",
+                "recent-aliases"
+              ]
             },
             "description": "Get up to 8 recent distinct aliases from entries not linked to a partner. Used for autocomplete."
           }
@@ -1167,8 +1398,14 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/api/journal/partners",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["api", "journal", "partners"]
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "journal",
+                    "partners"
+                  ]
                 },
                 "description": "List all saved partners for the authenticated user with encounter statistics."
               }
@@ -1213,8 +1450,14 @@
                 },
                 "url": {
                   "raw": "{{baseUrl}}/api/journal/partners",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["api", "journal", "partners"]
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "journal",
+                    "partners"
+                  ]
                 },
                 "description": "Create a new saved partner. Alias max 200 chars, notes max 5000 chars."
               }
@@ -1254,8 +1497,15 @@
                 },
                 "url": {
                   "raw": "{{baseUrl}}/api/journal/partners/promote",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["api", "journal", "partners", "promote"]
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "journal",
+                    "partners",
+                    "promote"
+                  ]
                 },
                 "description": "Promote a freeform alias into a partner record, backfilling all matching journal entries."
               }
@@ -1287,8 +1537,15 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/api/journal/partners/{{partnerId}}",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["api", "journal", "partners", "{{partnerId}}"]
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "journal",
+                    "partners",
+                    "{{partnerId}}"
+                  ]
                 },
                 "description": "Get detailed information about a specific partner, including notes and encounter stats."
               }
@@ -1328,8 +1585,15 @@
                 },
                 "url": {
                   "raw": "{{baseUrl}}/api/journal/partners/{{partnerId}}",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["api", "journal", "partners", "{{partnerId}}"]
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "journal",
+                    "partners",
+                    "{{partnerId}}"
+                  ]
                 },
                 "description": "Update a saved partner's alias, notes, or connection link."
               }
@@ -1341,8 +1605,15 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/api/journal/partners/{{partnerId}}",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["api", "journal", "partners", "{{partnerId}}"]
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "journal",
+                    "partners",
+                    "{{partnerId}}"
+                  ]
                 },
                 "description": "Delete a partner. Linked journal entries are preserved with partnerId set to null."
               }
@@ -1354,8 +1625,15 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/api/journal/partners/{{partnerId}}?deleteEntries=true",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["api", "journal", "partners", "{{partnerId}}"],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "journal",
+                    "partners",
+                    "{{partnerId}}"
+                  ],
                   "query": [
                     {
                       "key": "deleteEntries",
@@ -1392,8 +1670,16 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/api/journal/partners/{{partnerId}}/entries",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["api", "journal", "partners", "{{partnerId}}", "entries"]
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "journal",
+                    "partners",
+                    "{{partnerId}}",
+                    "entries"
+                  ]
                 },
                 "description": "Get all journal entries linked to a specific partner."
               }
@@ -1417,8 +1703,14 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/api/health-log/visits",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["api", "health-log", "visits"]
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "health-log",
+                    "visits"
+                  ]
                 },
                 "description": "List all test visits for the authenticated user, newest first. Each visit includes its test results."
               }
@@ -1439,8 +1731,14 @@
                 },
                 "url": {
                   "raw": "{{baseUrl}}/api/health-log/visits",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["api", "health-log", "visits"]
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "health-log",
+                    "visits"
+                  ]
                 },
                 "description": "Create a new test visit with one or more results. Results are encrypted at rest."
               }
@@ -1452,8 +1750,15 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/api/health-log/visits/{{visitId}}",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["api", "health-log", "visits", "{{visitId}}"]
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "health-log",
+                    "visits",
+                    "{{visitId}}"
+                  ]
                 },
                 "description": "Get a specific test visit with all its results."
               }
@@ -1474,8 +1779,15 @@
                 },
                 "url": {
                   "raw": "{{baseUrl}}/api/health-log/visits/{{visitId}}",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["api", "health-log", "visits", "{{visitId}}"]
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "health-log",
+                    "visits",
+                    "{{visitId}}"
+                  ]
                 },
                 "description": "Update an existing test visit and its results."
               }
@@ -1487,8 +1799,15 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/api/health-log/visits/{{visitId}}",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["api", "health-log", "visits", "{{visitId}}"]
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "health-log",
+                    "visits",
+                    "{{visitId}}"
+                  ]
                 },
                 "description": "Delete a test visit and all its results."
               }
@@ -1506,8 +1825,14 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/api/health-log/summary",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["api", "health-log", "summary"]
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "health-log",
+                    "summary"
+                  ]
                 },
                 "description": "Get health log dashboard stats: days since last test, tests this year, coverage count, latest status per condition."
               }
@@ -1519,8 +1844,15 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/api/health-log/condition/hiv",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["api", "health-log", "condition", "hiv"]
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "health-log",
+                    "condition",
+                    "hiv"
+                  ]
                 },
                 "description": "Get full testing history for a specific condition type. Replace 'hiv' with any condition type (chlamydia, gonorrhea, syphilis, etc.)."
               }
@@ -1538,8 +1870,14 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/api/health-log/labs",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["api", "health-log", "labs"]
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "health-log",
+                    "labs"
+                  ]
                 },
                 "description": "List saved lab connections with their credentials for the authenticated user."
               }
@@ -1560,8 +1898,14 @@
                 },
                 "url": {
                   "raw": "{{baseUrl}}/api/health-log/labs",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["api", "health-log", "labs"]
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "health-log",
+                    "labs"
+                  ]
                 },
                 "description": "Create a new lab connection with optional encrypted credentials."
               }
@@ -1582,8 +1926,15 @@
                 },
                 "url": {
                   "raw": "{{baseUrl}}/api/health-log/labs/{{labId}}",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["api", "health-log", "labs", "{{labId}}"]
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "health-log",
+                    "labs",
+                    "{{labId}}"
+                  ]
                 },
                 "description": "Update an existing lab connection's name and credentials."
               }
@@ -1595,8 +1946,15 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/api/health-log/labs/{{labId}}",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["api", "health-log", "labs", "{{labId}}"]
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "health-log",
+                    "labs",
+                    "{{labId}}"
+                  ]
                 },
                 "description": "Delete a lab connection and all its credentials."
               }
@@ -1634,8 +1992,13 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/medications",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "medications"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "medications"
+              ]
             },
             "description": "List all medications for the authenticated user, both active and inactive."
           }
@@ -1681,8 +2044,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/medications",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "medications"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "medications"
+              ]
             },
             "description": "Create a new medication. Name and dosage are encrypted at rest. Medication types come from the catalog."
           }
@@ -1694,8 +2062,14 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/medications/{{medicationId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "medications", "{{medicationId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "medications",
+                "{{medicationId}}"
+              ]
             },
             "description": "Get a single medication by ID with all fields."
           }
@@ -1716,8 +2090,14 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/medications/{{medicationId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "medications", "{{medicationId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "medications",
+                "{{medicationId}}"
+              ]
             },
             "description": "Update an existing medication. All fields are optional (partial update)."
           }
@@ -1729,8 +2109,14 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/medications/{{medicationId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "medications", "{{medicationId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "medications",
+                "{{medicationId}}"
+              ]
             },
             "description": "Deactivate a medication (soft delete). The medication and its dose logs are preserved but marked inactive."
           }
@@ -1771,8 +2157,15 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/medications/{{medicationId}}/log",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "medications", "{{medicationId}}", "log"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "medications",
+                "{{medicationId}}",
+                "log"
+              ]
             },
             "description": "Log a dose for a medication. scheduledFor is the date the dose was scheduled, taken indicates whether it was actually taken."
           }
@@ -1807,8 +2200,15 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/medications/{{medicationId}}/adherence?month=2026-03",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "medications", "{{medicationId}}", "adherence"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "medications",
+                "{{medicationId}}",
+                "adherence"
+              ],
               "query": [
                 {
                   "key": "month",
@@ -1847,8 +2247,14 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/medications/prep-streak",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "medications", "prep-streak"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "medications",
+                "prep-streak"
+              ]
             },
             "description": "Get PrEP adherence streak data with current streak, longest streak, and milestone achievements."
           }
@@ -1895,8 +2301,13 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/vaccinations",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "vaccinations"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "vaccinations"
+              ]
             },
             "description": "List all vaccination series for the authenticated user, grouped by vaccine type with completion status and doses."
           }
@@ -1942,8 +2353,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/vaccinations",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "vaccinations"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "vaccinations"
+              ]
             },
             "description": "Record a new vaccination dose. Vaccine types: HPV, MPOX, HEP_A, HEP_B. Location and notes are encrypted."
           }
@@ -1964,8 +2380,14 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/vaccinations/{{vaccinationId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "vaccinations", "{{vaccinationId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "vaccinations",
+                "{{vaccinationId}}"
+              ]
             },
             "description": "Update an existing vaccination dose record. All fields are optional (partial update)."
           }
@@ -1977,8 +2399,14 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/vaccinations/{{vaccinationId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "vaccinations", "{{vaccinationId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "vaccinations",
+                "{{vaccinationId}}"
+              ]
             },
             "description": "Delete a vaccination dose record."
           }
@@ -2025,8 +2453,13 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/reminders",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "reminders"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reminders"
+              ]
             },
             "description": "List all active, incomplete reminders for the authenticated user. Types: TESTING, MEDICATION, VACCINATION."
           }
@@ -2056,8 +2489,14 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/reminders/upcoming?days=7",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "reminders", "upcoming"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reminders",
+                "upcoming"
+              ],
               "query": [
                 {
                   "key": "days",
@@ -2104,8 +2543,15 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/reminders/{{reminderId}}/snooze",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "reminders", "{{reminderId}}", "snooze"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reminders",
+                "{{reminderId}}",
+                "snooze"
+              ]
             },
             "description": "Snooze a reminder until a specified ISO-8601 datetime."
           }
@@ -2136,8 +2582,15 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/reminders/{{reminderId}}/complete",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "reminders", "{{reminderId}}", "complete"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reminders",
+                "{{reminderId}}",
+                "complete"
+              ]
             },
             "description": "Mark a reminder as completed. Sets completedAt to the current timestamp."
           }
@@ -2167,8 +2620,15 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/reminders/{{reminderId}}/toggle",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "reminders", "{{reminderId}}", "toggle"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reminders",
+                "{{reminderId}}",
+                "toggle"
+              ]
             },
             "description": "Toggle the active/inactive state of a reminder."
           }
@@ -2180,8 +2640,14 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/reminders/{{reminderId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "reminders", "{{reminderId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reminders",
+                "{{reminderId}}"
+              ]
             },
             "description": "Permanently delete a reminder."
           }
@@ -2216,8 +2682,14 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/reminders/settings",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "reminders", "settings"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reminders",
+                "settings"
+              ]
             },
             "description": "Get the reminder settings for the authenticated user: quiet hours, email digest, and per-type toggles."
           }
@@ -2256,8 +2728,14 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/reminders/settings",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "reminders", "settings"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reminders",
+                "settings"
+              ]
             },
             "description": "Update reminder settings. All fields are optional (partial update)."
           }
@@ -2313,8 +2791,13 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/insights",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "insights"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "insights"
+              ]
             },
             "description": "Get aggregated personal insights across activity (encounters), testing (health log), and prevention (medications, vaccinations, reminders). Cached for 5 minutes per user."
           }
@@ -2357,8 +2840,13 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/catalog",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "catalog"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "catalog"
+              ]
             },
             "description": "Get the full health catalog: medication types, dosing frequencies, vaccine series, encounter types, and protection methods. Public endpoint, cached for 1 hour."
           }
@@ -2399,8 +2887,14 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/catalog/conditions",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "catalog", "conditions"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "catalog",
+                "conditions"
+              ]
             },
             "description": "List all active conditions from the condition catalog. Includes English and Spanish display names, descriptions, icons, and display order."
           }
@@ -2443,8 +2937,14 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/catalog/stages",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "catalog", "stages"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "catalog",
+                "stages"
+              ]
             },
             "description": "List all network constellation stages with English and Spanish names, node thresholds, and descriptions."
           }
@@ -2475,8 +2975,14 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/reciprocity/status",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "reciprocity", "status"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reciprocity",
+                "status"
+              ]
             },
             "description": "Get the current reciprocity status for the authenticated user. Returns opted-in state, cooldown info, and timestamps."
           }
@@ -2501,8 +3007,14 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/reciprocity/opt-in",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "reciprocity", "opt-in"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reciprocity",
+                "opt-in"
+              ]
             },
             "description": "Opt into the exposure network. Contribute test data to see exposure data. Subject to 15-day cooldown after opt-out."
           }
@@ -2527,8 +3039,14 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/reciprocity/opt-out",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "reciprocity", "opt-out"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reciprocity",
+                "opt-out"
+              ]
             },
             "description": "Opt out of the exposure network. You lose access to exposure data. 15-day cooldown before you can re-opt-in."
           }
@@ -2567,8 +3085,14 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/labs/providers",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "labs", "providers"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "labs",
+                "providers"
+              ]
             },
             "description": "List all enabled lab providers with their required credential fields. Public endpoint (no auth required)."
           }
@@ -2607,8 +3131,14 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/labs/verify",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "labs", "verify"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "labs",
+                "verify"
+              ]
             },
             "description": "Step 1: Initiate lab verification for a test visit. Calls the lab provider API and caches results for the confirm step. Either visitId or testDate must be provided."
           }
@@ -2647,8 +3177,14 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/labs/confirm",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "labs", "confirm"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "labs",
+                "confirm"
+              ]
             },
             "description": "Step 2: Confirm and save lab verification results. Must be called after a successful verify step. Retrieves cached results and persists them to the visit."
           }
@@ -2669,8 +3205,14 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/push/vapid-public-key",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "push", "vapid-public-key"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "push",
+                "vapid-public-key"
+              ]
             },
             "description": "Get the server's VAPID public key for push subscription. Public endpoint (no auth required)."
           }
@@ -2691,8 +3233,14 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/push/subscribe",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "push", "subscribe"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "push",
+                "subscribe"
+              ]
             },
             "description": "Register a Web Push subscription. The endpoint, p256dh, and auth values come from the browser's PushManager.subscribe() result."
           }
@@ -2704,8 +3252,14 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/push/subscriptions",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "push", "subscriptions"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "push",
+                "subscriptions"
+              ]
             },
             "description": "List all push subscriptions for the authenticated user."
           }
@@ -2717,8 +3271,15 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/push/subscriptions/{{pushSubscriptionId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "push", "subscriptions", "{{pushSubscriptionId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "push",
+                "subscriptions",
+                "{{pushSubscriptionId}}"
+              ]
             },
             "description": "Delete a push subscription by ID."
           }
@@ -2752,8 +3313,14 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/users/me",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "users", "me"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "me"
+              ]
             },
             "description": "Test that protected endpoints return 401 without a token"
           }
@@ -2783,8 +3350,15 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/connections/00000000-0000-0000-0000-000000000000/accept",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "connections", "00000000-0000-0000-0000-000000000000", "accept"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "connections",
+                "00000000-0000-0000-0000-000000000000",
+                "accept"
+              ]
             },
             "description": "Test that invalid connection ID returns 404"
           }
@@ -2818,8 +3392,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/connections",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "connections"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "connections"
+              ]
             },
             "description": "Test that missing identifier returns 400"
           }

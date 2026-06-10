@@ -27,6 +27,10 @@ Every text field in the API has a maximum length enforced on both the backend (`
 | Sex | 20 | Profile |
 | Avatar keys | 500 | Profile |
 | Confirmation text (delete) | 50 | Partner delete, Account delete |
+| Client error message | 500 | Client error reports |
+| Client error stack trace | 5,000 | Client error reports |
+| Client error page URL | 500 | Client error reports |
+| Client error user agent | 300 | Client error reports |
 
 ## Array Limits
 
